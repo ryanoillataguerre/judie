@@ -8,7 +8,7 @@ from alembic import context
 
 # import models to be detected for autogeneration
 
-from app.models import applications, base, offers, users
+from app.models import base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
