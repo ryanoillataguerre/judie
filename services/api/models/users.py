@@ -38,7 +38,7 @@ def create_user(name: str) -> User:
     return user
 
 
-def update_user(user_id: int, name: str) -> User:
+def update_user(user_id: str, name: str) -> User:
     user = get_user(user_id)
     user.name = name
     session.add(user)
