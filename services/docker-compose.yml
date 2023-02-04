@@ -30,8 +30,8 @@ services:
       - dev
     privileged: true
     volumes:
-      - ./api:/app/api
-    working_dir: /app/api
+      - ./api:/app
+    working_dir: /app
     build:
       context: ./api
       dockerfile: Dockerfile
