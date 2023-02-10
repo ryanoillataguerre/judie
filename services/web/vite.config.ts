@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [
     solid({
-      babel: (_, id) => ({
+      babel: (_: any, id: string) => ({
         plugins: [["solid-styled/babel", { source: id }]],
       }),
     }),
