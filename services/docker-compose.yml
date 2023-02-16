@@ -16,7 +16,7 @@ services:
       - judie-postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:latest
-    command: redis-server -- requirepass redis
+    command: redis-server --requirepass redis
     volumes:
       - judie-redis-data:/var/lib/redis
     environment:
@@ -48,6 +48,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: redis
+      SESSION_SECRET: secret
 networks:
   dev:
     driver: bridge

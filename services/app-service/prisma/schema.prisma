@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -23,9 +24,14 @@ enum GradeYear {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  name       String
-  password   String
-  grade_year GradeYear?
+  id                String     @id @default(uuid())
+  email             String     @unique
+  name              String
+  password          String
+  receivePromotions Boolean    @map("receive_promotions")
+  gradeYear         GradeYear? @map("grade_year")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime?  @map("updated_at")
+
+  @@map("users")
 }
