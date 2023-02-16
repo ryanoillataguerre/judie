@@ -45,6 +45,26 @@ services:
       PG_HOST: postgres
       PG_PORT: 5432
       PG_DB_NAME: postgres
+  inference-service:
+    networks:
+      - dev
+    privileged: true
+    volumes:
+      - ./inference-service:/app
+    working_dir: /app
+    build:
+      context: ./inference-service
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      ENV: development
+      SERVER_PORT: 8080
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB_NAME: postgres
 networks:
   dev:
     driver: bridge
