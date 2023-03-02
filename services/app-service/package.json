@@ -48,5 +48,8 @@
     "openai": "^3.2.1",
     "twilio": "^4.8.0",
     "validator": "^13.9.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
