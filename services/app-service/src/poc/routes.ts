@@ -3,6 +3,7 @@ import { body } from "express-validator";
 import { handleValidationErrors } from "../utils/express.js";
 import MessagingResponse from "twilio/lib/twiml/MessagingResponse.js";
 import bodyParser from "body-parser";
+import { createGPTRequestFromPrompt, getChatGPTCompletion } from "./service.js";
 
 const router = Router();
 
@@ -12,23 +13,19 @@ router.post(
   [body("From").exists(), body("Body").isString().exists()],
   handleValidationErrors,
   async (req: Request, res: Response) => {
-    const twiml = new MessagingResponse();
-
-    console.log(req.body);
     const session = req.session;
-    console.log(session);
-    // const { email, password, name, receivePromotions } = req.body;
-    // // Create user
-    // console.log("signing up user");
-    // const userId = await signup({ email, password, name, receivePromotions });
-    // console.log("signed up");
-    // // Create session for user
-    // session.userId = userId;
-    // res.sendStatus(201);
-    // const completion = await getCompletion(req.body.Body);
-    const completion = "Hello back!";
-    twiml.message(completion);
-
+    console.log("sessionId", session.id);
+    console.log("starting", session.chatSessionMessages);
+    // Generate the request to the ChatGPT model
+    const messages = await createGPTRequestFromPrompt(req.body.Body, session);
+    console.log("request generated", session.chatSessionMessages);
+    // Get response from ChatGPT
+    const completion = await getChatGPTCompletion(messages, session);
+    console.log("ending", session.chatSessionMessages);
+    const twiml = new MessagingResponse();
+    if (completion?.content) {
+      twiml.message(completion?.content);
+    }
     res.writeHead(200, { "Content-Type": "text/xml" });
     res.end(twiml.toString());
   }

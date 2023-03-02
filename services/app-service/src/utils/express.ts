@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import session from "express-session";
+import session, { Session, SessionData } from "express-session";
 import connectRedis from "connect-redis";
 import { Result, ValidationError, validationResult } from "express-validator";
 import {
@@ -99,9 +99,12 @@ declare module "express-session" {
   interface SessionData {
     userId?: string;
     chatSessionMessages?: ChatCompletionRequestMessage[];
+    chatSessionCharCount?: number;
   }
 }
 
 // Morgan logger
 export const morganLogger = () =>
   morgan(":method :url :status - :response-time ms");
+
+export type JudieSession = Session & Partial<SessionData>;
