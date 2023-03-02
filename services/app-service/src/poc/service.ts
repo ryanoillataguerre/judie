@@ -50,9 +50,10 @@ export const createGPTRequestFromPrompt = async (
 
     // Get metadata from each matching vector
     const matchMetadatas =
-      matches?.map(
-        (match) => (match.metadata as { [key: string]: string }).text
-      ) || [];
+      matches
+        ?.filter((match) => (match?.score || 0) > 0.8)
+        ?.map((match) => (match.metadata as { [key: string]: string }).text) ||
+      [];
 
     // Build messages array
     const existingSessionChatMessages = session.chatSessionMessages || [];
