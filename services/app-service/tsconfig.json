@@ -13,13 +13,14 @@
     "lib": [
       "ESNext"
     ],
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
 	"include": [
     "src/**/*.ts",
   ],
   "exclude": [
-    "node_modules",
+    "**/node_modules/*",
     "**/*.test.ts",
   ],
 }
