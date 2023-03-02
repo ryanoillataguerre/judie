@@ -2,7 +2,13 @@ import cookieParser from "cookie-parser";
 import express, { Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import http from "http";
-import { headers } from "./utils/express";
+import router from "./router";
+import {
+  errorHandler,
+  headers,
+  morganLogger,
+  sessionLayer,
+} from "./utils/express";
 
 const app = express();
 
@@ -10,22 +16,22 @@ const app = express();
 app.use(headers);
 app.use(helmet());
 app.use(cookieParser());
+app.use(morganLogger());
+app.use(sessionLayer());
 
 // Routes
-// app.use(
-//   "/",
-//   express.json({
-//     limit: "50mb",
-//   }),
-//   routes
-// );
-app.get("/health", (_: Request, res: Response) =>
-  res.status(200).send({ success: true, service: "app-service" })
+app.use(
+  "/",
+  express.json({
+    limit: "50mb",
+  }),
+  router
 );
-app.get("*", (_: Request, res: Response) => res.status(404).send("Not Found"));
+app.get("/healthcheck", (_: Request, res: Response) => res.sendStatus(200));
+app.get("*", (_: Request, res: Response) => res.sendStatus(404));
 
 // Fallback error handler
-// app.use(errorHandler);
+app.use(errorHandler);
 
 const server = () => {
   const httpServer = http.createServer(app);

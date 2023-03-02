@@ -1,5 +1,18 @@
 import { Request, Response, NextFunction } from "express";
+import session from "express-session";
+import connectRedis from "connect-redis";
+import { Result, ValidationError, validationResult } from "express-validator";
+import {
+  BadRequestError,
+  InternalError,
+  NotFoundError,
+  UnauthorizedError,
+  UnprocessableEntityError,
+} from "./errors";
+import { Redis } from "ioredis";
+import morgan from "morgan";
 
+// Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
   res.header(
     "Access-Control-Allow-Headers",
@@ -17,3 +30,74 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
   );
   next();
 };
+
+// Validation error handler
+export const handleValidationErrors = (
+  req: Request,
+  _: Response,
+  next: NextFunction
+) => {
+  const validationErrors: Result<ValidationError> = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    throw new UnprocessableEntityError("Validation failed", 422, {
+      validationErrors: validationErrors.array(),
+    });
+  }
+  next();
+};
+
+// Error handler
+export const errorHandler = (
+  error:
+    | InternalError
+    | BadRequestError
+    | NotFoundError
+    | UnauthorizedError
+    | UnprocessableEntityError,
+  req: Request,
+  res: Response,
+  _: NextFunction
+) => {
+  console.error(`Error: ${req.method} - ${req.path}`);
+  console.error(error);
+
+  const { name, message, details } = error;
+  const response = {
+    error: {
+      name,
+      message,
+      details,
+    },
+  };
+  return res.status(error.code || 404).send(response);
+};
+
+// Session Layer
+const RedisStore = connectRedis(session);
+const redisClient = new Redis({
+  port: parseInt(process.env.REDIS_PORT || "6379"),
+  host: process.env.REDIS_HOST,
+  password: process.env.REDIS_PASSWORD,
+});
+export const sessionLayer = () =>
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET || "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // if true only transmit cookie over https
+      httpOnly: false, // if true prevent client side JS from reading the cookie
+      maxAge: 1000 * 60 * 60 * 24, // session max age in miliseconds - 1 day
+    },
+  });
+// Extend session type
+declare module "express-session" {
+  interface SessionData {
+    userId?: string;
+  }
+}
+
+// Morgan logger
+export const morganLogger = () =>
+  morgan(":method :url :status - :response-time ms");
