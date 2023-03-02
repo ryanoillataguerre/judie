@@ -45,6 +45,11 @@ services:
       PG_HOST: postgres
       PG_PORT: 5432
       PG_DB_NAME: postgres
+      REDIS_HOST: redis
+      REDIS_PASSWORD: redis
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
   inference-service:
     networks:
       - dev
@@ -56,7 +61,7 @@ services:
       context: ./inference-service
       dockerfile: Dockerfile
     ports:
-      - 8080:8080
+      - 8081:8080
     environment:
       ENV: development
       SERVER_PORT: 8080

@@ -2,13 +2,13 @@ import cookieParser from "cookie-parser";
 import express, { Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import http from "http";
-import router from "./router";
+import router from "./router.js";
 import {
   errorHandler,
   headers,
   morganLogger,
   sessionLayer,
-} from "./utils/express";
+} from "./utils/express.js";
 
 const app = express();
 

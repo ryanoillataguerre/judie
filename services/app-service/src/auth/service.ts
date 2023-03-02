@@ -1,8 +1,9 @@
 import bcrypt from "bcryptjs";
-import validator from "validator";
-import { BadRequestError } from "../utils/errors";
-import dbClient from "../utils/prisma";
+import { BadRequestError } from "../utils/errors/index.js";
+import dbClient from "../utils/prisma.js";
+import isEmail from "validator/lib/isEmail.js";
 
+// This is broken locally - Prisma requires attention
 export const signup = async ({
   name,
   email,
@@ -17,7 +18,7 @@ export const signup = async ({
   email = email.trim().toLowerCase();
 
   // Verify email and password requirements
-  if (!validator.isEmail(email)) {
+  if (!isEmail.default(email)) {
     throw new BadRequestError("Invalid email");
   }
 

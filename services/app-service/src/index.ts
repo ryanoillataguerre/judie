@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import server from "./server";
+import server from "./server.js";
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();

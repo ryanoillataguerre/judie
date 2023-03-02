@@ -1,9 +1,9 @@
-import BadRequestError from "./BadRequestError";
-import CustomError from "./CustomError";
-import InternalError from "./InternalError";
-import NotFoundError from "./NotFoundError";
-import UnauthorizedError from "./UnauthorizedError";
-import UnprocessableEntityError from "./UnprocessableEntityError";
+import BadRequestError from "./BadRequestError.js";
+import CustomError from "./CustomError.js";
+import InternalError from "./InternalError.js";
+import NotFoundError from "./NotFoundError.js";
+import UnauthorizedError from "./UnauthorizedError.js";
+import UnprocessableEntityError from "./UnprocessableEntityError.js";
 
 export {
   BadRequestError,

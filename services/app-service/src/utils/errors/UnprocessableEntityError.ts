@@ -1,4 +1,4 @@
-import CustomError from "./CustomError";
+import CustomError from "./CustomError.js";
 
 class UnprocessableEntityError extends CustomError {
   constructor(message: string, code: number = 422, details?: Object) {

@@ -1,4 +1,4 @@
-import CustomError from "./CustomError";
+import CustomError from "./CustomError.js";
 
 class InternalError extends CustomError {
   constructor(message: string, code: number = 500, details?: Object) {

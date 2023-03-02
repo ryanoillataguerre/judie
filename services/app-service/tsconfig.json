@@ -1,29 +1,19 @@
 {
+  "ts-node": {
+    "esm": true
+  },
   "compilerOptions": {
-    "target": "ES6",                              
-    "module": "commonjs",                         
-    "moduleResolution": "node",
-		"declaration": true,
-    "declarationMap": true,
+    "target": "ESNext",                              
+    "module": "ESNext",                         
+    "moduleResolution": "nodenext",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
-    "strictFunctionTypes": true /* Enable strict checking of function types. */,
-    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
-    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
-    "importHelpers": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "outDir": "./build/",
-    "types": [
-      "node",
-    ],
     "lib": [
-      "ES6",
-      "DOM"
+      "ESNext"
     ],
+    "allowSyntheticDefaultImports": true
   },
 	"include": [
     "src/**/*.ts",

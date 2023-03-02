@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
-import { handleValidationErrors } from "../utils/express";
-import { signup } from "./service";
+import { handleValidationErrors } from "../utils/express.js";
+import { signup } from "./service.js";
 
 const router = Router();
 

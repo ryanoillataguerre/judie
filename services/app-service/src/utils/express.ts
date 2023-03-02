@@ -8,9 +8,10 @@ import {
   NotFoundError,
   UnauthorizedError,
   UnprocessableEntityError,
-} from "./errors";
+} from "./errors/index.js";
 import { Redis } from "ioredis";
 import morgan from "morgan";
+import { ChatCompletionRequestMessage } from "openai";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -18,11 +19,13 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Credentials, Set-Cookie, Cookie, Cookies, Cross-Origin, Access-Control-Allow-Credentials, Authorization, Access-Control-Allow-Origin"
   );
-  const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
-  const origin = String(req.headers.origin);
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
+  // TODO: When switching this to web, change this to actually only allow origins
+  // const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
+  // const origin = String(req.headers.origin);
+  // if (allowedOrigins.includes(origin)) {
+  //   res.header("Access-Control-Allow-Origin", origin);
+  // }
+  res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Methods",
@@ -88,13 +91,14 @@ export const sessionLayer = () =>
     cookie: {
       secure: false, // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
-      maxAge: 1000 * 60 * 60 * 24, // session max age in miliseconds - 1 day
+      maxAge: 1000 * 60 * 5, // session max age in miliseconds - 5 minutes - expire after 5min inactivity
     },
   });
 // Extend session type
 declare module "express-session" {
   interface SessionData {
     userId?: string;
+    chatSessionMessages?: ChatCompletionRequestMessage[];
   }
 }
 
