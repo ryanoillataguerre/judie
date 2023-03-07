@@ -4,7 +4,7 @@ cd "${0%/*}"
 brew install protobuf
 
 
-if [[ ! -d ../python/ve/ ]]; then
+if [[ ! -d ../python/ve ]]; then
   echo "No Python virtual environment installed. Installing ...."
   if [[ $(python3 --version | cut -d ' ' -f2 | cut -d '.' -f2) == 10 ]]; then
     echo "Building new python ve ...."
