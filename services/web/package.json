@@ -1,25 +1,23 @@
 {
-  "name": "web2",
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "solid-start dev",
-    "build": "solid-start build",
-    "start": "solid-start start"
-  },
-  "type": "module",
-  "devDependencies": {
-    "solid-start-node": "^0.2.19",
-    "typescript": "^4.9.4",
-    "vite": "^3.2.5"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@solidjs/meta": "^0.28.2",
-    "@solidjs/router": "^0.7.0",
-    "solid-js": "^1.6.10",
-    "solid-start": "^0.2.20",
-    "solid-styled": "^0.7.4",
-    "undici": "^5.15.1"
-  },
-  "engines": {
-    "node": ">=16"
+    "@types/node": "18.15.0",
+    "@types/react": "18.0.28",
+    "@types/react-dom": "18.0.11",
+    "eslint": "8.36.0",
+    "eslint-config-next": "13.2.4",
+    "next": "13.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sass": "^1.59.2",
+    "typescript": "4.9.5"
   }
 }

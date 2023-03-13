@@ -10,7 +10,7 @@ run-app:
 	cd web; yarn dev
 
 .PHONY: run
-run: run-backend # run-app
+run: run-backend run-app
 
 .PHONY: rebuild
 rebuild:
