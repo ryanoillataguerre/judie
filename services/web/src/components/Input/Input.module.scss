@@ -1,0 +1,21 @@
+.input {
+  display: block;
+  // max-width: 600px;
+  width: 100%;
+  padding: 0.6rem 14px;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: transparent;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  &::placeholder {
+    color: #d3d3d3;
+  }
+}
+
+.inputWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
