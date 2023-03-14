@@ -4,8 +4,25 @@ import Navbar from "@judie/components/Navbar/Navbar";
 import { Open_Sans } from "next/font/google";
 import ChatBox from "@judie/components/ChatBox/ChatBox";
 import Button from "@judie/components/Button/Button";
+import HomepageBackground from "@judie/components/lottie/HomepageBackground/HomepageBackground";
+import { GetStaticPropsContext } from "next";
+import { FormEventHandler, useState } from "react";
+import { useRouter } from "next/router";
+
+const openSans = Open_Sans({
+  weight: ["300", "400", "600", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+});
 
 export default function Home() {
+  const router = useRouter();
+  const [query, setQuery] = useState<string>("");
+  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    const url = `/chat?query=${query}`;
+    router.push(url);
+  };
   return (
     <>
       <Head>
@@ -18,6 +35,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        <HomepageBackground />
         <Navbar />
         <div className={styles.pageContentContainer}>
           <div className={styles.contentContainer}>
@@ -28,10 +46,15 @@ export default function Home() {
               Any subject, any question, any time.
             </h2>
             {/* Chat Box */}
-            <ChatBox />
-            <div className={styles.buttonContainer}>
-              <Button className={styles.submitButton} label="Start Learning" />
-            </div>
+            <form className={styles.formContainer} onSubmit={onSubmit}>
+              <ChatBox onChange={(e) => setQuery(e.target.value)} />
+              <div className={styles.buttonContainer}>
+                <Button
+                  className={styles.submitButton}
+                  label="Start Learning"
+                />
+              </div>
+            </form>
             {/* Extra Info */}
             <p className={styles.details}>
               Judie is built specifically to focus on the needs of students; we
@@ -48,4 +71,10 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+export async function getStaticProps(context: GetStaticPropsContext) {
+  return {
+    props: {},
+  };
 }

@@ -2,21 +2,13 @@ import { useState } from "react";
 import Input from "../Input/Input";
 import styles from "./ChatBox.module.scss";
 
-const ChatBox = () => {
-  const [query, setQuery] = useState<string>("");
-
-  const onSubmit = (e) => {
-    console.log(e.target.value);
-  };
+interface ChatBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+const ChatBox = ({ onChange }: ChatBoxProps) => {
   return (
     <div className={styles.chatContainer}>
       <Input
-        // className={styles.chatBoxInput}
         placeholder="What is the difference between mitosis and meiosis?"
-        onChange={(e) => {
-          setQuery(e.target.value);
-        }}
-        value={query}
+        onChange={onChange}
       />
     </div>
   );

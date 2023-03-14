@@ -7,6 +7,22 @@ import { createGPTRequestFromPrompt, getChatGPTCompletion } from "./service.js";
 
 const router = Router();
 
+router.post(
+  "/completion-web",
+  [body("query").exists()],
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const session = req.session;
+    // Generate the request to the ChatGPT model
+    const messages = await createGPTRequestFromPrompt(req.body.Body, session);
+    // Get response from ChatGPT
+    const completion = await getChatGPTCompletion(messages, session);
+    res.status(200).json({
+      completion: completion,
+    });
+  }
+);
+
 router.use(bodyParser.urlencoded({ extended: false }));
 router.post(
   "/completion",
