@@ -1,19 +1,12 @@
 import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
 import Navbar from "@judie/components/Navbar/Navbar";
-import { Open_Sans } from "next/font/google";
 import ChatBox from "@judie/components/ChatBox/ChatBox";
 import Button from "@judie/components/Button/Button";
 import HomepageBackground from "@judie/components/lottie/HomepageBackground/HomepageBackground";
 import { GetStaticPropsContext } from "next";
 import { FormEventHandler, useState } from "react";
 import { useRouter } from "next/router";
-
-const openSans = Open_Sans({
-  weight: ["300", "400", "600", "700"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-});
 
 export default function Home() {
   const router = useRouter();
