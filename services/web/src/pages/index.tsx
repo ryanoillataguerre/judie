@@ -56,7 +56,7 @@ export default function Home() {
               learning experience.
             </p>
             {/* Read More */}
-            <a className={styles.details} href={"/about"}>
+            <a className={styles.detailsLink} href={"/about"}>
               Read More about how Judie helps you learn
             </a>
           </div>

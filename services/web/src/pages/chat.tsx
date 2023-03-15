@@ -8,7 +8,6 @@ interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
-  console.log(query);
   return (
     <>
       <Head>
@@ -26,7 +25,7 @@ export default function ChatPage({ query }: ChatPageProps) {
           {/* Sidebar */}
           <Sidebar />
           {/* Chat UI */}
-          <Chat />
+          <Chat initialQuery={query} />
         </div>
       </main>
     </>

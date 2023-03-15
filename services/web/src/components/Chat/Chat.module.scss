@@ -9,6 +9,9 @@
 
 .conversationContainer {
   height: 90%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+
 }
 
 .chatBoxContainer {
@@ -28,8 +31,13 @@
   flex-direction: row;
   align-items: center;
   padding: 12px;
+  transition: border-color 0.2s ease-in-out;
+  line-height: 18px;
   &:focus-visible {
     outline: none;
+    border-color: v.$primary-blue;
+  }
+  &:hover {
     border-color: v.$primary-blue;
   }
 }
