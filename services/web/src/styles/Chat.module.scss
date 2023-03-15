@@ -1,0 +1,25 @@
+.main {
+  width: 100vw;
+  height: 100vh;
+}
+
+.chatPageContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.pageContentContainer {
+  display: flex;
+  width: 100vw;
+  height: calc(100vh - 4rem);
+  flex-direction: row;
+}
+
+.chatContentContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,14 @@
+@use "@judie/styles/variables.scss" as v;
+
+.button {
+  background-color: v.$primary-teal;
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  cursor: pointer;
+}
