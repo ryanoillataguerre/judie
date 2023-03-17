@@ -2,20 +2,36 @@ import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
 import Navbar from "@judie/components/Navbar/Navbar";
 import ChatBox from "@judie/components/ChatBox/ChatBox";
-import Button from "@judie/components/Button/Button";
-import HomepageBackground from "@judie/components/lottie/HomepageBackground/HomepageBackground";
+import Button, { ButtonVariant } from "@judie/components/Button/Button";
+import HomepageBackground, {
+  HomepageStyle,
+} from "@judie/components/lottie/HomepageBackground/HomepageBackground";
 import { GetStaticPropsContext } from "next";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 export default function Home() {
   const router = useRouter();
   const [query, setQuery] = useState<string>("");
+  const [styleMode, setStyleMode] = useState<HomepageStyle>(
+    HomepageStyle.Default
+  );
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     const url = `/chat?query=${query}`;
     router.push(url);
   };
+  useEffect(() => {
+    // Randomly pick between two background animations
+    // TODO: This leads to a flash of the default background, we should fix this
+    const random = Math.random();
+    if (random > 0.5) {
+      setStyleMode(HomepageStyle.Blue);
+    } else {
+      setStyleMode(HomepageStyle.Default);
+    }
+  }, []);
+
   return (
     <>
       <Head>
@@ -28,14 +44,28 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <HomepageBackground />
+        <HomepageBackground mode={styleMode} />
         <Navbar />
         <div className={styles.pageContentContainer}>
           <div className={styles.contentContainer}>
             {/* Title */}
-            <h1 className={styles.title}>Welcome to Judie!</h1>
+            <h1
+              className={
+                styleMode === HomepageStyle.Blue
+                  ? [styles.title, styles.white].join(" ")
+                  : styles.title
+              }
+            >
+              Welcome to Judie!
+            </h1>
             {/* Subtitle */}
-            <h2 className={styles.subtitle}>
+            <h2
+              className={
+                styleMode === HomepageStyle.Blue
+                  ? [styles.subtitle, styles.white].join(" ")
+                  : styles.subtitle
+              }
+            >
               Any subject, any question, any time.
             </h2>
             {/* Chat Box */}
@@ -45,18 +75,36 @@ export default function Home() {
                 <Button
                   className={styles.submitButton}
                   label="Start Learning"
+                  variant={
+                    styleMode === HomepageStyle.Blue
+                      ? ButtonVariant.Blue
+                      : ButtonVariant.Default
+                  }
                 />
               </div>
             </form>
             {/* Extra Info */}
-            <p className={styles.details}>
+            <p
+              className={
+                styleMode === HomepageStyle.Blue
+                  ? [styles.details, styles.white].join(" ")
+                  : styles.details
+              }
+            >
               Judie is built specifically to focus on the needs of students; we
               use the socratic method to prompt users to the answer, not feed it
               to you like bare ChatGPT, which we have found leads to a deeper
               learning experience.
             </p>
             {/* Read More */}
-            <a className={styles.detailsLink} href={"/about"}>
+            <a
+              className={
+                styleMode === HomepageStyle.Blue
+                  ? [styles.detailsLink, styles.white].join(" ")
+                  : styles.detailsLink
+              }
+              href={"/about"}
+            >
               Read More about how Judie helps you learn
             </a>
           </div>
