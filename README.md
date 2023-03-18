@@ -12,3 +12,9 @@ services
 -- service specific infrastructure
 -- service application code
 ```
+
+# To Start Up Services
+
+- Get `services/.env` file from someone
+- Install dependencies with `yarn` in `web` and `app-service`
+- Run `make run` in `services/`
