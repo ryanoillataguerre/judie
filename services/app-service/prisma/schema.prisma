@@ -31,7 +31,7 @@ model User {
   receivePromotions Boolean    @map("receive_promotions")
   gradeYear         GradeYear? @map("grade_year")
   createdAt         DateTime   @default(now()) @map("created_at")
-  updatedAt         DateTime?  @map("updated_at")
+  updatedAt         DateTime?  @updatedAt @map("updated_at")
   chats             Chat[]
 
   @@index([id, email])
@@ -42,7 +42,7 @@ model Chat {
   id        String    @id @default(uuid())
   userId    String    @map("user_id")
   createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @map("updated_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
   user      User      @relation(fields: [userId], references: [id])
   messages  Message[]
 
@@ -61,7 +61,7 @@ model Message {
   type      MessageType
   chatId    String      @map("chat_id")
   createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime?   @map("updated_at")
+  updatedAt DateTime?   @updatedAt @map("updated_at")
   chat      Chat        @relation(fields: [chatId], references: [id])
 
   @@index([id, chatId])

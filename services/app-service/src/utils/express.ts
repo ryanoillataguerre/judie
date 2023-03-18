@@ -120,7 +120,7 @@ declare module "express-session" {
 // Morgan logger
 export const morganLogger = () =>
   morgan(":method :url :status - :response-time ms", {
-    immediate: true,
+    immediate: false,
   });
 
 export type JudieSession = Session & Partial<SessionData>;
