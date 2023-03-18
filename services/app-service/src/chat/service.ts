@@ -211,7 +211,6 @@ export const createGPTRequestFromPrompt = async ({
         includeMetadata: true,
       },
     });
-    console.log("matches", pineconeResponse.matches);
     const matches = pineconeResponse.matches;
     // Get metadata from each matching vector
     const matchMetadatas =
