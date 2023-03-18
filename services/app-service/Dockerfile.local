@@ -1,9 +1,15 @@
-FROM node:lts
+FROM node:18 as builder
 
 WORKDIR /app
 
-COPY package.json /app
+COPY package.json ./
+COPY prisma ./prisma/
+
 RUN yarn
+
+RUN npx prisma generate --schema prisma/schema.prisma
+
+COPY . .
 
 COPY ./src ./
 COPY ./prisma ./prisma
