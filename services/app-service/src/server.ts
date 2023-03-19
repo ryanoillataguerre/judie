@@ -5,6 +5,7 @@ import http from "http";
 import router from "./router.js";
 import {
   errorHandler,
+  errorPassthrough,
   headers,
   morganLogger,
   sessionLayer,
@@ -27,8 +28,14 @@ app.use(
   }),
   router
 );
-app.get("/healthcheck", (_: Request, res: Response) => res.sendStatus(200));
-app.get("*", (_: Request, res: Response) => res.sendStatus(404));
+app.get(
+  "/healthcheck",
+  errorPassthrough((_: Request, res: Response) => res.sendStatus(200))
+);
+app.get(
+  "*",
+  errorPassthrough((_: Request, res: Response) => res.sendStatus(404))
+);
 
 // Fallback error handler
 app.use(errorHandler);

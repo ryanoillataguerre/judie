@@ -3,7 +3,7 @@
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native"]
+  binaryTargets = ["native", "darwin-arm64", "linux-arm64-openssl-1.1.x"]
 }
 
 datasource db {
@@ -31,7 +31,39 @@ model User {
   receivePromotions Boolean    @map("receive_promotions")
   gradeYear         GradeYear? @map("grade_year")
   createdAt         DateTime   @default(now()) @map("created_at")
-  updatedAt         DateTime?  @map("updated_at")
+  updatedAt         DateTime?  @updatedAt @map("updated_at")
+  chats             Chat[]
 
+  @@index([id, email])
   @@map("users")
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  user      User      @relation(fields: [userId], references: [id])
+  messages  Message[]
+
+  @@index([id, userId])
+  @@map("chats")
+}
+
+enum MessageType {
+  BOT
+  USER
+}
+
+model Message {
+  id        String      @id @default(uuid())
+  content   String
+  type      MessageType
+  chatId    String      @map("chat_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime?   @updatedAt @map("updated_at")
+  chat      Chat        @relation(fields: [chatId], references: [id])
+
+  @@index([id, chatId])
+  @@map("messages")
 }

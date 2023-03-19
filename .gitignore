@@ -1,2 +1,30 @@
 .idea/
 infrastructure/python/ve
+
+**/dist
+.env
+
+# Dependencies
+**/node_modules
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Solid
+.solid
+.output
+.vercel
+.netlify
+netlify
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+.vscode/
+
+# Temp
+gitignore

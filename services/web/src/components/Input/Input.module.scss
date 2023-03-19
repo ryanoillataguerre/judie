@@ -1,0 +1,33 @@
+@use "@judie/styles/variables.scss" as v;
+
+.input {
+  display: block;
+  // max-width: 600px;
+  width: 100%;
+  padding: 0.6rem 14px;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: white;
+  border: 2px solid;
+  border-color: #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.3s ease-in-out;
+  &::placeholder {
+    color: #d3d3d3;
+  }
+  &:focus-visible {
+    outline: none;
+    border-color: v.$primary-blue;
+  }
+  &:hover {
+    outline: none;
+    border-color: v.$primary-blue;
+  }
+}
+
+.inputWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}

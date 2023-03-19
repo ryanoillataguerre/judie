@@ -4,12 +4,26 @@ Judie monorepo
 
 The repo is structured as follows
 
-```agsl
-root
--- infrastructure
----- common utils
--- services
----- (*)service
------- service specifc infrastructure
------- service app code
 ```
+infrastructure
+- common utils
+services
+- (*)service
+-- service specific infrastructure
+-- service application code
+```
+
+# To Start Up Services
+
+- Get `services/.env` file from someone
+- Install dependencies with `yarn` in `web` and `app-service`
+- Run `make run` in `services/`
+- Create a `.env` in `app-service` with the following: `DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"`
+  - This file will help with migrations locally
+
+# To Run Migrations
+
+- `cd app-service`
+- `npx prisma generate --schema=prisma/schema.prisma`
+- `npx prisma migrate dev`
+- You may need to switch your `app-service/.env` `DATABASE_URL` to `DATABASE_URL="postgresql://postgres:postgres@localhost:5438/postgres"` depending on if you're running this inside the container or locally.

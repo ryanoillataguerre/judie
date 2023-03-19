@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import session, { Session, SessionData } from "express-session";
 import connectRedis from "connect-redis";
 import { Result, ValidationError, validationResult } from "express-validator";
@@ -11,7 +11,6 @@ import {
 } from "./errors/index.js";
 import { Redis } from "ioredis";
 import morgan from "morgan";
-import { ChatCompletionRequestMessage } from "openai";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -20,12 +19,12 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     "Origin, X-Requested-With, Content-Type, Accept, Credentials, Set-Cookie, Cookie, Cookies, Cross-Origin, Access-Control-Allow-Credentials, Authorization, Access-Control-Allow-Origin"
   );
   // TODO: When switching this to web, change this to actually only allow origins
-  // const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
-  // const origin = String(req.headers.origin);
-  // if (allowedOrigins.includes(origin)) {
-  //   res.header("Access-Control-Allow-Origin", origin);
-  // }
-  res.header("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
+  const origin = String(req.headers.origin);
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  // res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Methods",
@@ -48,6 +47,21 @@ export const handleValidationErrors = (
   }
   next();
 };
+
+// Error wrapping Higher order function
+// This is used to pass our custom errors into the error handler middleware below
+export const errorPassthrough =
+  (fn: RequestHandler) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // No idea why eslint is warning here
+      // Awaiting definitely does have an affect, since
+      // RequestHandler can be (and always is in our case) async
+      await fn(req, res, next);
+    } catch (err) {
+      next(err);
+    }
+  };
 
 // Error handler
 export const errorHandler = (
@@ -84,6 +98,7 @@ const redisClient = new Redis({
 });
 export const sessionLayer = () =>
   session({
+    name: "judie_sid",
     store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
@@ -91,20 +106,21 @@ export const sessionLayer = () =>
     cookie: {
       secure: false, // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
-      maxAge: 1000 * 60 * 5, // session max age in miliseconds - 5 minutes - expire after 5min inactivity
+      maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in miliseconds - 30d - expire after 30d inactivity
     },
   });
-// Extend session type
+
+// Extend express session type
 declare module "express-session" {
   interface SessionData {
     userId?: string;
-    chatSessionMessages?: ChatCompletionRequestMessage[];
-    chatSessionCharCount?: number;
   }
 }
 
 // Morgan logger
 export const morganLogger = () =>
-  morgan(":method :url :status - :response-time ms");
+  morgan(":method :url :status - :response-time ms", {
+    immediate: false,
+  });
 
 export type JudieSession = Session & Partial<SessionData>;
