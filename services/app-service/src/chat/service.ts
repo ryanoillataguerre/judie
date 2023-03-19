@@ -207,12 +207,11 @@ export const createGPTRequestFromPrompt = async ({
       queryRequest: {
         vector: embeddingVector,
         topK: 3,
-        includeValues: true,
+        includeValues: false,
         includeMetadata: true,
       },
     });
     const matches = pineconeResponse.matches;
-    console.log("matches", matches);
     // Get metadata from each matching vector
     const matchMetadatas =
       matches
