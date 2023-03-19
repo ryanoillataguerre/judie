@@ -11,7 +11,6 @@ import {
 } from "./errors/index.js";
 import { Redis } from "ioredis";
 import morgan from "morgan";
-import { ChatCompletionRequestMessage } from "openai";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -20,12 +19,12 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     "Origin, X-Requested-With, Content-Type, Accept, Credentials, Set-Cookie, Cookie, Cookies, Cross-Origin, Access-Control-Allow-Credentials, Authorization, Access-Control-Allow-Origin"
   );
   // TODO: When switching this to web, change this to actually only allow origins
-  // const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
-  // const origin = String(req.headers.origin);
-  // if (allowedOrigins.includes(origin)) {
-  //   res.header("Access-Control-Allow-Origin", origin);
-  // }
-  res.header("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
+  const origin = String(req.headers.origin);
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+  // res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Methods",
@@ -99,6 +98,7 @@ const redisClient = new Redis({
 });
 export const sessionLayer = () =>
   session({
+    name: "judie_sid",
     store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,

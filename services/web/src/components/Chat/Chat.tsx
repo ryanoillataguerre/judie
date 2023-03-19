@@ -10,57 +10,47 @@ interface ChatProps {
 }
 
 const Chat = ({ initialQuery }: ChatProps) => {
+  const router = useRouter();
+  const [messages, setMessages] = useState<Message[]>([]);
+
   const {
     isLoading,
     data: completionMutationData,
     isError,
+    mutateAsync,
   } = useMutation({
     mutationFn: completionFromQueryMutation,
+    onError: (error) => {
+      console.log("Error getting completion", error);
+    },
+    onSuccess: (data) => {
+      console.log("Success getting completion", data);
+    },
+    retry: false,
   });
 
-  const messages: Message[] = [
-    {
-      text: "Hello, how can I help you?",
-      type: MessageType.BOT,
-    },
-    {
-      text: "What is the square root of 16?",
-      type: MessageType.USER,
-    },
-    {
-      text: "4",
-      type: MessageType.BOT,
-    },
-    {
-      text: "What is the square root of 25?",
-      type: MessageType.USER,
-    },
-    {
-      text: "5",
-      type: MessageType.BOT,
-    },
-  ];
-
+  // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
-
-  const router = useRouter();
-
   useEffect(() => {
     if (chatValue.length > 0) {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
-  });
+  }, []);
 
-  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    console.log("onSubmit", chatValue);
+    await mutateAsync({
+      query: chatValue,
+      // When do we want to make a new chat? Maybe a button?
+      newChat: false,
+    });
   };
 
   return (
     <div className={styles.chatContainer}>
       <div className={styles.conversationContainer}>
-        {messages.map((message, index) => (
+        {messages?.map((message, index) => (
           <MessageRow key={index} message={message} />
         ))}
       </div>

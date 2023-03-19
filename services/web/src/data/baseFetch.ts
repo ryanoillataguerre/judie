@@ -1,4 +1,6 @@
+import { setCookie } from "cookies-next";
 import { NextApiResponse } from "next";
+import cookie from "cookie";
 
 export enum ServiceEnum {
   APP = "app",
@@ -55,13 +57,24 @@ const checkStatus = async (response: any) => {
   }
 };
 
+const checkForCookies = async (response: Response) => {
+  if (isClient()) {
+    const cookieHeader = response.headers.get("set-cookie");
+    const cookieContent = cookie.parse(cookieHeader || "");
+    if (cookieContent) {
+      console.log("cookieContent", cookieContent);
+      setCookie("judie_session", cookieContent.judie_sid);
+    }
+  } else {
+    return;
+  }
+};
+
 export async function baseFetch({
   url,
   method,
   body,
   headers,
-  res,
-  service = ServiceEnum.APP,
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
@@ -77,6 +90,7 @@ export async function baseFetch({
       body: body ? JSON.stringify(body) : null,
     });
     await checkStatus(response);
+    await checkForCookies(response);
 
     return response.json();
   } catch (err: any) {
