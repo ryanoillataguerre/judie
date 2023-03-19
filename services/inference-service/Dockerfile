@@ -1,11 +1,13 @@
-FROM python:3.11
+FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY ../../infrastructure/python/requirements.txt ./
+COPY inference_requirements.txt ./
 
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/inference_requirements.txt
+
+COPY server/ ./
 
 COPY ./ /app
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+CMD ["python", "docker_test.py"]

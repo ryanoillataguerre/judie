@@ -17,6 +17,6 @@ if [[ ! -d ../python/ve ]]; then
 fi
 
 source ../python/ve/bin/activate
-pip install -r ../python/requirements.txt
+pip install -r ../python/dev_requirements.txt
 
 exit 0
