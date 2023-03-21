@@ -15,7 +15,8 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@judie/*": ["./src/*"]
+      "@judie/*": ["./src/*"],
+      "@services/types": ["../app-service/src/types/web"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -1,10 +1,17 @@
 import { useState } from "react";
 import styles from "./Navbar.module.scss";
 import Link from "next/link";
+import Button, { ButtonVariant } from "../Button/Button";
+import { useRouter } from "next/router";
+import useAuth from "@judie/hooks/useAuth";
 
 const Navbar = () => {
-  // Mobile hamburger
+  const auth = useAuth({ allowUnauth: true });
+  console.log("auth", auth);
+  // TODO: Mobile hamburger
   const [isOpen, setIsOpen] = useState(false);
+
+  const router = useRouter();
   return (
     <div className={styles.container}>
       <Link href={"/"}>
@@ -16,8 +23,27 @@ const Navbar = () => {
         </div>
       </Link>
       <div className={styles.rightContainer}>
-        {/* About */}
-        {/* Sign Up */}
+        {/* TODO: About */}
+
+        {!auth.userData && (
+          <>
+            <Link href={"/signin"}>
+              <Button
+                type="button"
+                label="Sign In"
+                variant={ButtonVariant.Default}
+              />
+            </Link>
+            {/* Sign Up */}
+            <Link href={"/signup"}>
+              <Button
+                type="button"
+                label="Sign Up"
+                variant={ButtonVariant.Blue}
+              />
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

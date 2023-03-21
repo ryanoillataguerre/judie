@@ -1,19 +1,18 @@
+import { RegisterOptions, UseFormRegister } from "react-hook-form";
 import styles from "./Input.module.scss";
 
 interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  name: string;
+  register?: UseFormRegister<any>;
 }
 
-const Input = ({ label, className, ...props }: CustomInputProps) => {
+const Input = ({ name, className, register, ...props }: CustomInputProps) => {
   return (
-    // <div
-    //   className={
-    //     className ? `${className} ${styles.inputWrapper}` : styles.inputWrapper
-    //   }
-    // >
-    // {label ? <label>{label}</label> : undefined}
-    <input className={styles.input} {...props} />
-    // </div>
+    <input
+      className={styles.input}
+      {...(register ? register(name) : {})}
+      {...props}
+    />
   );
 };
 

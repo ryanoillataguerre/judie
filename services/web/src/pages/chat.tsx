@@ -4,10 +4,12 @@ import Head from "next/head";
 import Navbar from "@judie/components/Navbar/Navbar";
 import Sidebar from "@judie/components/Sidebar/Sidebar";
 import Chat from "@judie/components/Chat/Chat";
+import useAuth from "@judie/hooks/useAuth";
 interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
+  const auth = useAuth();
   return (
     <>
       <Head>

@@ -36,7 +36,7 @@ router.post(
     const userId = await signin({ email, password });
     // Create session for user
     session.userId = userId;
-    res.sendStatus(201);
+    res.sendStatus(200);
   })
 );
 

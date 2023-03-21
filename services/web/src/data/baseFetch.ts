@@ -1,4 +1,4 @@
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import { NextApiResponse } from "next";
 import cookie from "cookie";
 
@@ -7,6 +7,8 @@ export enum ServiceEnum {
   EXPLANATIONS = "explanations",
   ANALYTICS = "analytics",
 }
+
+export const SESSION_COOKIE = "judie_sid";
 
 const isClient = () => {
   return typeof window !== "undefined";
@@ -43,7 +45,7 @@ class HTTPResponseError extends Error {
   }
 }
 
-const checkStatus = async (response: any) => {
+const checkStatus = async (response: Response) => {
   if (response.ok ?? false) {
     // response.status >= 200 && response.status < 300
     return response;
@@ -57,14 +59,14 @@ const checkStatus = async (response: any) => {
   }
 };
 
-const checkForCookies = async (response: Response) => {
+const checkForCookies = (response: Response) => {
   if (isClient()) {
-    const cookieHeader = response.headers.get("set-cookie");
+    const cookieHeader = response.headers.get("Set-Cookie");
     const cookieContent = cookie.parse(cookieHeader || "");
     if (cookieContent) {
-      console.log("cookieContent", cookieContent);
-      setCookie("judie_session", cookieContent.judie_sid);
+      setCookie(SESSION_COOKIE, cookieContent.judie_sid);
     }
+    return;
   } else {
     return;
   }
@@ -83,15 +85,19 @@ export async function baseFetch({
       "Content-Type": "application/json",
       ...headers,
     };
+    const sessionCookie = getCookie(SESSION_COOKIE);
+    if (sessionCookie) {
+      reqHeaders.Cookie = `judie_sid=${sessionCookie};`;
+    }
     const response = await fetch(`${apiUri}${url}`, {
       headers: reqHeaders,
       credentials: "include",
       method,
       body: body ? JSON.stringify(body) : null,
     });
+    console.log(response);
     await checkStatus(response);
-    await checkForCookies(response);
-
+    // checkForCookies(response);
     return response.json();
   } catch (err: any) {
     throw err;

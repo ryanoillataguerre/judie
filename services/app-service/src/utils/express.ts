@@ -48,6 +48,13 @@ export const handleValidationErrors = (
   next();
 };
 
+export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
+  if (!req.session?.userId) {
+    throw new UnauthorizedError("Not authorized");
+  }
+  next();
+};
+
 // Error wrapping Higher order function
 // This is used to pass our custom errors into the error handler middleware below
 export const errorPassthrough =

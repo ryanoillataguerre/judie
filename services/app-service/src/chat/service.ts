@@ -20,19 +20,6 @@ await pinecone.init({
 const OPENAI_PROMPT_CHAR_LIMIT = 6000;
 const OPENAI_COMPLETION_MODEL = "gpt-4-0314";
 
-const getChatCompletionRequestMessageRoleEnumFromMessageType = (
-  messageType: MessageType
-): openai.ChatCompletionRequestMessageRoleEnum => {
-  switch (messageType) {
-    case MessageType.USER:
-      return "user";
-    case MessageType.BOT:
-      return "system";
-    default:
-      throw new InternalError("Invalid message type");
-  }
-};
-
 const transformMessageToChatCompletionMessage = (
   message: Message
 ): ChatCompletionRequestMessage => {
@@ -70,22 +57,6 @@ const updateChat = async (chatId: string, params: Prisma.ChatUpdateInput) => {
     },
   });
   return newChat;
-};
-
-const createMessage = async (
-  message: ChatCompletionRequestMessage,
-  chat: Chat
-) => {
-  const { role, content } = message;
-  const type = role === "user" ? MessageType.USER : MessageType.BOT;
-  const newMessage = await dbClient.message.create({
-    data: {
-      content,
-      type,
-      chatId: chat.id,
-    },
-  });
-  return newMessage;
 };
 
 /**
@@ -190,8 +161,9 @@ export const createGPTRequestFromPrompt = async ({
 
       newMessages.push({
         content: promptStart,
-        type: MessageType.BOT,
+        type: MessageType.SYSTEM,
         createdAt: new Date(),
+        readableContent: promptStart,
       });
     }
 
@@ -241,6 +213,7 @@ export const createGPTRequestFromPrompt = async ({
     newMessages.push({
       content: currentPrompt,
       type: MessageType.USER,
+      readableContent: prompt,
       createdAt: new Date(),
     });
 
@@ -250,6 +223,7 @@ export const createGPTRequestFromPrompt = async ({
         content: m.content,
         type: m.type,
         createdAt: m.createdAt,
+        readableContent: m.readableContent,
       }));
 
     const newChat = await updateChat(chat.id, {
@@ -324,6 +298,8 @@ export const getChatGPTCompletion = async (
       const newMessage = {
         content: completionMessageContent,
         type: MessageType.BOT,
+        createdAt: new Date(),
+        readableContent: completionMessageContent,
       };
       // Save new completion to DB
       const newChat = await updateChat(chat.id, {
