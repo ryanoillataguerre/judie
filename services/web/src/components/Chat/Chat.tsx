@@ -2,8 +2,9 @@ import { completionFromQueryMutation } from "@judie/data/mutations";
 import { useMutation } from "react-query";
 import styles from "./Chat.module.scss";
 import { FormEventHandler, useEffect, useState } from "react";
-import MessageRow, { Message, MessageType } from "../MessageRow/MessageRow";
+import MessageRow from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
+import { JudieMessage } from "@services/types";
 
 interface ChatProps {
   initialQuery?: string;
@@ -11,7 +12,8 @@ interface ChatProps {
 
 const Chat = ({ initialQuery }: ChatProps) => {
   const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<JudieMessage[]>([]);
+  const [mostRecentMessageContent, setMostRecentMessageContent] = useState("");
 
   const {
     isLoading,
@@ -28,6 +30,8 @@ const Chat = ({ initialQuery }: ChatProps) => {
     },
     retry: false,
   });
+
+  useEffect(() => {});
 
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
@@ -53,6 +57,9 @@ const Chat = ({ initialQuery }: ChatProps) => {
         {messages?.map((message, index) => (
           <MessageRow key={index} message={message} />
         ))}
+        {isLoading && (
+          <MessageRow message={{ type: "USER", content: "Hello" }} />
+        )}
       </div>
       <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
         <input

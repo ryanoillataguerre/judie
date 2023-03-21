@@ -15,30 +15,30 @@ export default function useAuth({
 } = {}): { userData: JudieUser | undefined; isLoading: boolean } {
   const router = useRouter();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
-  console.log("sessionCookie", sessionCookie);
-  const [userData, setUserData] = useState<JudieUser>();
   // GET /users/me
-  const { data, isError, refetch, error, isLoading } = useQuery(
-    GET_ME,
-    () => getMeQuery(),
-    {
-      staleTime: 30000,
-      enabled: !!sessionCookie,
-      onSuccess: (data) => {
-        setUserData(data);
-      },
-    }
-  );
+  const {
+    data: userData,
+    isError,
+    refetch,
+    error,
+    isLoading,
+    isFetched,
+  } = useQuery(GET_ME, () => getMeQuery(), {
+    enabled: !!sessionCookie,
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => setSessionCookie(getCookie(SESSION_COOKIE)));
+    const timer = setTimeout(
+      () => setSessionCookie(getCookie(SESSION_COOKIE)),
+      1000
+    );
     return () => clearTimeout(timer);
   });
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
     if (!sessionCookie) {
-      if (!allowUnauth && !isLoading && isError) {
+      if (!allowUnauth && !userData && !isLoading && isError) {
         router.push("/signin");
       }
     } else {
@@ -46,18 +46,12 @@ export default function useAuth({
     }
   }, [sessionCookie]);
 
-  // If cookies do exist, and we're getting a 401, session has expired
-  // Log out and redirect to signin
   useEffect(() => {
-    if (sessionCookie && isError && !isLoading) {
-      // deleteCookie(SESSION_COOKIE);
-      if (!allowUnauth) {
-        router.push("/signin");
-      }
-    } else {
-      refetch();
+    if (!userData && !isLoading && isError && isFetched) {
+      deleteCookie(SESSION_COOKIE);
+      router.push("/signin");
     }
-  }, [sessionCookie, isError, isLoading]);
+  }, [userData, isError, isLoading, isFetched]);
 
   useEffect(() => {
     // Redirect away from sign in and sign up pages if logged in

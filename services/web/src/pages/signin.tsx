@@ -27,7 +27,6 @@ const SigninForm = () => {
   const { mutate } = useMutation({
     mutationFn: signinMutation,
     onSuccess: () => {
-      console.log("onSuccess");
       router.push("/chat");
     },
   });
@@ -36,12 +35,10 @@ const SigninForm = () => {
     password,
   }: SubmitData) => {
     try {
-      console.log("mutating");
       mutate({
         email,
         password,
       });
-      console.log("mutated, pushing to /chat");
       router.push("/chat");
     } catch (err) {
       // TODO: Toast error with err message

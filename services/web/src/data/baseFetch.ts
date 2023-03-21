@@ -95,7 +95,7 @@ export async function baseFetch({
       method,
       body: body ? JSON.stringify(body) : null,
     });
-    console.log(response);
+    // console.log(response);
     await checkStatus(response);
     // checkForCookies(response);
     return response.json();

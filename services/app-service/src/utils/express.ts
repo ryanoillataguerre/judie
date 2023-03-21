@@ -11,6 +11,7 @@ import {
 } from "./errors/index.js";
 import { Redis } from "ioredis";
 import morgan from "morgan";
+import { isProduction } from "./env.js";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -111,7 +112,7 @@ export const sessionLayer = () =>
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // if true only transmit cookie over https
+      secure: isProduction(), // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
       maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in miliseconds - 30d - expire after 30d inactivity
     },

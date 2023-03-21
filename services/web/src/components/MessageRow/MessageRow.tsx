@@ -1,34 +1,18 @@
 import styles from "./MessageRow.module.scss";
+import { JudieMessage, JudieMessageType } from "@services/types";
 
-export interface Message {
-  type: MessageType;
-  text: string;
-}
-
-export enum MessageType {
-  BOT = "BOT",
-  USER = "USER",
-}
-
-const MessageRow = ({
-  message,
-}: {
-  message: {
-    text: string;
-    type: MessageType;
-  };
-}) => {
+const MessageRow = ({ message }: { message: JudieMessage }) => {
   return (
     <div
       className={[
         styles.messageRow,
-        message.type === MessageType.BOT
+        message.type === JudieMessageType.BOT
           ? styles.messageRowLeft
           : styles.messageRowRight,
       ].join(" ")}
     >
       <div className={styles.messageContainer}>
-        <p>{message.text}</p>
+        <p>{message.readableContent}</p>
       </div>
     </div>
   );
