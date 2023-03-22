@@ -10,4 +10,8 @@ COPY server/ ./
 
 COPY ./ /app
 
-CMD ["python", "docker_test.py"]
+EXPOSE 443
+
+ENV GRPC_PORT=443
+
+CMD ["python", "inference_service_server.py"]
