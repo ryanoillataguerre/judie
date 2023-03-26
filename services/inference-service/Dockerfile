@@ -13,5 +13,6 @@ COPY ./ /app
 EXPOSE 443
 
 ENV GRPC_PORT=443
+# ENV GRPC_VERBOSITY=debug
 
-CMD ["python", "inference_service_server.py"]
+CMD ["python", "-u", "inference_service_server.py"]
