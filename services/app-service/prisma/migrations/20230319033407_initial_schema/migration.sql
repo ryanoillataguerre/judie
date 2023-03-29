@@ -2,7 +2,7 @@
 CREATE TYPE "GradeYear" AS ENUM ('FRESHMAN', 'SOPHOMORE', 'JUNIOR', 'SENIOR', 'UNI_FRESHMAN', 'UNI_SOPHOMORE', 'UNI_JUNIOR', 'UNI_SENIOR', 'GRADUATE');
 
 -- CreateEnum
-CREATE TYPE "MessageType" AS ENUM ('BOT', 'USER');
+CREATE TYPE "MessageType" AS ENUM ('BOT', 'USER', 'SYSTEM');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -32,6 +32,7 @@ CREATE TABLE "chats" (
 CREATE TABLE "messages" (
     "id" TEXT NOT NULL,
     "content" TEXT NOT NULL,
+    "readable_content" TEXT NOT NULL,
     "type" "MessageType" NOT NULL,
     "chat_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

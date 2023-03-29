@@ -1,9 +1,19 @@
 import { completionFromQueryMutation } from "@judie/data/mutations";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import styles from "./Chat.module.scss";
-import { FormEventHandler, useEffect, useState } from "react";
-import MessageRow, { Message, MessageType } from "../MessageRow/MessageRow";
+import {
+  FormEventHandler,
+  Suspense,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import MessageRow, { TempMessage } from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
+import { Message, MessageType } from "@judie/data/types/api";
+import useStorageState from "@judie/hooks/useStorageState";
+import Loading from "../lottie/Loading/Loading";
+import { getUserActiveChatQuery } from "@judie/data/queries";
 
 interface ChatProps {
   initialQuery?: string;
@@ -11,7 +21,22 @@ interface ChatProps {
 
 const Chat = ({ initialQuery }: ChatProps) => {
   const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([]);
+
+  const [chatId, setChatId] = useStorageState("chat", "chatId");
+  const [messages, setMessages] = useStorageState<Message[]>(
+    [],
+    chatId ?? "messages"
+  );
+
+  const {
+    data: existingUserChat,
+    isLoading: isExistingChatLoading,
+    refetch: fetchExistingChat,
+  } = useQuery({
+    queryKey: ["activeChat"],
+    queryFn: () => getUserActiveChatQuery(),
+    enabled: false,
+  });
 
   const {
     isLoading,
@@ -24,10 +49,19 @@ const Chat = ({ initialQuery }: ChatProps) => {
       console.log("Error getting completion", error);
     },
     onSuccess: (data) => {
+      if (chatId !== data?.id) {
+        setChatId(data?.id);
+      }
+      data?.messages.unshift();
+      setMostRecentUserChat(undefined);
+      setMessages(data?.messages);
       console.log("Success getting completion", data);
     },
     retry: false,
   });
+
+  console.log("chatId", chatId);
+  console.log("messages", messages);
 
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
@@ -36,33 +70,59 @@ const Chat = ({ initialQuery }: ChatProps) => {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
+    (async () => {
+      const result = await fetchExistingChat();
+      console.log(result);
+      if (result?.data?.id) {
+        setChatId(result?.data?.id);
+        setMessages(result?.data?.messages);
+      } else {
+        setChatId("");
+        setMessages([]);
+      }
+    })();
   }, []);
+
+  const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    setMostRecentUserChat({
+      type: MessageType.USER,
+      readableContent: chatValue,
+      createdAt: new Date(),
+    });
+    setChatValue("");
     await mutateAsync({
       query: chatValue,
       // When do we want to make a new chat? Maybe a button?
-      newChat: false,
+      newChat: !chatId,
     });
   };
 
+  const reversedMessages = useMemo(() => {
+    return messages?.reverse();
+  }, [messages]);
+
   return (
-    <div className={styles.chatContainer}>
-      <div className={styles.conversationContainer}>
-        {messages?.map((message, index) => (
-          <MessageRow key={index} message={message} />
-        ))}
+    <Suspense fallback={<Loading />}>
+      <div className={styles.chatContainer}>
+        <div className={styles.conversationContainer}>
+          {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
+          {reversedMessages?.map((message, index) => (
+            <MessageRow key={index} message={message} />
+          ))}
+        </div>
+        <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
+          <input
+            placeholder={"What is mitosis?"}
+            className={styles.chatBoxInput}
+            onChange={(e) => setChatValue(e.target.value)}
+            value={chatValue}
+          />
+        </form>
       </div>
-      <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
-        <input
-          placeholder={"What is the square root of 16?"}
-          className={styles.chatBoxInput}
-          onChange={(e) => setChatValue(e.target.value)}
-          value={chatValue}
-        />
-      </form>
-    </div>
+    </Suspense>
   );
 };
 

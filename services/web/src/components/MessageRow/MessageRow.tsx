@@ -1,23 +1,12 @@
+import { Message, MessageType } from "@judie/data/types/api";
 import styles from "./MessageRow.module.scss";
 
-export interface Message {
-  type: MessageType;
-  text: string;
+export interface TempMessage {
+  type: MessageType.BOT | MessageType.USER;
+  readableContent: string;
+  createdAt: Date;
 }
-
-export enum MessageType {
-  BOT = "BOT",
-  USER = "USER",
-}
-
-const MessageRow = ({
-  message,
-}: {
-  message: {
-    text: string;
-    type: MessageType;
-  };
-}) => {
+const MessageRow = ({ message }: { message: Message | TempMessage }) => {
   return (
     <div
       className={[
@@ -28,7 +17,7 @@ const MessageRow = ({
       ].join(" ")}
     >
       <div className={styles.messageContainer}>
-        <p>{message.text}</p>
+        <p>{message.readableContent}</p>
       </div>
     </div>
   );

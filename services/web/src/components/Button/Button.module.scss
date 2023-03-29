@@ -1,6 +1,9 @@
 @use "@judie/styles/variables.scss" as v;
 
 .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: v.$primary-teal;
   width: 100%;
   padding: 12px 24px;

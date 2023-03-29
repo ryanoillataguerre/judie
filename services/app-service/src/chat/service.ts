@@ -20,19 +20,6 @@ await pinecone.init({
 const OPENAI_PROMPT_CHAR_LIMIT = 6000;
 const OPENAI_COMPLETION_MODEL = "gpt-4-0314";
 
-const getChatCompletionRequestMessageRoleEnumFromMessageType = (
-  messageType: MessageType
-): openai.ChatCompletionRequestMessageRoleEnum => {
-  switch (messageType) {
-    case MessageType.USER:
-      return "user";
-    case MessageType.BOT:
-      return "system";
-    default:
-      throw new InternalError("Invalid message type");
-  }
-};
-
 const transformMessageToChatCompletionMessage = (
   message: Message
 ): ChatCompletionRequestMessage => {
@@ -70,22 +57,6 @@ const updateChat = async (chatId: string, params: Prisma.ChatUpdateInput) => {
     },
   });
   return newChat;
-};
-
-const createMessage = async (
-  message: ChatCompletionRequestMessage,
-  chat: Chat
-) => {
-  const { role, content } = message;
-  const type = role === "user" ? MessageType.USER : MessageType.BOT;
-  const newMessage = await dbClient.message.create({
-    data: {
-      content,
-      type,
-      chatId: chat.id,
-    },
-  });
-  return newMessage;
 };
 
 /**
@@ -184,14 +155,15 @@ export const createGPTRequestFromPrompt = async ({
     if (messages.length === 0) {
       const promptStart =
         "You are a tutor named Judie that always responds in the Socratic style.\n\
-         You *never* give the student the answer, but always try to ask just the right question to help them learn to think for themselves.\n\
-         You should always tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.\n\n\
+         You don't usually just give the student the answer, but always try to ask just the right question to help them learn to think for themselves.\n\
+         You should always try to tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.\n\n\
         ";
 
       newMessages.push({
         content: promptStart,
-        type: MessageType.BOT,
+        type: MessageType.SYSTEM,
         createdAt: new Date(),
+        readableContent: promptStart,
       });
     }
 
@@ -219,7 +191,7 @@ export const createGPTRequestFromPrompt = async ({
           (match) =>
             match &&
             !!(match.metadata as { [key: string]: string }).Sentence &&
-            (match?.score || 0) > 0.8
+            (match?.score || 0) > 0.9
         )
         ?.map(
           (match) => (match.metadata as { [key: string]: string }).Sentence
@@ -241,6 +213,7 @@ export const createGPTRequestFromPrompt = async ({
     newMessages.push({
       content: currentPrompt,
       type: MessageType.USER,
+      readableContent: prompt,
       createdAt: new Date(),
     });
 
@@ -250,6 +223,7 @@ export const createGPTRequestFromPrompt = async ({
         content: m.content,
         type: m.type,
         createdAt: m.createdAt,
+        readableContent: m.readableContent,
       }));
 
     const newChat = await updateChat(chat.id, {
@@ -324,6 +298,8 @@ export const getChatGPTCompletion = async (
       const newMessage = {
         content: completionMessageContent,
         type: MessageType.BOT,
+        createdAt: new Date(),
+        readableContent: completionMessageContent,
       };
       // Save new completion to DB
       const newChat = await updateChat(chat.id, {
@@ -332,6 +308,7 @@ export const getChatGPTCompletion = async (
           create: newMessage,
         },
       });
+
       // TODO: Make this a background job (or send to inference-service?)
       // TODO: Save to Pinecone as vector
       // Get vector from OpenAI

@@ -21,7 +21,7 @@ router.post(
     const userId = await signup({ email, password, name, receivePromotions });
     // Create session for user
     session.userId = userId;
-    res.status(201).send({});
+    res.status(201).send({ success: true });
   })
 );
 
@@ -36,7 +36,7 @@ router.post(
     const userId = await signin({ email, password });
     // Create session for user
     session.userId = userId;
-    res.status(201).send({});
+    res.status(200).send({ success: true });
   })
 );
 
