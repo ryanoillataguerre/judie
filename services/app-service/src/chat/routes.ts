@@ -12,6 +12,7 @@ import InternalError from "../utils/errors/InternalError.js";
 const router = Router();
 
 const transformChat = (chat: Chat & { messages: Message[] }) => {
+  // Remove system message from chat
   chat?.messages?.pop();
   return {
     id: chat.id,

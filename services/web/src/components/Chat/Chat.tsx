@@ -14,6 +14,7 @@ import { Message, MessageType } from "@judie/data/types/api";
 import useStorageState from "@judie/hooks/useStorageState";
 import Loading from "../lottie/Loading/Loading";
 import { getUserActiveChatQuery } from "@judie/data/queries";
+import { Progress } from "@chakra-ui/react";
 
 interface ChatProps {
   initialQuery?: string;
@@ -46,7 +47,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
   } = useMutation({
     mutationFn: completionFromQueryMutation,
     onError: (error) => {
-      console.log("Error getting completion", error);
+      console.error("Error getting completion", error);
     },
     onSuccess: (data) => {
       if (chatId !== data?.id) {
@@ -60,9 +61,6 @@ const Chat = ({ initialQuery }: ChatProps) => {
     retry: false,
   });
 
-  console.log("chatId", chatId);
-  console.log("messages", messages);
-
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
   useEffect(() => {
@@ -72,7 +70,6 @@ const Chat = ({ initialQuery }: ChatProps) => {
     }
     (async () => {
       const result = await fetchExistingChat();
-      console.log(result);
       if (result?.data?.id) {
         setChatId(result?.data?.id);
         setMessages(result?.data?.messages);
@@ -114,6 +111,15 @@ const Chat = ({ initialQuery }: ChatProps) => {
           ))}
         </div>
         <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
+          {isLoading && (
+            <Progress
+              size="xs"
+              isIndeterminate
+              width={"100%"}
+              colorScheme={"green"}
+              background="transparent"
+            />
+          )}
           <input
             placeholder={"What is mitosis?"}
             className={styles.chatBoxInput}
