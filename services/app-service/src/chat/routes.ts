@@ -6,8 +6,21 @@ import {
   getChatAndMessagesForUser,
   getChatGPTCompletion,
 } from "./service.js";
+import { Chat, Message } from "@prisma/client";
+import InternalError from "../utils/errors/InternalError.js";
 
 const router = Router();
+
+const transformChat = (chat: Chat & { messages: Message[] }) => {
+  chat?.messages?.pop();
+  return {
+    id: chat.id,
+    createdAt: chat.createdAt,
+    updatedAt: chat.updatedAt,
+    userId: chat.userId,
+    messages: chat.messages ? chat.messages.reverse() : [],
+  } as Chat & { messages: Message[] };
+};
 
 router.post(
   "/completion",
@@ -17,26 +30,39 @@ router.post(
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages
-    console.time("getChatAndMessagesForUser");
     const chat = await getChatAndMessagesForUser(
       session.userId,
       req.body.newChat
     );
-    console.timeEnd("getChatAndMessagesForUser");
     // Create GPT request from prompt
-    console.time("createGPTRequestFromPrompt");
     const chatWithUserPrompt = await createGPTRequestFromPrompt({
       userId: session.userId,
       prompt: req.body.query,
       chat,
     });
-    console.timeEnd("createGPTRequestFromPrompt");
     // Get response from ChatGPT
-    console.time("getChatGPTCompletion");
-    const messages = await getChatGPTCompletion(chatWithUserPrompt);
-    console.timeEnd("getChatGPTCompletion");
+    const latestChat = await getChatGPTCompletion(chatWithUserPrompt);
+    if (!latestChat) {
+      throw new InternalError("Could not get response from ChatGPT");
+    }
     res.status(200).json({
-      data: messages,
+      data: transformChat(latestChat),
+    });
+  })
+);
+
+router.get(
+  "/active",
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    const chat = await getChatAndMessagesForUser(
+      session.userId,
+      req.body.newChat
+    );
+
+    res.status(200).json({
+      data: transformChat(chat),
     });
   })
 );

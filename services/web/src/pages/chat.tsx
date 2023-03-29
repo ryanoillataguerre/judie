@@ -9,7 +9,7 @@ interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
-  const auth = useAuth();
+  useAuth();
   return (
     <>
       <Head>

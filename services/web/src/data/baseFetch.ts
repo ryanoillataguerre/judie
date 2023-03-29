@@ -28,13 +28,11 @@ export interface BaseFetchOptions {
   service?: ServiceEnum;
 }
 
-class HTTPResponseError extends Error {
+export class HTTPResponseError extends Error {
   response?: any;
   constructor(response: any, status: number, ...args: any[]) {
     super(
-      `HTTP Error Response: ${status} ${
-        response.statusText || response?.error?.message
-      }`,
+      response.statusText || response?.error?.message,
       // @ts-ignore
       ...args
     );

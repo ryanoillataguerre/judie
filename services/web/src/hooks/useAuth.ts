@@ -1,10 +1,10 @@
 import { SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
+import { User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { JudieUser } from "@services/types";
 
 const redirToChatFrom = ["/signin", "/signup"];
 
@@ -12,7 +12,7 @@ export default function useAuth({
   allowUnauth = false,
 }: {
   allowUnauth?: boolean;
-} = {}): { userData: JudieUser | undefined; isLoading: boolean } {
+} = {}): { userData: User | undefined; isLoading: boolean } {
   const router = useRouter();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
   // GET /users/me

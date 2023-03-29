@@ -1,5 +1,5 @@
 import Navbar from "@judie/components/Navbar/Navbar";
-import { SESSION_COOKIE } from "@judie/data/baseFetch";
+import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import styles from "../styles/Signin.module.scss";
@@ -10,6 +10,7 @@ import { FormEventHandler, useCallback, useEffect, useState } from "react";
 import Input from "@judie/components/Input/Input";
 import Button, { ButtonVariant } from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useToast } from "@chakra-ui/react";
 
 interface SubmitData {
   email: string;
@@ -18,37 +19,45 @@ interface SubmitData {
 
 const SigninForm = () => {
   const router = useRouter();
+  const toast = useToast();
   const { handleSubmit, register } = useForm<SubmitData>({
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const { mutate } = useMutation({
+  const { mutateAsync, isLoading } = useMutation({
     mutationFn: signinMutation,
     onSuccess: () => {
       router.push("/chat");
     },
+    onError: (err: HTTPResponseError) => {
+      console.log("Error signing in", err);
+      toast({
+        title: "Error signing in",
+        description: err.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
   });
-  const onSubmit: SubmitHandler<SubmitData> = ({
+  const onSubmit: SubmitHandler<SubmitData> = async ({
     email,
     password,
   }: SubmitData) => {
     try {
-      mutate({
+      await mutateAsync({
         email,
         password,
       });
-      router.push("/chat");
-    } catch (err) {
-      // TODO: Toast error with err message
-    }
+    } catch (err) {}
   };
 
   return (
     <form
       className={styles.signinFormContainer}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(async (data) => await onSubmit(data))}
     >
       <h1>Sign In</h1>
       <label>Email</label>
@@ -60,6 +69,7 @@ const SigninForm = () => {
       <label>Password</label>
       <Input type="password" register={register} name={"password"} />
       <Button
+        loading={isLoading}
         className={styles.submitButton}
         label="Sign In"
         variant={ButtonVariant.Blue}

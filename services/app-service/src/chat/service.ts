@@ -155,8 +155,8 @@ export const createGPTRequestFromPrompt = async ({
     if (messages.length === 0) {
       const promptStart =
         "You are a tutor named Judie that always responds in the Socratic style.\n\
-         You *never* give the student the answer, but always try to ask just the right question to help them learn to think for themselves.\n\
-         You should always tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.\n\n\
+         You don't usually just give the student the answer, but always try to ask just the right question to help them learn to think for themselves.\n\
+         You should always try to tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.\n\n\
         ";
 
       newMessages.push({
@@ -191,7 +191,7 @@ export const createGPTRequestFromPrompt = async ({
           (match) =>
             match &&
             !!(match.metadata as { [key: string]: string }).Sentence &&
-            (match?.score || 0) > 0.8
+            (match?.score || 0) > 0.9
         )
         ?.map(
           (match) => (match.metadata as { [key: string]: string }).Sentence
@@ -308,6 +308,7 @@ export const getChatGPTCompletion = async (
           create: newMessage,
         },
       });
+
       // TODO: Make this a background job (or send to inference-service?)
       // TODO: Save to Pinecone as vector
       // Get vector from OpenAI
