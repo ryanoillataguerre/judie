@@ -14,6 +14,7 @@ import { Message, MessageType } from "@judie/data/types/api";
 import useStorageState from "@judie/hooks/useStorageState";
 import Loading from "../lottie/Loading/Loading";
 import { getUserActiveChatQuery } from "@judie/data/queries";
+import { Progress } from "@chakra-ui/react";
 
 interface ChatProps {
   initialQuery?: string;
@@ -114,6 +115,15 @@ const Chat = ({ initialQuery }: ChatProps) => {
           ))}
         </div>
         <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
+          {isLoading && (
+            <Progress
+              size="xs"
+              isIndeterminate
+              width={"100%"}
+              colorScheme={"green"}
+              background="transparent"
+            />
+          )}
           <input
             placeholder={"What is mitosis?"}
             className={styles.chatBoxInput}

@@ -154,9 +154,9 @@ export const createGPTRequestFromPrompt = async ({
     // If we haven't given a system prompt yet, give one
     if (messages.length === 0) {
       const promptStart =
-        "You are a tutor named Judie that always responds in the Socratic style.\n\
-         You don't usually just give the student the answer, but always try to ask just the right question to help them learn to think for themselves.\n\
-         You should always try to tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them.\n\n\
+        "You are a tutor named Judie that teaches in the Socratic Style of learning\n\
+        You don't usually just give the student the answer at the first prompt, but try at first to ask just the right question to help them learn to think for themselves.\n\
+        You should always try to tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them. If after asking a question the student does not get it you give them the answer and explain how you got there.  Never just give the answer, answers must come with explanations\n\n\
         ";
 
       newMessages.push({
@@ -258,9 +258,11 @@ export const getChatGPTCompletion = async (
   chat: Chat & { messages: Message[] }
 ): Promise<(Chat & { messages: Message[] }) | undefined> => {
   try {
-    const transformedMessages = chat.messages.map((message: Message) =>
-      transformMessageToChatCompletionMessage(message)
-    );
+    const transformedMessages = chat.messages
+      .reverse()
+      .map((message: Message) =>
+        transformMessageToChatCompletionMessage(message)
+      );
 
     let currentMessagesContentLength = 0;
     const maxLengthLimitedMessages: ChatCompletionRequestMessage[] =

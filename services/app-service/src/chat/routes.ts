@@ -12,6 +12,7 @@ import InternalError from "../utils/errors/InternalError.js";
 const router = Router();
 
 const transformChat = (chat: Chat & { messages: Message[] }) => {
+  // Remove system message from chat
   chat?.messages?.pop();
   return {
     id: chat.id,
@@ -41,6 +42,7 @@ router.post(
       chat,
     });
     // Get response from ChatGPT
+    console.log("chat", chatWithUserPrompt);
     const latestChat = await getChatGPTCompletion(chatWithUserPrompt);
     if (!latestChat) {
       throw new InternalError("Could not get response from ChatGPT");
