@@ -5,3 +5,4 @@ sqlalchemy
 uvicorn
 grpcio
 grpcio-tools
+jupyter
