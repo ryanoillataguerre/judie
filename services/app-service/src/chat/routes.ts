@@ -42,7 +42,6 @@ router.post(
       chat,
     });
     // Get response from ChatGPT
-    console.log("chat", chatWithUserPrompt);
     const latestChat = await getChatGPTCompletion(chatWithUserPrompt);
     if (!latestChat) {
       throw new InternalError("Could not get response from ChatGPT");

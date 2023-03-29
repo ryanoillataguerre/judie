@@ -32,7 +32,7 @@ const SigninForm = () => {
       router.push("/chat");
     },
     onError: (err: HTTPResponseError) => {
-      console.log("Error signing in", err);
+      console.error("Error signing in", err);
       toast({
         title: "Error signing in",
         description: err.message,

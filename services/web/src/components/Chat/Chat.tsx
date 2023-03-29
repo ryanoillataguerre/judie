@@ -47,7 +47,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
   } = useMutation({
     mutationFn: completionFromQueryMutation,
     onError: (error) => {
-      console.log("Error getting completion", error);
+      console.error("Error getting completion", error);
     },
     onSuccess: (data) => {
       if (chatId !== data?.id) {
@@ -61,9 +61,6 @@ const Chat = ({ initialQuery }: ChatProps) => {
     retry: false,
   });
 
-  console.log("chatId", chatId);
-  console.log("messages", messages);
-
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
   useEffect(() => {
@@ -73,7 +70,6 @@ const Chat = ({ initialQuery }: ChatProps) => {
     }
     (async () => {
       const result = await fetchExistingChat();
-      console.log(result);
       if (result?.data?.id) {
         setChatId(result?.data?.id);
         setMessages(result?.data?.messages);
