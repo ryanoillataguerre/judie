@@ -114,8 +114,8 @@ export default function Home() {
   );
 }
 
-export async function getStaticProps(context: GetStaticPropsContext) {
-  return {
-    props: {},
-  };
-}
+// export async function getStaticProps(context: GetStaticPropsContext) {
+//   return {
+//     props: {},
+//   };
+// }

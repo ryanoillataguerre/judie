@@ -9,6 +9,7 @@
 
 .messageRowLeft {
   justify-content: flex-start;
+  padding-right: 20%;
   .messageContainer {
     background-color: v.$primary-teal;
     border-radius: 12px 12px 12px 0px;
@@ -28,6 +29,7 @@
 
 .messageRowRight {
   justify-content: flex-end;
+  padding-left: 20%;
   .messageContainer {
     background-color: #f1f0f0;
     border-radius: 12px 12px 0px 12px;

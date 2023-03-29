@@ -56,7 +56,6 @@ const Chat = ({ initialQuery }: ChatProps) => {
       data?.messages.unshift();
       setMostRecentUserChat(undefined);
       setMessages(data?.messages);
-      console.log("Success getting completion", data);
     },
     retry: false,
   });
