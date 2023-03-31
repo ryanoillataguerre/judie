@@ -33,7 +33,7 @@ export default function useAuth({
       1000
     );
     return () => clearTimeout(timer);
-  });
+  }, []);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {

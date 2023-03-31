@@ -1,14 +1,31 @@
 import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
-import Navbar from "@judie/components/Navbar/Navbar";
-import ChatBox from "@judie/components/ChatBox/ChatBox";
-import Button, { ButtonVariant } from "@judie/components/Button/Button";
-import HomepageBackground, {
-  HomepageStyle,
-} from "@judie/components/lottie/HomepageBackground/HomepageBackground";
-import { GetStaticPropsContext } from "next";
-import { FormEventHandler, useEffect, useState } from "react";
+import { ButtonVariant } from "@judie/components/Button/Button";
+import { HomepageStyle } from "@judie/components/lottie/HomepageBackground/HomepageBackground";
+import { FormEventHandler, Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+import { GetStaticPropsContext } from "next";
+
+const DynamicBackground = dynamic(
+  () =>
+    import("@judie/components/lottie/HomepageBackground/HomepageBackground"),
+  {
+    ssr: false,
+  }
+);
+const DynamicNavbar = dynamic(() => import("@judie/components/Navbar/Navbar"), {
+  ssr: false,
+});
+const DynamicChatBox = dynamic(
+  () => import("@judie/components/ChatBox/ChatBox"),
+  {
+    ssr: false,
+  }
+);
+const DynamicButton = dynamic(() => import("@judie/components/Button/Button"), {
+  ssr: false,
+});
 
 export default function Home() {
   const router = useRouter();
@@ -19,8 +36,11 @@ export default function Home() {
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     const url = `/chat?query=${query}`;
-    router.push(url);
+    if (router?.isReady) {
+      router?.push(url);
+    }
   };
+
   useEffect(() => {
     // Randomly pick between two background animations
     // TODO: This leads to a flash of the default background, we should fix this
@@ -44,8 +64,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <HomepageBackground mode={styleMode} />
-        <Navbar />
+        <Suspense fallback={<div />}>
+          <DynamicBackground mode={styleMode} />
+        </Suspense>
+        <Suspense fallback={<div />}>
+          <DynamicNavbar />
+        </Suspense>
         <div className={styles.pageContentContainer}>
           <div className={styles.contentContainer}>
             {/* Title */}
@@ -70,17 +94,21 @@ export default function Home() {
             </h2>
             {/* Chat Box */}
             <form className={styles.formContainer} onSubmit={onSubmit}>
-              <ChatBox onChange={(e) => setQuery(e.target.value)} />
+              <Suspense fallback={<div />}>
+                <DynamicChatBox onChange={(e) => setQuery(e.target.value)} />
+              </Suspense>
               <div className={styles.buttonContainer}>
-                <Button
-                  className={styles.submitButton}
-                  label="Start Learning"
-                  variant={
-                    styleMode === HomepageStyle.Blue
-                      ? ButtonVariant.Blue
-                      : ButtonVariant.Default
-                  }
-                />
+                <Suspense fallback={<div />}>
+                  <DynamicButton
+                    className={styles.submitButton}
+                    label="Start Learning"
+                    variant={
+                      styleMode === HomepageStyle.Blue
+                        ? ButtonVariant.Blue
+                        : ButtonVariant.Default
+                    }
+                  />
+                </Suspense>
               </div>
             </form>
             {/* Extra Info */}

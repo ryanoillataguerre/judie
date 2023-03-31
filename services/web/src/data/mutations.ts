@@ -37,3 +37,22 @@ export const signinMutation = async ({
   });
   return response.data;
 };
+
+export const signupMutation = async ({
+  name,
+  email,
+  password,
+  receivePromotions,
+}: {
+  name: string;
+  email: string;
+  password: string;
+  receivePromotions: boolean;
+}) => {
+  const response = await baseFetch({
+    url: "/auth/signup",
+    method: "POST",
+    body: { email, password, name, receivePromotions },
+  });
+  return response.data;
+};

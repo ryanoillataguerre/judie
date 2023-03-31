@@ -1,16 +1,10 @@
-import { useState } from "react";
 import styles from "./Navbar.module.scss";
 import Link from "next/link";
 import Button, { ButtonVariant } from "../Button/Button";
-import { useRouter } from "next/router";
 import useAuth from "@judie/hooks/useAuth";
 
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
-  // TODO: Mobile hamburger
-  const [isOpen, setIsOpen] = useState(false);
-
-  const router = useRouter();
   return (
     <div className={styles.container}>
       <Link href={"/"}>
@@ -23,7 +17,6 @@ const Navbar = () => {
       </Link>
       <div className={styles.rightContainer}>
         {/* TODO: About */}
-
         {!auth.userData && (
           <>
             <Link href={"/signin"}>
