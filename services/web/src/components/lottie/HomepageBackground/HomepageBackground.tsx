@@ -2,6 +2,7 @@ import Lottie from "lottie-react";
 import animationData from "@judie/styles/lottie/background-animation.json";
 import animationData2 from "@judie/styles/lottie/background-animation-2.json";
 import styles from "./HomepageBackground.module.scss";
+import dynamic from "next/dynamic";
 
 export enum HomepageStyle {
   Default = "default",
@@ -24,4 +25,6 @@ const HomepageBackground = ({ mode }: { mode: HomepageStyle }) => {
   );
 };
 
-export default HomepageBackground;
+export default dynamic(() => Promise.resolve(HomepageBackground), {
+  ssr: false,
+});

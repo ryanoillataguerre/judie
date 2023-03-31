@@ -1,4 +1,3 @@
-import Navbar from "@judie/components/Navbar/Navbar";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";

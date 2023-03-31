@@ -1,6 +1,13 @@
 import { RegisterOptions, UseFormRegister } from "react-hook-form";
 import styles from "./Input.module.scss";
-import { ErrorMessage } from "@hookform/error-message";
+import dynamic from "next/dynamic";
+
+const ErrorMessage = dynamic(
+  () => import("@hookform/error-message").then((res) => res.ErrorMessage),
+  {
+    ssr: false,
+  }
+);
 
 interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -22,11 +29,15 @@ const Input = ({
         {...(register ? register(name) : {})}
         {...props}
       />
-      <ErrorMessage
-        errors={errors}
-        name={name}
-        render={({ message }) => <p className={styles.errorText}>{message}</p>}
-      />
+      {errors && errors[name] && (
+        <ErrorMessage
+          errors={errors}
+          name={name}
+          render={({ message }) => (
+            <p className={styles.errorText}>{message}</p>
+          )}
+        />
+      )}
     </>
   );
 };
