@@ -6,7 +6,6 @@ from concurrent import futures
 import logging
 import sys
 
-
 class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServicer):
     """
     Class to define the behavior of the Inference Service
@@ -29,6 +28,7 @@ def serve():
     logger.info(f'Inference GRPC server running at on port {grpc_port}')
     server.wait_for_termination(timeout=3)
     logger.info('Server ded')
+
 
 if __name__ == '__main__':
     # set up logging
