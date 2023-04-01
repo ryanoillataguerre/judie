@@ -1,5 +1,17 @@
 @use "@judie/styles/variables.scss" as v;
 
+.required:after {
+  content:" *";
+  color: red;
+}
+
+.label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.1rem;
+}
+
 .input {
   display: block;
   // max-width: 600px;

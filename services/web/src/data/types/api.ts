@@ -6,6 +6,8 @@ export interface User {
   receivePromotions: boolean;
   createdAt: Date;
   updatedAt: Date | null;
+  role: UserRole;
+  district?: string;
 }
 
 export enum MessageType {
@@ -29,4 +31,11 @@ export interface Chat {
   createdAt: Date;
   updatedAt: Date | null;
   messages: Message[];
+}
+
+export enum UserRole {
+  ADMINISTRATOR = "ADMINISTRATOR",
+  TEACHER = "TEACHER",
+  STUDENT = "STUDENT",
+  JUDIE = "JUDIE",
 }

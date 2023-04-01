@@ -15,7 +15,7 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
-  return "http://localhost:8080";
+  return process.env.NEXT_PUBLIC_API_URI || "http://localhost:8080";
 };
 
 export interface BaseFetchOptions {

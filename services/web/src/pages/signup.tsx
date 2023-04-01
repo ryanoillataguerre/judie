@@ -98,24 +98,24 @@ const SignupForm = () => {
       onSubmit={handleSubmit(async (data) => await onSubmit(data))}
     >
       <h1>Sign Up</h1>
-      <label>Name</label>
       <Input
+        label={"Name"}
         errors={errors}
         required
-        placeholder={"Naruto Uzumaki"}
+        placeholder={""}
         register={register}
         name={"name"}
       />
-      <label>Email</label>
       <Input
+        label={"Email"}
         errors={errors}
         required
         placeholder={"judie@judie.ai"}
         register={register}
         name={"email"}
       />
-      <label>Password</label>
       <Input
+        label={"Password"}
         errors={errors}
         required
         type="password"
@@ -123,6 +123,7 @@ const SignupForm = () => {
         register={register}
         name={"password"}
       />
+
       <div className={styles.bottomRow}>
         <Checkbox
           onChange={(e) => setReceivePromotions(e.target.checked)}

@@ -23,6 +23,13 @@ enum GradeYear {
   GRADUATE
 }
 
+enum UserRole {
+  ADMINISTRATOR
+  TEACHER
+  STUDENT
+  JUDIE
+}
+
 model User {
   id                String     @id @default(uuid())
   email             String     @unique
@@ -33,6 +40,8 @@ model User {
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedAt         DateTime?  @updatedAt @map("updated_at")
   chats             Chat[]
+  role              UserRole   @default(STUDENT)
+  district          String?
 
   @@index([id, email])
   @@map("users")

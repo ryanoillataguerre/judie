@@ -13,6 +13,7 @@ interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   errors?: any;
   register?: UseFormRegister<any>;
+  label?: string | JSX.Element;
 }
 
 const Input = ({
@@ -20,12 +21,22 @@ const Input = ({
   className,
   errors,
   register,
+  required,
+  label,
   ...props
 }: CustomInputProps) => {
   return (
     <>
+      <h4
+        className={
+          required ? [styles.label, styles.required].join(" ") : styles.label
+        }
+      >
+        {label || name}
+      </h4>
       <input
         className={styles.input}
+        required
         {...(register ? register(name) : {})}
         {...props}
       />
