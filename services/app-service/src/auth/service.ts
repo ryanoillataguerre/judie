@@ -2,17 +2,22 @@ import bcrypt from "bcryptjs";
 import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
+import { UserRole } from "@prisma/client";
 
 export const signup = async ({
   name,
   email,
   password,
   receivePromotions,
+  role,
+  district,
 }: {
   name: string;
   email: string;
   password: string;
   receivePromotions: boolean;
+  role: UserRole;
+  district?: string;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -40,6 +45,8 @@ export const signup = async ({
       email,
       password: _password,
       receivePromotions,
+      role,
+      district,
     },
   });
 

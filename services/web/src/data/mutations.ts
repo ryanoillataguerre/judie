@@ -1,5 +1,5 @@
 import { baseFetch } from "./baseFetch";
-import { Message } from "./types/api";
+import { Message, UserRole } from "./types/api";
 
 export interface ChatCompletionResponse {
   id: string;
@@ -43,16 +43,20 @@ export const signupMutation = async ({
   email,
   password,
   receivePromotions,
+  role,
+  district,
 }: {
   name: string;
   email: string;
   password: string;
   receivePromotions: boolean;
+  role: UserRole;
+  district?: string;
 }) => {
   const response = await baseFetch({
     url: "/auth/signup",
     method: "POST",
-    body: { email, password, name, receivePromotions },
+    body: { email, password, name, receivePromotions, role, district },
   });
   return response.data;
 };

@@ -1,4 +1,4 @@
-import { RegisterOptions, UseFormRegister } from "react-hook-form";
+import { UseFormRegister } from "react-hook-form";
 import styles from "./Input.module.scss";
 import dynamic from "next/dynamic";
 
@@ -27,13 +27,15 @@ const Input = ({
 }: CustomInputProps) => {
   return (
     <>
-      <h4
-        className={
-          required ? [styles.label, styles.required].join(" ") : styles.label
-        }
-      >
-        {label || name}
-      </h4>
+      {label && (
+        <h4
+          className={
+            required ? [styles.label, styles.required].join(" ") : styles.label
+          }
+        >
+          {label}
+        </h4>
+      )}
       <input
         className={styles.input}
         required

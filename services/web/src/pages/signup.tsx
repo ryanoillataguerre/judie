@@ -10,13 +10,17 @@ import { useState } from "react";
 import Input from "@judie/components/Input/Input";
 import Button, { ButtonVariant } from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Checkbox, useToast } from "@chakra-ui/react";
+import { Checkbox, Select, useToast } from "@chakra-ui/react";
+import { UserRole } from "@judie/data/types/api";
+import inputStyles from "@judie/components/Input/Input.module.scss";
 
 interface SubmitData {
   email: string;
   password: string;
   name: string;
   receivePromotions: boolean;
+  role: UserRole;
+  district?: string;
 }
 
 const SignupForm = () => {
@@ -32,6 +36,8 @@ const SignupForm = () => {
       password: "",
       name: "",
       receivePromotions: true,
+      role: UserRole.STUDENT,
+      district: "",
     },
     reValidateMode: "onBlur",
   });
@@ -123,7 +129,20 @@ const SignupForm = () => {
         register={register}
         name={"password"}
       />
-
+      <label className={[inputStyles.label, inputStyles.required].join(" ")}>
+        Role
+      </label>
+      <Select {...register("role")} className={styles.roleSelector}>
+        <option value={UserRole.STUDENT}>Student</option>
+        <option value={UserRole.TEACHER}>Teacher</option>
+        <option value={UserRole.ADMINISTRATOR}>Administrator</option>
+      </Select>
+      <Input
+        register={register}
+        name={"district"}
+        errors={errors}
+        label={"District"}
+      />
       <div className={styles.bottomRow}>
         <Checkbox
           onChange={(e) => setReceivePromotions(e.target.checked)}

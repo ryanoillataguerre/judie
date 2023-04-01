@@ -16,9 +16,17 @@ router.post(
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const { email, password, name, receivePromotions } = req.body;
+    const { email, password, name, receivePromotions, role, district } =
+      req.body;
     // Create user
-    const userId = await signup({ email, password, name, receivePromotions });
+    const userId = await signup({
+      email,
+      password,
+      name,
+      receivePromotions,
+      role,
+      district,
+    });
     // Create session for user
     session.userId = userId;
     res.status(201).send({ success: true });
