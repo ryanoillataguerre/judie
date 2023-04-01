@@ -77,7 +77,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
         setMessages([]);
       }
     })();
-  }, []);
+  }, [chatValue.length, fetchExistingChat, router, setChatId, setMessages]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 

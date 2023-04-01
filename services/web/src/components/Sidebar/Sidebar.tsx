@@ -26,9 +26,8 @@ const Sidebar = () => {
     <div className={styles.sidebarContainer}>
       {sidebarIcons.map((icon, index) => {
         return (
-          <Tooltip label={icon.tooltipText} placement="right">
+          <Tooltip label={icon.tooltipText} placement="right" key={icon.label}>
             <div
-              key={icon.label}
               className={[
                 styles.baseIcon,
                 activeIcon === icon.label

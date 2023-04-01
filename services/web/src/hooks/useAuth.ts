@@ -8,6 +8,8 @@ import { useQuery } from "react-query";
 
 const redirToChatFrom = ["/signin", "/signup"];
 
+const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
+
 export default function useAuth({
   allowUnauth = false,
 }: {
@@ -38,20 +40,34 @@ export default function useAuth({
   // If cookies do not exist, redirect to signin
   useEffect(() => {
     if (!sessionCookie) {
-      if (!allowUnauth && !userData && !isLoading && isError) {
+      if (
+        !allowUnauth &&
+        !userData &&
+        !isLoading &&
+        isError &&
+        !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
+      ) {
         router.push("/signin");
       }
     } else {
       refetch();
     }
-  }, [sessionCookie]);
+  }, [
+    sessionCookie,
+    allowUnauth,
+    isError,
+    isLoading,
+    refetch,
+    router,
+    userData,
+  ]);
 
   useEffect(() => {
-    if (!userData && !isLoading && isError && isFetched) {
+    if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
       deleteCookie(SESSION_COOKIE);
       router.push("/signin");
     }
-  }, [userData, isError, isLoading, isFetched]);
+  }, [userData, isError, isLoading, isFetched, router, allowUnauth]);
 
   useEffect(() => {
     // Redirect away from sign in and sign up pages if logged in
@@ -62,7 +78,7 @@ export default function useAuth({
     } else {
       refetch();
     }
-  }, [router.asPath, sessionCookie]);
+  }, [router.asPath, sessionCookie, refetch, router]);
 
   return { userData, isLoading };
 }
