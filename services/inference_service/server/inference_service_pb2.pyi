@@ -6,20 +6,18 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ConvTurn(_message.Message):
-    __slots__ = ["student_query", "tutor_response"]
-    STUDENT_QUERY_FIELD_NUMBER: _ClassVar[int]
-    TUTOR_RESPONSE_FIELD_NUMBER: _ClassVar[int]
-    student_query: str
-    tutor_response: str
-    def __init__(self, student_query: _Optional[str] = ..., tutor_response: _Optional[str] = ...) -> None: ...
+    __slots__ = ["message", "sender"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    SENDER_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    sender: str
+    def __init__(self, sender: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
 
 class Conversation(_message.Message):
-    __slots__ = ["query", "turn"]
-    QUERY_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["turn"]
     TURN_FIELD_NUMBER: _ClassVar[int]
-    query: str
     turn: _containers.RepeatedCompositeFieldContainer[ConvTurn]
-    def __init__(self, query: _Optional[str] = ..., turn: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...) -> None: ...
+    def __init__(self, turn: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...) -> None: ...
 
 class TutorResponse(_message.Message):
     __slots__ = ["response"]

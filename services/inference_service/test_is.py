@@ -1,0 +1,2 @@
+from inference_service.server import inference_service_pb2_grpc
+print(inference_service_pb2_grpc.__file__)
