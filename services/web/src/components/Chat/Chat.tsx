@@ -96,6 +96,24 @@ const Chat = ({ initialQuery }: ChatProps) => {
     });
   };
 
+  useEffect(() => {
+    if (initialQuery && chatValue === initialQuery) {
+      (async () => {
+        setMostRecentUserChat({
+          type: MessageType.USER,
+          readableContent: chatValue,
+          createdAt: new Date(),
+        });
+        setChatValue("");
+        await mutateAsync({
+          query: chatValue,
+          // When do we want to make a new chat? Maybe a button?
+          newChat: !chatId,
+        });
+      })();
+    }
+  }, [initialQuery, chatValue]);
+
   const reversedMessages = useMemo(() => {
     return messages?.reverse();
   }, [messages]);

@@ -72,6 +72,19 @@
   margin-bottom: 12px;
 }
 
+.switchAuthRow {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px ;
+  a {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
 @keyframes horizontal-shaking {
  0% { transform: translateX(0) }
  25% { transform: translateX(5px) }

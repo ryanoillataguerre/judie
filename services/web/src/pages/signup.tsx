@@ -13,6 +13,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Checkbox, Select, useToast } from "@chakra-ui/react";
 import { UserRole } from "@judie/data/types/api";
 import inputStyles from "@judie/components/Input/Input.module.scss";
+import Link from "next/link";
 
 interface SubmitData {
   email: string;
@@ -44,7 +45,10 @@ const SignupForm = () => {
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signupMutation,
     onSuccess: () => {
-      router.push("/chat");
+      router.push({
+        pathname: "/chat",
+        query: router.query,
+      });
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);
@@ -166,6 +170,19 @@ const SignupForm = () => {
             I agree to the Terms & Conditions
           </p>
         </Checkbox>
+      </div>
+      <div className={styles.switchAuthRow}>
+        <p>Already have an account?</p>
+        <a
+          onClick={() => {
+            router.push({
+              pathname: "/signin",
+              query: router.query,
+            });
+          }}
+        >
+          Sign In
+        </a>
       </div>
       <Button
         loading={isLoading}

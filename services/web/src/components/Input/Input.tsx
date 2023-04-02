@@ -38,7 +38,7 @@ const Input = ({
       )}
       <input
         className={styles.input}
-        required
+        required={required}
         {...(register ? register(name) : {})}
         {...props}
       />

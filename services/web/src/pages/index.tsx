@@ -6,6 +6,7 @@ import { FormEventHandler, Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { GetStaticPropsContext } from "next";
+import useAuth from "@judie/hooks/useAuth";
 
 const DynamicBackground = dynamic(
   () =>
@@ -29,15 +30,23 @@ const DynamicButton = dynamic(() => import("@judie/components/Button/Button"), {
 
 export default function Home() {
   const router = useRouter();
+  const { userData } = useAuth({ allowUnauth: true });
   const [query, setQuery] = useState<string>("");
   const [styleMode, setStyleMode] = useState<HomepageStyle>(
     HomepageStyle.Default
   );
   const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    const url = `/chat?query=${query}`;
-    if (router?.isReady) {
-      router?.push(url);
+    if (userData) {
+      const url = `/chat?query=${query}`;
+      if (router?.isReady) {
+        router?.push(url);
+      }
+    } else {
+      const url = `/signup?query=${query}`;
+      if (router?.isReady) {
+        router?.push(url);
+      }
     }
   };
 

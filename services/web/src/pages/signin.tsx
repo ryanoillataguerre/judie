@@ -28,7 +28,10 @@ const SigninForm = () => {
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signinMutation,
     onSuccess: () => {
-      router.push("/chat");
+      router.push({
+        pathname: "/chat",
+        query: router.query,
+      });
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing in", err);
