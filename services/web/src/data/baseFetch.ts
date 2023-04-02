@@ -21,11 +21,17 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
-  return isClient() &&
-    process.env.NEXT_PUBLIC_NODE_ENV !== Environment.DEV &&
-    process.env.NEX_PUBLIC_NODE_ENV !== Environment.PROD
-    ? "http://localhost:8080"
-    : process.env.NEXT_PUBLIC_API_URI || "http://localhost:8080";
+  switch (process.env.NEXT_PUBLIC_NODE_ENV ?? Environment.LOCAL) {
+    case Environment.LOCAL:
+      if (isClient()) return "http://localhost:8080";
+      return "http://app-service:8080";
+    case Environment.DEV:
+      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
+    case Environment.PROD:
+      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
+    default:
+      return "http://app-service:8080";
+  }
 };
 
 export interface BaseFetchOptions {
