@@ -25,6 +25,7 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     ? ["https://sandbox.judie.io"]
     : ["http://localhost:3000", "http://web:3000"];
   const origin = String(req.headers.origin);
+  console.log("reqHeaders: ", req.headers);
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
@@ -52,10 +53,13 @@ export const handleValidationErrors = (
 };
 
 export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
-  if (!req.session?.userId) {
-    throw new UnauthorizedError("Not authorized");
+  try {
+    if (!req.session?.userId) {
+      throw new UnauthorizedError("Not authorized");
+    }
+  } catch (err) {
+    next(err);
   }
-  next();
 };
 
 // Error wrapping Higher order function
