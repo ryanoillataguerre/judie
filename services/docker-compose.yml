@@ -16,7 +16,7 @@ services:
       - judie-postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:latest
-    command: redis-server --requirepass redis
+    command: redis-server
     volumes:
       - judie-redis-data:/var/lib/redis
     environment:
@@ -42,7 +42,6 @@ services:
       PORT: 8080
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       REDIS_HOST: redis
-      REDIS_PASSWORD: redis
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PINECONE_API_KEY: ${PINECONE_API_KEY}
       PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}

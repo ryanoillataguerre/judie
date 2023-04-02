@@ -101,8 +101,7 @@ export const errorHandler = (
 const RedisStore = connectRedis(session);
 const redisClient = new Redis({
   port: parseInt(process.env.REDIS_PORT || "6379"),
-  host: process.env.REDIS_HOST,
-  password: process.env.REDIS_PASSWORD,
+  host: process.env.REDIS_HOST || "localhost",
 });
 export const sessionLayer = () =>
   session({
