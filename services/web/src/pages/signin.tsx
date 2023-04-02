@@ -71,7 +71,7 @@ const SigninForm = () => {
       <label>Password</label>
       <Input type="password" register={register} name={"password"} />
       <div className={styles.switchAuthRow}>
-        <p>Don't have an account yet?</p>
+        <p>Don&apos;t have an account yet?</p>
         <a
           onClick={() => {
             router.push({

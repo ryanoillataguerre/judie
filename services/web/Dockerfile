@@ -3,6 +3,8 @@ FROM node:18-alpine
 WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
+ENV NEXT_PUBLIC_NODE_ENV production
+ENV NEXT_PUBLIC_API_URI https://prod-app-service-dwdxuw7wya-uw.a.run.app
 
 COPY package.json /app/
 COPY yarn.lock /app/

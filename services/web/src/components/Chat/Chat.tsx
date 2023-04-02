@@ -112,7 +112,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
         });
       })();
     }
-  }, [initialQuery, chatValue]);
+  }, [initialQuery, chatValue, chatId, mutateAsync]);
 
   const reversedMessages = useMemo(() => {
     return messages?.reverse();
