@@ -68,6 +68,8 @@ const SignupForm = () => {
     password,
     name,
     receivePromotions,
+    role,
+    district,
   }: SubmitData) => {
     try {
       setHasSubmitted(true);
@@ -91,6 +93,8 @@ const SignupForm = () => {
         password,
         receivePromotions,
         name,
+        role,
+        district,
       });
     } catch (err) {}
   };
