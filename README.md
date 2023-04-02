@@ -41,9 +41,9 @@ services
 
 ## Build and push the corresponding service's Docker Image
 
-- `docker buildx build --platform linux/amd64 -t gcr.io/judieai/{prod | dev}-{IMAGE_NAME}:latest {PATH_TO_SERVICE_ROOT}`
-- `docker push gcr.io/judieai/{prod | dev}-{IMAGE_NAME}:latest`
+- `docker buildx build --platform linux/amd64 -t us-west1-docker.pkg.dev/{GCP_PROJECT_ID}/{REPOSITORY}/{IMAGE_NAME}:latest {PATH_TO_SERVICE_ROOT}`
+- `docker push us-west1-docker.pkg.dev/{GCP_PROJECT_ID}/{REPOSITORY}/{IMAGE_NAME}:latest`
 
-## Go into the GCP console and redeploy a new revision Cloud Run
+## Redeploy Cloud Run service with new image
 
-- If someone wants to figure out how to do this through the CLI and add the command here, that would be dandy.
+- `gcloud run deploy {CLOUD_RUN_SERVICE_NAME} --image {IMAGE_URL}`
