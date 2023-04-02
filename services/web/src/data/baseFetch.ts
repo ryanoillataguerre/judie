@@ -8,6 +8,12 @@ export enum ServiceEnum {
   ANALYTICS = "analytics",
 }
 
+export enum Environment {
+  LOCAL = "local",
+  DEV = "dev",
+  PROD = "production",
+}
+
 export const SESSION_COOKIE = "judie_sid";
 
 const isClient = () => {
@@ -15,7 +21,9 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
-  return isClient()
+  return isClient() &&
+    process.env.NEXT_PUBLIC_NODE_ENV !== Environment.DEV &&
+    process.env.NEX_PUBLIC_NODE_ENV !== Environment.PROD
     ? "http://localhost:8080"
     : process.env.NEXT_PUBLIC_API_URI || "http://localhost:8080";
 };
