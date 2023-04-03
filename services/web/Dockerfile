@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV PATH /app/node_modules/.bin:$PATH
 ENV NEXT_PUBLIC_NODE_ENV production
-ENV NEXT_PUBLIC_API_URI https://app-service-dp57yopq7a-uw.a.run.app
+ENV NEXT_PUBLIC_API_URI https://app-service.judie.io
 
 COPY package.json /app/
 COPY yarn.lock /app/
