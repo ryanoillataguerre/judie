@@ -27,6 +27,7 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
   const origin = String(req.headers.origin);
   console.log("reqHeaders: ", req.headers);
   if (allowedOrigins.includes(origin)) {
+    console.log("adding origin ", origin);
     res.header("Access-Control-Allow-Origin", origin);
   }
   res.header("Access-Control-Allow-Credentials", "true");
