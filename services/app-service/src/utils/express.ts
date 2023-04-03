@@ -123,6 +123,7 @@ export const sessionLayer = () =>
       maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
       path: "/",
       domain: "judie.io",
+      sameSite: "none",
     },
   });
 
