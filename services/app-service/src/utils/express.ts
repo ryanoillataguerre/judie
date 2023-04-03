@@ -117,6 +117,7 @@ export const sessionLayer = () =>
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
       secure: isProduction(), // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
