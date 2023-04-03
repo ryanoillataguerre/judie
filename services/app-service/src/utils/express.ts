@@ -120,7 +120,9 @@ export const sessionLayer = () =>
     cookie: {
       secure: isProduction(), // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
-      maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in miliseconds - 30d - expire after 30d inactivity
+      maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
+      path: "/",
+      domain: "judie.io",
     },
   });
 
