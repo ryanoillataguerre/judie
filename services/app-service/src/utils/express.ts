@@ -116,10 +116,10 @@ export const sessionLayer = () =>
     store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     proxy: true,
     cookie: {
-      secure: isProduction(), // if true only transmit cookie over https
+      secure: isProduction() || isSandbox(), // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
       maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
       path: "/",
