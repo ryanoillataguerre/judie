@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 
 const redirToChatFrom = ["/signin", "/signup"];
-
 const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
 
 export default function useAuth({
@@ -25,7 +24,7 @@ export default function useAuth({
     error,
     isLoading,
     isFetched,
-  } = useQuery(GET_ME, () => getMeQuery(), {
+  } = useQuery([GET_ME], () => getMeQuery(), {
     enabled: !!sessionCookie,
   });
 
@@ -73,6 +72,7 @@ export default function useAuth({
     // Redirect away from sign in and sign up pages if logged in
     if (sessionCookie) {
       if (redirToChatFrom.includes(router.asPath)) {
+        refetch();
         router.push("/chat");
       }
     } else {

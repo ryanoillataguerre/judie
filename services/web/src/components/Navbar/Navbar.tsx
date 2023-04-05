@@ -5,6 +5,8 @@ import useAuth from "@judie/hooks/useAuth";
 
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
+
+  console.log(auth);
   return (
     <div className={styles.container}>
       <Link href={"/"}>
