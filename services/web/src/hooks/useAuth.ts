@@ -17,6 +17,7 @@ export default function useAuth({
   const router = useRouter();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
   // GET /users/me
+
   const {
     data: userData,
     isError,
@@ -24,16 +25,13 @@ export default function useAuth({
     error,
     isLoading,
     isFetched,
-  } = useQuery([GET_ME], () => getMeQuery(), {
+  } = useQuery(GET_ME, () => getMeQuery(), {
     enabled: !!sessionCookie,
+    staleTime: 1000 * 60,
   });
 
   useEffect(() => {
-    const timer = setTimeout(
-      () => setSessionCookie(getCookie(SESSION_COOKIE)),
-      1000
-    );
-    return () => clearTimeout(timer);
+    setTimeout(() => setSessionCookie(getCookie(SESSION_COOKIE)), 1000);
   }, []);
 
   // If cookies do not exist, redirect to signin

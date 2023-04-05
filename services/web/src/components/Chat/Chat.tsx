@@ -15,6 +15,7 @@ import useStorageState from "@judie/hooks/useStorageState";
 import Loading from "../lottie/Loading/Loading";
 import { GET_ACTIVE_CHAT, getUserActiveChatQuery } from "@judie/data/queries";
 import { Progress } from "@chakra-ui/react";
+import ChatInput from "../ChatInput/ChatInput";
 
 interface ChatProps {
   initialQuery?: string;
@@ -63,7 +64,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
   useEffect(() => {
-    if (chatValue.length > 0) {
+    if (chatValue.length > 0 && chatValue === initialQuery) {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
@@ -113,12 +114,12 @@ const Chat = ({ initialQuery }: ChatProps) => {
           readableContent: chatValue,
           createdAt: new Date(),
         });
-        setChatValue("");
         await mutateAsync({
           query: chatValue,
           // When do we want to make a new chat? Maybe a button?
           newChat: !chatId,
         });
+        setChatValue("");
       })();
     }
   }, [initialQuery, chatValue, chatId, mutateAsync]);
@@ -128,33 +129,26 @@ const Chat = ({ initialQuery }: ChatProps) => {
   }, [messages]);
 
   return (
-    <Suspense fallback={<Loading />}>
-      <div className={styles.chatContainer}>
-        <div className={styles.conversationContainer}>
-          {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
-          {reversedMessages?.map((message, index) => (
-            <MessageRow key={index} message={message} />
-          ))}
-        </div>
-        <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
-          {isLoading && (
-            <Progress
-              size="xs"
-              isIndeterminate
-              width={"100%"}
-              colorScheme={"green"}
-              background="transparent"
-            />
-          )}
-          <input
-            placeholder={"What is mitosis?"}
-            className={styles.chatBoxInput}
-            onChange={(e) => setChatValue(e.target.value)}
-            value={chatValue}
-          />
-        </form>
+    <div className={styles.chatContainer}>
+      <div className={styles.conversationContainer}>
+        {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
+        {reversedMessages?.map((message, index) => (
+          <MessageRow key={index} message={message} />
+        ))}
       </div>
-    </Suspense>
+      <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
+        {isLoading && (
+          <Progress
+            size="xs"
+            isIndeterminate
+            width={"100%"}
+            colorScheme={"green"}
+            background="transparent"
+          />
+        )}
+        <ChatInput chatValue={chatValue} setChatValue={setChatValue} />
+      </form>
+    </div>
   );
 };
 

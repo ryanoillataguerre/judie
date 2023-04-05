@@ -21,23 +21,3 @@
   flex-direction: column;
   align-items: center;
 }
-
-.chatBoxInput {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  border-top: 1px solid;
-  border-color: #ced4da;
-  flex-direction: row;
-  align-items: center;
-  padding: 12px;
-  transition: border-color 0.2s ease-in-out;
-  line-height: 18px;
-  &:focus-visible {
-    outline: none;
-    border-color: v.$primary-blue;
-  }
-  &:hover {
-    border-color: v.$primary-blue;
-  }
-}

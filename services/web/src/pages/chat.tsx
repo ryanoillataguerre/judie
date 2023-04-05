@@ -24,9 +24,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       <main className={styles.main}>
         <Navbar />
         <div className={styles.pageContentContainer}>
-          {/* Sidebar */}
           <Sidebar />
-          {/* Chat UI */}
           <Chat initialQuery={query} />
         </div>
       </main>
