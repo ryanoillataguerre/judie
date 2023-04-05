@@ -5,7 +5,6 @@ import useAuth from "@judie/hooks/useAuth";
 
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
-
   return (
     <div className={styles.container}>
       <Link href={"/"}>
@@ -18,7 +17,7 @@ const Navbar = () => {
       </Link>
       <div className={styles.rightContainer}>
         {/* TODO: About */}
-        {!auth.userData && (
+        {!auth.userData && !auth.isLoading && (
           <>
             <Link href={"/signin"}>
               <Button
