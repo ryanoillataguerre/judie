@@ -9,7 +9,8 @@ if __name__ == "__main__":
         stub = inference_service_pb2_grpc.InferenceServiceStub(channel)
         response = stub.GetChatResponse(
             inference_service_pb2.Conversation(
-                query="Tell me a story",
-                turn=[inference_service_pb2.ConvTurn(student_query="hey", tutor_response="hey"),
-                      inference_service_pb2.ConvTurn(student_query="teach me", tutor_response="I will")]))
+                turn=[inference_service_pb2.ConvTurn(sender="student", message="hey"),
+                      inference_service_pb2.ConvTurn(sender="tutor", message="hey"),
+                      inference_service_pb2.ConvTurn(sender="student", message="teach me"),
+                      ]))
         print("Client received: " + response.response)
