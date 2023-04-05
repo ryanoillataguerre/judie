@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { Message, MessageType } from "@judie/data/types/api";
 import useStorageState from "@judie/hooks/useStorageState";
 import Loading from "../lottie/Loading/Loading";
-import { getUserActiveChatQuery } from "@judie/data/queries";
+import { GET_ACTIVE_CHAT, getUserActiveChatQuery } from "@judie/data/queries";
 import { Progress } from "@chakra-ui/react";
 
 interface ChatProps {
@@ -34,7 +34,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
     isLoading: isExistingChatLoading,
     refetch: fetchExistingChat,
   } = useQuery({
-    queryKey: ["activeChat"],
+    queryKey: [GET_ACTIVE_CHAT],
     queryFn: () => getUserActiveChatQuery(),
     enabled: false,
   });
@@ -67,17 +67,26 @@ const Chat = ({ initialQuery }: ChatProps) => {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
-    (async () => {
-      const result = await fetchExistingChat();
-      if (result?.data?.id) {
-        setChatId(result?.data?.id);
-        setMessages(result?.data?.messages);
-      } else {
-        setChatId("");
-        setMessages([]);
-      }
-    })();
-  }, [chatValue.length, fetchExistingChat, router, setChatId, setMessages]);
+    if (!chatId) {
+      (async () => {
+        const result = await fetchExistingChat();
+        if (result?.data?.id) {
+          setChatId(result?.data?.id);
+          setMessages(result?.data?.messages);
+        } else {
+          setChatId("");
+          setMessages([]);
+        }
+      })();
+    }
+  }, [
+    chatValue.length,
+    fetchExistingChat,
+    router,
+    setChatId,
+    setMessages,
+    chatId,
+  ]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 

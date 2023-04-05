@@ -24,10 +24,9 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     : isSandbox()
     ? ["https://sandbox.judie.io"]
     : ["http://localhost:3000", "http://web:3000"];
+
   const origin = String(req.headers.origin);
-  console.log("reqHeaders: ", req.headers);
   if (allowedOrigins.includes(origin)) {
-    console.log("adding origin ", origin);
     res.header("Access-Control-Allow-Origin", origin);
   }
   res.header("Access-Control-Allow-Credentials", "true");
@@ -58,6 +57,7 @@ export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
     if (!req.session?.userId) {
       throw new UnauthorizedError("Not authorized");
     }
+    next();
   } catch (err) {
     next(err);
   }
@@ -116,15 +116,15 @@ export const sessionLayer = () =>
     store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
-    saveUninitialized: true,
-    proxy: true,
+    saveUninitialized: false,
+    proxy: isProduction() || isSandbox(),
     cookie: {
       secure: isProduction() || isSandbox(), // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
       maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
       path: "/",
-      domain: "judie.io",
-      sameSite: "none",
+      domain: isProduction() || isSandbox() ? "judie.io" : undefined,
+      ...(isProduction() || isSandbox() ? { sameSite: "none" } : {}),
     },
   });
 

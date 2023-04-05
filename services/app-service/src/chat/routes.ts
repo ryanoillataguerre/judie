@@ -1,6 +1,10 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
-import { errorPassthrough, handleValidationErrors } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import {
   createGPTRequestFromPrompt,
   getChatAndMessagesForUser,
@@ -27,6 +31,7 @@ router.post(
   "/completion",
   [body("query").exists()],
   [body("newChat").exists().isBoolean().default(false)],
+  requireAuth,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -54,6 +59,7 @@ router.post(
 
 router.get(
   "/active",
+  requireAuth,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;

@@ -6,7 +6,7 @@ const router = Router();
 
 router.get(
   "/me",
-  requireAuth,
+  // requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const user = await getUser(session.userId!);
