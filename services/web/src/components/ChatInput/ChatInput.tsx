@@ -9,7 +9,7 @@ const ChatInput = ({
   setChatValue: Dispatch<SetStateAction<string>>;
 }) => (
   <input
-    placeholder={"What is mitosis?"}
+    placeholder={"Type your question here..."}
     className={styles.chatBoxInput}
     onChange={(e) => setChatValue(e.target.value)}
     value={chatValue}
