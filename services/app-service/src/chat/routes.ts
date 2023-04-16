@@ -1,17 +1,19 @@
 import { Request, Response, Router } from "express";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 import {
   errorPassthrough,
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
 import {
-  createGPTRequestFromPrompt,
+  getChat,
   getChatAndMessagesForUser,
-  getChatGPTCompletion,
+  getCompletion,
+  getUserChats,
 } from "./service.js";
 import { Chat, Message } from "@prisma/client";
-import InternalError from "../utils/errors/InternalError.js";
+import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
+import NotFoundError from "../utils/errors/NotFoundError.js";
 
 const router = Router();
 
@@ -23,36 +25,29 @@ const transformChat = (chat: Chat & { messages: Message[] }) => {
     createdAt: chat.createdAt,
     updatedAt: chat.updatedAt,
     userId: chat.userId,
-    messages: chat.messages ? chat.messages.reverse() : [],
+    messages: chat.messages?.length ? chat.messages.reverse() : [],
   } as Chat & { messages: Message[] };
 };
 
 router.post(
   "/completion",
   [body("query").exists()],
-  [body("newChat").exists().isBoolean().default(false)],
+  [query("chatId").optional()],
   requireAuth,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages
-    const chat = await getChatAndMessagesForUser(
-      session.userId,
-      req.body.newChat
-    );
-    // Create GPT request from prompt
-    const chatWithUserPrompt = await createGPTRequestFromPrompt({
-      userId: session.userId,
-      prompt: req.body.query,
-      chat,
-    });
-    // Get response from ChatGPT
-    const latestChat = await getChatGPTCompletion(chatWithUserPrompt);
-    if (!latestChat) {
-      throw new InternalError("Could not get response from ChatGPT");
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
     }
+    const newChat = await getCompletion({
+      chatId: req.query.chatId as string | undefined,
+      query: req.body.query,
+      userId: session.userId,
+    });
     res.status(200).json({
-      data: transformChat(latestChat),
+      data: transformChat(newChat),
     });
   })
 );
@@ -67,6 +62,46 @@ router.get(
       session.userId,
       req.body.newChat
     );
+
+    res.status(200).json({
+      data: transformChat(chat),
+    });
+  })
+);
+
+router.get(
+  "/",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    // Typecasting to transform - need to better define transformChat type
+    const chats = (await getUserChats(session.userId)) as (Chat & {
+      messages: Message[];
+    })[];
+
+    res.status(200).json({
+      data: chats?.map((chat) => transformChat(chat)) || [],
+    });
+  })
+);
+
+router.get(
+  "/:chatId",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const chat = await getChat({
+      id: req.params.chatId,
+    });
+    if (!chat) {
+      throw new NotFoundError("Chat not found");
+    }
 
     res.status(200).json({
       data: transformChat(chat),

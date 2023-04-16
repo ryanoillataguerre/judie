@@ -1,10 +1,113 @@
-import { InternalError, UnauthorizedError } from "../utils/errors/index.js";
+import {
+  InternalError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../utils/errors/index.js";
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
 import * as openai from "openai";
 import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
+
+// Chat Service
+export const createChat = async (params: Prisma.ChatCreateInput) => {
+  const newChat = await dbClient.chat.create({
+    data: {
+      ...params,
+    },
+    include: {
+      messages: true,
+    },
+  });
+  return newChat;
+};
+
+export const updateChat = async (
+  chatId: string,
+  params: Prisma.ChatUpdateInput
+) => {
+  const newChat = await dbClient.chat.update({
+    where: {
+      id: chatId,
+    },
+    data: params,
+    include: {
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+  return newChat;
+};
+
+export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
+  const chat = await dbClient.chat.findUnique({
+    where: params,
+    include: {
+      messages: {
+        orderBy: {
+          updatedAt: "desc",
+        },
+      },
+    },
+  });
+  return chat;
+};
+
+export const getUserChats = async (userId: string) => {
+  const chats = await dbClient.chat.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+  return chats;
+};
+
+export const getCompletion = async ({
+  chatId,
+  query,
+  userId,
+}: {
+  chatId?: string;
+  query: string;
+  userId: string;
+}) => {
+  let chat: Chat & { messages: Message[] };
+  if (!chatId) {
+    chat = await createChat({
+      user: { connect: { id: userId } },
+    });
+  } else {
+    const existingChat = await getChat({
+      id: chatId as string,
+    });
+    if (existingChat) {
+      chat = existingChat;
+    } else {
+      throw new NotFoundError("Could not find chat");
+    }
+  }
+  // Create GPT request from prompt
+  const chatWithUserPrompt = await createGPTRequestFromPrompt({
+    userId: userId,
+    prompt: query,
+    chat,
+  });
+  // Get response from ChatGPT
+  const latestChat = await getChatGPTCompletion(chatWithUserPrompt);
+  if (!latestChat) {
+    throw new InternalError("Could not get response from ChatGPT");
+  }
+  return latestChat;
+};
+
+// OpenAI-relevant methods
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -29,36 +132,6 @@ const transformMessageToChatCompletionMessage = (
     content: content,
   };
 };
-
-const createChat = async (params: Prisma.ChatCreateInput) => {
-  const newChat = await dbClient.chat.create({
-    data: {
-      ...params,
-    },
-    include: {
-      messages: true,
-    },
-  });
-  return newChat;
-};
-
-const updateChat = async (chatId: string, params: Prisma.ChatUpdateInput) => {
-  const newChat = await dbClient.chat.update({
-    where: {
-      id: chatId,
-    },
-    data: params,
-    include: {
-      messages: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-    },
-  });
-  return newChat;
-};
-
 /**
  *
  * @remarks
@@ -74,9 +147,6 @@ export const getChatAndMessagesForUser = async (
   userId: string | undefined,
   newChat: boolean = false
 ): Promise<ChatAndMessageResponse> => {
-  if (!userId) {
-    throw new UnauthorizedError("User not found");
-  }
   if (newChat) {
     return await createChat({ user: { connect: { id: userId } } });
   }
@@ -130,8 +200,6 @@ export const getChatAndMessagesForUser = async (
  * @param prompt - The prompt the user just supplied
  * @param chat - ChatAndMessageResponse
  * @returns ChatAndMessageResponse
- *
- * @beta
  */
 export const createGPTRequestFromPrompt = async ({
   userId,
@@ -143,10 +211,6 @@ export const createGPTRequestFromPrompt = async ({
   chat: ChatAndMessageResponse;
 }): Promise<ChatAndMessageResponse> => {
   try {
-    if (!userId) {
-      throw new UnauthorizedError("User Not Found");
-    }
-
     // Build messages array
     const existingMessages = chat.messages;
     const newMessages = [];
@@ -253,8 +317,6 @@ export const createGPTRequestFromPrompt = async ({
  * @param userId - ID of the user
  * @param chat - ChatAndMessageResponse
  * @returns ChatAndMessageResponse
- *
- * @beta
  */
 export const getChatGPTCompletion = async (
   chat: Chat & { messages: Message[] }

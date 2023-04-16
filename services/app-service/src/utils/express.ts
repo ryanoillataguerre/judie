@@ -131,7 +131,7 @@ export const sessionLayer = () =>
 // Extend express session type
 declare module "express-session" {
   interface SessionData {
-    userId?: string;
+    userId: string;
   }
 }
 
