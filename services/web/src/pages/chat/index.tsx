@@ -25,10 +25,12 @@ export default function ChatPage({ query }: ChatPageProps) {
   }, []);
 
   useEffect(() => {
-    console.log(newChatId);
-    router.push(`/chat/${newChatId}`, {
-      query: router.query,
-    });
+    if (newChatId) {
+      router.push({
+        pathname: `/chat/${newChatId}`,
+        query: router.query,
+      });
+    }
   }, [newChatId]);
   return (
     <>

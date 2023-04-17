@@ -30,11 +30,6 @@ export default function useAuth({
       },
     }
   );
-  console.log("isError", isError);
-
-  // useEffect(() => {
-  //   setTimeout(() => setSessionCookie(getCookie(SESSION_COOKIE)), 1000);
-  // }, []);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
