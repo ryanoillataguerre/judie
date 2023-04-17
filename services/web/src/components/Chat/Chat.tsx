@@ -19,12 +19,11 @@ import ChatInput from "../ChatInput/ChatInput";
 
 interface ChatProps {
   initialQuery?: string;
+  chatId: string;
 }
 
-const Chat = ({ initialQuery }: ChatProps) => {
+const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const router = useRouter();
-
-  const [chatId, setChatId] = useStorageState("chat", "chatId");
   const [messages, setMessages] = useStorageState<Message[]>(
     [],
     chatId ?? "messages"
@@ -51,9 +50,6 @@ const Chat = ({ initialQuery }: ChatProps) => {
       console.error("Error getting completion", error);
     },
     onSuccess: (data) => {
-      if (chatId !== data?.id) {
-        setChatId(data?.id);
-      }
       data?.messages.unshift();
       setMostRecentUserChat(undefined);
       setMessages(data?.messages);
@@ -72,22 +68,13 @@ const Chat = ({ initialQuery }: ChatProps) => {
       (async () => {
         const result = await fetchExistingChat();
         if (result?.data?.id) {
-          setChatId(result?.data?.id);
           setMessages(result?.data?.messages);
         } else {
-          setChatId("");
           setMessages([]);
         }
       })();
     }
-  }, [
-    chatValue.length,
-    fetchExistingChat,
-    router,
-    setChatId,
-    setMessages,
-    chatId,
-  ]);
+  }, [chatValue.length, fetchExistingChat, router, setMessages, chatId]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 
@@ -102,7 +89,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
     await mutateAsync({
       query: chatValue,
       // When do we want to make a new chat? Maybe a button?
-      newChat: !chatId,
+      chatId,
     });
   };
 
@@ -116,8 +103,7 @@ const Chat = ({ initialQuery }: ChatProps) => {
         });
         await mutateAsync({
           query: chatValue,
-          // When do we want to make a new chat? Maybe a button?
-          newChat: !chatId,
+          chatId,
         });
         setChatValue("");
       })();

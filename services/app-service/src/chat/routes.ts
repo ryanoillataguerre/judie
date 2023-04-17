@@ -6,6 +6,7 @@ import {
   requireAuth,
 } from "../utils/express.js";
 import {
+  createChat,
   getChat,
   getChatAndMessagesForUser,
   getCompletion,
@@ -105,6 +106,28 @@ router.get(
 
     res.status(200).json({
       data: transformChat(chat),
+    });
+  })
+);
+
+router.post(
+  "/",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const newChat = await createChat({
+      user: {
+        connect: {
+          id: session.userId,
+        },
+      },
+    });
+
+    res.status(200).json({
+      data: transformChat(newChat),
     });
   })
 );

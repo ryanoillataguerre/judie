@@ -10,15 +10,15 @@ export interface ChatCompletionResponse {
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
   query,
-  newChat = false,
+  chatId,
 }: {
   query: string;
-  newChat?: boolean;
+  chatId: string;
 }): Promise<ChatCompletionResponse> => {
   const response = await baseFetch({
     url: "/chat/completion",
     method: "POST",
-    body: { query, newChat },
+    body: { query, chatId },
   });
   return response.data;
 };
@@ -57,6 +57,14 @@ export const signupMutation = async ({
     url: "/auth/signup",
     method: "POST",
     body: { email, password, name, receivePromotions, role, district },
+  });
+  return response.data;
+};
+
+export const createChatMutation = async () => {
+  const response = await baseFetch({
+    url: "/chat",
+    method: "POST",
   });
   return response.data;
 };

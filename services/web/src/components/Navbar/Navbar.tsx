@@ -17,7 +17,7 @@ const Navbar = () => {
       </Link>
       <div className={styles.rightContainer}>
         {/* TODO: About */}
-        {!auth.userData && !auth.isLoading && (
+        {!auth.userData && !auth.isLoading ? (
           <>
             <Link href={"/signin"}>
               <Button
@@ -35,6 +35,10 @@ const Navbar = () => {
               />
             </Link>
           </>
+        ) : (
+          <Link href={"/chat"}>
+            <Button type="button" label="Chat" variant={ButtonVariant.Blue} />
+          </Link>
         )}
       </div>
     </div>

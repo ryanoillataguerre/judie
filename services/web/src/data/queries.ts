@@ -20,3 +20,14 @@ export const getUserActiveChatQuery =
     });
     return response.data;
   };
+
+export const GET_USER_CHATS = "GET_USER_CHATS";
+export const getUserChatsQuery = async (): Promise<
+  ChatCompletionResponse[]
+> => {
+  const response = await baseFetch({
+    url: "/chat",
+    method: "GET",
+  });
+  return response.data;
+};

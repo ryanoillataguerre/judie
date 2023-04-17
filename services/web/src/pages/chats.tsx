@@ -3,17 +3,17 @@ import styles from "../styles/Chat.module.scss";
 import Head from "next/head";
 import Navbar from "@judie/components/Navbar/Navbar";
 import Sidebar from "@judie/components/Sidebar/Sidebar";
-import Chat from "@judie/components/Chat/Chat";
 import useAuth from "@judie/hooks/useAuth";
+import Chats from "@judie/components/Chats/Chats";
 interface ChatPageProps {
   query?: string;
 }
-export default function ChatPage({ query }: ChatPageProps) {
+export default function ChatsPage({ query }: ChatPageProps) {
   useAuth();
   return (
     <>
       <Head>
-        <title>Judie - Chat</title>
+        <title>Judie - Chats</title>
         <meta
           name="description"
           content="Welcome to Judie! We're here to help with your classes, from elementary english to college level maths."
@@ -25,7 +25,7 @@ export default function ChatPage({ query }: ChatPageProps) {
         <Navbar />
         <div className={styles.pageContentContainer}>
           <Sidebar />
-          <Chat initialQuery={query} />
+          <Chats />
         </div>
       </main>
     </>
