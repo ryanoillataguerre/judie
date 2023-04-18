@@ -3,13 +3,27 @@ import styles from "../styles/Chat.module.scss";
 import Head from "next/head";
 import Navbar from "@judie/components/Navbar/Navbar";
 import Sidebar from "@judie/components/Sidebar/Sidebar";
-import useAuth from "@judie/hooks/useAuth";
+import useAuth, { SEEN_CHATS_NOTICE_COOKIE } from "@judie/hooks/useAuth";
 import Chats from "@judie/components/Chats/Chats";
+import { useEffect, useState } from "react";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 interface ChatPageProps {
   query?: string;
 }
 export default function ChatsPage({ query }: ChatPageProps) {
   useAuth();
+  const [hasSeenAlert, setHasSeenAlert] = useState<boolean>(true);
+  useEffect(() => {
+    const alertCookie = getCookie(SEEN_CHATS_NOTICE_COOKIE);
+    if (!alertCookie) {
+      setHasSeenAlert(false);
+    }
+  }, []);
+
+  const onClickDismissAlert = () => {
+    setHasSeenAlert(true);
+    setCookie(SEEN_CHATS_NOTICE_COOKIE, "true");
+  };
   return (
     <>
       <Head>
@@ -25,7 +39,10 @@ export default function ChatsPage({ query }: ChatPageProps) {
         <Navbar />
         <div className={styles.pageContentContainer}>
           <Sidebar />
-          <Chats />
+          <Chats
+            seenAlert={hasSeenAlert}
+            onClickDismissAlert={onClickDismissAlert}
+          />
         </div>
       </main>
     </>
@@ -33,7 +50,6 @@ export default function ChatsPage({ query }: ChatPageProps) {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  // Get query parameter "query" and pass in as a prop
   const query = context.query.query;
   return {
     props: {

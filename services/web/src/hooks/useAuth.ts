@@ -8,6 +8,7 @@ import { useQuery } from "react-query";
 
 const redirToChatFrom = ["/signin", "/signup"];
 const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
+export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
 
 export default function useAuth({
   allowUnauth = false,
