@@ -82,9 +82,7 @@ const Sidebar = () => {
             <div
               className={[
                 styles.baseIcon,
-                activeIcon === icon.label
-                  ? styles.activeIcon
-                  : styles.iconContainer,
+                activeIcon === index ? styles.activeIcon : styles.iconContainer,
               ].join(" ")}
               onClick={() => {
                 if (icon.onClick && icon.enabled) {
