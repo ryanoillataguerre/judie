@@ -67,6 +67,20 @@ export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
   return chat;
 };
 
+export const getChatInternal = async (params: Prisma.ChatWhereUniqueInput) => {
+  const chat = await dbClient.chat.findUnique({
+    where: params,
+    include: {
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+  return chat;
+};
+
 export const getUserChats = async (userId: string) => {
   const chats = await dbClient.chat.findMany({
     where: {
@@ -104,13 +118,19 @@ export const getCompletion = async ({
     }
   }
   // Create GPT request from prompt
-  const chatWithUserPrompt = await createGPTRequestFromPrompt({
+  const chatWithPrompt = await createGPTRequestFromPrompt({
     userId: userId,
     prompt: query,
     chat,
   });
+  const newChat = await getChatInternal({
+    id: chat.id,
+  });
+  if (!newChat) {
+    throw new InternalError("Could not get chat");
+  }
   // Get response from ChatGPT
-  const latestChat = await getChatGPTCompletion(chatWithUserPrompt);
+  const latestChat = await getChatGPTCompletion(newChat);
   if (!latestChat) {
     throw new InternalError("Could not get response from ChatGPT");
   }
@@ -169,6 +189,7 @@ export const createGPTRequestFromPrompt = async ({
     const existingMessages = chat.messages;
     const newMessages = [];
     let messages = existingMessages || [];
+    console.log("messages", messages);
     // If we haven't given a system prompt yet, give one
     if (messages.length === 0) {
       const promptStart =
@@ -177,7 +198,9 @@ export const createGPTRequestFromPrompt = async ({
         You will ask questions upfront to assess the students level with the topic, but if they do not know anything about the topic you will teach them.\n\
         You are very careful with your math calculations.\n\
         Use examples from their interests to keep learning engaging.\n\
-        You prefer to ask questions to guide the student to the correct answer.";
+        You prefer to ask questions to guide the student to the correct answer.\n\
+        You will answer the question using the given context, if any.\n\
+        ";
 
       newMessages.push({
         content: promptStart,
@@ -246,6 +269,7 @@ export const createGPTRequestFromPrompt = async ({
         readableContent: m.readableContent,
       }));
 
+    console.log(newMessagesMapped);
     const newChat = await updateChat(chat.id, {
       messages: {
         createMany: {
@@ -301,11 +325,12 @@ export const getChatGPTCompletion = async (
         },
         []
       );
+    console.log("maxLengthLimitedMessages: ", maxLengthLimitedMessages);
     const completion = await openaiClient.createChatCompletion({
       model: OPENAI_COMPLETION_MODEL,
       messages: maxLengthLimitedMessages,
       user: chat.userId,
-      temperature: 1.0,
+      temperature: 0.7,
       max_tokens: 800,
       top_p: 1,
       frequency_penalty: 0,
