@@ -33,7 +33,6 @@ const Chats = ({
   const { isOpen: isVisible, onClose } = useDisclosure({
     defaultIsOpen: !seenAlert,
     onClose: () => {
-      console.log("closing");
       onClickDismissAlert();
     },
   });

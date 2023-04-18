@@ -189,7 +189,6 @@ export const createGPTRequestFromPrompt = async ({
     const existingMessages = chat.messages;
     const newMessages = [];
     let messages = existingMessages || [];
-    console.log("messages", messages);
     // If we haven't given a system prompt yet, give one
     if (messages.length === 0) {
       const promptStart =
@@ -269,7 +268,6 @@ export const createGPTRequestFromPrompt = async ({
         readableContent: m.readableContent,
       }));
 
-    console.log(newMessagesMapped);
     const newChat = await updateChat(chat.id, {
       messages: {
         createMany: {
@@ -325,7 +323,6 @@ export const getChatGPTCompletion = async (
         },
         []
       );
-    console.log("maxLengthLimitedMessages: ", maxLengthLimitedMessages);
     const completion = await openaiClient.createChatCompletion({
       model: OPENAI_COMPLETION_MODEL,
       messages: maxLengthLimitedMessages,
