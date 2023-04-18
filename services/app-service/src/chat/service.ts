@@ -37,6 +37,11 @@ export const updateChat = async (
         orderBy: {
           createdAt: "desc",
         },
+        where: {
+          type: {
+            not: MessageType.SYSTEM,
+          },
+        },
       },
     },
   });
@@ -50,6 +55,11 @@ export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
       messages: {
         orderBy: {
           updatedAt: "desc",
+        },
+        where: {
+          type: {
+            not: MessageType.SYSTEM,
+          },
         },
       },
     },
@@ -131,62 +141,6 @@ const transformMessageToChatCompletionMessage = (
     role: type === MessageType.USER ? "user" : "system",
     content: content,
   };
-};
-/**
- *
- * @remarks
- * This method retrieves a currently active chat and its messages for a user.
- * If no chat is found, one is created.
- *
- * @param userId - ID of the user
- * @returns ChatAndMessageResponse
- *
- * @beta
- */
-export const getChatAndMessagesForUser = async (
-  userId: string | undefined,
-  newChat: boolean = false
-): Promise<ChatAndMessageResponse> => {
-  if (newChat) {
-    return await createChat({ user: { connect: { id: userId } } });
-  }
-  const chat = await dbClient.chat.findFirst({
-    where: {
-      userId,
-    },
-    include: {
-      messages: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-    take: 1,
-  });
-  // If chat exists
-  if (chat) {
-    // And if it's been updated in the last 5 minutes
-    // Or created in the past 5 minutes
-    const FIVE_MINUTES_MS = 5 * 60 * 1000;
-    const chatUpdatedWithin5Minutes = chat.updatedAt
-      ? new Date().getTime() - new Date(chat.updatedAt).getTime() <
-        FIVE_MINUTES_MS
-      : new Date().getTime() - new Date(chat.createdAt).getTime() <
-        FIVE_MINUTES_MS;
-    // If so, use this current chat and messages
-    if (chatUpdatedWithin5Minutes) {
-      return chat;
-    } else {
-      // If not, create a new chat and return it with no messages
-      return await createChat({ user: { connect: { id: userId } } });
-    }
-  } else {
-    // If user has no chats, create a new chat and return it with no messages
-    return await createChat({ user: { connect: { id: userId } } });
-  }
 };
 
 /**

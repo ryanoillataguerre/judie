@@ -1,7 +1,7 @@
 import { baseFetch } from "./baseFetch";
 import { Message, UserRole } from "./types/api";
 
-export interface ChatCompletionResponse {
+export interface ChatResponse {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -14,11 +14,11 @@ export const completionFromQueryMutation = async ({
 }: {
   query: string;
   chatId: string;
-}): Promise<ChatCompletionResponse> => {
+}): Promise<ChatResponse> => {
   const response = await baseFetch({
-    url: "/chat/completion",
+    url: `/chat/completion?chatId=${chatId}`,
     method: "POST",
-    body: { query, chatId },
+    body: { query },
   });
   return response.data;
 };

@@ -23,8 +23,8 @@ export default function ChatPage({ query }: ChatPageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Navbar />
       <main className={styles.main}>
-        <Navbar />
         <div className={styles.pageContentContainer}>
           <Sidebar />
           <Chat chatId={router.query.chatId as string} initialQuery={query} />

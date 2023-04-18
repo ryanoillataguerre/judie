@@ -11,10 +11,9 @@ import {
 import MessageRow, { TempMessage } from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
 import { Message, MessageType } from "@judie/data/types/api";
-import useStorageState from "@judie/hooks/useStorageState";
 import Loading from "../lottie/Loading/Loading";
-import { GET_ACTIVE_CHAT, getUserActiveChatQuery } from "@judie/data/queries";
-import { Progress } from "@chakra-ui/react";
+import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { Progress, useToast } from "@chakra-ui/react";
 import ChatInput from "../ChatInput/ChatInput";
 
 interface ChatProps {
@@ -24,20 +23,27 @@ interface ChatProps {
 
 const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const router = useRouter();
-  const [messages, setMessages] = useStorageState<Message[]>(
-    [],
-    chatId ?? "messages"
-  );
+  const toast = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const {
     data: existingUserChat,
     isLoading: isExistingChatLoading,
     refetch: fetchExistingChat,
   } = useQuery({
-    queryKey: [GET_ACTIVE_CHAT],
-    queryFn: () => getUserActiveChatQuery(),
+    queryKey: [GET_CHAT_BY_ID],
+    queryFn: () => getChatByIdQuery(chatId),
+    onSuccess: (data) => {
+      setMessages(data?.messages);
+    },
     enabled: false,
   });
+
+  useEffect(() => {
+    if (chatId) {
+      fetchExistingChat();
+    }
+  }, [chatId]);
 
   const {
     isLoading,
@@ -47,10 +53,15 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   } = useMutation({
     mutationFn: completionFromQueryMutation,
     onError: (error) => {
-      console.error("Error getting completion", error);
+      toast({
+        title: "Oops!",
+        description: "Something went wrong, please try again.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
     },
     onSuccess: (data) => {
-      data?.messages.unshift();
       setMostRecentUserChat(undefined);
       setMessages(data?.messages);
     },
@@ -64,22 +75,21 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
-    if (!chatId) {
-      (async () => {
-        const result = await fetchExistingChat();
-        if (result?.data?.id) {
-          setMessages(result?.data?.messages);
-        } else {
-          setMessages([]);
-        }
-      })();
-    }
-  }, [chatValue.length, fetchExistingChat, router, setMessages, chatId]);
+  }, [chatValue.length, router]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    if (isLoading) {
+      toast({
+        title: "Please wait for the previous message to respond",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
     setMostRecentUserChat({
       type: MessageType.USER,
       readableContent: chatValue,

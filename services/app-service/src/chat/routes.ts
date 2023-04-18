@@ -5,13 +5,7 @@ import {
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
-import {
-  createChat,
-  getChat,
-  getChatAndMessagesForUser,
-  getCompletion,
-  getUserChats,
-} from "./service.js";
+import { createChat, getChat, getCompletion, getUserChats } from "./service.js";
 import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
@@ -19,8 +13,6 @@ import NotFoundError from "../utils/errors/NotFoundError.js";
 const router = Router();
 
 const transformChat = (chat: Chat & { messages: Message[] }) => {
-  // Remove system message from chat
-  chat?.messages?.pop();
   return {
     id: chat.id,
     createdAt: chat.createdAt,
@@ -49,23 +41,6 @@ router.post(
     });
     res.status(200).json({
       data: transformChat(newChat),
-    });
-  })
-);
-
-router.get(
-  "/active",
-  requireAuth,
-  handleValidationErrors,
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    const chat = await getChatAndMessagesForUser(
-      session.userId,
-      req.body.newChat
-    );
-
-    res.status(200).json({
-      data: transformChat(chat),
     });
   })
 );
