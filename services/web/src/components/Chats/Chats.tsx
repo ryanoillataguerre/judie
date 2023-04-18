@@ -43,7 +43,6 @@ const Chats = ({
         <Alert
           status="warning"
           width={"100%"}
-          height={"100%"}
           display={"flex"}
           flexDir={"row"}
           alignItems={"center"}
