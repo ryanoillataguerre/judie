@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 cd "${0%/*}"
+ROOT_DIR="$(cd ../..; pwd)"
 
 brew install protobuf
 
@@ -18,5 +19,8 @@ fi
 
 source ../python/ve/bin/activate
 pip install -r ../python/dev_requirements.txt
+
+cd $(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+echo $ROOT_DIR/services > services.pth
 
 exit 0
