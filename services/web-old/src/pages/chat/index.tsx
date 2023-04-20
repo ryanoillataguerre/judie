@@ -1,17 +1,37 @@
 import { GetServerSidePropsContext } from "next";
 import styles from "../../styles/Chat.module.scss";
 import Head from "next/head";
-import Navbar from "@judie/components/Navbar/Navbar";
-import Sidebar from "@judie/components/Sidebar/Sidebar";
-import Chat from "@judie/components/Chat/Chat";
 import useAuth from "@judie/hooks/useAuth";
+import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
+import { useEffect, useState } from "react";
+import { useMutation } from "react-query";
+import { createChatMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
-  const router = useRouter();
   useAuth();
+  const { mutateAsync } = useMutation({
+    mutationFn: createChatMutation,
+  });
+  const [newChatId, setNewChatId] = useState<string | null>(null);
+  const router = useRouter();
+  useEffect(() => {
+    (async () => {
+      const newChat = await mutateAsync();
+      setNewChatId(newChat.id);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (newChatId) {
+      router.push({
+        pathname: `/chat/${newChatId}`,
+        query: router.query,
+      });
+    }
+  }, [newChatId]);
   return (
     <>
       <Head>
@@ -23,6 +43,7 @@ export default function ChatPage({ query }: ChatPageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <LoadingScreen />
     </>
   );
 }

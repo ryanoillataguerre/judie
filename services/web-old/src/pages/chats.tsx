@@ -1,7 +1,10 @@
 import { GetServerSidePropsContext } from "next";
 import styles from "../styles/Chat.module.scss";
 import Head from "next/head";
+import Navbar from "@judie/components/Navbar/Navbar";
+import Sidebar from "@judie/components/Sidebar/Sidebar";
 import useAuth, { SEEN_CHATS_NOTICE_COOKIE } from "@judie/hooks/useAuth";
+import Chats from "@judie/components/Chats/Chats";
 import { useEffect, useState } from "react";
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 interface ChatPageProps {
@@ -32,7 +35,16 @@ export default function ChatsPage({ query }: ChatPageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}></main>
+      <main className={styles.main}>
+        <Navbar />
+        <div className={styles.pageContentContainer}>
+          <Sidebar />
+          <Chats
+            seenAlert={hasSeenAlert}
+            onClickDismissAlert={onClickDismissAlert}
+          />
+        </div>
+      </main>
     </>
   );
 }

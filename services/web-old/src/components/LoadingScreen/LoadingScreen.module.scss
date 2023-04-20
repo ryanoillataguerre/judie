@@ -1,0 +1,14 @@
+@use "@judie/styles/variables.scss" as v;
+
+.loadingPageContainer {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-bottom: 30%;
+  justify-content: center;
+  background-color: v.$primary-teal;
+}
+
+.loadingAnimation {
+  height: 30%;
+}

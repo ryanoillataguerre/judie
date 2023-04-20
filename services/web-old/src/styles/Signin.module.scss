@@ -1,0 +1,66 @@
+@use "@judie/styles/variables.scss" as v;
+
+.main {
+  width: 100vw;
+  height: 100vh;
+}
+
+.pageContentContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  background-color: v.$primary-teal;
+}
+
+.signinFormContainer {
+  width: 80%;
+  @media screen and (min-width: 768px) {
+    width: 30%;
+  }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #FFFFFF;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border-radius: 8px;
+  padding: 36px;
+  input, button {
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0 0 1rem 0;
+  }
+}
+
+.pageHeader {
+  align-self: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #FFF;
+  margin: 0 0 2rem 0;
+}
+
+.logo {
+  width: 10rem;
+  height: 10rem;
+  margin: 3rem;
+}
+
+.switchAuthRow {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px ;
+  a {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}

@@ -1,11 +1,32 @@
 import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
 import { ButtonVariant } from "@judie/components/Button/Button";
+import { HomepageStyle } from "@judie/components/lottie/HomepageBackground/HomepageBackground";
 import { FormEventHandler, Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { GetStaticPropsContext } from "next";
 import useAuth from "@judie/hooks/useAuth";
+
+const DynamicBackground = dynamic(
+  () =>
+    import("@judie/components/lottie/HomepageBackground/HomepageBackground"),
+  {
+    ssr: false,
+  }
+);
+const DynamicNavbar = dynamic(() => import("@judie/components/Navbar/Navbar"), {
+  ssr: false,
+});
+const DynamicChatBox = dynamic(
+  () => import("@judie/components/ChatBox/ChatBox"),
+  {
+    ssr: false,
+  }
+);
+const DynamicButton = dynamic(() => import("@judie/components/Button/Button"), {
+  ssr: false,
+});
 
 export default function Home() {
   const router = useRouter();
