@@ -3,6 +3,7 @@ infrastructure/python/ve
 
 **/dist
 .env
+**/__pycache__
 
 # Dependencies
 **/node_modules
