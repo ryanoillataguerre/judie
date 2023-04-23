@@ -34,8 +34,8 @@ services:
       - ./protos:/app/protos # Copies protos into the container at dir /app/protos
     working_dir: /app
     build:
-      context: ./app-service
-      dockerfile: ./Dockerfile.local
+      context: .
+      dockerfile: ./app-service/Dockerfile.local
     ports:
       - 8080:8080
     environment:

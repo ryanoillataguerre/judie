@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 cd "${0%/*}"
-cd ../../services
 
 PY_OUT=inference_service/server
 PROTO_PATH=protos/inference_service/server
