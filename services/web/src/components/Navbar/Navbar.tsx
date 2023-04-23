@@ -2,9 +2,11 @@ import styles from "./Navbar.module.scss";
 import Link from "next/link";
 import Button, { ButtonVariant } from "../Button/Button";
 import useAuth from "@judie/hooks/useAuth";
+import { useRouter } from "next/router";
 
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
+  const router = useRouter();
   return (
     <div className={styles.container}>
       <Link href={"/"}>
@@ -17,7 +19,7 @@ const Navbar = () => {
       </Link>
       <div className={styles.rightContainer}>
         {/* TODO: About */}
-        {!auth.userData && (
+        {!auth.userData && !auth.isLoading ? (
           <>
             <Link href={"/signin"}>
               <Button
@@ -35,6 +37,10 @@ const Navbar = () => {
               />
             </Link>
           </>
+        ) : router.asPath.includes("/chat/") ? null : (
+          <Link href={"/chat"}>
+            <Button type="button" label="Chat" variant={ButtonVariant.Blue} />
+          </Link>
         )}
       </div>
     </div>

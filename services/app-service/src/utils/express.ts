@@ -11,7 +11,7 @@ import {
 } from "./errors/index.js";
 import { Redis } from "ioredis";
 import morgan from "morgan";
-import { isProduction } from "./env.js";
+import { isProduction, isSandbox } from "./env.js";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -19,13 +19,16 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Credentials, Set-Cookie, Cookie, Cookies, Cross-Origin, Access-Control-Allow-Credentials, Authorization, Access-Control-Allow-Origin"
   );
-  // TODO: When switching this to web, change this to actually only allow origins
-  const allowedOrigins = ["http://localhost:3000", "http://web:3000"];
+  const allowedOrigins = isProduction()
+    ? ["https://judie.io"]
+    : isSandbox()
+    ? ["https://sandbox.judie.io"]
+    : ["http://localhost:3000", "http://web:3000"];
+
   const origin = String(req.headers.origin);
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
-  // res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Methods",
@@ -50,10 +53,14 @@ export const handleValidationErrors = (
 };
 
 export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
-  if (!req.session?.userId) {
-    throw new UnauthorizedError("Not authorized");
+  try {
+    if (!req.session?.userId) {
+      throw new UnauthorizedError("Not authorized");
+    }
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 };
 
 // Error wrapping Higher order function
@@ -101,8 +108,7 @@ export const errorHandler = (
 const RedisStore = connectRedis(session);
 const redisClient = new Redis({
   port: parseInt(process.env.REDIS_PORT || "6379"),
-  host: process.env.REDIS_HOST,
-  password: process.env.REDIS_PASSWORD,
+  host: process.env.REDIS_HOST || "localhost",
 });
 export const sessionLayer = () =>
   session({
@@ -111,17 +117,21 @@ export const sessionLayer = () =>
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,
+    proxy: isProduction() || isSandbox(),
     cookie: {
-      secure: isProduction(), // if true only transmit cookie over https
+      secure: isProduction() || isSandbox(), // if true only transmit cookie over https
       httpOnly: false, // if true prevent client side JS from reading the cookie
-      maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in miliseconds - 30d - expire after 30d inactivity
+      maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
+      path: "/",
+      domain: isProduction() || isSandbox() ? "judie.io" : undefined,
+      ...(isProduction() || isSandbox() ? { sameSite: "none" } : {}),
     },
   });
 
 // Extend express session type
 declare module "express-session" {
   interface SessionData {
-    userId?: string;
+    userId: string;
   }
 }
 

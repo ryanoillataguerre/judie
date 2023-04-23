@@ -11,33 +11,39 @@ import {
 import MessageRow, { TempMessage } from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
 import { Message, MessageType } from "@judie/data/types/api";
-import useStorageState from "@judie/hooks/useStorageState";
 import Loading from "../lottie/Loading/Loading";
-import { getUserActiveChatQuery } from "@judie/data/queries";
-import { Progress } from "@chakra-ui/react";
+import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { Progress, useToast } from "@chakra-ui/react";
+import ChatInput from "../ChatInput/ChatInput";
 
 interface ChatProps {
   initialQuery?: string;
+  chatId: string;
 }
 
-const Chat = ({ initialQuery }: ChatProps) => {
+const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const router = useRouter();
-
-  const [chatId, setChatId] = useStorageState("chat", "chatId");
-  const [messages, setMessages] = useStorageState<Message[]>(
-    [],
-    chatId ?? "messages"
-  );
+  const toast = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const {
     data: existingUserChat,
     isLoading: isExistingChatLoading,
     refetch: fetchExistingChat,
   } = useQuery({
-    queryKey: ["activeChat"],
-    queryFn: () => getUserActiveChatQuery(),
+    queryKey: [GET_CHAT_BY_ID],
+    queryFn: () => getChatByIdQuery(chatId),
+    onSuccess: (data) => {
+      setMessages(data?.messages);
+    },
     enabled: false,
   });
+
+  useEffect(() => {
+    if (chatId) {
+      fetchExistingChat();
+    }
+  }, [chatId]);
 
   const {
     isLoading,
@@ -47,13 +53,15 @@ const Chat = ({ initialQuery }: ChatProps) => {
   } = useMutation({
     mutationFn: completionFromQueryMutation,
     onError: (error) => {
-      console.error("Error getting completion", error);
+      toast({
+        title: "Oops!",
+        description: "Something went wrong, please try again.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
     },
     onSuccess: (data) => {
-      if (chatId !== data?.id) {
-        setChatId(data?.id);
-      }
-      data?.messages.unshift();
       setMostRecentUserChat(undefined);
       setMessages(data?.messages);
     },
@@ -63,26 +71,25 @@ const Chat = ({ initialQuery }: ChatProps) => {
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
   useEffect(() => {
-    if (chatValue.length > 0) {
+    if (chatValue.length > 0 && chatValue === initialQuery) {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
-    (async () => {
-      const result = await fetchExistingChat();
-      if (result?.data?.id) {
-        setChatId(result?.data?.id);
-        setMessages(result?.data?.messages);
-      } else {
-        setChatId("");
-        setMessages([]);
-      }
-    })();
-  }, []);
+  }, [chatValue.length, router]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    if (isLoading) {
+      toast({
+        title: "Please wait for the previous message to respond",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
     setMostRecentUserChat({
       type: MessageType.USER,
       readableContent: chatValue,
@@ -92,42 +99,52 @@ const Chat = ({ initialQuery }: ChatProps) => {
     await mutateAsync({
       query: chatValue,
       // When do we want to make a new chat? Maybe a button?
-      newChat: !chatId,
+      chatId,
     });
   };
+
+  useEffect(() => {
+    if (initialQuery && chatValue === initialQuery) {
+      (async () => {
+        setMostRecentUserChat({
+          type: MessageType.USER,
+          readableContent: chatValue,
+          createdAt: new Date(),
+        });
+        await mutateAsync({
+          query: chatValue,
+          chatId,
+        });
+        setChatValue("");
+      })();
+    }
+  }, [initialQuery, chatValue, chatId, mutateAsync]);
 
   const reversedMessages = useMemo(() => {
     return messages?.reverse();
   }, [messages]);
 
   return (
-    <Suspense fallback={<Loading />}>
-      <div className={styles.chatContainer}>
-        <div className={styles.conversationContainer}>
-          {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
-          {reversedMessages?.map((message, index) => (
-            <MessageRow key={index} message={message} />
-          ))}
-        </div>
-        <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
-          {isLoading && (
-            <Progress
-              size="xs"
-              isIndeterminate
-              width={"100%"}
-              colorScheme={"green"}
-              background="transparent"
-            />
-          )}
-          <input
-            placeholder={"What is mitosis?"}
-            className={styles.chatBoxInput}
-            onChange={(e) => setChatValue(e.target.value)}
-            value={chatValue}
-          />
-        </form>
+    <div className={styles.chatContainer}>
+      <div className={styles.conversationContainer}>
+        {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
+        {reversedMessages?.map((message, index) => (
+          <MessageRow key={index} message={message} />
+        ))}
       </div>
-    </Suspense>
+      <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
+        {isLoading && (
+          <Progress
+            size="xs"
+            isIndeterminate
+            width={"100%"}
+            colorScheme={"green"}
+            background="transparent"
+          />
+        )}
+        <ChatInput chatValue={chatValue} setChatValue={setChatValue} />
+      </form>
+    </div>
   );
 };
 

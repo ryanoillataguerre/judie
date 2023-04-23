@@ -28,7 +28,10 @@ const SigninForm = () => {
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signinMutation,
     onSuccess: () => {
-      router.push("/chat");
+      router.push({
+        pathname: "/chat",
+        query: router.query,
+      });
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing in", err);
@@ -67,6 +70,19 @@ const SigninForm = () => {
       />
       <label>Password</label>
       <Input type="password" register={register} name={"password"} />
+      <div className={styles.switchAuthRow}>
+        <p>Don&apos;t have an account yet?</p>
+        <a
+          onClick={() => {
+            router.push({
+              pathname: "/signup",
+              query: router.query,
+            });
+          }}
+        >
+          Sign Up
+        </a>
+      </div>
       <Button
         loading={isLoading}
         className={styles.submitButton}

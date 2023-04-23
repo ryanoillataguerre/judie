@@ -6,3 +6,4 @@ uvicorn
 grpcio
 grpcio-tools
 jupyter
+protoletariat

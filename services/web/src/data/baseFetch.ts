@@ -8,6 +8,12 @@ export enum ServiceEnum {
   ANALYTICS = "analytics",
 }
 
+export enum Environment {
+  LOCAL = "local",
+  DEV = "dev",
+  PROD = "production",
+}
+
 export const SESSION_COOKIE = "judie_sid";
 
 const isClient = () => {
@@ -15,7 +21,17 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
-  return "http://localhost:8080";
+  switch (process.env.NEXT_PUBLIC_NODE_ENV ?? Environment.LOCAL) {
+    case Environment.LOCAL:
+      if (isClient()) return "http://localhost:8080";
+      return "http://app-service:8080";
+    case Environment.DEV:
+      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
+    case Environment.PROD:
+      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
+    default:
+      return "http://app-service:8080";
+  }
 };
 
 export interface BaseFetchOptions {

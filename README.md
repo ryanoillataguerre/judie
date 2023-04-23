@@ -27,3 +27,23 @@ services
 - `npx prisma generate --schema=prisma/schema.prisma`
 - `npx prisma migrate dev`
 - You may need to switch your `app-service/.env` `DATABASE_URL` to `DATABASE_URL="postgresql://postgres:postgres@localhost:5438/postgres"` depending on if you're running this inside the container or locally.
+
+# To Deploy Images
+
+## Make sure you've authenticated with GCloud
+
+- (If you haven't installed GCloud CLI) `brew install gcloud`
+- `gcloud auth login`
+
+## Make sure you've authenticated with Docker and GCR
+
+- `gcloud auth configure-docker gcr.io`
+
+## Build and push the corresponding service's Docker Image
+
+- `docker buildx build --platform linux/amd64 -t us-west1-docker.pkg.dev/{GCP_PROJECT_ID}/{REPOSITORY}/{IMAGE_NAME}:latest {PATH_TO_SERVICE_ROOT}`
+- `docker push us-west1-docker.pkg.dev/{GCP_PROJECT_ID}/{REPOSITORY}/{IMAGE_NAME}:latest`
+
+## Redeploy Cloud Run service with new image
+
+- `gcloud run deploy {CLOUD_RUN_SERVICE_NAME} --image {IMAGE_URL}`

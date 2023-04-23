@@ -10,13 +10,18 @@ import { useState } from "react";
 import Input from "@judie/components/Input/Input";
 import Button, { ButtonVariant } from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Checkbox, useToast } from "@chakra-ui/react";
+import { Checkbox, Select, useToast } from "@chakra-ui/react";
+import { UserRole } from "@judie/data/types/api";
+import inputStyles from "@judie/components/Input/Input.module.scss";
+import Link from "next/link";
 
 interface SubmitData {
   email: string;
   password: string;
   name: string;
   receivePromotions: boolean;
+  role: UserRole;
+  district?: string;
 }
 
 const SignupForm = () => {
@@ -32,13 +37,18 @@ const SignupForm = () => {
       password: "",
       name: "",
       receivePromotions: true,
+      role: UserRole.STUDENT,
+      district: "",
     },
     reValidateMode: "onBlur",
   });
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signupMutation,
     onSuccess: () => {
-      router.push("/chat");
+      router.push({
+        pathname: "/chat",
+        query: router.query,
+      });
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);
@@ -62,6 +72,8 @@ const SignupForm = () => {
     password,
     name,
     receivePromotions,
+    role,
+    district,
   }: SubmitData) => {
     try {
       setHasSubmitted(true);
@@ -85,6 +97,8 @@ const SignupForm = () => {
         password,
         receivePromotions,
         name,
+        role,
+        district,
       });
     } catch (err) {}
   };
@@ -98,30 +112,44 @@ const SignupForm = () => {
       onSubmit={handleSubmit(async (data) => await onSubmit(data))}
     >
       <h1>Sign Up</h1>
-      <label>Name</label>
       <Input
+        label={"Name"}
         errors={errors}
         required
-        placeholder={"Naruto Uzumaki"}
+        placeholder={""}
         register={register}
         name={"name"}
       />
-      <label>Email</label>
       <Input
+        label={"Email"}
         errors={errors}
         required
         placeholder={"judie@judie.ai"}
         register={register}
         name={"email"}
       />
-      <label>Password</label>
       <Input
+        label={"Password"}
         errors={errors}
         required
         type="password"
         minLength={6}
         register={register}
         name={"password"}
+      />
+      <label className={[inputStyles.label, inputStyles.required].join(" ")}>
+        Role
+      </label>
+      <Select {...register("role")} className={styles.roleSelector}>
+        <option value={UserRole.STUDENT}>Student</option>
+        <option value={UserRole.TEACHER}>Teacher</option>
+        <option value={UserRole.ADMINISTRATOR}>Administrator</option>
+      </Select>
+      <Input
+        register={register}
+        name={"district"}
+        errors={errors}
+        label={"District"}
       />
       <div className={styles.bottomRow}>
         <Checkbox
@@ -142,6 +170,19 @@ const SignupForm = () => {
             I agree to the Terms & Conditions
           </p>
         </Checkbox>
+      </div>
+      <div className={styles.switchAuthRow}>
+        <p>Already have an account?</p>
+        <a
+          onClick={() => {
+            router.push({
+              pathname: "/signin",
+              query: router.query,
+            });
+          }}
+        >
+          Sign In
+        </a>
       </div>
       <Button
         loading={isLoading}

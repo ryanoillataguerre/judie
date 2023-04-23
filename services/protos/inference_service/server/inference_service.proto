@@ -1,18 +1,17 @@
 syntax = "proto3";
-package inferenceservice;
+package inference_service.server;
 
 service InferenceService{
   rpc GetChatResponse(Conversation) returns (TutorResponse){}
 }
 
 message Conversation{
-  string query = 1;
-  repeated ConvTurn turns = 2;
+  repeated ConvTurn turns = 1;
 }
 
 message ConvTurn{
-  string student_query = 1;
-  string tutor_response = 2;
+  string sender = 1;
+  string message = 2;
 }
 
 message TutorResponse{

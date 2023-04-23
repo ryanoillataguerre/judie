@@ -16,7 +16,7 @@ services:
       - judie-postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:latest
-    command: redis-server --requirepass redis
+    command: redis-server
     volumes:
       - judie-redis-data:/var/lib/redis
     environment:
@@ -38,18 +38,32 @@ services:
     ports:
       - 8080:8080
     environment:
-      ENV: development
-      SERVER_PORT: 8080
-      PG_USER: postgres
-      PG_PASSWORD: postgres
-      PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DB_NAME: postgres
+      NODE_ENV: local
+      PORT: 8080
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       REDIS_HOST: redis
-      REDIS_PASSWORD: redis
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PINECONE_API_KEY: ${PINECONE_API_KEY}
       PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
+  web:
+    networks:
+      - dev
+    privileged: true
+    depends_on:
+      - app-service
+    volumes:
+      - ./web:/app
+      - /app/web/node_modules
+    working_dir: /app
+    build:
+      context: ./web
+      dockerfile: ./Dockerfile.local
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URI: http://app-service:8080
+
   # inference-service:
   #   networks:
   #     - dev

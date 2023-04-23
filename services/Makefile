@@ -1,16 +1,9 @@
 MAKEFLAGS += -j2
 
-.PHONY: run-backend
-run-backend:
+.PHONY: run
+run:
 	docker compose down
 	docker compose up
-
-.PHONY: run-app
-run-app:
-	cd web; yarn dev
-
-.PHONY: run
-run: run-backend run-app
 
 .PHONY: rebuild
 rebuild:

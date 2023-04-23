@@ -44,7 +44,7 @@ const server = () => {
   const httpServer = http.createServer(app);
 
   httpServer.on("listening", () => {
-    console.info(`app-service listening on port ${process.env.SERVER_PORT}...`);
+    console.info(`app-service listening on port ${process.env.PORT}...`);
   });
 
   return httpServer;

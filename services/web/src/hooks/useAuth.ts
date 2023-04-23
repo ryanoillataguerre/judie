@@ -3,10 +3,12 @@ import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useQuery } from "react-query";
 
 const redirToChatFrom = ["/signin", "/signup"];
+const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
+export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
 
 export default function useAuth({
   allowUnauth = false,
@@ -15,54 +17,62 @@ export default function useAuth({
 } = {}): { userData: User | undefined; isLoading: boolean } {
   const router = useRouter();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
-  // GET /users/me
-  const {
-    data: userData,
-    isError,
-    refetch,
-    error,
-    isLoading,
-    isFetched,
-  } = useQuery(GET_ME, () => getMeQuery(), {
-    enabled: !!sessionCookie,
-  });
 
-  useEffect(() => {
-    const timer = setTimeout(
-      () => setSessionCookie(getCookie(SESSION_COOKIE)),
-      1000
-    );
-    return () => clearTimeout(timer);
-  }, []);
+  const [userData, setUserData] = useState<User | undefined>(undefined);
+  // GET /users/me
+  const { isError, refetch, error, isLoading, isFetched } = useQuery(
+    GET_ME,
+    () => getMeQuery(),
+    {
+      enabled: !!sessionCookie,
+      staleTime: 1000 * 60,
+      onSuccess: (data) => {
+        setUserData(data);
+      },
+    }
+  );
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
     if (!sessionCookie) {
-      if (!allowUnauth && !userData && !isLoading && isError) {
+      if (
+        !allowUnauth &&
+        !isLoading &&
+        isError &&
+        !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
+      ) {
         router.push("/signin");
       }
     } else {
       refetch();
     }
-  }, [sessionCookie]);
+  }, [sessionCookie, allowUnauth, isError, isLoading, refetch, router]);
 
   useEffect(() => {
-    if (!userData && !isLoading && isError && isFetched) {
-      deleteCookie(SESSION_COOKIE);
-      router.push("/signin");
+    if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
+      logout();
     }
-  }, [userData, isError, isLoading, isFetched]);
+  }, [userData, isError, isLoading, isFetched, router, allowUnauth]);
 
   useEffect(() => {
     // Redirect away from sign in and sign up pages if logged in
-    if (sessionCookie) {
-      if (redirToChatFrom.includes(router.asPath)) {
-        router.push("/chat");
-      }
-    } else {
+    if (redirToChatFrom.includes(router.asPath) && sessionCookie) {
       refetch();
+      router.push("/chat");
     }
-  }, [router.asPath, sessionCookie]);
+  }, [sessionCookie, refetch, router]);
+
+  const logout = useCallback(() => {
+    deleteCookie(SESSION_COOKIE);
+    setSessionCookie(undefined);
+    setUserData(undefined);
+    router.push("/signin");
+  }, [router]);
 
   return { userData, isLoading };
+}
+
+export interface AuthData {
+  userData: User | undefined;
+  isLoading: boolean;
 }

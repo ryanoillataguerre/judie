@@ -1,10 +1,143 @@
-import { InternalError, UnauthorizedError } from "../utils/errors/index.js";
+import {
+  InternalError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../utils/errors/index.js";
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
 import * as openai from "openai";
 import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
+
+// Chat Service
+export const createChat = async (params: Prisma.ChatCreateInput) => {
+  const newChat = await dbClient.chat.create({
+    data: {
+      ...params,
+    },
+    include: {
+      messages: true,
+    },
+  });
+  return newChat;
+};
+
+export const updateChat = async (
+  chatId: string,
+  params: Prisma.ChatUpdateInput
+) => {
+  const newChat = await dbClient.chat.update({
+    where: {
+      id: chatId,
+    },
+    data: params,
+    include: {
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        where: {
+          type: {
+            not: MessageType.SYSTEM,
+          },
+        },
+      },
+    },
+  });
+  return newChat;
+};
+
+export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
+  const chat = await dbClient.chat.findUnique({
+    where: params,
+    include: {
+      messages: {
+        orderBy: {
+          updatedAt: "desc",
+        },
+        where: {
+          type: {
+            not: MessageType.SYSTEM,
+          },
+        },
+      },
+    },
+  });
+  return chat;
+};
+
+export const getChatInternal = async (params: Prisma.ChatWhereUniqueInput) => {
+  const chat = await dbClient.chat.findUnique({
+    where: params,
+    include: {
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+  return chat;
+};
+
+export const getUserChats = async (userId: string) => {
+  const chats = await dbClient.chat.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+  return chats;
+};
+
+export const getCompletion = async ({
+  chatId,
+  query,
+  userId,
+}: {
+  chatId?: string;
+  query: string;
+  userId: string;
+}) => {
+  let chat: Chat & { messages: Message[] };
+  if (!chatId) {
+    chat = await createChat({
+      user: { connect: { id: userId } },
+    });
+  } else {
+    const existingChat = await getChat({
+      id: chatId as string,
+    });
+    if (existingChat) {
+      chat = existingChat;
+    } else {
+      throw new NotFoundError("Could not find chat");
+    }
+  }
+  // Create GPT request from prompt
+  const chatWithPrompt = await createGPTRequestFromPrompt({
+    userId: userId,
+    prompt: query,
+    chat,
+  });
+  const newChat = await getChatInternal({
+    id: chat.id,
+  });
+  if (!newChat) {
+    throw new InternalError("Could not get chat");
+  }
+  // Get response from ChatGPT
+  const latestChat = await getChatGPTCompletion(newChat);
+  if (!latestChat) {
+    throw new InternalError("Could not get response from ChatGPT");
+  }
+  return latestChat;
+};
+
+// OpenAI-relevant methods
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -30,95 +163,6 @@ const transformMessageToChatCompletionMessage = (
   };
 };
 
-const createChat = async (params: Prisma.ChatCreateInput) => {
-  const newChat = await dbClient.chat.create({
-    data: {
-      ...params,
-    },
-    include: {
-      messages: true,
-    },
-  });
-  return newChat;
-};
-
-const updateChat = async (chatId: string, params: Prisma.ChatUpdateInput) => {
-  const newChat = await dbClient.chat.update({
-    where: {
-      id: chatId,
-    },
-    data: params,
-    include: {
-      messages: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-    },
-  });
-  return newChat;
-};
-
-/**
- *
- * @remarks
- * This method retrieves a currently active chat and its messages for a user.
- * If no chat is found, one is created.
- *
- * @param userId - ID of the user
- * @returns ChatAndMessageResponse
- *
- * @beta
- */
-export const getChatAndMessagesForUser = async (
-  userId: string | undefined,
-  newChat: boolean = false
-): Promise<ChatAndMessageResponse> => {
-  if (!userId) {
-    throw new UnauthorizedError("User not found");
-  }
-  if (newChat) {
-    return await createChat({ user: { connect: { id: userId } } });
-  }
-  const chat = await dbClient.chat.findFirst({
-    where: {
-      userId,
-    },
-    include: {
-      messages: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-    take: 1,
-  });
-  // If chat exists
-  if (chat) {
-    // And if it's been updated in the last 5 minutes
-    // Or created in the past 5 minutes
-    const FIVE_MINUTES_MS = 5 * 60 * 1000;
-    const chatUpdatedWithin5Minutes = chat.updatedAt
-      ? new Date().getTime() - new Date(chat.updatedAt).getTime() <
-        FIVE_MINUTES_MS
-      : new Date().getTime() - new Date(chat.createdAt).getTime() <
-        FIVE_MINUTES_MS;
-    // If so, use this current chat and messages
-    if (chatUpdatedWithin5Minutes) {
-      return chat;
-    } else {
-      // If not, create a new chat and return it with no messages
-      return await createChat({ user: { connect: { id: userId } } });
-    }
-  } else {
-    // If user has no chats, create a new chat and return it with no messages
-    return await createChat({ user: { connect: { id: userId } } });
-  }
-};
-
 /**
  *
  * @remarks
@@ -130,8 +174,6 @@ export const getChatAndMessagesForUser = async (
  * @param prompt - The prompt the user just supplied
  * @param chat - ChatAndMessageResponse
  * @returns ChatAndMessageResponse
- *
- * @beta
  */
 export const createGPTRequestFromPrompt = async ({
   userId,
@@ -143,10 +185,6 @@ export const createGPTRequestFromPrompt = async ({
   chat: ChatAndMessageResponse;
 }): Promise<ChatAndMessageResponse> => {
   try {
-    if (!userId) {
-      throw new UnauthorizedError("User Not Found");
-    }
-
     // Build messages array
     const existingMessages = chat.messages;
     const newMessages = [];
@@ -154,9 +192,13 @@ export const createGPTRequestFromPrompt = async ({
     // If we haven't given a system prompt yet, give one
     if (messages.length === 0) {
       const promptStart =
-        "You are a tutor named Judie that teaches in the Socratic Style of learning\n\
-        You don't usually just give the student the answer at the first prompt, but try at first to ask just the right question to help them learn to think for themselves.\n\
-        You should always try to tune your question to the interest & knowledge of the student, breaking down the problem into simpler parts until it's at just the right level for them. If after asking a question the student does not get it you give them the answer and explain how you got there.  Never just give the answer, answers must come with explanations\n\n\
+        "You are a tutor designed to help students learn.\n\
+        You use the socratic method to teach, but you balance that with other teaching methods to make sure the student can learn.\n\
+        You will ask questions upfront to assess the students level with the topic, but if they do not know anything about the topic you will teach them.\n\
+        You are very careful with your math calculations.\n\
+        Use examples from their interests to keep learning engaging.\n\
+        You prefer to ask questions to guide the student to the correct answer.\n\
+        You will answer the question using the given context, if any.\n\
         ";
 
       newMessages.push({
@@ -251,8 +293,6 @@ export const createGPTRequestFromPrompt = async ({
  * @param userId - ID of the user
  * @param chat - ChatAndMessageResponse
  * @returns ChatAndMessageResponse
- *
- * @beta
  */
 export const getChatGPTCompletion = async (
   chat: Chat & { messages: Message[] }
@@ -287,7 +327,7 @@ export const getChatGPTCompletion = async (
       model: OPENAI_COMPLETION_MODEL,
       messages: maxLengthLimitedMessages,
       user: chat.userId,
-      temperature: 1.0,
+      temperature: 0.7,
       max_tokens: 800,
       top_p: 1,
       frequency_penalty: 0,

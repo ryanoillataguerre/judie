@@ -6,13 +6,7 @@ const LoadingScreen = () => {
   return (
     <div className={styles.loadingPageContainer}>
       <div className={styles.loadingAnimation}>
-        <Lottie
-          animationData={loadingAnimationData}
-          loop
-          style={{
-            fill: "#d3d3d3",
-          }}
-        />
+        <Lottie animationData={loadingAnimationData} loop />
       </div>
     </div>
   );
