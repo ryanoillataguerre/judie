@@ -7,7 +7,7 @@ service InferenceService{
 }
 
 message Conversation{
-  repeated ConvTurn turn = 1;
+  repeated ConvTurn turns = 1;
 }
 
 message ConvTurn{
