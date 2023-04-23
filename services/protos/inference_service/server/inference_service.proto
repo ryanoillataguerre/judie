@@ -1,5 +1,6 @@
 syntax = "proto3";
-package inference_service.server;
+
+package inferenceServiceServer;
 
 service InferenceService{
   rpc GetChatResponse(Conversation) returns (TutorResponse){}

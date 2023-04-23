@@ -1,18 +1,18 @@
-FROM node:18 as builder
+FROM node:18
 
 WORKDIR /app
 
-COPY package.json ./
-COPY prisma ./prisma/
+COPY app-service/package.json ./
+COPY app-service/prisma ./prisma/
+COPY build_protos.sh /opt/build_protos.sh
 
 RUN yarn
 
 RUN npx prisma generate --schema prisma/schema.prisma
 
-COPY . .
+COPY ./app-service .
 
-COPY ./src ./
-COPY ./prisma ./prisma
+RUN /opt/build_protos.sh
 
 EXPOSE 8080
 
