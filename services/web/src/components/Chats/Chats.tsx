@@ -7,6 +7,7 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
+  Badge,
   Box,
   CloseButton,
   Flex,
@@ -75,6 +76,12 @@ const Chats = ({
           <h2 className={styles.chatTitle}>
             Chat from {new Date(chat.updatedAt).toLocaleString()}
           </h2>
+          <Badge
+            variant={"subtle"}
+            colorScheme={chat.subject ? "green" : "gray"}
+          >
+            {chat.subject ? chat.subject : "No subject selected"}
+          </Badge>
         </div>
       ))}
     </div>

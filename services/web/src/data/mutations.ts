@@ -3,6 +3,7 @@ import { Message, UserRole } from "./types/api";
 
 export interface ChatResponse {
   id: string;
+  subject?: string;
   createdAt: string;
   updatedAt: string;
   messages: Message[];
@@ -65,6 +66,23 @@ export const createChatMutation = async () => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",
+  });
+  return response.data;
+};
+
+export const putChatMutation = async ({
+  chatId,
+  subject,
+}: {
+  chatId: string;
+  subject?: string;
+}): Promise<ChatResponse> => {
+  const response = await baseFetch({
+    url: `/chat/${chatId}`,
+    method: "PUT",
+    body: {
+      subject,
+    },
   });
   return response.data;
 };
