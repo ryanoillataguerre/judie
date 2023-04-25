@@ -39,6 +39,6 @@ export const subjects = [
   "Trigonometry",
   "US Govt & Politics",
   "US History",
-  "Personal Finance",
-  "Personal Assistant",
+  // "Personal Finance",
+  // "Personal Assistant",
 ];

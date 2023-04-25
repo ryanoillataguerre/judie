@@ -8,11 +8,12 @@ import {
   AlertIcon,
   AlertTitle,
   Badge,
-  Box,
   CloseButton,
   Flex,
   useDisclosure,
 } from "@chakra-ui/react";
+import { MessageType } from "@judie/data/types/api";
+import { ChatResponse } from "@judie/data/mutations";
 
 const Chats = ({
   seenAlert,
@@ -37,6 +38,14 @@ const Chats = ({
       onClickDismissAlert();
     },
   });
+  const getTitleForChat = (chat: ChatResponse) => {
+    if (chat.messages?.[0]?.content) {
+      if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
+        return chat.messages?.[0]?.content.slice(0, 100) + "...";
+      }
+    }
+    return "Untitled Chat";
+  };
 
   return (
     <div className={styles.chatsPageContainer}>
@@ -73,9 +82,7 @@ const Chats = ({
           onClick={() => onClickChat(chat.id)}
         >
           {/* TODO: Make this title use job-generated chat title */}
-          <h2 className={styles.chatTitle}>
-            Chat from {new Date(chat.updatedAt).toLocaleString()}
-          </h2>
+          <h2 className={styles.chatTitle}>{getTitleForChat(chat)}</h2>
           <Badge
             variant={"subtle"}
             colorScheme={chat.subject ? "green" : "gray"}
