@@ -2,12 +2,11 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY ./inference_service/ ./inference_service/
-COPY build_protos.sh /opt/build_protos.sh
+COPY ./ ./inference_service/
+# COPY build_protos.sh /opt/build_protos.sh
 
 RUN pip install --no-cache-dir -r inference_service/inference_requirements.txt
 
-# Builds protos
 # RUN /opt/build_protos.sh
 
 ENV PYTHONPATH "${PYTHONPATH}:/app/"

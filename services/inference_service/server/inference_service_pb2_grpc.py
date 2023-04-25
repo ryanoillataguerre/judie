@@ -15,7 +15,7 @@ class InferenceServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetChatResponse = channel.unary_unary(
-                '/inference_service.server.InferenceService/GetChatResponse',
+                '/inferenceServiceServer.InferenceService/GetChatResponse',
                 request_serializer=inference__service__pb2.Conversation.SerializeToString,
                 response_deserializer=inference__service__pb2.TutorResponse.FromString,
                 )
@@ -40,7 +40,7 @@ def add_InferenceServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'inference_service.server.InferenceService', rpc_method_handlers)
+            'inferenceServiceServer.InferenceService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -59,7 +59,7 @@ class InferenceService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/inference_service.server.InferenceService/GetChatResponse',
+        return grpc.experimental.unary_unary(request, target, '/inferenceServiceServer.InferenceService/GetChatResponse',
             inference__service__pb2.Conversation.SerializeToString,
             inference__service__pb2.TutorResponse.FromString,
             options, channel_credentials,

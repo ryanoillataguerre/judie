@@ -4,6 +4,7 @@ ROOT_DIR="$(cd ../..; pwd)"
 
 brew install protobuf
 brew install node
+brew install yarn
 
 
 if [[ ! -d ../python/ve ]]; then
