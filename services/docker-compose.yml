@@ -31,7 +31,6 @@ services:
     privileged: true
     volumes:
       - ./app-service:/app
-      - ./protos:/app/protos # Copies protos into the container at dir /app/protos
     working_dir: /app
     build:
       context: .
@@ -69,12 +68,11 @@ services:
     networks:
       - dev
     privileged: true
-    volumes:
-      - ./inference_service:/app
-    working_dir: /app
+    # volumes:
+    #   - ./inference_service:/app
     build:
-      context: .
-      dockerfile: ./inference_service/Dockerfile
+      context: ./inference_service
+      dockerfile: ./Dockerfile.local
     ports:
       - 8081:8080
     environment:
