@@ -14,10 +14,10 @@ class ConvTurn(_message.Message):
     def __init__(self, sender: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
 
 class Conversation(_message.Message):
-    __slots__ = ["turn"]
-    TURN_FIELD_NUMBER: _ClassVar[int]
-    turn: _containers.RepeatedCompositeFieldContainer[ConvTurn]
-    def __init__(self, turn: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...) -> None: ...
+    __slots__ = ["turns"]
+    TURNS_FIELD_NUMBER: _ClassVar[int]
+    turns: _containers.RepeatedCompositeFieldContainer[ConvTurn]
+    def __init__(self, turns: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...) -> None: ...
 
 class TutorResponse(_message.Message):
     __slots__ = ["response"]
