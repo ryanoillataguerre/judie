@@ -1,4 +1,4 @@
-import { SESSION_COOKIE } from "@judie/data/baseFetch";
+import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
@@ -19,6 +19,14 @@ export default function useAuth({
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
+
+  const logout = useCallback(() => {
+    deleteCookie(SESSION_COOKIE);
+    setSessionCookie(undefined);
+    setUserData(undefined);
+    router.push("/signin");
+  }, [router]);
+
   // GET /users/me
   const { isError, refetch, error, isLoading, isFetched } = useQuery(
     GET_ME,
@@ -28,6 +36,11 @@ export default function useAuth({
       staleTime: 1000 * 60,
       onSuccess: (data) => {
         setUserData(data);
+      },
+      onError: (err: HTTPResponseError) => {
+        if (err.response?.status === 401) {
+          logout();
+        }
       },
     }
   );
@@ -52,7 +65,7 @@ export default function useAuth({
     if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
       logout();
     }
-  }, [userData, isError, isLoading, isFetched, router, allowUnauth]);
+  }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
   useEffect(() => {
     // Redirect away from sign in and sign up pages if logged in
@@ -61,13 +74,6 @@ export default function useAuth({
       router.push("/chat");
     }
   }, [sessionCookie, refetch, router]);
-
-  const logout = useCallback(() => {
-    deleteCookie(SESSION_COOKIE);
-    setSessionCookie(undefined);
-    setUserData(undefined);
-    router.push("/signin");
-  }, [router]);
 
   return { userData, isLoading };
 }

@@ -3,10 +3,31 @@ import Link from "next/link";
 import Button, { ButtonVariant } from "../Button/Button";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
+import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { Badge } from "@chakra-ui/react";
 
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
   const router = useRouter();
+  const currentChatId = router?.query?.chatId;
+
+  const [chatSubject, setChatSubject] = useState<string | undefined>();
+  const {
+    data: existingUserChat,
+    isLoading: isExistingChatLoading,
+    refetch: fetchExistingChat,
+  } = useQuery({
+    queryKey: [GET_CHAT_BY_ID, currentChatId],
+    queryFn: () => getChatByIdQuery(currentChatId as string),
+    onSuccess: (data) => {
+      if (data?.subject) {
+        setChatSubject(data.subject);
+      }
+    },
+    enabled: !!currentChatId,
+  });
   return (
     <div className={styles.container}>
       <Link href={"/"}>
@@ -37,9 +58,23 @@ const Navbar = () => {
               />
             </Link>
           </>
-        ) : router.asPath.includes("/chat/") ? null : (
+        ) : router.asPath.includes("/chat/") ? (
+          chatSubject ? (
+            <Badge colorScheme="green" variant="subtle">
+              Chat Subject: {chatSubject}
+            </Badge>
+          ) : (
+            <Badge colorScheme="gray" variant="subtle">
+              No Chat Subject
+            </Badge>
+          )
+        ) : (
           <Link href={"/chat"}>
-            <Button type="button" label="Chat" variant={ButtonVariant.Blue} />
+            <Button
+              type="button"
+              label="Chat"
+              variant={ButtonVariant.Default}
+            />
           </Link>
         )}
       </div>

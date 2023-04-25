@@ -1,4 +1,7 @@
-import { completionFromQueryMutation } from "@judie/data/mutations";
+import {
+  completionFromQueryMutation,
+  putChatMutation,
+} from "@judie/data/mutations";
 import { useMutation, useQuery } from "react-query";
 import styles from "./Chat.module.scss";
 import {
@@ -15,6 +18,7 @@ import Loading from "../lottie/Loading/Loading";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Progress, useToast } from "@chakra-ui/react";
 import ChatInput from "../ChatInput/ChatInput";
+import ChatWelcome from "../ChatWelcome/ChatWelcome";
 
 interface ChatProps {
   initialQuery?: string;
@@ -25,25 +29,31 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const router = useRouter();
   const toast = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [displayWelcome, setDisplayWelcome] = useState<boolean>(false);
 
   const {
     data: existingUserChat,
     isLoading: isExistingChatLoading,
     refetch: fetchExistingChat,
   } = useQuery({
-    queryKey: [GET_CHAT_BY_ID],
+    queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
     onSuccess: (data) => {
+      if (data?.subject) {
+        setDisplayWelcome(false);
+      } else {
+        setDisplayWelcome(true);
+      }
       setMessages(data?.messages);
     },
-    enabled: false,
+    enabled: !!chatId,
   });
 
   useEffect(() => {
     if (chatId) {
       fetchExistingChat();
     }
-  }, [chatId]);
+  }, [chatId, fetchExistingChat]);
 
   const {
     isLoading,
@@ -75,7 +85,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
-  }, [chatValue.length, router]);
+  }, [chatValue, router, initialQuery]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 
@@ -124,14 +134,45 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     return messages?.reverse();
   }, [messages]);
 
+  useEffect(() => {
+    if (mostRecentUserChat || reversedMessages.length > 0) {
+      setDisplayWelcome(false);
+    }
+  }, [mostRecentUserChat, reversedMessages]);
+
+  const putChat = useMutation({
+    mutationFn: putChatMutation,
+  });
+  const onSelectSubject = (subject: string) => {
+    // Set subject on chat in DB
+    putChat.mutate(
+      {
+        chatId,
+        subject,
+      },
+      {
+        onSuccess: () => {
+          setDisplayWelcome(false);
+          fetchExistingChat();
+        },
+      }
+    );
+  };
+
   return (
     <div className={styles.chatContainer}>
-      <div className={styles.conversationContainer}>
-        {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
-        {reversedMessages?.map((message, index) => (
-          <MessageRow key={index} message={message} />
-        ))}
-      </div>
+      {displayWelcome ? (
+        <div className={styles.welcomeContainer}>
+          <ChatWelcome selectSubject={onSelectSubject} />
+        </div>
+      ) : (
+        <div className={styles.conversationContainer}>
+          {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
+          {reversedMessages?.map((message, index) => (
+            <MessageRow key={index} message={message} />
+          ))}
+        </div>
+      )}
       <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
         {isLoading && (
           <Progress
