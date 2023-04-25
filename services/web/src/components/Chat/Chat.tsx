@@ -39,7 +39,6 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
     onSuccess: (data) => {
-      console.log("data", data);
       if (data?.subject) {
         setDisplayWelcome(false);
       } else {

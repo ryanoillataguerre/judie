@@ -1,14 +1,10 @@
-import {
-  InternalError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../utils/errors/index.js";
-import { PineconeClient } from "@pinecone-database/pinecone";
+import { InternalError, NotFoundError } from "../utils/errors/index.js";
+import { PineconeClient, QueryRequest } from "@pinecone-database/pinecone";
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
-import * as openai from "openai";
 import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
+import { subjectToNamespaceMap, subjectToPromptMap } from "./consts.js";
 
 // Chat Service
 export const createChat = async (params: Prisma.ChatCreateInput) => {
@@ -86,6 +82,19 @@ export const getUserChats = async (userId: string) => {
     where: {
       userId,
     },
+    include: {
+      messages: {
+        take: 1,
+        orderBy: {
+          updatedAt: "desc",
+        },
+        where: {
+          type: {
+            not: MessageType.SYSTEM,
+          },
+        },
+      },
+    },
     orderBy: {
       updatedAt: "desc",
     },
@@ -117,12 +126,15 @@ export const getCompletion = async ({
       throw new NotFoundError("Could not find chat");
     }
   }
+  console.time("createRequest");
   // Create GPT request from prompt
-  const chatWithPrompt = await createGPTRequestFromPrompt({
+  await createGPTRequestFromPrompt({
     userId: userId,
     prompt: query,
     chat,
   });
+  console.timeEnd("createRequest");
+
   const newChat = await getChatInternal({
     id: chat.id,
   });
@@ -130,7 +142,9 @@ export const getCompletion = async ({
     throw new InternalError("Could not get chat");
   }
   // Get response from ChatGPT
+  console.time("getChatGPTCompletion");
   const latestChat = await getChatGPTCompletion(newChat);
+  console.timeEnd("getChatGPTCompletion");
   if (!latestChat) {
     throw new InternalError("Could not get response from ChatGPT");
   }
@@ -191,7 +205,8 @@ export const createGPTRequestFromPrompt = async ({
     let messages = existingMessages || [];
     // If we haven't given a system prompt yet, give one
     if (messages.length === 0) {
-      const promptStart =
+      // Default prompt
+      let prompt =
         "You are a tutor designed to help students learn.\n\
         You use the socratic method to teach, but you balance that with other teaching methods to make sure the student can learn.\n\
         You will ask questions upfront to assess the students level with the topic, but if they do not know anything about the topic you will teach them.\n\
@@ -201,11 +216,15 @@ export const createGPTRequestFromPrompt = async ({
         You will answer the question using the given context, if any.\n\
         ";
 
+      // If subject, mutate prompt
+      if (chat.subject) {
+        prompt = subjectToPromptMap[chat.subject] || prompt;
+      }
       newMessages.push({
-        content: promptStart,
+        content: prompt,
         type: MessageType.SYSTEM,
         createdAt: new Date(),
-        readableContent: promptStart,
+        readableContent: prompt,
       });
     }
 
@@ -216,14 +235,18 @@ export const createGPTRequestFromPrompt = async ({
     });
     const embeddingVector = embeddingResponse.data?.data?.[0]?.embedding;
     // Get matching vectors from Pinecone
-    const pcIndex = pinecone.Index("apmvp");
+    const pcIndex = pinecone.Index("judieai");
+    let queryRequest: QueryRequest = {
+      vector: embeddingVector,
+      topK: 3,
+      includeValues: false,
+      includeMetadata: true,
+    };
+    if (chat.subject) {
+      queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
+    }
     const pineconeResponse = await pcIndex.query({
-      queryRequest: {
-        vector: embeddingVector,
-        topK: 3,
-        includeValues: false,
-        includeMetadata: true,
-      },
+      queryRequest,
     });
     const matches = pineconeResponse.matches;
     // Get metadata from each matching vector
