@@ -10,7 +10,7 @@ const ChatWelcome = ({
     <div className={styles.welcome}>
       <h1 className={styles.welcomeText}>Welcome to Judie!</h1>
       <p className={styles.welcomeSubtext}>
-        Select a subject below to increase the degree of focus in Judie's
+        Select a subject below to increase the degree of focus in Judie&apos;s
         answers
       </p>
       <SubjectSelector selectSubject={selectSubject} />

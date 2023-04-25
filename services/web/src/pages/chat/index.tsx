@@ -22,7 +22,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       const newChat = await mutateAsync();
       setNewChatId(newChat.id);
     })();
-  }, []);
+  }, [mutateAsync]);
 
   useEffect(() => {
     if (newChatId) {
@@ -31,7 +31,7 @@ export default function ChatPage({ query }: ChatPageProps) {
         query: router.query,
       });
     }
-  }, [newChatId]);
+  }, [newChatId, router]);
   return (
     <>
       <Head>

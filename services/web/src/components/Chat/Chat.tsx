@@ -54,7 +54,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     if (chatId) {
       fetchExistingChat();
     }
-  }, [chatId]);
+  }, [chatId, fetchExistingChat]);
 
   const {
     isLoading,
@@ -86,7 +86,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       // Remove query param
       router.replace(router.pathname, undefined, { shallow: true });
     }
-  }, [chatValue.length, router]);
+  }, [chatValue, router, initialQuery]);
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 

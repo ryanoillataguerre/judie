@@ -48,11 +48,18 @@ export default function useAuth({
     }
   }, [sessionCookie, allowUnauth, isError, isLoading, refetch, router]);
 
+  const logout = useCallback(() => {
+    deleteCookie(SESSION_COOKIE);
+    setSessionCookie(undefined);
+    setUserData(undefined);
+    router.push("/signin");
+  }, [router]);
+
   useEffect(() => {
     if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
       logout();
     }
-  }, [userData, isError, isLoading, isFetched, router, allowUnauth]);
+  }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
   useEffect(() => {
     // Redirect away from sign in and sign up pages if logged in
@@ -61,13 +68,6 @@ export default function useAuth({
       router.push("/chat");
     }
   }, [sessionCookie, refetch, router]);
-
-  const logout = useCallback(() => {
-    deleteCookie(SESSION_COOKIE);
-    setSessionCookie(undefined);
-    setUserData(undefined);
-    router.push("/signin");
-  }, [router]);
 
   return { userData, isLoading };
 }
