@@ -13,12 +13,13 @@ interface ChatPageProps {
 }
 export default function ChatPage({ query }: ChatPageProps) {
   useAuth();
+  const router = useRouter();
   const { data, isError, isLoading } = useQuery({
     queryKey: [GET_USER_CHATS],
     queryFn: () => getUserChatsQuery(),
     enabled: true,
     onSuccess: (data) => {
-      if (data.length) {
+      if (data.length && !router.query.newChat) {
         router.push({
           pathname: `/chat/${data[0].id}`,
           query: router.query,
@@ -31,21 +32,23 @@ export default function ChatPage({ query }: ChatPageProps) {
     mutationFn: createChatMutation,
   });
   const [newChatId, setNewChatId] = useState<string | null>(null);
-  const router = useRouter();
   useEffect(() => {
-    if (!data?.length && !isError && !isLoading) {
+    if ((!data?.length && !isError && !isLoading) || router.query.newChat) {
       (async () => {
         const newChat = await mutateAsync();
         setNewChatId(newChat.id);
       })();
     }
-  }, [mutateAsync, data, isError, isLoading, setNewChatId]);
+  }, [mutateAsync, data, isError, isLoading, setNewChatId, router.query]);
 
   useEffect(() => {
     if (newChatId) {
+      delete router.query.newChat;
       router.push({
         pathname: `/chat/${newChatId}`,
-        query: router.query,
+        query: {
+          ...router.query,
+        },
       });
     }
   }, [newChatId, router]);

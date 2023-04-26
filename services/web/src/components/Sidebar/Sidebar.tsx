@@ -6,30 +6,6 @@ import { BsClockHistory, BsPlusSquareDotted } from "react-icons/bs";
 import { Tooltip } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
-const sidebarIcons = [
-  {
-    icon: <BsPlusSquareDotted size={20} color={"#FFFFFF"} />,
-    label: "New Chat",
-    enabled: true,
-    tooltipText: "New Chat",
-  },
-  {
-    icon: <BsClockHistory size={20} color={"#FFFFFF"} />,
-    label: "Past Chats",
-    enabled: true,
-    tooltipText: "Past Chats",
-    onClick: () => {
-      window.location.href = "/history";
-    },
-  },
-  {
-    icon: <MdOutlineAssignment size={20} color={"#d3d3d3"} />,
-    label: "Quiz",
-    enabled: false,
-    tooltipText: "Quizzes are coming soon!",
-  },
-];
-
 const getActiveIconIndex = (path: string) => {
   switch (true) {
     case path.includes("/chat/"):
@@ -52,7 +28,7 @@ const Sidebar = () => {
       enabled: true,
       tooltipText: "New Chat",
       onClick: () => {
-        router.push("/chat");
+        router.push("/chat?newChat=true");
       },
     },
     {

@@ -242,7 +242,7 @@ export const createGPTRequestFromPrompt = async ({
       includeValues: false,
       includeMetadata: true,
     };
-    if (chat.subject) {
+    if (chat.subject && subjectToNamespaceMap[chat.subject]) {
       queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
     }
     const pineconeResponse = await pcIndex.query({

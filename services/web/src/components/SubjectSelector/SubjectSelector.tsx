@@ -11,6 +11,7 @@ const SubjectSelector = ({
   const { userData } = useAuth();
   const subjectOptions = useMemo(() => {
     // Add content creation for Alex
+    console.log(userData?.email);
     if (userData?.email?.includes("@judie.io")) {
       return [...subjects, "Content Creation"];
     }
