@@ -46,6 +46,7 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PINECONE_API_KEY: ${PINECONE_API_KEY}
       PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
+      STRIPE_SK: ${STRIPE_SK}
   web:
     networks:
       - dev
