@@ -20,7 +20,7 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     "Origin, X-Requested-With, Content-Type, Accept, Credentials, Set-Cookie, Cookie, Cookies, Cross-Origin, Access-Control-Allow-Credentials, Authorization, Access-Control-Allow-Origin"
   );
   const allowedOrigins = isProduction()
-    ? ["https://judie.io"]
+    ? ["https://judie.io", "https://app.judie.io"]
     : isSandbox()
     ? ["https://sandbox.judie.io"]
     : ["http://localhost:3000", "http://web:3000"];
