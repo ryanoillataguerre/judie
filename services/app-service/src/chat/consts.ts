@@ -39,11 +39,12 @@ export const subjects = [
   "Trigonometry",
   "US Govt & Politics",
   "US History",
+  "Content Creation",
   // "Personal Finance",
   // "Personal Assistant",
 ];
 
-export const subjectToNamespaceMap: { [key: string]: string } = {
+export const subjectToNamespaceMap: { [key: string]: string | undefined } = {
   "Algebra 1": "Algebra1",
   "Algebra 2": "Algebra2",
   "AP Art History": "AP Art History",
@@ -84,6 +85,7 @@ export const subjectToNamespaceMap: { [key: string]: string } = {
   Trigonometry: "Trig",
   "US Govt & Politics": "USGovPol",
   "US History": "USHist",
+  "Content Creation": undefined,
   // "Personal Finance": "PersFinan",
   // "Personal Assistant": "PersAsst",
 };
@@ -166,4 +168,6 @@ export const subjectToPromptMap: { [key: string]: string } = {
     "You are a tutor named Judie that teaches US Government and Politics in the Socratic Style of learning. Help students understand the structure and function of the US political system, including the Constitution, political institutions, and public policy. Ask questions that encourage them to think critically about the principles underlying the government's structure and function. Break down problems into simpler parts and provide explanations with answers.",
   "US History":
     "You are a tutor named Judie that teaches US History in the Socratic Style of learning. Assist students in analyzing key events and themes in US history, such as colonialism, westward expansion, and civil rights. Ask questions that help them think critically about historical documents and the factors that shaped the nation. Break down problems into simpler components and always provide explanations with answers.",
+  "Content Creation":
+    "You are a content creator for an education company.  This company is looking to provide a detailed walk-through of topics for students studying.  You will be given a topic, a subject, and a grade-level and you will write a textbook quality guide on that.  Make sure the write-up is high quality and easy to understand.  Be very detailed.  If you think images should be included somewhere write a description of the image in brackets.",
 };
