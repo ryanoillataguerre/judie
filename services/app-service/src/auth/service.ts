@@ -6,14 +6,16 @@ import { UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 
 export const signup = async ({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   receivePromotions,
   role,
   district,
 }: {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
@@ -42,7 +44,8 @@ export const signup = async ({
 
   const newUser = await dbClient.user.create({
     data: {
-      name,
+      firstName,
+      lastName,
       email,
       password: _password,
       receivePromotions,

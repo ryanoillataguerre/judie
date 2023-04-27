@@ -18,7 +18,8 @@ import Link from "next/link";
 interface SubmitData {
   email: string;
   password: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   receivePromotions: boolean;
   role: UserRole;
   district?: string;
@@ -35,7 +36,8 @@ const SignupForm = () => {
     defaultValues: {
       email: "",
       password: "",
-      name: "",
+      firstName: "",
+      lastName: "",
       receivePromotions: true,
       role: UserRole.STUDENT,
       district: "",
@@ -70,7 +72,8 @@ const SignupForm = () => {
   const onSubmit: SubmitHandler<SubmitData> = async ({
     email,
     password,
-    name,
+    firstName,
+    lastName,
     receivePromotions,
     role,
     district,
@@ -96,7 +99,8 @@ const SignupForm = () => {
         email,
         password,
         receivePromotions,
-        name,
+        firstName,
+        lastName,
         role,
         district,
       });
@@ -113,12 +117,20 @@ const SignupForm = () => {
     >
       <h1>Sign Up</h1>
       <Input
-        label={"Name"}
+        label={"First Name"}
         errors={errors}
         required
         placeholder={""}
         register={register}
-        name={"name"}
+        name={"firstName"}
+      />
+      <Input
+        label={"Last Name"}
+        errors={errors}
+        required
+        placeholder={""}
+        register={register}
+        name={"lastName"}
       />
       <Input
         label={"Email"}
@@ -174,6 +186,7 @@ const SignupForm = () => {
       <div className={styles.switchAuthRow}>
         <p>Already have an account?</p>
         <a
+          className={styles.link}
           onClick={() => {
             router.push({
               pathname: "/signin",

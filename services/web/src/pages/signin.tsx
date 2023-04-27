@@ -73,6 +73,7 @@ const SigninForm = () => {
       <div className={styles.switchAuthRow}>
         <p>Don&apos;t have an account yet?</p>
         <a
+          className={styles.link}
           onClick={() => {
             router.push({
               pathname: "/signup",

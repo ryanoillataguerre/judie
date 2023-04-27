@@ -1,13 +1,10 @@
 import useAuth from "@judie/hooks/useAuth";
 import styles from "./AccountMenu.module.scss";
-import { useState } from "react";
 import {
   Popover,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
-  PopoverHeader,
   PopoverTrigger,
 } from "@chakra-ui/react";
 

@@ -16,13 +16,21 @@ router.post(
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const { email, password, name, receivePromotions, role, district } =
-      req.body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      receivePromotions,
+      role,
+      district,
+    } = req.body;
     // Create user
     const userId = await signup({
       email,
       password,
-      name,
+      firstName,
+      lastName,
       receivePromotions,
       role,
       district,

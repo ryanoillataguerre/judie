@@ -40,14 +40,16 @@ export const signinMutation = async ({
 };
 
 export const signupMutation = async ({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   receivePromotions,
   role,
   district,
 }: {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
@@ -57,7 +59,15 @@ export const signupMutation = async ({
   const response = await baseFetch({
     url: "/auth/signup",
     method: "POST",
-    body: { email, password, name, receivePromotions, role, district },
+    body: {
+      email,
+      password,
+      firstName,
+      lastName,
+      receivePromotions,
+      role,
+      district,
+    },
   });
   return response.data;
 };

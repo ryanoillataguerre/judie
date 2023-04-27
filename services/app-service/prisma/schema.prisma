@@ -60,7 +60,8 @@ model Subscription {
 model User {
   id                String        @id @default(uuid())
   email             String        @unique
-  name              String
+  firstName         String?
+  lastName          String?
   password          String
   receivePromotions Boolean       @map("receive_promotions")
   gradeYear         GradeYear?    @map("grade_year")

@@ -54,10 +54,20 @@ const Navbar = () => {
     if (router?.query?.paid) {
       toast({
         title: "Success!",
-        description: "Welcome to unlimited access",
+        description: (
+          <div className={styles.toastDescription}>
+            <p>Welcome to Judie's Unlimited plan </p>
+            <p>Good luck with your studies! 🎉</p>
+          </div>
+        ),
         status: "success",
         duration: 8000,
         isClosable: true,
+        position: "top",
+      });
+      delete router.query.paid;
+      router.replace(router.asPath.split("?")[0], {
+        query: router.query,
       });
     }
   }, [router, toast]);
