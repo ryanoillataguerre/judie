@@ -44,3 +44,9 @@
     margin: 0 8px;
   }
 }
+
+.badgesContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}

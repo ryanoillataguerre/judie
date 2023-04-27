@@ -5,6 +5,7 @@ export const getUser = async (params: Prisma.UserWhereInput) => {
   return await dbClient.user.findFirst({
     where: params,
     include: {
+      subscription: true,
       chats: {
         include: {
           messages: true,
@@ -27,5 +28,18 @@ export const updateUser = async (
       id: userId,
     },
     data,
+  });
+};
+
+export const incrementUserQuestionsAsked = async (userId: string) => {
+  return await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      questionsAsked: {
+        increment: 1,
+      },
+    },
   });
 };

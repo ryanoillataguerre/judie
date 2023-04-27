@@ -46,7 +46,7 @@ router.get(
     );
 
     res.status(200).json({
-      data: checkoutSession,
+      data: checkoutSession.url,
     });
   })
 );

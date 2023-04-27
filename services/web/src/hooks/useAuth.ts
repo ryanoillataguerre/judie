@@ -4,7 +4,12 @@ import { User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useCallback } from "react";
-import { useQuery } from "react-query";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useQuery,
+} from "react-query";
 
 const redirToChatFrom = ["/signin", "/signup"];
 const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
@@ -14,7 +19,7 @@ export default function useAuth({
   allowUnauth = false,
 }: {
   allowUnauth?: boolean;
-} = {}): { userData: User | undefined; isLoading: boolean } {
+} = {}): AuthData {
   const router = useRouter();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
@@ -75,10 +80,13 @@ export default function useAuth({
     }
   }, [sessionCookie, refetch, router]);
 
-  return { userData, isLoading };
+  return { userData, isLoading, refresh: refetch };
 }
 
 export interface AuthData {
   userData: User | undefined;
   isLoading: boolean;
+  refresh: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<User, HTTPResponseError>>;
 }

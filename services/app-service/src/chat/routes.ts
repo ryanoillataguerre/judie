@@ -15,6 +15,7 @@ import {
 import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
+import { incrementUserQuestionsAsked } from "../user/service.js";
 
 const router = Router();
 
@@ -49,6 +50,7 @@ router.post(
     res.status(200).json({
       data: transformChat(newChat),
     });
+    incrementUserQuestionsAsked(session.userId);
   })
 );
 

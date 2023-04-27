@@ -11,6 +11,7 @@ const ChatInput = ({
 }) => (
   <div className={styles.inputContainer}>
     <input
+      tabIndex={0}
       placeholder={"Type your question here..."}
       className={styles.chatBoxInput}
       onChange={(e) => setChatValue(e.target.value)}

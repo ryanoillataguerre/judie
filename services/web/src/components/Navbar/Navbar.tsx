@@ -7,6 +7,20 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Badge } from "@chakra-ui/react";
+import { SubscriptionStatus } from "@judie/data/types/api";
+
+const getColorSchemeFromQuestionsAsked = (questionsAsked?: number) => {
+  if (!questionsAsked && questionsAsked !== 0) {
+    return "gray";
+  }
+  if (questionsAsked < 4) {
+    return "green";
+  }
+  if (questionsAsked < 8) {
+    return "yellow";
+  }
+  return "red";
+};
 
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
@@ -59,15 +73,33 @@ const Navbar = () => {
             </Link>
           </>
         ) : router.asPath.includes("/chat/") ? (
-          chatSubject ? (
-            <Badge colorScheme="green" variant="subtle">
-              Chat Subject: {chatSubject}
-            </Badge>
-          ) : (
-            <Badge colorScheme="gray" variant="subtle">
-              No Chat Subject
-            </Badge>
-          )
+          <div className={styles.badgesContainer}>
+            {auth?.userData?.subscription?.status ===
+            SubscriptionStatus.ACTIVE ? (
+              <Badge colorScheme="green" variant="subtle">
+                Active Subscription
+              </Badge>
+            ) : (
+              <Badge
+                colorScheme={getColorSchemeFromQuestionsAsked(
+                  auth?.userData?.questionsAsked
+                )}
+                variant="subtle"
+              >
+                Questions remaining:{" "}
+                {10 - (auth?.userData?.questionsAsked || 0)}
+              </Badge>
+            )}
+            {chatSubject ? (
+              <Badge colorScheme="green" variant="subtle">
+                Chat Subject: {chatSubject}
+              </Badge>
+            ) : (
+              <Badge colorScheme="gray" variant="subtle">
+                No Chat Subject
+              </Badge>
+            )}
+          </div>
         ) : (
           <Link href={"/chat"}>
             <Button

@@ -1,3 +1,22 @@
+export enum SubscriptionStatus {
+  ACTIVE,
+  CANCELED,
+  PAST_DUE,
+}
+
+export enum SubscriptionType {
+  MONTHLY,
+  YEARLY,
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  status: SubscriptionStatus;
+  type: SubscriptionType;
+  stripeId: string;
+  user: User;
+}
 export interface User {
   id: string;
   email: string;
@@ -8,6 +27,9 @@ export interface User {
   updatedAt: Date | null;
   role: UserRole;
   district?: string;
+  stripeCustomerId?: string;
+  questionsAsked: number;
+  subscription?: Subscription;
 }
 
 export enum MessageType {
