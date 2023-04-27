@@ -26,6 +26,13 @@ const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
   const router = useRouter();
   const currentChatId = router?.query?.chatId;
+  useEffect(() => {
+    // if (router.query.paid) {
+    //   auth.refresh();
+    // }
+  }, [auth, router]);
+
+  console.log(auth);
 
   const [chatSubject, setChatSubject] = useState<string | undefined>();
   const {
@@ -74,10 +81,9 @@ const Navbar = () => {
           </>
         ) : router.asPath.includes("/chat/") ? (
           <div className={styles.badgesContainer}>
-            {auth?.userData?.subscription?.status ===
-            SubscriptionStatus.ACTIVE ? (
+            {auth?.isPaid ? (
               <Badge colorScheme="green" variant="subtle">
-                Active Subscription
+                Subscription: Active
               </Badge>
             ) : (
               <Badge

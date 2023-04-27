@@ -28,17 +28,3 @@ export const getChatByIdQuery = async (id: string): Promise<ChatResponse> => {
   });
   return response.data;
 };
-
-export const GET_CHECKOUT_SESSION = "GET_CHECKOUT_SESSION";
-export const getCheckoutSessionQuery = async (
-  currentUrl: string
-): Promise<string> => {
-  const response = await baseFetch({
-    url: "/payments/checkout-session",
-    method: "POST",
-    body: {
-      currentUrl,
-    },
-  });
-  return response.data.url;
-};

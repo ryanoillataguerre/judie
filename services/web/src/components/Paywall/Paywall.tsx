@@ -2,21 +2,57 @@ import {
   Modal,
   ModalBody,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   useDisclosure,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import styles from "./Paywall.module.scss";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SubscriptionStatus } from "@judie/data/types/api";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import {
-  GET_CHECKOUT_SESSION,
-  getCheckoutSessionQuery,
-} from "@judie/data/queries";
+  CREATE_CHECKOUT_SESSION,
+  createCheckoutSessionMutation,
+} from "@judie/data/mutations";
 import { useRouter } from "next/router";
 
+const SubscribeCard = ({
+  onClick,
+  loading,
+}: {
+  onClick: () => void;
+  loading: boolean;
+}) => {
+  return (
+    // TODO: WTF?
+    // eslint-disable-next-line
+    <div
+      className={styles.subscribeCard}
+      onClick={loading ? () => {} : onClick}
+    >
+      {loading ? (
+        <Spinner height={12} width={12} color={"#3d7d72"} />
+      ) : (
+        <>
+          <div className={styles.priceContainer}>
+            <h1 className={styles.price}>$29</h1>
+            <p className={styles.priceInterval}>/mo</p>
+          </div>
+          <div className={styles.descriptionContainer}>
+            <h1>Judie Premium</h1>
+            <p>
+              Unlimited questions, study guides, more tailored responses,
+              customized quizzes coming soon, and more.
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 const Paywall = ({
   isOpen,
   setIsOpen,
@@ -24,7 +60,7 @@ const Paywall = ({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
-  console.log(isOpen);
+  const [loading, setLoading] = useState(false);
   const { userData } = useAuth();
   useEffect(() => {
     // If user is subbed, do not open paywall
@@ -32,21 +68,33 @@ const Paywall = ({
       setIsOpen(false);
       return;
     }
-
-    console.log("paywall", userData);
   }, [userData]);
 
   const currentUrl = useMemo(() => {
     return typeof window !== "undefined" ? window?.location?.href : "";
   }, []);
 
-  const { data: checkoutSessionUrl, refetch: fetchCheckoutSession } = useQuery(
-    [GET_CHECKOUT_SESSION],
-    {
-      queryFn: () => getCheckoutSessionQuery(currentUrl),
-      enabled: false,
+  const {
+    data: checkoutSessionUrl,
+    mutate,
+    isLoading,
+  } = useMutation({
+    mutationKey: CREATE_CHECKOUT_SESSION,
+    mutationFn: () => createCheckoutSessionMutation(currentUrl),
+  });
+
+  const onClick = useCallback(() => {
+    if (!checkoutSessionUrl && !isLoading) {
+      setLoading(true);
+      mutate();
     }
-  );
+  }, [mutate, checkoutSessionUrl, isLoading, setLoading]);
+
+  useEffect(() => {
+    if (checkoutSessionUrl) {
+      window?.location?.assign(checkoutSessionUrl);
+    }
+  }, [checkoutSessionUrl]);
 
   return (
     <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size={"xl"}>
@@ -72,6 +120,9 @@ const Paywall = ({
               please consider subscribing!
             </p>
           </ModalBody>
+          <ModalFooter>
+            <SubscribeCard onClick={onClick} loading={loading} />
+          </ModalFooter>
         </div>
       </ModalContent>
     </Modal>

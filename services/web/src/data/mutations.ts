@@ -86,3 +86,17 @@ export const putChatMutation = async ({
   });
   return response.data;
 };
+
+export const CREATE_CHECKOUT_SESSION = "CREATE_CHECKOUT_SESSION";
+export const createCheckoutSessionMutation = async (
+  currentUrl: string
+): Promise<string> => {
+  const response = await baseFetch({
+    url: `/payments/checkout-session`,
+    method: "POST",
+    body: {
+      currentUrl,
+    },
+  });
+  return response.data;
+};

@@ -38,11 +38,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const [displayWelcome, setDisplayWelcome] = useState<boolean>(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
   const { userData, refresh: refreshUserData } = useAuth();
-  const {
-    data: existingUserChat,
-    isLoading: isExistingChatLoading,
-    refetch: fetchExistingChat,
-  } = useQuery({
+  const { refetch: fetchExistingChat } = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
     onSuccess: (data) => {
@@ -62,18 +58,13 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     }
   }, [chatId, fetchExistingChat]);
 
-  const {
-    isLoading,
-    data: completionMutationData,
-    isError,
-    mutateAsync,
-  } = useMutation({
+  const { isLoading, mutateAsync } = useMutation({
     mutationFn: () =>
       completionFromQueryMutation({
         query: chatValue,
         chatId,
       }),
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Oops!",
         description: "Something went wrong, please try again.",

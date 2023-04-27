@@ -1,9 +1,9 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
-import { User } from "@judie/data/types/api";
+import { SubscriptionStatus, User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -50,6 +50,13 @@ export default function useAuth({
     }
   );
 
+  const isPaid = useMemo(() => {
+    return (
+      (userData?.subscription?.status as SubscriptionStatus) ===
+      SubscriptionStatus.ACTIVE
+    );
+  }, [userData]);
+
   // If cookies do not exist, redirect to signin
   useEffect(() => {
     if (!sessionCookie) {
@@ -80,12 +87,13 @@ export default function useAuth({
     }
   }, [sessionCookie, refetch, router]);
 
-  return { userData, isLoading, refresh: refetch };
+  return { userData, isPaid, isLoading, refresh: refetch };
 }
 
 export interface AuthData {
   userData: User | undefined;
   isLoading: boolean;
+  isPaid: boolean;
   refresh: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<User, HTTPResponseError>>;

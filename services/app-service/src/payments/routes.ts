@@ -1,5 +1,9 @@
 import { Request, Response, Router } from "express";
-import { errorPassthrough, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import { checkout, createCustomer } from "./service.js";
 import { body } from "express-validator";
@@ -26,10 +30,11 @@ router.post(
   })
 );
 
-router.get(
+router.post(
   "/checkout-session",
-  [body("currentUrl").exists().isURL()],
+  [body("currentUrl").exists().isString()],
   requireAuth,
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {

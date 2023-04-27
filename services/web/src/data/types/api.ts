@@ -1,12 +1,12 @@
 export enum SubscriptionStatus {
-  ACTIVE,
-  CANCELED,
-  PAST_DUE,
+  ACTIVE = "ACTIVE",
+  CANCELED = "CANCELED",
+  PAST_DUE = "PAST_DUE",
 }
 
 export enum SubscriptionType {
-  MONTHLY,
-  YEARLY,
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY",
 }
 
 export interface Subscription {
