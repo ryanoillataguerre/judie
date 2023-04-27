@@ -6,8 +6,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
-import { Badge } from "@chakra-ui/react";
+import { Badge, useToast } from "@chakra-ui/react";
 import { SubscriptionStatus } from "@judie/data/types/api";
+import AccountMenu from "../AccountMenu/AccountMenu";
 
 const getColorSchemeFromQuestionsAsked = (questionsAsked?: number) => {
   if (!questionsAsked && questionsAsked !== 0) {
@@ -25,6 +26,7 @@ const getColorSchemeFromQuestionsAsked = (questionsAsked?: number) => {
 const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
   const router = useRouter();
+  const toast = useToast();
   const currentChatId = router?.query?.chatId;
   useEffect(() => {
     // if (router.query.paid) {
@@ -49,6 +51,19 @@ const Navbar = () => {
     },
     enabled: !!currentChatId,
   });
+
+  useEffect(() => {
+    if (router?.query?.paid) {
+      toast({
+        title: "Success!",
+        description: "Welcome to unlimited access",
+        status: "success",
+        duration: 8000,
+        isClosable: true,
+      });
+    }
+  }, [router, toast]);
+
   return (
     <div className={styles.container}>
       <Link href={"/"}>
@@ -79,41 +94,46 @@ const Navbar = () => {
               />
             </Link>
           </>
-        ) : router.asPath.includes("/chat/") ? (
-          <div className={styles.badgesContainer}>
-            {auth?.isPaid ? (
-              <Badge colorScheme="green" variant="subtle">
-                Subscription: Active
-              </Badge>
-            ) : (
-              <Badge
-                colorScheme={getColorSchemeFromQuestionsAsked(
-                  auth?.userData?.questionsAsked
-                )}
-                variant="subtle"
-              >
-                Questions remaining:{" "}
-                {10 - (auth?.userData?.questionsAsked || 0)}
-              </Badge>
-            )}
-            {chatSubject ? (
-              <Badge colorScheme="green" variant="subtle">
-                Chat Subject: {chatSubject}
-              </Badge>
-            ) : (
-              <Badge colorScheme="gray" variant="subtle">
-                No Chat Subject
-              </Badge>
-            )}
-          </div>
         ) : (
-          <Link href={"/chat"}>
-            <Button
-              type="button"
-              label="Chat"
-              variant={ButtonVariant.Default}
-            />
-          </Link>
+          <>
+            {router.asPath.includes("/chat/") ? (
+              <div className={styles.badgesContainer}>
+                {auth?.isPaid ? (
+                  <Badge colorScheme="green" variant="subtle">
+                    Subscription: Active
+                  </Badge>
+                ) : (
+                  <Badge
+                    colorScheme={getColorSchemeFromQuestionsAsked(
+                      auth?.userData?.questionsAsked
+                    )}
+                    variant="subtle"
+                  >
+                    Questions remaining:{" "}
+                    {10 - (auth?.userData?.questionsAsked || 0)}
+                  </Badge>
+                )}
+                {chatSubject ? (
+                  <Badge colorScheme="green" variant="subtle">
+                    Chat Subject: {chatSubject}
+                  </Badge>
+                ) : (
+                  <Badge colorScheme="gray" variant="subtle">
+                    No Chat Subject
+                  </Badge>
+                )}
+              </div>
+            ) : (
+              <Link href={"/chat"}>
+                <Button
+                  type="button"
+                  label="Chat"
+                  variant={ButtonVariant.Default}
+                />
+              </Link>
+            )}
+            <AccountMenu />
+          </>
         )}
       </div>
     </div>

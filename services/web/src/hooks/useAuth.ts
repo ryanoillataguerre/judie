@@ -87,13 +87,14 @@ export default function useAuth({
     }
   }, [sessionCookie, refetch, router]);
 
-  return { userData, isPaid, isLoading, refresh: refetch };
+  return { userData, isPaid, isLoading, refresh: refetch, logout };
 }
 
 export interface AuthData {
   userData: User | undefined;
   isLoading: boolean;
   isPaid: boolean;
+  logout: () => void;
   refresh: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<User, HTTPResponseError>>;
