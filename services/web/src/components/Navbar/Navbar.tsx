@@ -34,8 +34,6 @@ const Navbar = () => {
     // }
   }, [auth, router]);
 
-  console.log(auth);
-
   const [chatSubject, setChatSubject] = useState<string | undefined>();
   const {
     data: existingUserChat,
@@ -98,11 +96,7 @@ const Navbar = () => {
           <>
             {router.asPath.includes("/chat/") ? (
               <div className={styles.badgesContainer}>
-                {auth?.isPaid ? (
-                  <Badge colorScheme="green" variant="subtle">
-                    Subscription: Active
-                  </Badge>
-                ) : (
+                {auth?.isPaid ? null : (
                   <Badge
                     colorScheme={getColorSchemeFromQuestionsAsked(
                       auth?.userData?.questionsAsked
