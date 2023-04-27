@@ -3,6 +3,7 @@ import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
 import { UserRole } from "@prisma/client";
+import { createCustomer } from "../payments/service.js";
 
 export const signup = async ({
   name,
@@ -51,7 +52,7 @@ export const signup = async ({
   });
 
   // TODO: Identify user with analytics platform
-  // TODO: Create Stripe customer
+  await createCustomer(newUser.id);
 
   return newUser.id;
 };
