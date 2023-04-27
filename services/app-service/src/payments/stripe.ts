@@ -17,6 +17,13 @@ export const createStripeCustomer = async (user: User) => {
   return customer;
 };
 
+export const createCheckoutSession = async (
+  params: Stripe.Checkout.SessionCreateParams
+) => {
+  const session = await stripe.checkout.sessions.create(params);
+  return session;
+};
+
 export const handleStripeWebhookEvents = async (
   body: any,
   stripeSignature: string,

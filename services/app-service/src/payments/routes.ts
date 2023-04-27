@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { errorPassthrough, requireAuth } from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
-import { createCheckoutSession, createCustomer } from "./service.js";
+import { checkout, createCustomer } from "./service.js";
 import { body } from "express-validator";
 
 const router = Router();
@@ -26,7 +26,7 @@ router.post(
   })
 );
 
-router.post(
+router.get(
   "/checkout-session",
   [body("currentUrl").exists().isURL()],
   requireAuth,
@@ -36,8 +36,8 @@ router.post(
       throw new UnauthorizedError("No user id found in session");
     }
 
-    // Create Stripe customer for user
-    const checkoutSession = await createCheckoutSession(
+    // Create Stripe Checkout Session for user
+    const checkoutSession = await checkout(
       session.userId,
       req.body.currentUrl
         ? `${req.body.currentUrl}?paid=true`

@@ -1,12 +1,7 @@
 import Stripe from "stripe";
 import { getUser, updateUser } from "../user/service.js";
-import { createStripeCustomer } from "./stripe.js";
-import {
-  Prisma,
-  Subscription,
-  SubscriptionStatus,
-  SubscriptionType,
-} from "@prisma/client";
+import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
+import { Prisma, SubscriptionStatus, SubscriptionType } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createCustomer = async (userId: string): Promise<string> => {
@@ -29,7 +24,7 @@ export const createCustomer = async (userId: string): Promise<string> => {
   return customer.id;
 };
 
-export const createCheckoutSession = async (
+export const checkout = async (
   userId: string,
   currentUrl: string,
   cancelUrl: string
@@ -67,6 +62,7 @@ export const createCheckoutSession = async (
       },
     ],
   };
+  return await createCheckoutSession(params);
 };
 
 export const createSubscription = async (
@@ -237,11 +233,9 @@ export const createSubscription = async (
 export const handleSubscriptionCreated = async (
   subscription: Stripe.Subscription
 ) => {
-  console.log("subscription created");
-  console.log(subscription);
   const customerId = subscription.customer as string;
   const subscriptionId = subscription.id;
-  const priceId = subscription.items.data[0].price.id;
+  const priceId = subscription.items.data[0].price.id; // For when we have different plans
   const user = await getUser({ stripeCustomerId: customerId });
   if (!user) {
     throw new Error("User not found");
