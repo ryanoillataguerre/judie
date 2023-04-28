@@ -1,7 +1,12 @@
 import Stripe from "stripe";
 import { getUser, updateUser } from "../user/service.js";
 import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
-import { Prisma, SubscriptionStatus, SubscriptionType } from "@prisma/client";
+import {
+  Prisma,
+  SubscriptionStatus,
+  SubscriptionType,
+  UserRole,
+} from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createCustomer = async (userId: string): Promise<string> => {
@@ -56,7 +61,10 @@ export const checkout = async (
     customer: user.stripeCustomerId || newCustomerId || undefined,
     discounts: [
       {
-        coupon: process.env.STRIPE_COUPON_ID,
+        coupon:
+          user.role === UserRole.JUDIE
+            ? process.env.STRIPE_EMPLOYEE_COUPON_ID
+            : process.env.STRIPE_COUPON_ID,
       },
     ],
   };
