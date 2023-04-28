@@ -51,6 +51,7 @@ export interface Message {
 export interface Chat {
   id: string;
   userId: string;
+  usertitle?: string;
   createdAt: Date;
   updatedAt: Date | null;
   messages: Message[];

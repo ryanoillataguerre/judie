@@ -26,6 +26,7 @@
   cursor: pointer;
   margin: 0 0 12px 0;
   .leftContainer {
+    min-width: 40%;
   }
   .rightContainer {
     display: flex;
@@ -47,4 +48,12 @@
       }
     }
   }
+}
+
+.chatTitle {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
 }

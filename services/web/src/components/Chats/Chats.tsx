@@ -9,6 +9,9 @@ import {
   AlertTitle,
   Badge,
   CloseButton,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Flex,
   Modal,
   ModalContent,
@@ -18,9 +21,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { MessageType } from "@judie/data/types/api";
-import { ChatResponse, deleteChatMutation } from "@judie/data/mutations";
+import {
+  ChatResponse,
+  deleteChatMutation,
+  putChatMutation,
+} from "@judie/data/mutations";
 import { BsTrash } from "react-icons/bs";
-import { useState } from "react";
+import { HiOutlinePencil } from "react-icons/hi";
+import { FormEvent, useState } from "react";
 import Button, { ButtonVariant } from "../Button/Button";
 
 const Chats = ({
@@ -47,6 +55,9 @@ const Chats = ({
     },
   });
   const getTitleForChat = (chat: ChatResponse) => {
+    if (chat.userTitle) {
+      return chat.userTitle;
+    }
     if (chat.messages?.[0]?.content) {
       if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
         return chat.messages?.[0]?.content.slice(0, 100) + "...";
@@ -55,6 +66,7 @@ const Chats = ({
     return "Untitled Chat";
   };
 
+  // Delete logic
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [beingDeletedChatId, setBeingDeletedChatId] = useState<string>();
 
@@ -69,7 +81,16 @@ const Chats = ({
     setBeingDeletedChatId(chatId);
     setIsDeleteModalOpen(true);
   };
-  console.log("beingDeletedChatId", beingDeletedChatId);
+  // Edit Title Logic
+  const [beingEditedChatId, setBeingEditedChatId] = useState<string>();
+  const [editingTitle, setEditingTitle] = useState<string>();
+  const editTitleMutation = useMutation({
+    mutationFn: ({ title }: { title: string }) =>
+      putChatMutation({
+        chatId: beingEditedChatId || "",
+        userTitle: title,
+      }),
+  });
 
   return (
     <div className={styles.chatsPageContainer}>
@@ -140,10 +161,41 @@ const Chats = ({
         <div key={chat.id} className={styles.chatContainer}>
           <div
             className={styles.leftContainer}
-            onClick={() => onClickChat(chat.id)}
+            onClick={() =>
+              !beingEditedChatId ? onClickChat(chat.id) : () => {}
+            }
           >
-            {/* TODO: Make this title use job-generated chat title */}
-            <h2 className={styles.chatTitle}>{getTitleForChat(chat)}</h2>
+            <div className={styles.chatTitle}>
+              <Editable
+                defaultValue={getTitleForChat(chat)}
+                style={{
+                  zIndex: 10,
+                  width: "100%",
+                }}
+                onEdit={() => {
+                  setBeingEditedChatId(chat.id);
+                }}
+                onBlur={() => {
+                  setBeingEditedChatId(undefined);
+                }}
+                onSubmit={(value) => {
+                  setBeingEditedChatId(undefined);
+                  if (value !== getTitleForChat(chat)) {
+                    editTitleMutation.mutate({ title: value });
+                  }
+                }}
+              >
+                <EditablePreview />
+                <EditableInput
+                  width={"100%"}
+                  onSubmit={(event: FormEvent<HTMLInputElement>) => {
+                    event.preventDefault();
+                  }}
+                />
+              </Editable>
+            </div>
+
+            {/* <h2 className={styles.chatTitle}>{getTitleForChat(chat)}</h2> */}
             <Badge
               variant={"subtle"}
               colorScheme={chat.subject ? "green" : "gray"}

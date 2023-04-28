@@ -23,6 +23,7 @@ const router = Router();
 const transformChat = (chat: Chat & { messages: Message[] }) => {
   return {
     id: chat.id,
+    userTitle: chat.userTitle,
     subject: chat.subject,
     createdAt: chat.createdAt,
     updatedAt: chat.updatedAt,
@@ -120,17 +121,21 @@ router.post(
 router.put(
   "/:chatId",
   requireAuth,
-  [body("subject").optional()],
-  [param("chatId").exists()],
+  [
+    body("subject").optional(),
+    param("chatId").exists(),
+    body("userTitle").optional(),
+  ],
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const { chatId } = req.params;
-    const { subject } = req.body;
+    const { subject, userTitle } = req.body;
     const newChat = await updateChat(chatId, {
       subject,
+      userTitle,
     });
 
     res.status(200).json({
