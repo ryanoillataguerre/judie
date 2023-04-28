@@ -56,7 +56,7 @@ const Navbar = () => {
         title: "Success!",
         description: (
           <div className={styles.toastDescription}>
-            <p>Welcome to Judie's Unlimited plan </p>
+            <p>Welcome to Judie&apos;s Unlimited plan </p>
             <p>Good luck with your studies! 🎉</p>
           </div>
         ),

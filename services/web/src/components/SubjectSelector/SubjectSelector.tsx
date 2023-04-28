@@ -15,7 +15,7 @@ const SubjectSelector = ({
       return [...subjects, "Content Creation"];
     }
     return subjects;
-  }, [subjects, userData]);
+  }, [userData]);
   return (
     <Select
       size={"lg"}

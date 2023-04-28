@@ -68,7 +68,7 @@ const Paywall = ({
       setIsOpen(false);
       return;
     }
-  }, [userData]);
+  }, [userData, setIsOpen]);
 
   const currentUrl = useMemo(() => {
     return typeof window !== "undefined" ? window?.location?.href : "";
@@ -103,21 +103,21 @@ const Paywall = ({
         <div className={styles.modalContentContainer}>
           <ModalHeader>
             <h1>
-              Thank you for checking out Judie! We're so glad you're here
+              Thank you for checking out Judie! We&apos;re so glad you're here
               learning with us 🎉
             </h1>
           </ModalHeader>
           <ModalBody>
             <p>
-              We're currently in beta, and we're working hard to make Judie the
-              best learning experience possible. We're also relying on
-              subscriptions to help us keep the lights on.
+              We&apos;re currently in beta, and we&apos;re working hard to make
+              Judie the best learning experience possible. We&apos;re also
+              relying on subscriptions to help us keep the lights on.
             </p>
             <br />
             <p>
-              In the meantime, we're limiting the number of questions every user
-              can ask for free to 10. If you'd like to ask more questions,
-              please consider subscribing!
+              In the meantime, we&apos;re limiting the number of questions every
+              user can ask for free to 10. If you&apos;d like to ask more
+              questions, please consider subscribing!
             </p>
           </ModalBody>
           <ModalFooter>
