@@ -103,8 +103,8 @@ const Paywall = ({
         <div className={styles.modalContentContainer}>
           <ModalHeader>
             <h1>
-              Thank you for checking out Judie! We&apos;re so glad you're here
-              learning with us 🎉
+              Thank you for checking out Judie! We&apos;re so glad you&apos;re
+              here learning with us 🎉
             </h1>
           </ModalHeader>
           <ModalBody>
