@@ -110,3 +110,12 @@ export const createCheckoutSessionMutation = async (
   });
   return response.data;
 };
+
+export const DELETE_CHAT = "DELETE_CHAT";
+export const deleteChatMutation = async (chatId: string) => {
+  const response = await baseFetch({
+    url: `/chat/${chatId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};

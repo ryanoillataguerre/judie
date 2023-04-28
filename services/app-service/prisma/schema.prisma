@@ -85,6 +85,7 @@ model Chat {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   user      User      @relation(fields: [userId], references: [id])
+  deletedAt DateTime? @map("deleted_at")
   messages  Message[]
 
   @@index([id, userId])

@@ -20,6 +20,22 @@ export const createChat = async (params: Prisma.ChatCreateInput) => {
   return newChat;
 };
 
+export const deleteChat = async (chatId: string) => {
+  if (!chatId) {
+    throw new InternalError("Chat ID not provided");
+  }
+
+  const chat = await dbClient.chat.update({
+    where: {
+      id: chatId,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+  return chat;
+};
+
 export const updateChat = async (
   chatId: string,
   params: Prisma.ChatUpdateInput
@@ -46,8 +62,11 @@ export const updateChat = async (
 };
 
 export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
-  const chat = await dbClient.chat.findUnique({
-    where: params,
+  const chat = await dbClient.chat.findFirst({
+    where: {
+      ...params,
+      deletedAt: null,
+    },
     include: {
       messages: {
         orderBy: {
@@ -82,6 +101,7 @@ export const getUserChats = async (userId: string) => {
   const chats = await dbClient.chat.findMany({
     where: {
       userId,
+      deletedAt: null,
     },
     include: {
       messages: {

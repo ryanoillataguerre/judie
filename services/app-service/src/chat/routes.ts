@@ -7,6 +7,7 @@ import {
 } from "../utils/express.js";
 import {
   createChat,
+  deleteChat,
   getChat,
   getCompletion,
   getUserChats,
@@ -134,6 +135,23 @@ router.put(
 
     res.status(200).json({
       data: transformChat(newChat),
+    });
+  })
+);
+
+router.delete(
+  "/:chatId",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const { chatId } = req.params;
+    await deleteChat(chatId);
+
+    res.status(200).json({
+      data: { success: true },
     });
   })
 );
