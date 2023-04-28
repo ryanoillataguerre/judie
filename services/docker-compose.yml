@@ -25,49 +25,49 @@ services:
       - 6379:6379
     networks:
       - dev
-  app-service:
-    networks:
-      - dev
-    privileged: true
-    volumes:
-      - ./app-service:/app
-      - ./protos:/app/protos # Copies protos into the container at dir /app/protos
-    working_dir: /app
-    build:
-      context: .
-      dockerfile: ./app-service/Dockerfile.local
-    ports:
-      - 8080:8080
-    environment:
-      NODE_ENV: local
-      PORT: 8080
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
-      REDIS_HOST: redis
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      PINECONE_API_KEY: ${PINECONE_API_KEY}
-      PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
-      STRIPE_SK: ${STRIPE_SK}
-      STRIPE_MONTHLY_PRICE_ID: ${STRIPE_MONTHLY_PRICE_ID}
-      STRIPE_COUPON_ID: ${STRIPE_COUPON_ID}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-  web:
-    networks:
-      - dev
-    privileged: true
-    depends_on:
-      - app-service
-    volumes:
-      - ./web:/app
-      - /app/web/node_modules
-    working_dir: /app
-    build:
-      context: ./web
-      dockerfile: ./Dockerfile.local
-    ports:
-      - 3000:3000
-    environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URI: http://app-service:8080
+  # app-service:
+  #   networks:
+  #     - dev
+  #   privileged: true
+  #   volumes:
+  #     - ./app-service:/app
+  #     - ./protos:/app/protos # Copies protos into the container at dir /app/protos
+  #   working_dir: /app
+  #   build:
+  #     context: .
+  #     dockerfile: ./app-service/Dockerfile.local
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     NODE_ENV: local
+  #     PORT: 8080
+  #     DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+  #     REDIS_HOST: redis
+  #     OPENAI_API_KEY: ${OPENAI_API_KEY}
+  #     PINECONE_API_KEY: ${PINECONE_API_KEY}
+  #     PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
+  #     STRIPE_SK: ${STRIPE_SK}
+  #     STRIPE_MONTHLY_PRICE_ID: ${STRIPE_MONTHLY_PRICE_ID}
+  #     STRIPE_COUPON_ID: ${STRIPE_COUPON_ID}
+  #     STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+  # web:
+  #   networks:
+  #     - dev
+  #   privileged: true
+  #   depends_on:
+  #     - app-service
+  #   volumes:
+  #     - ./web:/app
+  #     - /app/web/node_modules
+  #   working_dir: /app
+  #   build:
+  #     context: ./web
+  #     dockerfile: ./Dockerfile.local
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     NODE_ENV: development
+  #     NEXT_PUBLIC_API_URI: http://app-service:8080
 
   inference-service:
     networks:
@@ -89,6 +89,7 @@ services:
       PG_HOST: postgres
       PG_PORT: 5432
       PG_DB_NAME: postgres
+    # command: tail -f /dev/null
 networks:
   dev:
     driver: bridge
