@@ -8,15 +8,11 @@ import {
   PopoverTrigger,
 } from "@chakra-ui/react";
 
-const getUserInitials = (name?: string) => {
-  if (!name) {
+const getUserInitials = (firstName?: string, lastName?: string) => {
+  if (!firstName && !lastName) {
     return "JD";
   }
-  const nameParts = name.split(" ");
-  if (nameParts.length === 1) {
-    return nameParts[0].slice(0, 2).toUpperCase();
-  }
-  return `${nameParts[0].slice(0, 1)}${nameParts[1].slice(0, 1)}`.toUpperCase();
+  return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
 };
 
 const AccountMenu = () => {
@@ -27,7 +23,10 @@ const AccountMenu = () => {
       <PopoverTrigger>
         <div className={styles.accountMenuContainer}>
           <p className={styles.lettersContainer}>
-            {getUserInitials(auth?.userData?.name)}
+            {getUserInitials(
+              auth?.userData?.firstName,
+              auth?.userData?.lastName
+            )}
           </p>
         </div>
       </PopoverTrigger>
