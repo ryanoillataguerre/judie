@@ -30,7 +30,7 @@ export default function useAuth({
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
-  }, [router]);
+  }, [router, setUserData, setSessionCookie]);
 
   // GET /users/me
   const { isError, refetch, error, isLoading, isFetched } = useQuery(

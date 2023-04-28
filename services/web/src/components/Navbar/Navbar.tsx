@@ -77,7 +77,7 @@ const Navbar = () => {
       <Link href={"/"}>
         <div className={styles.leftContainer}>
           {/* Logo */}
-          <img src={"/logo.svg"} alt={"Judie Logo"} className={styles.logo} />
+          <img src={"/logo_2.svg"} alt={"Judie Logo"} className={styles.logo} />
           {/* Title */}
           <h1 className={styles.title}>Judie</h1>
         </div>
