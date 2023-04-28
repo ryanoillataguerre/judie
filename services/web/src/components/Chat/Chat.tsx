@@ -13,12 +13,18 @@ import {
 } from "react";
 import MessageRow, { TempMessage } from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
-import { Message, MessageType } from "@judie/data/types/api";
+import {
+  Message,
+  MessageType,
+  SubscriptionStatus,
+} from "@judie/data/types/api";
 import Loading from "../lottie/Loading/Loading";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Progress, useToast } from "@chakra-ui/react";
 import ChatInput from "../ChatInput/ChatInput";
 import ChatWelcome from "../ChatWelcome/ChatWelcome";
+import useAuth from "@judie/hooks/useAuth";
+import Paywall from "../Paywall/Paywall";
 
 interface ChatProps {
   initialQuery?: string;
@@ -30,12 +36,9 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const toast = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayWelcome, setDisplayWelcome] = useState<boolean>(false);
-
-  const {
-    data: existingUserChat,
-    isLoading: isExistingChatLoading,
-    refetch: fetchExistingChat,
-  } = useQuery({
+  const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
+  const { userData, refresh: refreshUserData } = useAuth();
+  const { refetch: fetchExistingChat } = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
     onSuccess: (data) => {
@@ -55,14 +58,13 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     }
   }, [chatId, fetchExistingChat]);
 
-  const {
-    isLoading,
-    data: completionMutationData,
-    isError,
-    mutateAsync,
-  } = useMutation({
-    mutationFn: completionFromQueryMutation,
-    onError: (error) => {
+  const { isLoading, mutateAsync } = useMutation({
+    mutationFn: () =>
+      completionFromQueryMutation({
+        query: chatValue,
+        chatId,
+      }),
+    onError: () => {
       toast({
         title: "Oops!",
         description: "Something went wrong, please try again.",
@@ -72,8 +74,13 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       });
     },
     onSuccess: (data) => {
-      setMostRecentUserChat(undefined);
-      setMessages(data?.messages);
+      if (data) {
+        setMostRecentUserChat(undefined);
+        if (data?.messages) {
+          setMessages(data?.messages);
+        }
+        refreshUserData();
+      }
     },
     retry: false,
   });
@@ -100,17 +107,20 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       });
       return;
     }
+    if (
+      (userData?.questionsAsked || 0) >= 10 &&
+      !(userData?.subscription?.status === SubscriptionStatus.ACTIVE)
+    ) {
+      setIsPaywallOpen(true);
+      return;
+    }
     setMostRecentUserChat({
       type: MessageType.USER,
       readableContent: chatValue,
       createdAt: new Date(),
     });
     setChatValue("");
-    await mutateAsync({
-      query: chatValue,
-      // When do we want to make a new chat? Maybe a button?
-      chatId,
-    });
+    await mutateAsync();
   };
 
   useEffect(() => {
@@ -121,10 +131,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
           readableContent: chatValue,
           createdAt: new Date(),
         });
-        await mutateAsync({
-          query: chatValue,
-          chatId,
-        });
+        await mutateAsync();
         setChatValue("");
       })();
     }
@@ -161,6 +168,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
 
   return (
     <div className={styles.chatContainer}>
+      <Paywall isOpen={isPaywallOpen} setIsOpen={setIsPaywallOpen} />
       {displayWelcome ? (
         <div className={styles.welcomeContainer}>
           <ChatWelcome selectSubject={onSelectSubject} />

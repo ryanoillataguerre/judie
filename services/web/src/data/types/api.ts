@@ -1,13 +1,36 @@
+export enum SubscriptionStatus {
+  ACTIVE = "ACTIVE",
+  CANCELED = "CANCELED",
+  PAST_DUE = "PAST_DUE",
+}
+
+export enum SubscriptionType {
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY",
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  status: SubscriptionStatus;
+  type: SubscriptionType;
+  stripeId: string;
+  user: User;
+}
 export interface User {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   password: string;
   receivePromotions: boolean;
   createdAt: Date;
   updatedAt: Date | null;
   role: UserRole;
   district?: string;
+  stripeCustomerId?: string;
+  questionsAsked: number;
+  subscription?: Subscription;
 }
 
 export enum MessageType {
@@ -28,6 +51,7 @@ export interface Message {
 export interface Chat {
   id: string;
   userId: string;
+  usertitle?: string;
   createdAt: Date;
   updatedAt: Date | null;
   messages: Message[];

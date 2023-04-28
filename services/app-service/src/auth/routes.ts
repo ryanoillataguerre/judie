@@ -10,19 +10,28 @@ router.post(
   [
     body("email").exists().isEmail(),
     body("password").isString().exists(),
-    body("name").isString().exists(),
+    body("firstName").isString().optional(),
+    body("lastName").isString().optional(),
     body("receivePromotions").isBoolean().toBoolean().exists(),
   ],
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const { email, password, name, receivePromotions, role, district } =
-      req.body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      receivePromotions,
+      role,
+      district,
+    } = req.body;
     // Create user
     const userId = await signup({
       email,
       password,
-      name,
+      firstName,
+      lastName,
       receivePromotions,
       role,
       district,

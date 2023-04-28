@@ -9,7 +9,7 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const user = await getUser(session.userId!);
+    const user = await getUser({ id: session.userId }!);
     res.status(200).send({
       data: user,
     });

@@ -18,4 +18,18 @@
 
 .blue {
   background-color: #046AC5;
+  border-color: #046AC5;
+}
+
+.red {
+  background-color: v.$primary-red;
+  border-color: v.$primary-red;
+  color: v.$primary-red !important;
+}
+
+.transparent {
+  background: transparent;
+  border-width: 1px;
+  border-style: solid;
+  color: black;
 }

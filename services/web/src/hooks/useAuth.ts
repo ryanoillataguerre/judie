@@ -1,10 +1,15 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
-import { User } from "@judie/data/types/api";
+import { SubscriptionStatus, User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback } from "react";
-import { useQuery } from "react-query";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useQuery,
+} from "react-query";
 
 const redirToChatFrom = ["/signin", "/signup"];
 const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
@@ -14,7 +19,7 @@ export default function useAuth({
   allowUnauth = false,
 }: {
   allowUnauth?: boolean;
-} = {}): { userData: User | undefined; isLoading: boolean } {
+} = {}): AuthData {
   const router = useRouter();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
@@ -44,6 +49,13 @@ export default function useAuth({
       },
     }
   );
+
+  const isPaid = useMemo(() => {
+    return (
+      (userData?.subscription?.status as SubscriptionStatus) ===
+      SubscriptionStatus.ACTIVE
+    );
+  }, [userData]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
@@ -75,10 +87,15 @@ export default function useAuth({
     }
   }, [sessionCookie, refetch, router]);
 
-  return { userData, isLoading };
+  return { userData, isPaid, isLoading, refresh: refetch, logout };
 }
 
 export interface AuthData {
   userData: User | undefined;
   isLoading: boolean;
+  isPaid: boolean;
+  logout: () => void;
+  refresh: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<User, HTTPResponseError>>;
 }

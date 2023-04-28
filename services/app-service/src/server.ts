@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import http from "http";
 import router from "./router.js";
+import webhookRoutes from "./payments/webhooks.js";
 import {
   errorHandler,
   errorPassthrough,
@@ -19,7 +20,15 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(morganLogger());
 app.use(sessionLayer());
-
+// Webhooks
+app.use(
+  "/webhooks",
+  express.raw({
+    limit: "50mb",
+    type: "*/*",
+  }),
+  webhookRoutes
+);
 // Routes
 app.use(
   "/",

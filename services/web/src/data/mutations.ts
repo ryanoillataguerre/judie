@@ -3,6 +3,7 @@ import { Message, UserRole } from "./types/api";
 
 export interface ChatResponse {
   id: string;
+  userTitle?: string;
   subject?: string;
   createdAt: string;
   updatedAt: string;
@@ -40,14 +41,16 @@ export const signinMutation = async ({
 };
 
 export const signupMutation = async ({
-  name,
+  firstName,
+  lastName,
   email,
   password,
   receivePromotions,
   role,
   district,
 }: {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
@@ -57,7 +60,15 @@ export const signupMutation = async ({
   const response = await baseFetch({
     url: "/auth/signup",
     method: "POST",
-    body: { email, password, name, receivePromotions, role, district },
+    body: {
+      email,
+      password,
+      firstName,
+      lastName,
+      receivePromotions,
+      role,
+      district,
+    },
   });
   return response.data;
 };
@@ -73,16 +84,42 @@ export const createChatMutation = async () => {
 export const putChatMutation = async ({
   chatId,
   subject,
+  userTitle,
 }: {
   chatId: string;
   subject?: string;
+  userTitle?: string;
 }): Promise<ChatResponse> => {
   const response = await baseFetch({
     url: `/chat/${chatId}`,
     method: "PUT",
     body: {
       subject,
+      userTitle,
     },
+  });
+  return response.data;
+};
+
+export const CREATE_CHECKOUT_SESSION = "CREATE_CHECKOUT_SESSION";
+export const createCheckoutSessionMutation = async (
+  currentUrl: string
+): Promise<string> => {
+  const response = await baseFetch({
+    url: `/payments/checkout-session`,
+    method: "POST",
+    body: {
+      currentUrl,
+    },
+  });
+  return response.data;
+};
+
+export const DELETE_CHAT = "DELETE_CHAT";
+export const deleteChatMutation = async (chatId: string) => {
+  const response = await baseFetch({
+    url: `/chat/${chatId}`,
+    method: "DELETE",
   });
   return response.data;
 };
