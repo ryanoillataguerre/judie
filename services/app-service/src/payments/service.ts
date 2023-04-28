@@ -41,7 +41,7 @@ export const checkout = async (
 
   const params: Stripe.Checkout.SessionCreateParams = {
     mode: "subscription",
-    payment_method_types: ["card", "cashapp"],
+    payment_method_types: ["card"],
     line_items: [
       {
         price: process.env.STRIPE_MONTHLY_PRICE_ID,
