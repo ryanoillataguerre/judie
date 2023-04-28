@@ -4,7 +4,10 @@
   height: 100vh;
   display: flex;
   align-items: center;
-  padding-bottom: 40%;
+  padding-bottom: 50%;
+  @media screen and (min-width: 768px) {
+    padding-right: 5%;
+  }
   justify-content: center;
   background-color: v.$primary-teal;
 }

@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SK || "", {
 export const createStripeCustomer = async (user: User) => {
   const customer = await stripe.customers.create({
     email: user.email,
-    name: user.name,
+    name: `${user.firstName || ""} ${user.lastName || ""}`,
     metadata: {
       userId: user.id,
     },

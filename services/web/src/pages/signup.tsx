@@ -119,7 +119,6 @@ const SignupForm = () => {
       <Input
         label={"First Name"}
         errors={errors}
-        required
         placeholder={""}
         register={register}
         name={"firstName"}
@@ -127,7 +126,6 @@ const SignupForm = () => {
       <Input
         label={"Last Name"}
         errors={errors}
-        required
         placeholder={""}
         register={register}
         name={"lastName"}
