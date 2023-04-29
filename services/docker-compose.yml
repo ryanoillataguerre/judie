@@ -30,6 +30,7 @@ services:
       - dev
     privileged: true
     volumes:
+      - ./app-service:/app
       - ./protos:/app/protos # Copies protos into the container at dir /app/protos
     working_dir: /app
     build:
@@ -56,6 +57,7 @@ services:
     depends_on:
       - app-service
     volumes:
+      - ./web:/app
       - /app/web/node_modules
     working_dir: /app
     build:

@@ -9,6 +9,7 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Badge, useToast } from "@chakra-ui/react";
 import { SubscriptionStatus } from "@judie/data/types/api";
 import AccountMenu from "../AccountMenu/AccountMenu";
+import Paywall from "../Paywall/Paywall";
 
 const getColorSchemeFromQuestionsAsked = (questionsAsked?: number) => {
   if (!questionsAsked && questionsAsked !== 0) {
@@ -71,9 +72,11 @@ const Navbar = () => {
       });
     }
   }, [router, toast]);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
   return (
     <div className={styles.container}>
+      <Paywall isOpen={isPaywallOpen} setIsOpen={setIsPaywallOpen} />
       <Link href={"/"}>
         <div className={styles.leftContainer}>
           {/* Logo */}
@@ -108,6 +111,8 @@ const Navbar = () => {
               <div className={styles.badgesContainer}>
                 {auth?.isPaid ? null : (
                   <Badge
+                    cursor={"pointer"}
+                    onClick={() => setIsPaywallOpen(true)}
                     colorScheme={getColorSchemeFromQuestionsAsked(
                       auth?.userData?.questionsAsked
                     )}
@@ -136,7 +141,7 @@ const Navbar = () => {
                 />
               </Link>
             )}
-            <AccountMenu />
+            <AccountMenu setIsPaywallOpen={setIsPaywallOpen} />
           </>
         )}
       </div>

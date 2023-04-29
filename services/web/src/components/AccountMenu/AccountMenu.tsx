@@ -5,8 +5,12 @@ import {
   PopoverArrow,
   PopoverBody,
   PopoverContent,
+  PopoverHeader,
   PopoverTrigger,
 } from "@chakra-ui/react";
+import Paywall from "../Paywall/Paywall";
+import { useState } from "react";
+import { SubscriptionStatus } from "@judie/data/types/api";
 
 const getUserInitials = (firstName?: string, lastName?: string) => {
   if (!firstName && !lastName) {
@@ -15,11 +19,15 @@ const getUserInitials = (firstName?: string, lastName?: string) => {
   return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
 };
 
-const AccountMenu = () => {
+const AccountMenu = ({
+  setIsPaywallOpen,
+}: {
+  setIsPaywallOpen: (isOpen: boolean) => void;
+}) => {
   const auth = useAuth();
 
   return (
-    <Popover trigger="hover" placement={"bottom-end"}>
+    <Popover trigger="hover" placement={"bottom-end"} size={"sm"}>
       <PopoverTrigger>
         <div className={styles.accountMenuContainer}>
           <p className={styles.lettersContainer}>
@@ -33,6 +41,17 @@ const AccountMenu = () => {
       <PopoverContent>
         <PopoverArrow />
         <PopoverBody>
+          {auth?.userData?.subscription?.status ===
+          SubscriptionStatus.ACTIVE ? null : (
+            <div
+              className={[styles.popoverContent].join(" ")}
+              onClick={() => {
+                setIsPaywallOpen(true);
+              }}
+            >
+              Upgrade ⭐
+            </div>
+          )}
           <div
             className={[styles.popoverContent, styles.red].join(" ")}
             onClick={auth.logout}
