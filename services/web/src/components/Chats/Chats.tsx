@@ -157,62 +157,69 @@ const Chats = ({
       <h1 className={styles.title}>Past Chats</h1>
 
       {/* TODO: Learn More */}
-      {data?.map((chat) => (
-        <div key={chat.id} className={styles.chatContainer}>
-          <div
-            className={styles.leftContainer}
-            onClick={() =>
-              !beingEditedChatId ? onClickChat(chat.id) : () => {}
-            }
-          >
-            <div className={styles.chatTitle}>
-              <Editable
-                defaultValue={getTitleForChat(chat)}
-                style={{
-                  zIndex: 10,
-                  width: "100%",
-                }}
-                onEdit={() => {
-                  setBeingEditedChatId(chat.id);
-                }}
-                onBlur={() => {
-                  setBeingEditedChatId(undefined);
-                }}
-                onSubmit={(value) => {
-                  setBeingEditedChatId(undefined);
-                  if (value !== getTitleForChat(chat)) {
-                    editTitleMutation.mutate({ title: value });
-                  }
-                }}
-              >
-                <EditablePreview />
-                <EditableInput
-                  width={"100%"}
-                  onSubmit={(event: FormEvent<HTMLInputElement>) => {
-                    event.preventDefault();
-                  }}
-                />
-              </Editable>
-            </div>
-
-            {/* <h2 className={styles.chatTitle}>{getTitleForChat(chat)}</h2> */}
-            <Badge
-              variant={"subtle"}
-              colorScheme={chat.subject ? "green" : "gray"}
-            >
-              {chat.subject ? chat.subject : "No subject selected"}
-            </Badge>
-          </div>
-          <div className={styles.rightContainer}>
+      {data?.length ? (
+        data?.map((chat) => (
+          <div key={chat.id} className={styles.chatContainer}>
             <div
-              className={styles.iconContainer}
-              onClick={() => openDeleteModal(chat.id)}
+              className={styles.leftContainer}
+              onClick={() =>
+                !beingEditedChatId ? onClickChat(chat.id) : () => {}
+              }
             >
-              <BsTrash size={16} color={"red"} />
+              <div className={styles.chatTitle}>
+                <Editable
+                  defaultValue={getTitleForChat(chat)}
+                  style={{
+                    zIndex: 10,
+                    width: "100%",
+                  }}
+                  onEdit={() => {
+                    setBeingEditedChatId(chat.id);
+                  }}
+                  onBlur={() => {
+                    setBeingEditedChatId(undefined);
+                  }}
+                  onSubmit={(value) => {
+                    setBeingEditedChatId(undefined);
+                    if (value !== getTitleForChat(chat)) {
+                      editTitleMutation.mutate({ title: value });
+                    }
+                  }}
+                >
+                  <EditablePreview />
+                  <EditableInput
+                    width={"100%"}
+                    onSubmit={(event: FormEvent<HTMLInputElement>) => {
+                      event.preventDefault();
+                    }}
+                  />
+                </Editable>
+              </div>
+
+              {/* <h2 className={styles.chatTitle}>{getTitleForChat(chat)}</h2> */}
+              <Badge
+                variant={"subtle"}
+                colorScheme={chat.subject ? "green" : "gray"}
+              >
+                {chat.subject ? chat.subject : "No subject selected"}
+              </Badge>
+            </div>
+            <div className={styles.rightContainer}>
+              <div
+                className={styles.iconContainer}
+                onClick={() => openDeleteModal(chat.id)}
+              >
+                <BsTrash size={16} color={"red"} />
+              </div>
             </div>
           </div>
+        ))
+      ) : (
+        <div className={styles.noChatsContainer}>
+          <h1>No chats yet!</h1>
+          <p>Start a chat by clicking the Chat button above</p>
         </div>
-      ))}
+      )}
     </div>
   );
 };

@@ -57,3 +57,21 @@
   align-items: center;
   gap: 12px;
 }
+
+.noChatsContainer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  p {
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+}

@@ -376,6 +376,7 @@ export const getChatGPTCompletion = async (
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
+      stream: true,
     });
     const completionMessageContent =
       completion.data.choices[0].message?.content;
