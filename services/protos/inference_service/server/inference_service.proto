@@ -3,7 +3,7 @@ syntax = "proto3";
 package inferenceServiceServer;
 
 service InferenceService{
-  rpc GetChatResponse(Conversation) returns (TutorResponse){}
+  rpc GetChatResponse(Conversation) returns (stream TutorResponse){}
 }
 
 message Conversation{
@@ -16,5 +16,5 @@ message ConvTurn{
 }
 
 message TutorResponse{
-  string response = 1;
+  string responsePart = 1;
 }

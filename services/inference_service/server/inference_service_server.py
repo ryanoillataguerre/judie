@@ -12,7 +12,8 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     """
 
     def GetChatResponse(self, request, context) -> None:
-        return inference_service_pb2.TutorResponse(response="I will")
+        for part in ["Do.", "Or do not.", "There is no try."]:
+            yield inference_service_pb2.TutorResponse(responsePart=part)
 
 
 def serve():

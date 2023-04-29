@@ -2,7 +2,7 @@ from inference_service.prompts import prompt_chunks
 from inference_service.context.context_retriever import pull_context
 
 
-def generate_gpt_prompt(context, subject_modifier):
+def generate_gpt_prompt(question: str, subject_modifier: str) -> str:
     try:
         subject_prompt = prompt_chunks.PROMPT_MAP[subject_modifier]
     except KeyError:
@@ -13,3 +13,6 @@ def generate_gpt_prompt(context, subject_modifier):
         + "\n Use the following context to help answer the next question. \n Context:\n"
         + context
     )
+    prompt_context_and_question = subject_plus_context + "\n Question:\n" + question
+
+    return prompt_context_and_question

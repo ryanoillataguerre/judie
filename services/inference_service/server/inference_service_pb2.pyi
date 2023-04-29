@@ -30,7 +30,7 @@ class Conversation(_message.Message):
     ) -> None: ...
 
 class TutorResponse(_message.Message):
-    __slots__ = ["response"]
-    RESPONSE_FIELD_NUMBER: _ClassVar[int]
-    response: str
-    def __init__(self, response: _Optional[str] = ...) -> None: ...
+    __slots__ = ["responsePart"]
+    RESPONSEPART_FIELD_NUMBER: _ClassVar[int]
+    responsePart: str
+    def __init__(self, responsePart: _Optional[str] = ...) -> None: ...
