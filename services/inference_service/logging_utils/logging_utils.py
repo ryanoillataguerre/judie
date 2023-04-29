@@ -1,5 +1,7 @@
 import logging
 import sys
+
+
 def setup_logger():
     logger = logging.getLogger("inference_logger")
 
@@ -9,7 +11,8 @@ def setup_logger():
     handler.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(funcName)s - %(message)s')
+        "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(funcName)s - %(message)s"
+    )
 
     handler.setFormatter(formatter)
     logger.addHandler(handler)
