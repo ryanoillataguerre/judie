@@ -20,6 +20,9 @@ services
 - Run `make run` in `services/`
 - Create a `.env` in `app-service` with the following: `DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"`
   - This file will help with migrations locally
+  - `yarn`
+  - `yarn migrate`
+  - `yarn generate`
 
 # To Run Migrations
 
