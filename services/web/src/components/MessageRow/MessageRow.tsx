@@ -23,7 +23,9 @@ const MessageRow = ({
       ].join(" ")}
     >
       <div className={styles.messageContainer}>
-        <p>{message.readableContent}</p>
+        <p>
+          <pre>{message.readableContent}</pre>
+        </p>
       </div>
     </div>
   );

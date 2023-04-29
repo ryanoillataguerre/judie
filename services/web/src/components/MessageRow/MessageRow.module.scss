@@ -21,8 +21,14 @@
     }
     word-wrap: break-word;
     p {
-      color: #fff;
-      font-weight: 500;
+      pre {
+        color: #fff;
+        font-weight: 500;
+        font-family: "Roboto", monospace;
+        width: 100%;
+        white-space: pre-wrap;
+      }
+      
     }
   }
 }
@@ -39,6 +45,12 @@
     word-wrap: break-word;
   }
   p {
-    font-weight: 500;
+    pre {
+      font-weight: 500;
+      font-family: "Roboto", monospace;
+      width: 100%;
+      white-space: pre-wrap;
+    }
+
   }
 }

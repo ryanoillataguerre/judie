@@ -58,9 +58,10 @@ const Chats = ({
     if (chat.userTitle) {
       return chat.userTitle;
     }
-    if (chat.messages?.[0]?.content) {
+    if (chat.messages?.[0]?.readableContent) {
+      console.log(chat.messages?.[0]);
       if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
-        return chat.messages?.[0]?.content.slice(0, 100) + "...";
+        return chat.messages?.[0]?.readableContent.slice(0, 100) + "...";
       }
     }
     return "Untitled Chat";

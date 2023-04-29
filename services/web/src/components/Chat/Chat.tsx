@@ -176,9 +176,16 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       ) : (
         <div className={styles.conversationContainer}>
           {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
-          {reversedMessages?.map((message, index) => (
-            <MessageRow key={index} message={message} />
-          ))}
+          {reversedMessages?.map((message, index) => {
+            if (
+              message.type === MessageType.USER &&
+              message.readableContent === mostRecentUserChat?.readableContent &&
+              index === reversedMessages.length - 1
+            ) {
+              return null;
+            }
+            return <MessageRow key={index} message={message} />;
+          })}
         </div>
       )}
       <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
