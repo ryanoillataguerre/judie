@@ -12,27 +12,34 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     """
 
     def GetChatResponse(self, request, context) -> None:
-        return inference_service_pb2.TutorResponse(response="I will")
+        for part in ["Do.", "Or do not.", "There is no try."]:
+            yield inference_service_pb2.TutorResponse(responsePart=part)
+
+    def ServerConnectionCheck(self, request, context):
+        return inference_service_pb2.ConnectedCheckResonse(connected=True)
 
 
 def serve():
     grpc_port = os.getenv("GRPC_PORT")
-    logger.info(f'Attempting grpc connection on port: {grpc_port}',)
+    logger.info(
+        f"Attempting grpc connection on port: {grpc_port}",
+    )
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    server.add_insecure_port(f'[::]:{grpc_port}')
+    server.add_insecure_port(f"[::]:{grpc_port}")
 
-    inference_service_pb2_grpc.add_InferenceServiceServicer_to_server(InferenceServiceServicer(),
-                                                                      server)
+    inference_service_pb2_grpc.add_InferenceServiceServicer_to_server(
+        InferenceServiceServicer(), server
+    )
 
     server.start()
-    logger.info(f'Inference GRPC server running at on port {grpc_port}')
+    logger.info(f"Inference GRPC server running at on port {grpc_port}")
     server.wait_for_termination()
-    logger.info('Server ded')
+    logger.info("Server ded")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # set up logging
     logger = logging_utils.setup_logger()
 
-    logger.info('Running serve()')
+    logger.info("Running serve()")
     serve()

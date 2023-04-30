@@ -1,9 +1,21 @@
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import (
+    ClassVar as _ClassVar,
+    Iterable as _Iterable,
+    Mapping as _Mapping,
+    Optional as _Optional,
+    Union as _Union,
+)
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class ConnectedCheckResonse(_message.Message):
+    __slots__ = ["connected"]
+    CONNECTED_FIELD_NUMBER: _ClassVar[int]
+    connected: bool
+    def __init__(self, connected: bool = ...) -> None: ...
 
 class ConvTurn(_message.Message):
     __slots__ = ["message", "sender"]
@@ -11,16 +23,26 @@ class ConvTurn(_message.Message):
     SENDER_FIELD_NUMBER: _ClassVar[int]
     message: str
     sender: str
-    def __init__(self, sender: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self, sender: _Optional[str] = ..., message: _Optional[str] = ...
+    ) -> None: ...
 
 class Conversation(_message.Message):
     __slots__ = ["turns"]
     TURNS_FIELD_NUMBER: _ClassVar[int]
     turns: _containers.RepeatedCompositeFieldContainer[ConvTurn]
-    def __init__(self, turns: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self, turns: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...
+    ) -> None: ...
+
+class ReturnConnectedCheck(_message.Message):
+    __slots__ = ["returnCheck"]
+    RETURNCHECK_FIELD_NUMBER: _ClassVar[int]
+    returnCheck: bool
+    def __init__(self, returnCheck: bool = ...) -> None: ...
 
 class TutorResponse(_message.Message):
-    __slots__ = ["response"]
-    RESPONSE_FIELD_NUMBER: _ClassVar[int]
-    response: str
-    def __init__(self, response: _Optional[str] = ...) -> None: ...
+    __slots__ = ["responsePart"]
+    RESPONSEPART_FIELD_NUMBER: _ClassVar[int]
+    responsePart: str
+    def __init__(self, responsePart: _Optional[str] = ...) -> None: ...

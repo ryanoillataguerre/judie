@@ -5,12 +5,27 @@ from inference_service.server import inference_service_pb2_grpc, inference_servi
 
 if __name__ == "__main__":
     print(sys.path)
-    with grpc.insecure_channel('localhost:443') as channel:
+    with grpc.insecure_channel("localhost:443") as channel:
         stub = inference_service_pb2_grpc.InferenceServiceStub(channel)
+
+        print("Connection health check")
+        response = stub.ServerConnectionCheck(
+            inference_service_pb2.ReturnConnectedCheck(returnCheck=True)
+        )
+        print(response)
+        print()
+
+        print("Chat response stream")
         response = stub.GetChatResponse(
             inference_service_pb2.Conversation(
-                turn=[inference_service_pb2.ConvTurn(sender="student", message="hey"),
-                      inference_service_pb2.ConvTurn(sender="tutor", message="hey"),
-                      inference_service_pb2.ConvTurn(sender="student", message="teach me"),
-                      ]))
-        print("Client received: " + response.response)
+                turns=[
+                    inference_service_pb2.ConvTurn(sender="student", message="hey"),
+                    inference_service_pb2.ConvTurn(sender="tutor", message="hey"),
+                    inference_service_pb2.ConvTurn(
+                        sender="student", message="teach me"
+                    ),
+                ]
+            )
+        )
+        for part in response:
+            print("Client received: " + part.responsePart)
