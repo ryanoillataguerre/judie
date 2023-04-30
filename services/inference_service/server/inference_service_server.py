@@ -15,6 +15,9 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
         for part in ["Do.", "Or do not.", "There is no try."]:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
+    def ServerConnectionCheck(self, request, context):
+        return inference_service_pb2.ConnectedCheckResonse(connected=True)
+
 
 def serve():
     grpc_port = os.getenv("GRPC_PORT")

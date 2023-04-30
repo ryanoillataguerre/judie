@@ -11,6 +11,12 @@ from typing import (
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class ConnectedCheckResonse(_message.Message):
+    __slots__ = ["connected"]
+    CONNECTED_FIELD_NUMBER: _ClassVar[int]
+    connected: bool
+    def __init__(self, connected: bool = ...) -> None: ...
+
 class ConvTurn(_message.Message):
     __slots__ = ["message", "sender"]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
@@ -28,6 +34,12 @@ class Conversation(_message.Message):
     def __init__(
         self, turns: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...
     ) -> None: ...
+
+class ReturnConnectedCheck(_message.Message):
+    __slots__ = ["returnCheck"]
+    RETURNCHECK_FIELD_NUMBER: _ClassVar[int]
+    returnCheck: bool
+    def __init__(self, returnCheck: bool = ...) -> None: ...
 
 class TutorResponse(_message.Message):
     __slots__ = ["responsePart"]

@@ -7,6 +7,15 @@ if __name__ == "__main__":
     print(sys.path)
     with grpc.insecure_channel("localhost:443") as channel:
         stub = inference_service_pb2_grpc.InferenceServiceStub(channel)
+
+        print("Connection health check")
+        response = stub.ServerConnectionCheck(
+            inference_service_pb2.ReturnConnectedCheck(returnCheck=True)
+        )
+        print(response)
+        print()
+
+        print("Chat response stream")
         response = stub.GetChatResponse(
             inference_service_pb2.Conversation(
                 turns=[

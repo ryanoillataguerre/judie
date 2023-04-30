@@ -4,6 +4,8 @@ package inferenceServiceServer;
 
 service InferenceService{
   rpc GetChatResponse(Conversation) returns (stream TutorResponse){}
+
+  rpc ServerConnectionCheck(ReturnConnectedCheck) returns (ConnectedCheckResonse){}
 }
 
 message Conversation{
@@ -17,4 +19,12 @@ message ConvTurn{
 
 message TutorResponse{
   string responsePart = 1;
+}
+
+message ReturnConnectedCheck{
+  bool returnCheck = 1;
+}
+
+message ConnectedCheckResonse{
+  bool connected = 1;
 }
