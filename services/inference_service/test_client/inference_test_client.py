@@ -4,7 +4,6 @@ from inference_service.server import inference_service_pb2_grpc, inference_servi
 
 
 if __name__ == "__main__":
-    print(sys.path)
     with grpc.insecure_channel("localhost:443") as channel:
         stub = inference_service_pb2_grpc.InferenceServiceStub(channel)
 

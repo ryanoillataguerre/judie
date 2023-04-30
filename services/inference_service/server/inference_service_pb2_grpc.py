@@ -15,15 +15,15 @@ class InferenceServiceStub(object):
             channel: A grpc.Channel.
         """
         self.GetChatResponse = channel.unary_stream(
-            "/inferenceServiceServer.InferenceService/GetChatResponse",
-            request_serializer=inference__service__pb2.Conversation.SerializeToString,
-            response_deserializer=inference__service__pb2.TutorResponse.FromString,
-        )
+                '/inferenceServiceServer.InferenceService/GetChatResponse',
+                request_serializer=inference__service__pb2.Conversation.SerializeToString,
+                response_deserializer=inference__service__pb2.TutorResponse.FromString,
+                )
         self.ServerConnectionCheck = channel.unary_unary(
-            "/inferenceServiceServer.InferenceService/ServerConnectionCheck",
-            request_serializer=inference__service__pb2.ReturnConnectedCheck.SerializeToString,
-            response_deserializer=inference__service__pb2.ConnectedCheckResonse.FromString,
-        )
+                '/inferenceServiceServer.InferenceService/ServerConnectionCheck',
+                request_serializer=inference__service__pb2.ReturnConnectedCheck.SerializeToString,
+                response_deserializer=inference__service__pb2.ConnectedCheckResponse.FromString,
+                )
 
 
 class InferenceServiceServicer(object):
@@ -32,93 +32,68 @@ class InferenceServiceServicer(object):
     def GetChatResponse(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def ServerConnectionCheck(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details("Method not implemented!")
-        raise NotImplementedError("Method not implemented!")
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
 
 def add_InferenceServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "GetChatResponse": grpc.unary_stream_rpc_method_handler(
-            servicer.GetChatResponse,
-            request_deserializer=inference__service__pb2.Conversation.FromString,
-            response_serializer=inference__service__pb2.TutorResponse.SerializeToString,
-        ),
-        "ServerConnectionCheck": grpc.unary_unary_rpc_method_handler(
-            servicer.ServerConnectionCheck,
-            request_deserializer=inference__service__pb2.ReturnConnectedCheck.FromString,
-            response_serializer=inference__service__pb2.ConnectedCheckResonse.SerializeToString,
-        ),
+            'GetChatResponse': grpc.unary_stream_rpc_method_handler(
+                    servicer.GetChatResponse,
+                    request_deserializer=inference__service__pb2.Conversation.FromString,
+                    response_serializer=inference__service__pb2.TutorResponse.SerializeToString,
+            ),
+            'ServerConnectionCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.ServerConnectionCheck,
+                    request_deserializer=inference__service__pb2.ReturnConnectedCheck.FromString,
+                    response_serializer=inference__service__pb2.ConnectedCheckResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-        "inferenceServiceServer.InferenceService", rpc_method_handlers
-    )
+            'inferenceServiceServer.InferenceService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
-# This class is part of an EXPERIMENTAL API.
+ # This class is part of an EXPERIMENTAL API.
 class InferenceService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetChatResponse(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
-        return grpc.experimental.unary_stream(
-            request,
+    def GetChatResponse(request,
             target,
-            "/inferenceServiceServer.InferenceService/GetChatResponse",
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/inferenceServiceServer.InferenceService/GetChatResponse',
             inference__service__pb2.Conversation.SerializeToString,
             inference__service__pb2.TutorResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-        )
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def ServerConnectionCheck(
-        request,
-        target,
-        options=(),
-        channel_credentials=None,
-        call_credentials=None,
-        insecure=False,
-        compression=None,
-        wait_for_ready=None,
-        timeout=None,
-        metadata=None,
-    ):
-        return grpc.experimental.unary_unary(
-            request,
+    def ServerConnectionCheck(request,
             target,
-            "/inferenceServiceServer.InferenceService/ServerConnectionCheck",
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/inferenceServiceServer.InferenceService/ServerConnectionCheck',
             inference__service__pb2.ReturnConnectedCheck.SerializeToString,
-            inference__service__pb2.ConnectedCheckResonse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-        )
+            inference__service__pb2.ConnectedCheckResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
