@@ -16,7 +16,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
     def ServerConnectionCheck(self, request, context):
-        return inference_service_pb2.ConnectedCheckResonse(connected=True)
+        return inference_service_pb2.ConnectedCheckResponse(connected=True)
 
 
 def serve():

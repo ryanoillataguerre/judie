@@ -25,4 +25,7 @@ pip install -r ../python/dev_requirements.txt
 cd $(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
 echo $ROOT_DIR/services > services.pth
 
+cd $ROOT_DIR/services/app-service
+yarn
+
 exit 0
