@@ -7,11 +7,15 @@
   width: 100%;
 }
 
+.reverseFlexContainer {
+  flex-direction: column-reverse;
+}
 .conversationContainer {
   height: 90%;
   overflow: auto;
   display: flex;
   flex-direction: column-reverse;
+  scroll-snap-align: start;
 }
 
 .chatBoxContainer {

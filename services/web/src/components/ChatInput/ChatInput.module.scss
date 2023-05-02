@@ -9,6 +9,10 @@
   flex-direction: row;
   align-items: center;
   padding: 12px;
+  padding-right: max(15%, 50px); // For Submit button
+  @media screen and (min-width: 768px) {
+    padding: 24px;
+  }
   transition: border-color 0.2s ease-in-out;
   line-height: 18px;
   &:focus-visible {
