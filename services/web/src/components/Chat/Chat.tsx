@@ -103,7 +103,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    if (isLoading) {
+    if (beingStreamedMessage.length > 0) {
       toast({
         title: "Please wait for the previous message to respond",
         status: "warning",

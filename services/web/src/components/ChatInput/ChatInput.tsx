@@ -34,12 +34,11 @@ const ChatInput = ({
       />
       <button type="submit" className={styles.submitButton}>
         <IoSend
-          size={36}
+          size={24}
           style={{
-            position: "absolute",
-            right: "12px",
-            top: "43%",
-            width: "10%",
+            alignSelf: "center",
+            justifySelf: "center",
+            zIndex: 1000,
             fill: "#0E8B8F",
           }}
         />
