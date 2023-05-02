@@ -6,6 +6,8 @@ import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
 import { subjectToNamespaceMap, subjectToPromptMap } from "./consts.js";
 import { incrementUserQuestionsAsked } from "../user/service.js";
+import { IncomingMessage } from "http";
+import { Response } from "express";
 
 // Chat Service
 export const createChat = async (params: Prisma.ChatCreateInput) => {
@@ -127,10 +129,12 @@ export const getCompletion = async ({
   chatId,
   query,
   userId,
+  response,
 }: {
   chatId?: string;
   query: string;
   userId: string;
+  response: Response;
 }) => {
   let chat: Chat & { messages: Message[] };
   if (!chatId) {
@@ -164,7 +168,9 @@ export const getCompletion = async ({
   }
   // Get response from ChatGPT
   console.time("getChatGPTCompletion");
-  const latestChat = await getChatGPTCompletion(newChat);
+  const latestChat = await getChatGPTCompletion(newChat, (chunk: string) => {
+    response.write(chunk);
+  });
   console.timeEnd("getChatGPTCompletion");
   if (!latestChat) {
     throw new InternalError("Could not get response from ChatGPT");
@@ -185,10 +191,10 @@ await pinecone.init({
   apiKey: process.env.PINECONE_API_KEY || "",
 });
 
-const OPENAI_PROMPT_CHAR_LIMIT = 6000;
-const OPENAI_COMPLETION_MODEL = "gpt-4-0314";
+export const OPENAI_PROMPT_CHAR_LIMIT = 6000;
+export const OPENAI_COMPLETION_MODEL = "gpt-4-0314";
 
-const transformMessageToChatCompletionMessage = (
+export const transformMessageToChatCompletionMessage = (
   message: Message
 ): ChatCompletionRequestMessage => {
   const { content, type } = message;
@@ -339,7 +345,8 @@ export const createGPTRequestFromPrompt = async ({
  * @returns ChatAndMessageResponse
  */
 export const getChatGPTCompletion = async (
-  chat: Chat & { messages: Message[] }
+  chat: Chat & { messages: Message[] },
+  onChunkReceived: (chunk: string) => void
 ): Promise<(Chat & { messages: Message[] }) | undefined> => {
   try {
     const transformedMessages = chat.messages
@@ -367,25 +374,65 @@ export const getChatGPTCompletion = async (
         },
         []
       );
-    const completion = await openaiClient.createChatCompletion({
-      model: OPENAI_COMPLETION_MODEL,
-      messages: maxLengthLimitedMessages,
-      user: chat.userId,
-      temperature: 0.7,
-      max_tokens: 800,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-    });
-    const completionMessageContent =
-      completion.data.choices[0].message?.content;
 
-    if (completionMessageContent) {
+    let fullContent = "";
+    await new Promise(async (resolve, reject) => {
+      const response = await openaiClient.createChatCompletion(
+        {
+          model: OPENAI_COMPLETION_MODEL,
+          messages: maxLengthLimitedMessages,
+          user: chat.userId,
+          temperature: 0.7,
+          max_tokens: 600,
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          stream: true,
+        },
+        { responseType: "stream" }
+      );
+
+      const stream = response.data as unknown as IncomingMessage;
+
+      stream.on("data", (chunk: Buffer) => {
+        // Messages in the event stream are separated by a pair of newline characters.
+        const payloads = chunk.toString().split("\n\n");
+        for (const payload of payloads) {
+          if (payload.includes("[DONE]")) {
+            return;
+          }
+          if (payload.startsWith("data:")) {
+            const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
+            try {
+              const delta = JSON.parse(data.trim());
+              const content = delta.choices[0].delta?.content;
+              const filteredContent = content?.replace("undefined", "");
+              if (filteredContent) {
+                fullContent += filteredContent;
+                onChunkReceived(filteredContent);
+              }
+            } catch (error) {
+              throw new InternalError("Error parsing OpenAI stream");
+            }
+          }
+        }
+      });
+
+      stream.on("end", () => {
+        resolve(fullContent);
+      });
+      stream.on("error", (e: Error) => {
+        console.error("Stream error: ", e);
+        reject(e);
+      });
+    });
+
+    if (fullContent) {
       const newMessage = {
-        content: completionMessageContent,
+        content: fullContent,
         type: MessageType.BOT,
         createdAt: new Date(),
-        readableContent: completionMessageContent,
+        readableContent: fullContent,
       };
       // Save new completion to DB
       const newChat = await updateChat(chat.id, {
@@ -424,6 +471,7 @@ export const getChatGPTCompletion = async (
     } else {
       throw new InternalError("Could not get completion from OpenAI");
     }
+    return;
   } catch (err) {
     console.error("OpenAI error", err);
     throw err;

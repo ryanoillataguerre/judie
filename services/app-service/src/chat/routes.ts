@@ -44,14 +44,13 @@ router.post(
     if (!session.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
-    const newChat = await getCompletion({
+    await getCompletion({
       chatId: req.query.chatId as string | undefined,
       query: req.body.query,
       userId: session.userId,
+      response: res,
     });
-    res.status(200).json({
-      data: transformChat(newChat),
-    });
+    res.status(200).end();
     incrementUserQuestionsAsked(session.userId);
   })
 );

@@ -59,7 +59,6 @@ const Chats = ({
       return chat.userTitle;
     }
     if (chat.messages?.[0]?.readableContent) {
-      console.log(chat.messages?.[0]);
       if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
         return chat.messages?.[0]?.readableContent.slice(0, 100) + "...";
       }
