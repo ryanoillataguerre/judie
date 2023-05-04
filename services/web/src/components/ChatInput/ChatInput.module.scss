@@ -34,6 +34,13 @@
 }
 
 .submitButton {
+  background-color: v.$primary-teal;
+  margin-left: 8px;
+  min-width: 56px;
+  &:hover {
+    background-color: v.$teal-600;
+  }
+  transition: background-color 0.2s ease-in-out;
   height: 100%;
   width: 10%;
   display: flex;

@@ -39,7 +39,7 @@ const ChatInput = ({
             alignSelf: "center",
             justifySelf: "center",
             zIndex: 1000,
-            fill: "#0E8B8F",
+            fill: "#FFFFFF",
           }}
         />
       </button>

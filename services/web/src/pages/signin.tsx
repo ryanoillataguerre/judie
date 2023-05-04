@@ -109,11 +109,7 @@ const SigninPage = () => {
       </Head>
       <main className={styles.main}>
         <div className={styles.pageContentContainer}>
-          <img
-            src={"/logo_dark.svg"}
-            alt={"Judie Logo"}
-            className={styles.logo}
-          />
+          <img src={"/logo.svg"} alt={"Judie Logo"} className={styles.logo} />
           <h1 className={styles.pageHeader}>Welcome back</h1>
           <SigninForm />
         </div>

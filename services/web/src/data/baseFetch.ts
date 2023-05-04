@@ -1,4 +1,4 @@
-import { getCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { NextApiResponse } from "next";
 import cookie from "cookie";
 
@@ -69,6 +69,14 @@ const checkStatus = async (response: Response) => {
   } else {
     const responseBody = await response.json();
     if (responseBody && response?.status) {
+      if (response.status === 401) {
+        deleteCookie(SESSION_COOKIE, {
+          path: "/",
+        });
+        if (isClient()) {
+          window.location.href = "/signin";
+        }
+      }
       throw new HTTPResponseError(responseBody, response.status || 500);
     } else {
       throw new HTTPResponseError({ error: true }, 500);
@@ -76,18 +84,18 @@ const checkStatus = async (response: Response) => {
   }
 };
 
-const checkForCookies = (response: Response) => {
-  if (isClient()) {
-    const cookieHeader = response.headers.get("Set-Cookie");
-    const cookieContent = cookie.parse(cookieHeader || "");
-    if (cookieContent) {
-      setCookie(SESSION_COOKIE, cookieContent.judie_sid);
-    }
-    return;
-  } else {
-    return;
-  }
-};
+// const checkForCookies = (response: Response) => {
+//   if (isClient()) {
+//     const cookieHeader = response.headers.get("Set-Cookie");
+//     const cookieContent = cookie.parse(cookieHeader || "");
+//     if (cookieContent) {
+//       setCookie(SESSION_COOKIE, cookieContent.judie_sid);
+//     }
+//     return;
+//   } else {
+//     return;
+//   }
+// };
 
 export async function baseFetch({
   url,

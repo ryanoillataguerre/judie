@@ -26,7 +26,9 @@ export default function useAuth({
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
   const logout = useCallback(() => {
-    deleteCookie(SESSION_COOKIE);
+    deleteCookie(SESSION_COOKIE, {
+      path: "/",
+    });
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
