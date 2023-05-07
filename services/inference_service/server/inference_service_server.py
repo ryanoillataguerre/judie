@@ -4,6 +4,8 @@ import os
 import grpc
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
+from inference_service.prompts import prompt_generator
+import pinecone
 
 
 class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServicer):
@@ -12,6 +14,11 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     """
 
     def GetChatResponse(self, request, context) -> None:
+        print(request.turns[-1].message)
+        prompt = prompt_generator.generate_gpt_prompt(
+            question=request.turns[-1].message
+        )
+        logger.info(f"Full prompt: {prompt}")
         for part in ["Do.", "Or do not.", "There is no try."]:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
@@ -21,6 +28,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
 def serve():
     grpc_port = os.getenv("GRPC_PORT")
+
     logger.info(
         f"Attempting grpc connection on port: {grpc_port}",
     )
