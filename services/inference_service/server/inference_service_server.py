@@ -15,7 +15,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
     def GetChatResponse(self, request, context) -> None:
         print(request.turns[-1].message)
-        prompt = prompt_generator.generate_gpt_prompt(
+        prompt = prompt_generator.generate_question_answer_prompt(
             question=request.turns[-1].message
         )
         logger.info(f"Full prompt: {prompt}")
