@@ -12,7 +12,7 @@ import {
 import { Redis } from "ioredis";
 import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
-import { getUser } from "../user/service.js";
+import { getUser, updateUser } from "../user/service.js";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -71,11 +71,17 @@ export const messageRateLimit = async (
     return;
   }
   if ((user?.questionsAsked || 0) >= 3) {
+    // If the last question was within the last 24 hours
     if (
       mostRecentMessage?.createdAt?.getTime() >
       Date.now() - 1000 * 60 * 60 * 24
     ) {
       throw new BadRequestError("Too many messages today", 429);
+    } else {
+      // Reset questions asked
+      await updateUser(userId, {
+        questionsAsked: 0,
+      });
     }
   }
 
