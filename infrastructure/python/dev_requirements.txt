@@ -11,3 +11,4 @@ openai
 pinecone-client
 pytest
 python-dotenv
+prisma
