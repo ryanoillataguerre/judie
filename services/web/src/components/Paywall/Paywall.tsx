@@ -116,7 +116,7 @@ const Paywall = ({
             <br />
             <p>
               In the meantime, we&apos;re limiting the number of questions every
-              user can ask for free to 10. If you&apos;d like to ask more
+              user can ask for free to 3 per day. If you&apos;d like to ask more
               questions, please consider subscribing!
             </p>
           </ModalBody>

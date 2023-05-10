@@ -3,6 +3,7 @@ import { body, param, query } from "express-validator";
 import {
   errorPassthrough,
   handleValidationErrors,
+  messageRateLimit,
   requireAuth,
 } from "../utils/express.js";
 import {
@@ -38,6 +39,7 @@ router.post(
   [query("chatId").optional()],
   requireAuth,
   handleValidationErrors,
+  messageRateLimit,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages

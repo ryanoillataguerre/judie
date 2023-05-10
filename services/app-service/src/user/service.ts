@@ -8,7 +8,11 @@ export const getUser = async (params: Prisma.UserWhereInput) => {
       subscription: true,
       chats: {
         include: {
-          messages: true,
+          messages: {
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",

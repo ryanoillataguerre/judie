@@ -27,6 +27,7 @@ import ChatWelcome from "../ChatWelcome/ChatWelcome";
 import useAuth from "@judie/hooks/useAuth";
 import Paywall from "../Paywall/Paywall";
 import { flushSync } from "react-dom";
+import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface ChatProps {
   initialQuery?: string;
@@ -45,7 +46,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
     onSuccess: (data) => {
-      if (data?.subject) {
+      if (data?.subject || data?.messages?.length > 0) {
         setDisplayWelcome(false);
       } else {
         setDisplayWelcome(true);
@@ -78,10 +79,10 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
           setBeingStreamedMessage("");
         },
       }),
-    onError: () => {
+    onError: (err: HTTPResponseError) => {
       toast({
         title: "Oops!",
-        description: "Something went wrong, please try again.",
+        description: err.message || "Something went wrong, please try again.",
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -116,7 +117,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       return;
     }
     if (
-      (userData?.questionsAsked || 0) >= 10 &&
+      (userData?.questionsAsked || 0) >= 3 &&
       !(userData?.subscription?.status === SubscriptionStatus.ACTIVE)
     ) {
       setIsPaywallOpen(true);
