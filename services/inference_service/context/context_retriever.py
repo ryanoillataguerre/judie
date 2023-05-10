@@ -5,18 +5,29 @@ import pinecone
 
 CONTEXT_LIMIT = 4000
 
+
 def pull_context_block(query) -> str:
     contexts = pull_context(query)
 
-    running_len_contexts = 0
-    for i, c in enumerate(contexts):
-        running_len_contexts += len(c)
-        if running_len_contexts > CONTEXT_LIMIT:
-            break
+    if contexts:
+        running_len_contexts = 0
+        over_limit = False
+        for i, c in enumerate(contexts):
+            running_len_contexts += len(c)
+            if running_len_contexts > CONTEXT_LIMIT:
+                over_limit = True
+                break
 
-    context_block = "\n".join(contexts[:i])
+        if over_limit:
+            last_index = i
+        else:
+            last_index = i + 1
+        context_block = "\n".join(contexts[:last_index])
+    else:
+        context_block = ""
 
     return context_block
+
 
 def pull_context(query) -> List[str]:
     pinecone.init(
