@@ -1,13 +1,16 @@
-import os
 from typing import List
 
+from inference_service.prompts.prompt_chunks import SUBJECT_NAMESPACE_MAP
+
 import pinecone
+import openai
 
 CONTEXT_LIMIT = 4000
+EMBEDDING_MODEL = "text-embedding-ada-002"
 
 
-def pull_context_block(query) -> str:
-    contexts = pull_context(query)
+def pull_context_block(query, subject=None) -> str:
+    contexts = pull_context(query, subject)
 
     if contexts:
         running_len_contexts = 0
@@ -29,12 +32,25 @@ def pull_context_block(query) -> str:
     return context_block
 
 
-def pull_context(query) -> List[str]:
-    pinecone.init(
-        api_key=os.getenv("PINECONE_API_KEY"),
-        environment=os.getenv("PINECONE_ENVIRONMENT"),
-    )
-
+def pull_context(query, subject=None) -> List[str]:
+    print(f"Query string: {query}")
     general_index = pinecone.Index("judieai")
-    print(general_index.describe_index_stats())
-    return ["SOME CONTEXT"]
+
+    ada_embedding = openai.Embedding.create(input=[query], engine=EMBEDDING_MODEL)
+
+    # retrieve from Pinecone
+    query_vector = ada_embedding["data"][0]["embedding"]
+
+    # get relevant contexts
+    query_matches = general_index.query(
+        query_vector,
+        top_k=3,
+        include_metadata=True,
+        namespace=SUBJECT_NAMESPACE_MAP[subject]
+        if subject in SUBJECT_NAMESPACE_MAP
+        else None,
+    )
+    print(query_matches)
+
+    context_list = [match["metadata"]["Sentence"] for match in query_matches["matches"]]
+    return context_list

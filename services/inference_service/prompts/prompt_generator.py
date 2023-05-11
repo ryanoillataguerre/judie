@@ -13,9 +13,11 @@ def generate_question_answer_prompt(
             subject_prompt = prompt_chunks.DEFAULT_PROMPT
     except KeyError:
         subject_prompt = prompt_chunks.DEFAULT_PROMPT
-    print(subject_prompt)
+    # print(subject_prompt)
 
-    context_block = context_retriever.pull_context_block(question)
+    context_block = context_retriever.pull_context_block(
+        question, subject=subject_modifier
+    )
 
     subject_plus_context = "\n".join(
         [
@@ -24,7 +26,7 @@ def generate_question_answer_prompt(
             context_block,
         ]
     )
-    print(subject_plus_context)
+    # print(subject_plus_context)
 
     if chat_history:
         for i, c in enumerate(reversed(chat_history)):
