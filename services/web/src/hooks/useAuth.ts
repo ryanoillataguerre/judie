@@ -25,16 +25,18 @@ export default function useAuth({
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
-  const logout = useCallback(() => {
-    deleteCookie(SESSION_COOKIE);
+  const logout = () => {
+    deleteCookie(SESSION_COOKIE, {
+      path: "/",
+    });
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
-  }, [router]);
+  };
 
   // GET /users/me
   const { isError, refetch, error, isLoading, isFetched } = useQuery(
-    GET_ME,
+    [GET_ME],
     () => getMeQuery(),
     {
       enabled: !!sessionCookie,

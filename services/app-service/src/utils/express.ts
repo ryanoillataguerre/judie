@@ -12,6 +12,7 @@ import {
 import { Redis } from "ioredis";
 import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
+import { getUser, updateUser } from "../user/service.js";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -49,6 +50,41 @@ export const handleValidationErrors = (
       validationErrors: validationErrors.array(),
     });
   }
+  next();
+};
+
+export const messageRateLimit = async (
+  req: Request,
+  _: Response,
+  next: NextFunction
+) => {
+  const userId = req.session?.userId;
+  if (!userId) {
+    throw new UnauthorizedError("No user id found in session");
+  }
+  const user = await getUser({
+    id: userId,
+  });
+  const mostRecentMessage = user?.chats?.[0]?.messages?.[0];
+  if (!mostRecentMessage) {
+    next();
+    return;
+  }
+  if ((user?.questionsAsked || 0) >= 3) {
+    // If the last question was within the last 24 hours
+    if (
+      mostRecentMessage?.createdAt?.getTime() >
+      Date.now() - 1000 * 60 * 60 * 24
+    ) {
+      throw new BadRequestError("Too many messages today", 429);
+    } else {
+      // Reset questions asked
+      await updateUser(userId, {
+        questionsAsked: 0,
+      });
+    }
+  }
+
   next();
 };
 

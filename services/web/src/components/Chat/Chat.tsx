@@ -7,6 +7,7 @@ import styles from "./Chat.module.scss";
 import {
   FormEventHandler,
   Suspense,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -25,6 +26,8 @@ import ChatInput from "../ChatInput/ChatInput";
 import ChatWelcome from "../ChatWelcome/ChatWelcome";
 import useAuth from "@judie/hooks/useAuth";
 import Paywall from "../Paywall/Paywall";
+import { flushSync } from "react-dom";
+import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface ChatProps {
   initialQuery?: string;
@@ -37,12 +40,13 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayWelcome, setDisplayWelcome] = useState<boolean>(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
+  const [beingStreamedMessage, setBeingStreamedMessage] = useState<string>("");
   const { userData, refresh: refreshUserData } = useAuth();
   const { refetch: fetchExistingChat } = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
     onSuccess: (data) => {
-      if (data?.subject) {
+      if (data?.subject || data?.messages?.length > 0) {
         setDisplayWelcome(false);
       } else {
         setDisplayWelcome(true);
@@ -58,29 +62,31 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     }
   }, [chatId, fetchExistingChat]);
 
+  const streamCallback = (message: string) => {
+    setBeingStreamedMessage((prev) => prev + message);
+  };
+
   const { isLoading, mutateAsync } = useMutation({
     mutationFn: () =>
       completionFromQueryMutation({
         query: chatValue,
         chatId,
+        setChatValue: streamCallback,
+        onStreamEnd: () => {
+          refreshUserData();
+          fetchExistingChat();
+          setMostRecentUserChat(undefined);
+          setBeingStreamedMessage("");
+        },
       }),
-    onError: () => {
+    onError: (err: HTTPResponseError) => {
       toast({
         title: "Oops!",
-        description: "Something went wrong, please try again.",
+        description: err.message || "Something went wrong, please try again.",
         status: "error",
         duration: 2000,
         isClosable: true,
       });
-    },
-    onSuccess: (data) => {
-      if (data) {
-        setMostRecentUserChat(undefined);
-        if (data?.messages) {
-          setMessages(data?.messages);
-        }
-        refreshUserData();
-      }
     },
     retry: false,
   });
@@ -98,7 +104,10 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
 
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    if (isLoading) {
+    if (chatValue.length === 0) {
+      return;
+    }
+    if (beingStreamedMessage.length > 0) {
       toast({
         title: "Please wait for the previous message to respond",
         status: "warning",
@@ -108,7 +117,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       return;
     }
     if (
-      (userData?.questionsAsked || 0) >= 10 &&
+      (userData?.questionsAsked || 0) >= 3 &&
       !(userData?.subscription?.status === SubscriptionStatus.ACTIVE)
     ) {
       setIsPaywallOpen(true);
@@ -137,15 +146,11 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     }
   }, [initialQuery, chatValue, chatId, mutateAsync]);
 
-  const reversedMessages = useMemo(() => {
-    return messages?.reverse();
-  }, [messages]);
-
   useEffect(() => {
-    if (mostRecentUserChat || reversedMessages.length > 0) {
+    if (mostRecentUserChat || messages.length > 0) {
       setDisplayWelcome(false);
     }
-  }, [mostRecentUserChat, reversedMessages]);
+  }, [mostRecentUserChat, messages]);
 
   const putChat = useMutation({
     mutationFn: putChatMutation,
@@ -165,7 +170,6 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       }
     );
   };
-
   return (
     <div className={styles.chatContainer}>
       <Paywall isOpen={isPaywallOpen} setIsOpen={setIsPaywallOpen} />
@@ -174,18 +178,31 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
           <ChatWelcome selectSubject={onSelectSubject} />
         </div>
       ) : (
+        // <div className={styles.reverseFlexContainer}>
         <div className={styles.conversationContainer}>
-          {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
-          {reversedMessages?.map((message, index) => {
-            if (
-              message.type === MessageType.USER &&
-              message.readableContent === mostRecentUserChat?.readableContent &&
-              index === reversedMessages.length - 1
-            ) {
-              return null;
-            }
-            return <MessageRow key={index} message={message} />;
-          })}
+          <div className={styles.reverseFlexContainer}>
+            {messages?.map((message, index) => {
+              if (
+                message.type === MessageType.USER &&
+                message.readableContent ===
+                  mostRecentUserChat?.readableContent &&
+                index === messages.length - 1
+              ) {
+                setMostRecentUserChat(undefined);
+              }
+              return <MessageRow key={index} message={message} />;
+            })}
+            {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
+            {beingStreamedMessage && (
+              <MessageRow
+                message={{
+                  type: MessageType.BOT,
+                  readableContent: beingStreamedMessage,
+                  createdAt: new Date(),
+                }}
+              />
+            )}
+          </div>
         </div>
       )}
       <form onSubmit={onSubmit} className={styles.chatBoxContainer}>

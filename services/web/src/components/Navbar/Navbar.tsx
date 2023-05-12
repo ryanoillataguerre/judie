@@ -118,8 +118,8 @@ const Navbar = () => {
                     )}
                     variant="subtle"
                   >
-                    Questions remaining:{" "}
-                    {10 - (auth?.userData?.questionsAsked || 0)}
+                    Questions remaining today:{" "}
+                    {3 - (auth?.userData?.questionsAsked || 0)}
                   </Badge>
                 )}
                 {chatSubject ? (

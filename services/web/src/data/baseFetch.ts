@@ -1,4 +1,4 @@
-import { getCookie, setCookie } from "cookies-next";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { NextApiResponse } from "next";
 import cookie from "cookie";
 
@@ -42,6 +42,9 @@ export interface BaseFetchOptions {
   access_token?: string;
   res?: NextApiResponse;
   service?: ServiceEnum;
+  stream?: boolean;
+  onChunkReceived?: (chunk: string) => void;
+  onStreamEnd?: () => void;
 }
 
 export class HTTPResponseError extends Error {
@@ -66,6 +69,14 @@ const checkStatus = async (response: Response) => {
   } else {
     const responseBody = await response.json();
     if (responseBody && response?.status) {
+      if (response.status === 401) {
+        deleteCookie(SESSION_COOKIE, {
+          path: "/",
+        });
+        if (isClient()) {
+          window.location.href = "/signin";
+        }
+      }
       throw new HTTPResponseError(responseBody, response.status || 500);
     } else {
       throw new HTTPResponseError({ error: true }, 500);
@@ -73,24 +84,27 @@ const checkStatus = async (response: Response) => {
   }
 };
 
-const checkForCookies = (response: Response) => {
-  if (isClient()) {
-    const cookieHeader = response.headers.get("Set-Cookie");
-    const cookieContent = cookie.parse(cookieHeader || "");
-    if (cookieContent) {
-      setCookie(SESSION_COOKIE, cookieContent.judie_sid);
-    }
-    return;
-  } else {
-    return;
-  }
-};
+// const checkForCookies = (response: Response) => {
+//   if (isClient()) {
+//     const cookieHeader = response.headers.get("Set-Cookie");
+//     const cookieContent = cookie.parse(cookieHeader || "");
+//     if (cookieContent) {
+//       setCookie(SESSION_COOKIE, cookieContent.judie_sid);
+//     }
+//     return;
+//   } else {
+//     return;
+//   }
+// };
 
 export async function baseFetch({
   url,
   method,
   body,
   headers,
+  stream,
+  onChunkReceived,
+  onStreamEnd,
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
@@ -103,14 +117,36 @@ export async function baseFetch({
     if (sessionCookie) {
       reqHeaders.Cookie = `judie_sid=${sessionCookie};`;
     }
-    const response = await fetch(`${apiUri}${url}`, {
-      headers: reqHeaders,
-      credentials: "include",
-      method,
-      body: body ? JSON.stringify(body) : null,
-    });
-    await checkStatus(response);
-    return response.json();
+    if (stream) {
+      fetch(`${apiUri}${url}`, {
+        headers: reqHeaders,
+        credentials: "include",
+        method,
+        body: body ? JSON.stringify(body) : null,
+      }).then(async (res) => {
+        const reader = res.body?.getReader();
+        while (true) {
+          const result = await reader?.read();
+          if (result?.done) {
+            onStreamEnd?.();
+            return;
+          }
+          if (result?.value) {
+            const chunk = new TextDecoder("utf-8").decode(result.value);
+            onChunkReceived?.(chunk);
+          }
+        }
+      });
+    } else {
+      const response = await fetch(`${apiUri}${url}`, {
+        headers: reqHeaders,
+        credentials: "include",
+        method,
+        body: body ? JSON.stringify(body) : null,
+      });
+      await checkStatus(response);
+      return response.json();
+    }
   } catch (err: any) {
     throw err;
   }

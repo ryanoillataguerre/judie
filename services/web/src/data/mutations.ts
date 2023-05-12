@@ -13,16 +13,25 @@ export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
   query,
   chatId,
+  setChatValue,
+  onStreamEnd,
 }: {
   query: string;
   chatId: string;
-}): Promise<ChatResponse> => {
+  setChatValue: (chat: string) => void;
+  onStreamEnd?: () => void;
+}): Promise<string> => {
   const response = await baseFetch({
     url: `/chat/completion?chatId=${chatId}`,
     method: "POST",
     body: { query },
+    stream: true,
+    onChunkReceived: (chunk) => {
+      setChatValue(chunk);
+    },
+    onStreamEnd,
   });
-  return response.data;
+  return response;
 };
 
 export const signinMutation = async ({
