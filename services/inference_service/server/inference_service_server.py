@@ -5,7 +5,7 @@ import grpc
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
 from inference_service.prompts import prompt_generator
-import pinecone
+import openai
 
 
 class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServicer):
@@ -19,6 +19,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
             question=request.turns[-1].message
         )
         logger.info(f"Full prompt: {prompt}")
+        openai_response = openai.ChatCompletion
         for part in ["Do.", "Or do not.", "There is no try."]:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
