@@ -74,7 +74,6 @@ export const subjects = [
   "GMAT Preparation",
   "GED Preparation",
   "College Admissions",
-  // Admin subjects
-  "PurePromise",
-  "Content Creation",
 ];
+
+export const adminSubjects = ["Content Creation", "PurePromise"];

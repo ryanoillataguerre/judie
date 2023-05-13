@@ -1,5 +1,5 @@
 import { Select } from "@chakra-ui/react";
-import { subjects } from "../../data/static/subjects";
+import { adminSubjects, subjects } from "../../data/static/subjects";
 import { useMemo } from "react";
 import useAuth from "@judie/hooks/useAuth";
 
@@ -12,7 +12,7 @@ const SubjectSelector = ({
   const subjectOptions = useMemo(() => {
     // Add content creation for Alex
     if (userData?.email?.includes("@judie.io")) {
-      return [...subjects, "Content Creation"];
+      return [...subjects, ...adminSubjects];
     }
     return subjects;
   }, [userData]);
