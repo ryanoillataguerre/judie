@@ -2,9 +2,22 @@ import bcrypt from "bcryptjs";
 import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { UserRole } from "@prisma/client";
+import { User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
+
+const transformUserForSegment = (user: User) => ({
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+  district: user.district,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+  questionsAsked: user.questionsAsked,
+  receivePromotions: user.receivePromotions,
+  stripeCustomerId: user.stripeCustomerId,
+});
 
 export const signup = async ({
   firstName,
@@ -61,7 +74,7 @@ export const signup = async ({
   analytics.identify({
     userId: newUser.id,
     traits: {
-      ...newUser,
+      ...transformUserForSegment(newUser),
     },
   });
 
@@ -95,7 +108,7 @@ export const signin = async ({
   analytics.identify({
     userId: user.id,
     traits: {
-      ...user,
+      ...transformUserForSegment(user),
     },
   });
 
