@@ -1,13 +1,29 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript } from "next/document";
+import * as snippet from "@segment/snippet";
 
 export default function Document() {
+  const loadSegment = () => {
+    const options = {
+      apiKey: process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY,
+    };
+    if (process.env.NEXT_PUBLIC_NODE_ENV) {
+      return snippet.max(options);
+    } else {
+      return snippet.min(options);
+    }
+  };
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        <script
+          dangerouslySetInnerHTML={{ __html: loadSegment() }}
+          id="segmentScript"
+        />
+      </Head>
       <body>
         <Main />
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }

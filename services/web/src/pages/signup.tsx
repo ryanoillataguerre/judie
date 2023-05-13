@@ -220,7 +220,11 @@ const SignupPage = () => {
       </Head>
       <main className={styles.main}>
         <div className={styles.pageContentContainer}>
-          <img src={"/logo.svg"} alt={"Judie Logo"} className={styles.logo} />
+          <img
+            src={"/logo_dark.svg"}
+            alt={"Judie Logo"}
+            className={styles.logo}
+          />
           <h1 className={styles.pageHeader}>Welcome to Judie</h1>
           <SignupForm />
         </div>
