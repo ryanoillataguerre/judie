@@ -84,19 +84,6 @@ const checkStatus = async (response: Response) => {
   }
 };
 
-// const checkForCookies = (response: Response) => {
-//   if (isClient()) {
-//     const cookieHeader = response.headers.get("Set-Cookie");
-//     const cookieContent = cookie.parse(cookieHeader || "");
-//     if (cookieContent) {
-//       setCookie(SESSION_COOKIE, cookieContent.judie_sid);
-//     }
-//     return;
-//   } else {
-//     return;
-//   }
-// };
-
 export async function baseFetch({
   url,
   method,

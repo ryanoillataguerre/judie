@@ -28,6 +28,7 @@ export default function useAuth({
   const logout = () => {
     deleteCookie(SESSION_COOKIE, {
       path: "/",
+      domain: process.env.NODE_ENV === "production" ? "judie.io" : undefined,
     });
     setSessionCookie(undefined);
     setUserData(undefined);
