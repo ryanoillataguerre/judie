@@ -15,7 +15,12 @@ const openSans = Open_Sans({
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { isReady } = useRouter();
+  const { isReady, events } = useRouter();
+
+  events.on("routeChangeComplete", (url: string) => {
+    // Fire segment Page event on any route change
+    window.analytics?.page(url);
+  });
 
   if (!isReady) {
     return <LoadingScreen />;

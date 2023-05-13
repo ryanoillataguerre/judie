@@ -10,6 +10,7 @@ import Input from "@judie/components/Input/Input";
 import Button, { ButtonVariant } from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useToast } from "@chakra-ui/react";
+import useAuth from "@judie/hooks/useAuth";
 
 interface SubmitData {
   email: string;
@@ -96,6 +97,7 @@ const SigninForm = () => {
 };
 
 const SigninPage = () => {
+  useAuth({ allowUnauth: true });
   return (
     <>
       <Head>

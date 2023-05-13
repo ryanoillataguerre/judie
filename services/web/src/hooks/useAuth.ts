@@ -1,6 +1,7 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
+import { analytics } from "@judie/utils/analytics";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -24,6 +25,31 @@ export default function useAuth({
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
+
+  const isPaid = useMemo(() => {
+    return (
+      (userData?.subscription?.status as SubscriptionStatus) ===
+      SubscriptionStatus.ACTIVE
+    );
+  }, [userData]);
+
+  useEffect(() => {
+    window?.analytics?.identify(
+      userData
+        ? {
+            email: userData?.email,
+            firstName: userData?.firstName,
+            lastName: userData?.lastName,
+            receivePromotions: userData?.receivePromotions,
+            createdAt: userData?.createdAt,
+            role: userData?.role,
+            district: userData?.district,
+            questionsAsked: userData?.questionsAsked,
+            subscriptionStatus: userData?.subscription?.status,
+          }
+        : undefined
+    );
+  }, [userData]);
 
   const logout = () => {
     deleteCookie(SESSION_COOKIE, {
@@ -52,13 +78,6 @@ export default function useAuth({
       },
     }
   );
-
-  const isPaid = useMemo(() => {
-    return (
-      (userData?.subscription?.status as SubscriptionStatus) ===
-      SubscriptionStatus.ACTIVE
-    );
-  }, [userData]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
