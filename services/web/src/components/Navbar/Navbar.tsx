@@ -12,16 +12,13 @@ import AccountMenu from "../AccountMenu/AccountMenu";
 import Paywall from "../Paywall/Paywall";
 
 const getColorSchemeFromQuestionsAsked = (questionsAsked?: number) => {
-  if (!questionsAsked && questionsAsked !== 0) {
-    return "gray";
-  }
-  if (questionsAsked < 4) {
-    return "green";
-  }
-  if (questionsAsked < 8) {
-    return "yellow";
-  }
-  return "red";
+  const numToColorSchemeMap: { [key: number]: string } = {
+    0: "green",
+    1: "yellow",
+    2: "red",
+    3: "red",
+  };
+  return numToColorSchemeMap[questionsAsked || 0];
 };
 
 const Navbar = () => {
@@ -118,7 +115,7 @@ const Navbar = () => {
                     )}
                     variant="subtle"
                   >
-                    Questions remaining today:{" "}
+                    Chats remaining today:{" "}
                     {3 - (auth?.userData?.questionsAsked || 0)}
                   </Badge>
                 )}
