@@ -5,6 +5,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { useRouter } from "next/router";
 import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
+import { useEffect } from "react";
 
 const openSans = Open_Sans({
   weight: ["300", "400", "600", "700"],
@@ -16,6 +17,10 @@ const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
   const { isReady } = useRouter();
+
+  useEffect(() => {
+    // TODO: Page calls
+  }, []);
 
   if (!isReady) {
     return <LoadingScreen />;

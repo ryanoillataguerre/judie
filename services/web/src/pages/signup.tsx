@@ -14,6 +14,7 @@ import { Checkbox, Select, useToast } from "@chakra-ui/react";
 import { UserRole } from "@judie/data/types/api";
 import inputStyles from "@judie/components/Input/Input.module.scss";
 import Link from "next/link";
+import useAuth from "@judie/hooks/useAuth";
 
 interface SubmitData {
   email: string;
@@ -207,6 +208,7 @@ const SignupForm = () => {
 };
 
 const SignupPage = () => {
+  useAuth({ allowUnauth: true });
   return (
     <>
       <Head>
@@ -220,7 +222,11 @@ const SignupPage = () => {
       </Head>
       <main className={styles.main}>
         <div className={styles.pageContentContainer}>
-          <img src={"/logo.svg"} alt={"Judie Logo"} className={styles.logo} />
+          <img
+            src={"/logo_dark.svg"}
+            alt={"Judie Logo"}
+            className={styles.logo}
+          />
           <h1 className={styles.pageHeader}>Welcome to Judie</h1>
           <SignupForm />
         </div>

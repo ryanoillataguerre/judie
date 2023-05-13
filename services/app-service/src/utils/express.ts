@@ -14,6 +14,7 @@ import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
 import { getUser, updateUser } from "../user/service.js";
 import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
+import { SubscriptionStatus } from "@prisma/client";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -62,6 +63,10 @@ export const messageRateLimit = async (
   const userId = req.session?.userId;
   if (!userId) {
     throw new UnauthorizedError("No user id found in session");
+  }
+  const user = await getUser({ id: userId });
+  if (user?.subscription?.status === SubscriptionStatus.ACTIVE) {
+    return next();
   }
 
   const existingQuestionCountEntry = await getQuestionCountEntry({ userId });

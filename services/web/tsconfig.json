@@ -16,7 +16,11 @@
     "incremental": true,
     "paths": {
       "@judie/*": ["./src/*"],
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/typings"
+    ]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

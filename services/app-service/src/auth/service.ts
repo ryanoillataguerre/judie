@@ -2,8 +2,22 @@ import bcrypt from "bcryptjs";
 import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { UserRole } from "@prisma/client";
+import { User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
+import analytics from "../utils/analytics.js";
+
+const transformUserForSegment = (user: User) => ({
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+  district: user.district,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+  questionsAsked: user.questionsAsked,
+  receivePromotions: user.receivePromotions,
+  stripeCustomerId: user.stripeCustomerId,
+});
 
 export const signup = async ({
   firstName,
@@ -54,8 +68,15 @@ export const signup = async ({
     },
   });
 
-  // TODO: Identify user with analytics platform
+  // Create Stripe customer
   await createCustomer(newUser.id);
+  // Identify in Segment
+  analytics.identify({
+    userId: newUser.id,
+    traits: {
+      ...transformUserForSegment(newUser),
+    },
+  });
 
   return newUser.id;
 };
@@ -83,6 +104,13 @@ export const signin = async ({
   if (!match) {
     throw new UnauthorizedError("Invalid email or password");
   }
+
+  analytics.identify({
+    userId: user.id,
+    traits: {
+      ...transformUserForSegment(user),
+    },
+  });
 
   return user.id;
 };

@@ -3,7 +3,7 @@ import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -24,6 +24,19 @@ export default function useAuth({
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
+
+  const isPaid = useMemo(() => {
+    return (
+      (userData?.subscription?.status as SubscriptionStatus) ===
+      SubscriptionStatus.ACTIVE
+    );
+  }, [userData]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") {
+      window?.analytics?.identify(userData?.id ?? undefined);
+    }
+  }, [userData]);
 
   const logout = () => {
     deleteCookie(SESSION_COOKIE, {
@@ -52,13 +65,6 @@ export default function useAuth({
       },
     }
   );
-
-  const isPaid = useMemo(() => {
-    return (
-      (userData?.subscription?.status as SubscriptionStatus) ===
-      SubscriptionStatus.ACTIVE
-    );
-  }, [userData]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {

@@ -154,7 +154,6 @@ export const getCompletion = async ({
   console.time("createRequest");
   // Create GPT request from prompt
   await createGPTRequestFromPrompt({
-    userId: userId,
     prompt: query,
     chat,
   });
@@ -191,7 +190,7 @@ await pinecone.init({
   apiKey: process.env.PINECONE_API_KEY || "",
 });
 
-export const OPENAI_PROMPT_CHAR_LIMIT = 6000;
+export const OPENAI_PROMPT_TOKEN_LIMIT = 6000;
 export const OPENAI_COMPLETION_MODEL = "gpt-4-0314";
 
 export const transformMessageToChatCompletionMessage = (
@@ -217,11 +216,9 @@ export const transformMessageToChatCompletionMessage = (
  * @returns ChatAndMessageResponse
  */
 export const createGPTRequestFromPrompt = async ({
-  userId,
   prompt,
   chat,
 }: {
-  userId: string | undefined;
   prompt: string;
   chat: ChatAndMessageResponse;
 }): Promise<ChatAndMessageResponse> => {
@@ -233,7 +230,7 @@ export const createGPTRequestFromPrompt = async ({
     // If we haven't given a system prompt yet, give one
     if (messages.length === 0) {
       // Default prompt
-      let prompt =
+      let defaultPrompt =
         "You are a tutor designed to help students learn.\n\
         You use the socratic method to teach, but you balance that with other teaching methods to make sure the student can learn.\n\
         You will ask questions upfront to assess the students level with the topic, but if they do not know anything about the topic you will teach them.\n\
@@ -245,14 +242,15 @@ export const createGPTRequestFromPrompt = async ({
 
       // If subject, mutate prompt
       if (chat.subject) {
-        prompt = subjectToPromptMap[chat.subject] || prompt;
+        defaultPrompt = subjectToPromptMap[chat.subject] || prompt;
       }
-      newMessages.push({
-        content: prompt,
+      let defaultMessage = {
+        content: defaultPrompt,
         type: MessageType.SYSTEM,
         createdAt: new Date(),
         readableContent: prompt,
-      });
+      };
+      newMessages.push(defaultMessage);
     }
 
     // Get embedding vector from OpenAI
@@ -321,8 +319,6 @@ export const createGPTRequestFromPrompt = async ({
     const newChat = await updateChat(chat.id, {
       messages: {
         createMany: {
-          // Using 'as' because we technically have a partial above
-          // but we know content is defined, which is the only concern here
           data: newMessagesMapped,
         },
       },
@@ -363,12 +359,12 @@ export const getChatGPTCompletion = async (
           val: ChatCompletionRequestMessage
         ) => {
           if (
-            currentMessagesContentLength + val.content.length >
-            OPENAI_PROMPT_CHAR_LIMIT
+            currentMessagesContentLength + val.content.split(" ").length >
+            OPENAI_PROMPT_TOKEN_LIMIT
           ) {
             return acc;
           } else {
-            currentMessagesContentLength += val.content.length;
+            currentMessagesContentLength += val.content.split(" ").length;
             return [...acc, val];
           }
         },
