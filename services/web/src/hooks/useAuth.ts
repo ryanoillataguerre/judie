@@ -1,10 +1,9 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
-import { analytics } from "@judie/utils/analytics";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -34,7 +33,9 @@ export default function useAuth({
   }, [userData]);
 
   useEffect(() => {
-    window?.analytics?.identify(userData?.id ?? undefined);
+    if (process.env.NODE_ENV === "production") {
+      window?.analytics?.identify(userData?.id ?? undefined);
+    }
   }, [userData]);
 
   const logout = () => {
