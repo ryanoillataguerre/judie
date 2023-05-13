@@ -34,21 +34,7 @@ export default function useAuth({
   }, [userData]);
 
   useEffect(() => {
-    window?.analytics?.identify(
-      userData
-        ? {
-            email: userData?.email,
-            firstName: userData?.firstName,
-            lastName: userData?.lastName,
-            receivePromotions: userData?.receivePromotions,
-            createdAt: userData?.createdAt,
-            role: userData?.role,
-            district: userData?.district,
-            questionsAsked: userData?.questionsAsked,
-            subscriptionStatus: userData?.subscription?.status,
-          }
-        : undefined
-    );
+    window?.analytics?.identify(userData?.id ?? undefined);
   }, [userData]);
 
   const logout = () => {

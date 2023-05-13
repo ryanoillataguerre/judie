@@ -50,6 +50,7 @@ services:
       STRIPE_MONTHLY_PRICE_ID: ${STRIPE_MONTHLY_PRICE_ID}
       STRIPE_COUPON_ID: ${STRIPE_COUPON_ID}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      SEGMENT_WRITE_KEY: ${SEGMENT_WRITE_KEY}
   web:
     networks:
       - dev
@@ -68,7 +69,7 @@ services:
     environment:
       NODE_ENV: development
       NEXT_PUBLIC_API_URI: http://app-service:8080
-      NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${NEXT_PUBLIC_SEGMENT_WRITE_KEY}
+      NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${SEGMENT_WRITE_KEY}
   inference-service:
     networks:
       - dev

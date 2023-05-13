@@ -4,6 +4,7 @@ import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
 import { UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
+import analytics from "../utils/analytics.js";
 
 export const signup = async ({
   firstName,
@@ -54,8 +55,15 @@ export const signup = async ({
     },
   });
 
-  // TODO: Identify user with analytics platform
+  // Create Stripe customer
   await createCustomer(newUser.id);
+  // Identify in Segment
+  analytics.identify({
+    userId: newUser.id,
+    traits: {
+      ...newUser,
+    },
+  });
 
   return newUser.id;
 };
@@ -83,6 +91,13 @@ export const signin = async ({
   if (!match) {
     throw new UnauthorizedError("Invalid email or password");
   }
+
+  analytics.identify({
+    userId: user.id,
+    traits: {
+      ...user,
+    },
+  });
 
   return user.id;
 };
