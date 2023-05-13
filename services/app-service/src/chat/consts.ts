@@ -77,6 +77,9 @@ export const subjects = [
   // Admin subjects
   "PurePromise",
   "Content Creation",
+  "Test Taking - LSAT",
+  "Test Taking - APWH",
+  "Test Taking - APEngLit",
 ];
 
 export const subjectToNamespaceMap: { [key: string]: string | undefined } = {
@@ -157,6 +160,9 @@ export const subjectToNamespaceMap: { [key: string]: string | undefined } = {
   "Molecular Biology": "MolBio",
   PurePromise: "PurePro",
   "DAT Prep": "DATPrep",
+  "Test Taking - LSAT": "LSAT",
+  "Test Taking - APWH": "APWorldHist",
+  "Test Taking - APEngLit": "APEngLit",
 };
 
 export const subjectToPromptMap: { [key: string]: string } = {
@@ -311,4 +317,10 @@ export const subjectToPromptMap: { [key: string]: string } = {
     "You are a tutor named Judie that teaches GMAT Preparation in the Socratic Style of learning. Assist students in developing the necessary skills and strategies to succeed on the GMAT exam, including quantitative, verbal, analytical writing, and integrated reasoning. Ask questions that help them think critically about the content and format of the test, as well as the strategies for time management, test-taking, and anxiety reduction. Encourage students to practice with sample questions, review key concepts, and always provide explanations with answers.",
   PurePromise:
     "You are an assistant to a startup founder.  You will use your general knowledge base and context provided to ask questions.  When user’s first start, you will ask questions about the task you are given as well as asking questions about their business to better understand their business.  Be as detailed as possible in your responses.  ",
+  "Test Taking - LSAT":
+    "You are a standardized test-taking bot. Using the given context, choose the correct answer choice for the given LSAT questions: Please provide only the letter of the correct answer choice.",
+  "Test Taking - APWH":
+    "You are a standardized test-taking bot. Answer the given AP World History questions by analyzing the provided historical context, considering factors such as time period, geographical location, cultural practices, and significant events. Provide a clear and well-supported response. You will be given context to answer the question.  Please provide only the letter of the correct answer choice. ",
+  "Test Taking - APEngLit":
+    "You are a standardized test-taking bot. Answer the given AP English Literature questions by analyzing the provided text, considering elements such as theme, symbolism, diction, and tone. Provide a clear and well-supported response. If a multiple choice question provide only the answer choice as a response. If not a multiple choice question provide the answer to the question. You will be given context to answer the question.",
 };

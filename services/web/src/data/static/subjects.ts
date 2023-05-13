@@ -76,4 +76,10 @@ export const subjects = [
   "College Admissions",
 ];
 
-export const adminSubjects = ["Content Creation", "PurePromise"];
+export const adminSubjects = [
+  "Content Creation",
+  "PurePromise",
+  "Test Taking - LSAT",
+  "Test Taking - APWH",
+  "Test Taking - APEngLit",
+];
