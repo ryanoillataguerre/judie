@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
-import { Badge, useToast } from "@chakra-ui/react";
+import { Badge, useColorMode, useToast } from "@chakra-ui/react";
 import { SubscriptionStatus } from "@judie/data/types/api";
 import AccountMenu from "../AccountMenu/AccountMenu";
 import Paywall from "../Paywall/Paywall";
@@ -70,6 +70,7 @@ const Navbar = () => {
     }
   }, [router, toast]);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const { colorMode } = useColorMode();
 
   return (
     <div className={styles.container}>
@@ -77,7 +78,11 @@ const Navbar = () => {
       <Link href={"/"}>
         <div className={styles.leftContainer}>
           {/* Logo */}
-          <img src={"/logo.svg"} alt={"Judie Logo"} className={styles.logo} />
+          <img
+            src={colorMode === "light" ? "/logo.svg" : "/logo_dark.svg"}
+            alt={"Judie Logo"}
+            className={styles.logo}
+          />
           {/* Title */}
           <h1 className={styles.title}>Judie</h1>
         </div>
