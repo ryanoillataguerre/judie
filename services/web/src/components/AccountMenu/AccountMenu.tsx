@@ -30,7 +30,6 @@ const AccountMenu = ({
   const auth = useAuth();
 
   const { toggleColorMode, colorMode } = useColorMode();
-  console.log(colorMode);
   return (
     <Popover trigger="hover" placement={"bottom-end"} size={"sm"}>
       <PopoverTrigger>
