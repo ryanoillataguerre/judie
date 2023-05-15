@@ -37,7 +37,7 @@ const Input = ({
         </h4>
       )}
       <input
-        className={styles.input}
+        className={[styles.input, className].join(" ")}
         required={required}
         {...(register ? register(name) : {})}
         {...props}

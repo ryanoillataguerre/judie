@@ -42,29 +42,6 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
   const [beingStreamedMessage, setBeingStreamedMessage] = useState<string>("");
   const { userData, refresh: refreshUserData } = useAuth();
-  const { refetch: fetchExistingChat } = useQuery({
-    queryKey: [GET_CHAT_BY_ID, chatId],
-    queryFn: () => getChatByIdQuery(chatId),
-    onSuccess: (data) => {
-      if (data?.subject || data?.messages?.length > 0) {
-        setDisplayWelcome(false);
-      } else {
-        setDisplayWelcome(true);
-      }
-      setMessages(data?.messages);
-    },
-    enabled: !!chatId,
-  });
-
-  useEffect(() => {
-    if (chatId) {
-      fetchExistingChat();
-    }
-  }, [chatId, fetchExistingChat]);
-
-  const streamCallback = (message: string) => {
-    setBeingStreamedMessage((prev) => prev + message);
-  };
 
   const { isLoading, mutateAsync } = useMutation({
     mutationFn: () =>
@@ -75,8 +52,6 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
         onStreamEnd: () => {
           refreshUserData();
           fetchExistingChat();
-          setMostRecentUserChat(undefined);
-          setBeingStreamedMessage("");
         },
       }),
     onError: (err: HTTPResponseError) => {
@@ -90,6 +65,33 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     },
     retry: false,
   });
+  const { refetch: fetchExistingChat } = useQuery({
+    queryKey: [GET_CHAT_BY_ID, chatId],
+    queryFn: () => getChatByIdQuery(chatId),
+    onSuccess: (data) => {
+      if (data?.subject || data?.messages?.length > 0) {
+        setDisplayWelcome(false);
+      } else {
+        setDisplayWelcome(true);
+      }
+      setMessages(data?.messages);
+      if (!isLoading && data?.messages?.length > 0) {
+        setMostRecentUserChat(undefined);
+        setBeingStreamedMessage("");
+      }
+    },
+    enabled: !!chatId,
+  });
+
+  useEffect(() => {
+    if (chatId) {
+      fetchExistingChat();
+    }
+  }, [chatId, fetchExistingChat]);
+
+  const streamCallback = (message: string) => {
+    setBeingStreamedMessage((prev) => prev + message);
+  };
 
   // Suck query param into text box for clean path
   const [chatValue, setChatValue] = useState<string>(initialQuery || "");
@@ -178,7 +180,6 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
           <ChatWelcome selectSubject={onSelectSubject} />
         </div>
       ) : (
-        // <div className={styles.reverseFlexContainer}>
         <div className={styles.conversationContainer}>
           <div className={styles.reverseFlexContainer}>
             {messages?.map((message, index) => {

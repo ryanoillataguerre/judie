@@ -151,19 +151,28 @@ const SignupForm = () => {
       <label className={[inputStyles.label, inputStyles.required].join(" ")}>
         Role
       </label>
-      <Select {...register("role")} className={styles.roleSelector}>
+      <Select
+        {...register("role")}
+        className={styles.roleSelector}
+        style={{
+          border: "1px solid #E2E8F0",
+        }}
+      >
         <option value={UserRole.STUDENT}>Student</option>
         <option value={UserRole.TEACHER}>Teacher</option>
         <option value={UserRole.ADMINISTRATOR}>Administrator</option>
       </Select>
-      <Input
-        register={register}
-        name={"district"}
-        errors={errors}
-        label={"District"}
-      />
+      <div className={styles.districtInput}>
+        <Input
+          register={register}
+          name={"district"}
+          errors={errors}
+          label={"District"}
+        />
+      </div>
       <div className={styles.bottomRow}>
         <Checkbox
+          borderColor={"#E2E8F0"}
           onChange={(e) => setReceivePromotions(e.target.checked)}
           defaultChecked
           checked={receivePromotions}
@@ -172,6 +181,7 @@ const SignupForm = () => {
           <p className={styles.checkboxText}>Receive Emails from JudieAI</p>
         </Checkbox>
         <Checkbox
+          borderColor={"#E2E8F0"}
           onChange={(e) => setTermsAndConditions(e.target.checked)}
           checked={termsAndConditions}
           isInvalid={hasSubmitted && !termsAndConditions}
