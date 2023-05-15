@@ -18,8 +18,8 @@ const app = express();
 app.use(headers);
 app.use(helmet());
 app.use(cookieParser());
-app.use(morganLogger());
 app.use(sessionLayer());
+app.use(morganLogger());
 // Webhooks
 app.use(
   "/webhooks",
