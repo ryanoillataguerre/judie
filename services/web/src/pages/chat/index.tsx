@@ -19,7 +19,7 @@ export default function ChatPage({ query }: ChatPageProps) {
     queryFn: () => getUserChatsQuery(),
     enabled: true,
     onSuccess: (data) => {
-      if (data.length && !router.query.newChat) {
+      if (data.length && !router.query.newChat && data?.[0]?.id) {
         router.push({
           pathname: `/chat/${data[0].id}`,
           query: router.query,
@@ -60,6 +60,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       });
     }
   }, [newChatId, router]);
+
   return (
     <>
       <Head>

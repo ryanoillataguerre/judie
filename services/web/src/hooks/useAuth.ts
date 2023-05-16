@@ -60,6 +60,7 @@ export default function useAuth({
       },
       onError: (err: HTTPResponseError) => {
         console.error("/me error", err);
+        setUserData(undefined);
         if (err.response?.status === 401) {
           logout();
         }
@@ -89,13 +90,13 @@ export default function useAuth({
     }
   }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
-  useEffect(() => {
-    // Redirect away from sign in and sign up pages if logged in
-    if (redirToChatFrom.includes(router.asPath) && sessionCookie) {
-      refetch();
-      router.push("/chat");
-    }
-  }, [sessionCookie, refetch, router]);
+  // useEffect(() => {
+  //   // Redirect away from sign in and sign up pages if logged in
+  //   if (redirToChatFrom.includes(router.asPath) && userData) {
+  //     refetch();
+  //     router.push("/chat");
+  //   }
+  // }, [userData, refetch, router]);
 
   return { userData, isPaid, isLoading, refresh: refetch, logout };
 }
