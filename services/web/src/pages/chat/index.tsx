@@ -1,5 +1,4 @@
 import { GetServerSidePropsContext } from "next";
-import styles from "../../styles/Chat.module.scss";
 import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";

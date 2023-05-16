@@ -6,11 +6,11 @@ import Sidebar from "@judie/components/Sidebar/Sidebar";
 import useAuth, { SEEN_CHATS_NOTICE_COOKIE } from "@judie/hooks/useAuth";
 import Chats from "@judie/components/Chats/Chats";
 import { useEffect, useState } from "react";
-import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 interface ChatPageProps {
   query?: string;
 }
-export default function ChatsPage({ query }: ChatPageProps) {
+const ChatsPage = ({ query }: ChatPageProps) => {
   useAuth();
   const [hasSeenAlert, setHasSeenAlert] = useState<boolean>(true);
   useEffect(() => {
@@ -47,7 +47,9 @@ export default function ChatsPage({ query }: ChatPageProps) {
       </main>
     </>
   );
-}
+};
+
+ChatsPage.displayName = "Chats";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const query = context.query.query;
@@ -57,3 +59,5 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   };
 }
+
+export default ChatsPage;

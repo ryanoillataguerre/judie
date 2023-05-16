@@ -13,7 +13,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Checkbox, Select, useToast } from "@chakra-ui/react";
 import { UserRole } from "@judie/data/types/api";
 import inputStyles from "@judie/components/Input/Input.module.scss";
-import Link from "next/link";
 import useAuth from "@judie/hooks/useAuth";
 
 interface SubmitData {
@@ -260,5 +259,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   return { props: {} };
 }
+
+SignupPage.displayName = "Sign Up";
 
 export default SignupPage;

@@ -20,7 +20,11 @@ export default function App({ Component, pageProps }: AppProps) {
   const { isReady } = useRouter();
 
   useEffect(() => {
-    // TODO: Page calls
+    if (Component.displayName) {
+      if (process.env.NEXT_PUBLIC_ENV === "production") {
+        window?.analytics?.page(Component.displayName);
+      }
+    }
   }, []);
 
   if (!isReady) {

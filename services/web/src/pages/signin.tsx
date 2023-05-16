@@ -5,7 +5,6 @@ import styles from "../styles/Signin.module.scss";
 import { useMutation } from "react-query";
 import { signinMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { FormEventHandler, useCallback, useEffect, useState } from "react";
 import Input from "@judie/components/Input/Input";
 import Button, { ButtonVariant } from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -139,5 +138,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   return { props: {} };
 }
+
+SigninPage.displayName = "Sign In";
 
 export default SigninPage;

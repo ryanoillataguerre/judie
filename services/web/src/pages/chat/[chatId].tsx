@@ -6,6 +6,7 @@ import Sidebar from "@judie/components/Sidebar/Sidebar";
 import Chat from "@judie/components/Chat/Chat";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
+
 interface ChatPageProps {
   query?: string;
 }
