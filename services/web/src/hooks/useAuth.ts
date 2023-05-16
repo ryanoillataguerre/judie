@@ -59,6 +59,7 @@ export default function useAuth({
         setUserData(data);
       },
       onError: (err: HTTPResponseError) => {
+        console.error("/me error", err);
         if (err.response?.status === 401) {
           logout();
         }

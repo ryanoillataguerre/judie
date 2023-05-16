@@ -7,11 +7,12 @@ import { useMutation, useQuery } from "react-query";
 import { createChatMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
+import { HTTPResponseError } from "@judie/data/baseFetch";
 interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
-  useAuth();
+  const auth = useAuth();
   const router = useRouter();
   const { data, isError, isLoading } = useQuery({
     queryKey: [GET_USER_CHATS],
@@ -25,10 +26,18 @@ export default function ChatPage({ query }: ChatPageProps) {
         });
       }
     },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error getting chats", err);
+      auth.logout();
+    },
     staleTime: 1000 * 60,
   });
   const { mutateAsync } = useMutation({
     mutationFn: createChatMutation,
+    onError: (err: HTTPResponseError) => {
+      console.error("Error creating chat", err);
+      auth.logout();
+    },
   });
   const [newChatId, setNewChatId] = useState<string | null>(null);
   useEffect(() => {
