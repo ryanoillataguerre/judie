@@ -5,14 +5,7 @@ import {
 } from "@judie/data/mutations";
 import { useMutation, useQuery } from "react-query";
 import styles from "./Chat.module.scss";
-import {
-  FormEventHandler,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import MessageRow, { TempMessage } from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
 import {
@@ -20,7 +13,12 @@ import {
   MessageType,
   SubscriptionStatus,
 } from "@judie/data/types/api";
-import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import {
+  GET_CHAT_BY_ID,
+  GET_USER_CHATS,
+  getChatByIdQuery,
+  getUserChatsQuery,
+} from "@judie/data/queries";
 import { Progress, useToast } from "@chakra-ui/react";
 import ChatInput from "../ChatInput/ChatInput";
 import ChatWelcome from "../ChatWelcome/ChatWelcome";
@@ -44,6 +42,38 @@ const Chat = ({ initialQuery }: ChatProps) => {
   const [beingStreamedMessage, setBeingStreamedMessage] = useState<string>("");
   const { userData, refresh: refreshUserData } = useAuth();
   const [chatId, setChatId] = useState<string>(router?.query?.id as string);
+
+  // Get user chats on initial load -
+  // if there's no chatId and no newChat query param, set it to their most recent chat
+  const {
+    data,
+    isError,
+    isLoading: initialChatLoading,
+  } = useQuery({
+    queryKey: [GET_USER_CHATS],
+    queryFn: () => getUserChatsQuery(),
+    enabled: true,
+    onSuccess: (data) => {
+      if (data.length && !router.query.newChat && data?.[0]?.id) {
+        setChatId(data[0].id);
+        router.push(
+          {
+            pathname: `/chat`,
+            query: {
+              id: data[0].id,
+            },
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+    },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error getting chats", err);
+      auth.logout();
+    },
+    staleTime: 1000 * 60,
+  });
 
   useEffect(() => {
     if (chatId) {

@@ -27,16 +27,12 @@ const Navbar = () => {
   const toast = useToast();
   const currentChatId = router.asPath.includes("/chat?") && router?.query?.id;
 
-  const [chatSubject, setChatSubject] = useState<string | undefined>();
-  useQuery({
+  const { data } = useQuery({
     queryKey: [GET_CHAT_BY_ID, currentChatId],
     queryFn: () => getChatByIdQuery(currentChatId as string),
-    onSuccess: (data) => {
-      if (data?.subject) {
-        setChatSubject(data.subject);
-      }
-    },
   });
+
+  const chatSubject = data?.subject;
 
   useEffect(() => {
     if (router?.query?.paid) {
