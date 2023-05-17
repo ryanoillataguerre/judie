@@ -1,5 +1,5 @@
 import { baseFetch } from "./baseFetch";
-import { Message, UserRole } from "./types/api";
+import { Chat, Message, UserRole } from "./types/api";
 
 export interface ChatResponse {
   id: string;
@@ -82,7 +82,7 @@ export const signupMutation = async ({
   return response.data;
 };
 
-export const createChatMutation = async () => {
+export const createChatMutation = async (): Promise<ChatResponse> => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",

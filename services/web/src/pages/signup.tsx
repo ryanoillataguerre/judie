@@ -113,7 +113,7 @@ const SignupForm = () => {
         styles.signupFormContainer,
         isAnimating ? styles.animate : "",
       ].join(" ")}
-      onSubmit={handleSubmit(async (data) => await onSubmit(data))}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <h1>Sign Up</h1>
       <Input
@@ -134,7 +134,7 @@ const SignupForm = () => {
         label={"Email"}
         errors={errors}
         required
-        placeholder={"judie@judie.ai"}
+        placeholder={"judie@judie.io"}
         register={register}
         name={"email"}
       />
@@ -166,7 +166,7 @@ const SignupForm = () => {
           register={register}
           name={"district"}
           errors={errors}
-          label={"District"}
+          label={"District (optional)"}
         />
       </div>
       <div className={styles.bottomRow}>

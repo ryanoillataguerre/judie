@@ -40,12 +40,6 @@ const Sidebar = () => {
         router.push("/chats");
       },
     },
-    {
-      icon: <MdOutlineAssignment size={20} color={"#d3d3d3"} />,
-      label: "Quiz",
-      enabled: false,
-      tooltipText: "Quizzes are coming soon!",
-    },
   ];
   const activeIconIndex = getActiveIconIndex(router.pathname);
   const [activeIcon, setActiveIcon] = useState<number>(activeIconIndex);
