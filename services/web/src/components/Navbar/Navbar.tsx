@@ -25,28 +25,14 @@ const Navbar = () => {
   const auth = useAuth({ allowUnauth: true });
   const router = useRouter();
   const toast = useToast();
-  const currentChatId = router?.query?.chatId;
-  useEffect(() => {
-    // if (router.query.paid) {
-    //   auth.refresh();
-    // }
-  }, [auth, router]);
+  const currentChatId = router.asPath.includes("/chat?") && router?.query?.id;
 
-  const [chatSubject, setChatSubject] = useState<string | undefined>();
-  const {
-    data: existingUserChat,
-    isLoading: isExistingChatLoading,
-    refetch: fetchExistingChat,
-  } = useQuery({
+  const { data } = useQuery({
     queryKey: [GET_CHAT_BY_ID, currentChatId],
     queryFn: () => getChatByIdQuery(currentChatId as string),
-    onSuccess: (data) => {
-      if (data?.subject) {
-        setChatSubject(data.subject);
-      }
-    },
-    enabled: !!currentChatId,
   });
+
+  const chatSubject = data?.subject;
 
   useEffect(() => {
     if (router?.query?.paid) {
@@ -109,7 +95,7 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            {router.asPath.includes("/chat/") ? (
+            {router.asPath.includes("/chat") ? (
               <div className={styles.badgesContainer}>
                 {auth?.isPaid ? null : (
                   <Badge

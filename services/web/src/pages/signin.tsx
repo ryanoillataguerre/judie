@@ -59,12 +59,12 @@ const SigninForm = () => {
   return (
     <form
       className={styles.signinFormContainer}
-      onSubmit={handleSubmit(async (data) => await onSubmit(data))}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <h1>Sign In</h1>
       <label>Email</label>
       <Input
-        placeholder={"judie@judie.ai"}
+        placeholder={"judie@judie.io"}
         register={register}
         name={"email"}
       />

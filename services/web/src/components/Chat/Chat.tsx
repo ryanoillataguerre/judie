@@ -1,17 +1,11 @@
 import {
   completionFromQueryMutation,
+  createChatMutation,
   putChatMutation,
 } from "@judie/data/mutations";
 import { useMutation, useQuery } from "react-query";
 import styles from "./Chat.module.scss";
-import {
-  FormEventHandler,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import MessageRow, { TempMessage } from "../MessageRow/MessageRow";
 import { useRouter } from "next/router";
 import {
@@ -19,14 +13,18 @@ import {
   MessageType,
   SubscriptionStatus,
 } from "@judie/data/types/api";
-import Loading from "../lottie/Loading/Loading";
-import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import {
+  GET_CHAT_BY_ID,
+  GET_USER_CHATS,
+  getChatByIdQuery,
+  getUserChatsQuery,
+} from "@judie/data/queries";
 import { Progress, useToast } from "@chakra-ui/react";
 import ChatInput from "../ChatInput/ChatInput";
 import ChatWelcome from "../ChatWelcome/ChatWelcome";
 import useAuth from "@judie/hooks/useAuth";
 import Paywall from "../Paywall/Paywall";
-import { flushSync } from "react-dom";
+
 import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface ChatProps {
@@ -34,14 +32,77 @@ interface ChatProps {
   chatId: string;
 }
 
-const Chat = ({ initialQuery, chatId }: ChatProps) => {
+const Chat = ({ initialQuery }: ChatProps) => {
   const router = useRouter();
   const toast = useToast();
+  const auth = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayWelcome, setDisplayWelcome] = useState<boolean>(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState<boolean>(false);
   const [beingStreamedMessage, setBeingStreamedMessage] = useState<string>("");
   const { userData, refresh: refreshUserData } = useAuth();
+  const [chatId, setChatId] = useState<string>(router?.query?.id as string);
+
+  // Get user chats on initial load -
+  // if there's no chatId and no newChat query param, set it to their most recent chat
+  const {
+    data,
+    isError,
+    isLoading: initialChatLoading,
+  } = useQuery({
+    queryKey: [GET_USER_CHATS],
+    queryFn: () => getUserChatsQuery(),
+    enabled: true,
+    onSuccess: (data) => {
+      if (data.length && !router.query.newChat && data?.[0]?.id) {
+        setChatId(data[0].id);
+        router.push(
+          {
+            pathname: `/chat`,
+            query: {
+              id: data[0].id,
+            },
+          },
+          undefined,
+          { shallow: true }
+        );
+      }
+    },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error getting chats", err);
+      auth.logout();
+    },
+    staleTime: 1000 * 60,
+  });
+
+  useEffect(() => {
+    if (chatId) {
+      setDisplayWelcome(false);
+    }
+    if (!chatId) {
+      setDisplayWelcome(true);
+    }
+  }, [chatId]);
+
+  const { mutateAsync: createChat } = useMutation({
+    mutationFn: createChatMutation,
+    onSuccess: (data) => {
+      setChatId(data.id);
+      router.push(
+        `/chat`,
+        {
+          query: {
+            id: data.id,
+          },
+        },
+        { shallow: true }
+      );
+    },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error creating chat", err);
+      auth.logout();
+    },
+  });
 
   const { isLoading, mutateAsync } = useMutation({
     mutationFn: () =>
@@ -65,6 +126,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     },
     retry: false,
   });
+
   const { refetch: fetchExistingChat } = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
     queryFn: () => getChatByIdQuery(chatId),
@@ -83,12 +145,6 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     enabled: !!chatId,
   });
 
-  useEffect(() => {
-    if (chatId) {
-      fetchExistingChat();
-    }
-  }, [chatId, fetchExistingChat]);
-
   const streamCallback = (message: string) => {
     setBeingStreamedMessage((prev) => prev + message);
   };
@@ -104,10 +160,15 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
 
   const [mostRecentUserChat, setMostRecentUserChat] = useState<TempMessage>();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const onSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (chatValue.length === 0) {
       return;
+    }
+    if (!chatId) {
+      await createChat();
     }
     if (beingStreamedMessage.length > 0) {
       toast({
@@ -132,6 +193,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
     });
     setChatValue("");
     await mutateAsync();
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -157,11 +219,15 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
   const putChat = useMutation({
     mutationFn: putChatMutation,
   });
-  const onSelectSubject = (subject: string) => {
-    // Set subject on chat in DB
-    putChat.mutate(
+  const onSelectSubject = async (subject: string) => {
+    let newChatId = undefined;
+    if (!chatId) {
+      const newChat = await createChat();
+      newChatId = newChat.id;
+    }
+    await putChat.mutateAsync(
       {
-        chatId,
+        chatId: newChatId || chatId,
         subject,
       },
       {
@@ -172,6 +238,25 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
       }
     );
   };
+
+  // If new chat, create new chat
+  useEffect(() => {
+    if (router.query.newChat && !chatId) {
+      (async () => {
+        const newChat = await createChat();
+        router.push(
+          `/chat`,
+          {
+            query: {
+              id: newChat.id,
+            },
+          },
+          { shallow: true }
+        );
+      })();
+    }
+  }, [router.query.newChat, createChat, router.push]);
+
   return (
     <div className={styles.chatContainer}>
       <Paywall isOpen={isPaywallOpen} setIsOpen={setIsPaywallOpen} />
@@ -207,7 +292,7 @@ const Chat = ({ initialQuery, chatId }: ChatProps) => {
         </div>
       )}
       <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
-        {isLoading && (
+        {(isLoading || loading) && (
           <Progress
             size="xs"
             isIndeterminate
