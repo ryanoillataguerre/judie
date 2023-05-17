@@ -33,7 +33,7 @@ export default function useAuth({
   }, [userData]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
       window?.analytics?.identify(userData?.id ?? undefined);
     }
   }, [userData]);
@@ -41,7 +41,10 @@ export default function useAuth({
   const logout = () => {
     deleteCookie(SESSION_COOKIE, {
       path: "/",
-      domain: process.env.NODE_ENV === "production" ? "judie.io" : undefined,
+      domain:
+        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+          ? "judie.io"
+          : undefined,
     });
     setSessionCookie(undefined);
     setUserData(undefined);
