@@ -8,18 +8,11 @@ service InferenceService{
   rpc ServerConnectionCheck(ReturnConnectedCheck) returns (ConnectedCheckResponse){}
 }
 
-message Conversation{
-  repeated ConvTurn turns = 1;
-}
-
 message ChatDetails{
   string chat_id = 1;
+  string subject = 2;
 }
 
-message ConvTurn{
-  string sender = 1;
-  string message = 2;
-}
 
 message TutorResponse{
   string responsePart = 1;

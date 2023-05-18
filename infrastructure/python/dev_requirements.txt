@@ -12,3 +12,10 @@ pinecone-client
 pytest
 python-dotenv
 prisma
+jupyter
+notebook
+matplotlib
+altair
+pandas
+altair_saver
+vl-convert-python

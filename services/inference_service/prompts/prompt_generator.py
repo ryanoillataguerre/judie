@@ -2,6 +2,7 @@ from inference_service.prompts import prompt_chunks
 from inference_service.context import context_retriever
 from typing import List, Optional
 
+TOTAL_PROMPT_LIMIT = 7000
 
 def generate_question_answer_prompt(
     question: str, subject_modifier: str = None, chat_history: Optional[List] = None
@@ -40,4 +41,4 @@ def generate_question_answer_prompt(
     print("Full prompt:")
     print(prompt_context_and_question)
 
-    return prompt_context_and_question
+    return {"subject": subject_plus_context}
