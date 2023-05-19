@@ -4,6 +4,7 @@ from typing import List, Optional
 
 TOTAL_PROMPT_LIMIT = 7000
 
+
 def generate_question_answer_prompt(
     question: str, subject_modifier: str = None, chat_history: Optional[List] = None
 ) -> str:
