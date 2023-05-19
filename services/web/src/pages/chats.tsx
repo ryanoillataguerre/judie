@@ -7,6 +7,7 @@ import useAuth, { SEEN_CHATS_NOTICE_COOKIE } from "@judie/hooks/useAuth";
 import Chats from "@judie/components/Chats/Chats";
 import { useEffect, useState } from "react";
 import { getCookie, setCookie } from "cookies-next";
+import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 interface ChatPageProps {
   query?: string;
 }
@@ -51,13 +52,17 @@ const ChatsPage = ({ query }: ChatPageProps) => {
 
 ChatsPage.displayName = "Chats";
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const query = context.query.query;
-  return {
-    props: {
-      query: query || null,
-    },
-  };
-}
+// TEMP: Redirect users to /waitlist if they visit
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
+  serverRedirect(ctx, "/waitlist");
+
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   const query = context.query.query;
+//   return {
+//     props: {
+//       query: query || null,
+//     },
+//   };
+// }
 
 export default ChatsPage;

@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { useRouter } from "next/router";
 import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
 import { useEffect } from "react";
-import theme from "@judie/styles/chakra";
+import theme from "@judie/styles/chakra/chakra";
 
 const openSans = Open_Sans({
   weight: ["300", "400", "600", "700"],
@@ -17,17 +17,17 @@ const openSans = Open_Sans({
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
-  const { isReady } = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     if (Component.displayName) {
-      if (process.env.NEXT_PUBLIC_ENV === "production") {
+      if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
         window?.analytics?.page(Component.displayName);
       }
     }
   }, []);
 
-  if (!isReady) {
+  if (!router.isReady) {
     return <LoadingScreen />;
   }
   return (

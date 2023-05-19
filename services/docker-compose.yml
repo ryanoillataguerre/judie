@@ -67,7 +67,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      NODE_ENV: development
+      NEXT_PUBLIC_NODE_ENV: local
       NEXT_PUBLIC_API_URI: http://app-service:8080
       NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${NEXT_PUBLIC_SEGMENT_WRITE_KEY}
   inference-service:

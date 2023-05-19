@@ -132,3 +132,13 @@ export const deleteChatMutation = async (chatId: string) => {
   });
   return response.data;
 };
+
+// Waitlist
+export const waitlistMutation = async ({ email }: { email: string }) => {
+  const response = await baseFetch({
+    url: "/auth/waitlist",
+    method: "POST",
+    body: { email },
+  });
+  return response.data;
+};

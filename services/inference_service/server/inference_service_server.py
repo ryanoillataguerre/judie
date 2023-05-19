@@ -2,8 +2,20 @@ import inference_service_pb2
 import inference_service_pb2_grpc
 import os
 import grpc
+import pinecone
+import openai
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
+from inference_service.prompts import prompt_generator
+from inference_service.openai_manager import openai_manager
+
+
+def setup_env():
+    pinecone.init(
+        api_key=os.getenv("PINECONE_API_KEY"),
+        environment=os.getenv("PINECONE_ENVIRONMENT"),
+    )
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServicer):
@@ -12,7 +24,15 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     """
 
     def GetChatResponse(self, request, context) -> None:
-        for part in ["Do.", "Or do not.", "There is no try."]:
+        print(request.turns[-1].message)
+        prompt = prompt_generator.generate_question_answer_prompt(
+            question=request.turns[-1].message
+        )
+        logger.info(f"Full prompt: {prompt}")
+
+        openai_response = openai_manager.get_gpt_response()
+
+        for part in openai_response:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
     def ServerConnectionCheck(self, request, context):
@@ -21,6 +41,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
 def serve():
     grpc_port = os.getenv("GRPC_PORT")
+
     logger.info(
         f"Attempting grpc connection on port: {grpc_port}",
     )
@@ -30,6 +51,8 @@ def serve():
     inference_service_pb2_grpc.add_InferenceServiceServicer_to_server(
         InferenceServiceServicer(), server
     )
+
+    setup_env()
 
     server.start()
     logger.info(f"Inference GRPC server running at on port {grpc_port}")
