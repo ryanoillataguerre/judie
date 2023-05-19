@@ -21,6 +21,10 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
+  console.log(
+    "process.env.NEXT_PUBLIC_NODE_ENV",
+    process.env.NEXT_PUBLIC_NODE_ENV
+  );
   switch (process.env.NEXT_PUBLIC_NODE_ENV ?? Environment.LOCAL) {
     case Environment.LOCAL:
       if (isClient()) return "http://localhost:8080";

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import { errorPassthrough, handleValidationErrors } from "../utils/express.js";
-import { signup, signin } from "./service.js";
+import { signup, signin, addToWaitlist } from "./service.js";
 
 const router = Router();
 
@@ -53,6 +53,17 @@ router.post(
     const userId = await signin({ email, password });
     // Create session for user
     session.userId = userId;
+    res.status(200).send({ success: true });
+  })
+);
+
+router.post(
+  "/waitlist",
+  [body("email").exists().isEmail()],
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    await addToWaitlist({ email });
     res.status(200).send({ success: true });
   })
 );

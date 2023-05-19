@@ -14,6 +14,7 @@ import { Checkbox, Select, useToast } from "@chakra-ui/react";
 import { UserRole } from "@judie/data/types/api";
 import inputStyles from "@judie/components/Input/Input.module.scss";
 import useAuth from "@judie/hooks/useAuth";
+import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 
 interface SubmitData {
   email: string;
@@ -244,21 +245,25 @@ const SignupPage = () => {
   );
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const {
-    req: { cookies },
-  } = context;
+// TEMP: Redirect users to /waitlist if they visit
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
+  serverRedirect(ctx, "/waitlist");
 
-  if (cookies?.[SESSION_COOKIE]) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/chat",
-      },
-    };
-  }
-  return { props: {} };
-}
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   const {
+//     req: { cookies },
+//   } = context;
+
+//   if (cookies?.[SESSION_COOKIE]) {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: "/chat",
+//       },
+//     };
+//   }
+//   return { props: {} };
+// }
 
 SignupPage.displayName = "Sign Up";
 
