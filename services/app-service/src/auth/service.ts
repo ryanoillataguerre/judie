@@ -1,5 +1,9 @@
 import bcrypt from "bcryptjs";
-import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
+import {
+  BadRequestError,
+  InternalError,
+  UnauthorizedError,
+} from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
 import { User, UserRole } from "@prisma/client";
@@ -113,4 +117,23 @@ export const signin = async ({
   });
 
   return user.id;
+};
+
+export const addToWaitlist = async ({ email }: { email: string }) => {
+  email = email.trim().toLowerCase();
+
+  // Verify email is an email
+  if (!isEmail.default(email)) {
+    throw new BadRequestError("Invalid email");
+  }
+  try {
+    await dbClient.waitlistEntry.create({
+      data: {
+        email,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    // Swallow bc it's most likely a duplicate entry
+  }
 };

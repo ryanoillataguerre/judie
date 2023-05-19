@@ -10,6 +10,7 @@ import Button, { ButtonVariant } from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useToast } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
+import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 
 interface SubmitData {
   email: string;
@@ -123,21 +124,25 @@ const SigninPage = () => {
   );
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const {
-    req: { cookies },
-  } = context;
+// TEMP: Redirect users to /waitlist if they visit
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
+  serverRedirect(ctx, "/waitlist");
 
-  if (cookies?.[SESSION_COOKIE]) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/chat",
-      },
-    };
-  }
-  return { props: {} };
-}
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   const {
+//     req: { cookies },
+//   } = context;
+
+//   if (cookies?.[SESSION_COOKIE]) {
+//     return {
+//       redirect: {
+//         permanent: false,
+//         destination: "/chat",
+//       },
+//     };
+//   }
+//   return { props: {} };
+// }
 
 SigninPage.displayName = "Sign In";
 

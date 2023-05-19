@@ -60,8 +60,8 @@ model Subscription {
 model User {
   id                String        @id @default(uuid())
   email             String        @unique
-  firstName         String?
-  lastName          String?
+  firstName         String?       @map("first_name")
+  lastName          String?       @map("last_name")
   password          String
   receivePromotions Boolean       @map("receive_promotions")
   gradeYear         GradeYear?    @map("grade_year")
@@ -111,4 +111,14 @@ model Message {
 
   @@index([id, chatId])
   @@map("messages")
+}
+
+model WaitlistEntry {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  userId    String?   @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("waitlist_entries")
 }

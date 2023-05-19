@@ -12,7 +12,9 @@
     "dev": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.ts",
     "test": "jest --runInBand",
     "generate": "prisma generate --schema prisma/schema.prisma",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "migrate:soft": "prisma migrate dev --create-only",
+    "migrate:prod": "prisma migrate deploy"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.2",

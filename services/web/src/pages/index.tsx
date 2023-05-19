@@ -4,8 +4,9 @@ import { ButtonVariant } from "@judie/components/Button/Button";
 import { FormEventHandler, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { GetStaticPropsContext } from "next";
+import { GetServerSidePropsContext, GetStaticPropsContext } from "next";
 import useAuth from "@judie/hooks/useAuth";
+import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 
 const DynamicNavbar = dynamic(() => import("@judie/components/Navbar/Navbar"), {
   ssr: false,
@@ -90,10 +91,14 @@ const Home = () => {
 };
 Home.displayName = "Home";
 
-export async function getStaticProps(context: GetStaticPropsContext) {
-  return {
-    props: {},
-  };
-}
+// TEMP: Redirect users to /waitlist if they visit
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
+  serverRedirect(ctx, "/waitlist");
+
+// export async function getStaticProps(context: GetStaticPropsContext) {
+//   return {
+//     props: {},
+//   };
+// }
 
 export default Home;
