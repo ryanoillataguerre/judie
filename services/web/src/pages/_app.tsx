@@ -7,8 +7,6 @@ import { useRouter } from "next/router";
 import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
 import { useEffect } from "react";
 import theme from "@judie/styles/chakra/chakra";
-import { GetServerSidePropsContext } from "next";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 
 const openSans = Open_Sans({
   weight: ["300", "400", "600", "700"],

@@ -6,7 +6,7 @@ export const serverRedirect = (
 ) => {
   const { referer } = ctx.req.headers; // if there's no referer then it was a server request
 
-  if (!referer || external) {
+  if (!referer) {
     ctx.res.setHeader("Location", path);
     ctx.res.statusCode = 301;
   }
