@@ -27,6 +27,10 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, []);
 
+  useEffect(() => {
+    router.push("/waitlist");
+  }, [router.asPath]);
+
   if (!router.isReady) {
     return <LoadingScreen />;
   }
