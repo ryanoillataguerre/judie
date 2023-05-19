@@ -1,7 +1,13 @@
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import (
+    ClassVar as _ClassVar,
+    Iterable as _Iterable,
+    Mapping as _Mapping,
+    Optional as _Optional,
+    Union as _Union,
+)
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -17,13 +23,17 @@ class ConvTurn(_message.Message):
     SENDER_FIELD_NUMBER: _ClassVar[int]
     message: str
     sender: str
-    def __init__(self, sender: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self, sender: _Optional[str] = ..., message: _Optional[str] = ...
+    ) -> None: ...
 
 class Conversation(_message.Message):
     __slots__ = ["turns"]
     TURNS_FIELD_NUMBER: _ClassVar[int]
     turns: _containers.RepeatedCompositeFieldContainer[ConvTurn]
-    def __init__(self, turns: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self, turns: _Optional[_Iterable[_Union[ConvTurn, _Mapping]]] = ...
+    ) -> None: ...
 
 class ReturnConnectedCheck(_message.Message):
     __slots__ = ["returnCheck"]

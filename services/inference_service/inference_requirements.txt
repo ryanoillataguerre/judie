@@ -1,2 +1,5 @@
 grpcio
 grpcio-tools
+openai
+pinecone-client
+prisma
