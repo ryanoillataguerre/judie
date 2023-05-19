@@ -126,10 +126,10 @@ const WaitlistPage = () => {
             >
               Thanks for your interest in Judie!
             </Text>
-            <Text marginY={"1rem"}>We're currently in closed beta.</Text>
+            <Text marginY={"1rem"}>We&apos;re currently in closed beta.</Text>
             <Text marginY={"1rem"}>
-              Please enter your email below and join our waitlist. We'll reach
-              out soon with an invite!
+              Please enter your email below and join our waitlist. We&apos;ll
+              reach out soon with an invite!
             </Text>
           </Box>
           <form
