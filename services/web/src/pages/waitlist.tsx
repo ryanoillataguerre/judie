@@ -76,7 +76,7 @@ const WaitlistPage = () => {
     return "Submit";
   }, [isLoading, submitted]);
 
-  const inputWidth = useBreakpointValue({ base: "100%", md: "50%" });
+  const containerWidth = useBreakpointValue({ base: "100%", md: "50%" });
   return (
     <>
       <Head>
@@ -111,7 +111,7 @@ const WaitlistPage = () => {
           />
           <Box
             style={{
-              width: "100%",
+              width: containerWidth,
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
@@ -138,13 +138,13 @@ const WaitlistPage = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
-              width: "100%",
+              width: containerWidth,
             }}
           >
             <Input
               placeholder={"judie@judie.io"}
               style={{
-                width: inputWidth,
+                width: "100%",
                 marginTop: "1rem",
               }}
               {...register("email", { required: true })}
