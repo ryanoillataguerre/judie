@@ -11,6 +11,7 @@ import {
   Spinner,
   Text,
   useBreakpointValue,
+  useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
