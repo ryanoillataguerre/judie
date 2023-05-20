@@ -1,2 +1,3 @@
 prod-sa-key.json
 sandbox-sa-key.json
+.terraform/
