@@ -13,6 +13,21 @@ provider "google" {
   region      = var.gcp_region
 }
 
+# Store backend state in Cloud Storage
+resource "random_id" "bucket_prefix" {
+  byte_length = 8
+}
+
+resource "google_storage_bucket" "default" {
+  name          = "${random_id.bucket_prefix.hex}-bucket-tfstate"
+  force_destroy = false
+  location      = "US"
+  storage_class = "STANDARD"
+  versioning {
+    enabled = true
+  }
+}
+
 # Enables the Cloud Run API
 resource "google_project_service" "run_api" {
   service = "run.googleapis.com"
@@ -73,21 +88,24 @@ resource "google_sql_user" "core_db_master_user" {
 }
 
 # Redis Instance
-# resource "google_redis_instance" "redis-core" {
-#   authorized_network      = "projects/${var.gcp_project}/global/networks/default"
-#   connect_mode            = "DIRECT_PEERING"
-#   location_id             = "us-west1-a"
-#   memory_size_gb          = 1
-#   name                    = "redis-core"
-#   project                 = var.gcp_project
-#   read_replicas_mode      = "READ_REPLICAS_DISABLED"
-#   redis_version           = "REDIS_6_X"
-#   region                  = "us-west1"
-#   # authorized_network = data.google_compute_network.redis-network.id
-#   # reserved_ip_range       = "10.229.30.64/29"
-#   tier                    = "BASIC"
-#   transit_encryption_mode = "DISABLED"
-# }
+resource "google_redis_instance" "redis-core" {
+  authorized_network      = "projects/${var.gcp_project}/global/networks/default"
+  connect_mode            = "DIRECT_PEERING"
+  location_id             = "us-west1-a"
+  memory_size_gb          = 1
+  name                    = "redis-core"
+  project                 = var.gcp_project
+  read_replicas_mode      = "READ_REPLICAS_DISABLED"
+  redis_version           = "REDIS_6_X"
+  region                  = "us-west1"
+  tier                    = "BASIC"
+  transit_encryption_mode = "DISABLED"
+  # In Prod?
+  # persistence_config = {
+  #   persistence_mode    = "RDB"
+  #   rdb_snapshot_period = "ONE_HOUR"
+  # }
+}
 
 # Artifact Registry
 resource "google_artifact_registry_repository" "web" {
