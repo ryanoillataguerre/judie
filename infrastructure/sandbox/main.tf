@@ -1,16 +1,25 @@
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-    }
-  }
-  required_version = ">= 1.4.6"
+# Enables the Cloud Run API
+resource "google_project_service" "run_api" {
+  service = "run.googleapis.com"
+
+  disable_on_destroy = true
 }
 
-provider "google" {
-  project     = var.gcp_project
-  credentials = file(var.gcp_auth_file)
-  region      = var.gcp_region
+# Enables the VPC Access API
+resource "google_project_service" "vpcaccess-api" {
+  project = var.gcp_project
+  service = "vpcaccess.googleapis.com"
+}
+
+
+resource "google_compute_network" "vpc_network" {
+  name = "default-vpc"
+}
+resource "google_compute_subnetwork" "public-subnetwork" {
+  name = "default-subnet"
+  ip_cidr_range = "10.8.0.0/28"
+  region = "us-west1"
+  network = google_compute_network.vpc_network.name
 }
 
 # Store backend state in Cloud Storage
@@ -28,12 +37,17 @@ resource "google_storage_bucket" "default" {
   }
 }
 
-# Enables the Cloud Run API
-resource "google_project_service" "run_api" {
-  service = "run.googleapis.com"
-
-  disable_on_destroy = true
+resource "google_vpc_access_connector" "connector" {
+  name          = "vpc-access-conn"
+  subnet {
+    name = google_compute_subnetwork.public-subnetwork.name
+  }
+  min_instances = 2
+  max_instances = 3
+  project = var.gcp_project
+  region  = var.gcp_region
 }
+
 
 # Create a Cloud SQL DB
 resource "google_sql_database_instance" "core" {
@@ -68,7 +82,7 @@ resource "google_sql_database_instance" "core" {
       }
 
       ipv4_enabled    = true
-      # private_network = "projects/${var.gcp_project}/global/networks/default"
+      # private_network = google_compute_network.vpc_network.name
     }
 
     location_preference {
@@ -89,7 +103,7 @@ resource "google_sql_user" "core_db_master_user" {
 
 # Redis Instance
 resource "google_redis_instance" "redis-core" {
-  authorized_network      = "projects/${var.gcp_project}/global/networks/default"
+  authorized_network      = google_compute_network.vpc_network.id
   connect_mode            = "DIRECT_PEERING"
   location_id             = "us-west1-a"
   memory_size_gb          = 1
@@ -132,16 +146,74 @@ resource "google_cloud_run_service" "app-service" {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
           name = "DATABASE_URL"
-          value = "postgres://postgres:${random_password.core_db_master_user_password.result}@:5432/postgres?host=/cloudsql/production-382518:us-west1:core"
+          value = "postgres://postgres:${random_password.core_db_master_user_password.result}@:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
+        }
+        env {
+          name = "REDIS_HOST"
+          value = google_redis_instance.redis-core.host
+        }
+        env {
+          name = "REDIS_PORT"
+          value = "6379"
+        }
+        env {
+          name = "NODE_ENV"
+          value = "sandbox"
+        }
+        // TODO: Add rest of ENV vars 
+        env {
+          name = "OPENAI_API_KEY"
+          value = var.env_openai_api_key
+        }
+        env {
+          name = "PINECONE_API_KEY"
+          value = var.env_pinecone_api_key
+        }
+        env {
+          name = "PINECONE_ENVIRONMENT"
+          value = var.env_pinecone_environment
+        }
+        env {
+          name = "SESSION_SECRET"
+          value = var.env_session_secret
+        }
+        env {
+          name = "STRIPE_WEBHOOK_SECRET"
+          value = var.env_stripe_whsec
+        }
+        env {
+          name = "STRIPE_MONTHLY_PRICE_ID"
+          value = var.env_stripe_monthly_price_id
+        }
+        env {
+          name = "STRIPE_COUPON_ID"
+          value = var.env_stripe_coupon_id
+        }
+        env {
+          name = "STRIPE_SK"
+          value = var.env_stripe_sk
+        }
+        env {
+          name = "STRIPE_EMPLOYEE_COUPON_ID"
+          value = var.env_stripe_employee_coupon_id
+        }
+        liveness_probe {
+          initial_delay_seconds = 10
+          failure_threshold = 3
+          http_get {
+            path = "/healthcheck"
+            port = 8080
+          }
         }
       }
     }
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale"      = "1000"
-        # "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name - possible option?
+        "autoscaling.knative.dev/maxScale"      = "100"
         "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
         "run.googleapis.com/client-name"        = "cloud-console"
+        "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
+        "run.googleapis.com/vpc-access-egress"    = "all-traffic"
       }
     }
   }
@@ -151,8 +223,7 @@ resource "google_cloud_run_service" "app-service" {
     latest_revision = true
   }
 
-  # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.run_api]
+  depends_on = [google_project_service.run_api, google_redis_instance.redis-core, google_sql_database_instance.core, google_artifact_registry_repository.app-service, google_vpc_access_connector.connector]
 }
 resource "google_cloud_run_service" "web" {
   name = "web"
@@ -168,9 +239,14 @@ resource "google_cloud_run_service" "web" {
         }
         env {
           name = "NEXT_PUBLIC_API_URI"
-          # TODO: App Service URL
-          value = ""
+          value = google_cloud_run_service.app-service.status[0].url
         }
+      }
+    }
+    metadata {
+      annotations = {
+        "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
+        "run.googleapis.com/vpc-access-egress"    = "all-traffic"
       }
     }
   }
@@ -180,8 +256,7 @@ resource "google_cloud_run_service" "web" {
     latest_revision = true
   }
 
-  # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.run_api]
+  depends_on = [google_project_service.run_api, google_cloud_run_service.app-service, google_artifact_registry_repository.web]
 }
 
 # Allow unauthenticated users to invoke the service
@@ -192,7 +267,10 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
   member   = "allUsers"
 }
 
-# Display the service URL
-output "service_url" {
+# Display the service URLs
+output "web_url" {
   value = google_cloud_run_service.web.status[0].url
+}
+output "app_service_url" {
+  value = google_cloud_run_service.app-service.status[0].url
 }

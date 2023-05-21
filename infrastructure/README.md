@@ -8,8 +8,11 @@
 
 ### How to make changes
 
-- Add or edit the resource you want in the corresponding environment's folder (`production` or `sandbox`)
+- Run `terraform init` in the corresponding environment's folder (`production` or `sandbox`)
+- Add or edit the resource you want
 - **From the environment's folder** run the following:
   - `terraform plan --var-file=sandbox.tfvars`
 - If all of the changes look good and necessary (no unintended side effects especially), go ahead and run:
   - `terraform apply --var-file=sandbox.tfvars`
+- If you get 400 or authentication errors while initializing or planning/applying, run the following:
+  - `export GOOGLE_APPLICATION_CREDENTIALS=./sandbox-sa-key.json // path to service account json file`
