@@ -200,7 +200,6 @@ resource "google_cloud_run_service" "app-service" {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
           name = "DATABASE_URL"
-          # value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.private_ip_address}:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
           value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
         }
         env {
