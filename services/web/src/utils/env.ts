@@ -12,7 +12,6 @@ export const isLocal = () =>
   process.env.NEXT_PUBLIC_NODE_ENV === Environment.Local;
 
 export const getEnv = () => {
-  console.log("NEXT_PUBLIC_NODE_ENV", process.env.NEXT_PUBLIC_NODE_ENV);
   if (isProduction()) {
     return Environment.Production;
   }
