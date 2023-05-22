@@ -41,26 +41,6 @@ resource "google_storage_bucket" "default" {
   }
 }
 
-resource "google_vpc_access_connector" "connector" {
-  name          = "vpc-access-conn"
-  subnet {
-    name = google_compute_subnetwork.public-subnetwork.name
-  }
-  min_instances = 2
-  max_instances = 3
-  project = var.gcp_project
-  region  = var.gcp_region
-}
-
-# Necessary?
-# resource "google_dns_managed_zone" "private_zone" {
-#   dns_name      = "sandbox.services.judie.io."
-#   force_destroy = false
-#   name          = "private-zone"
-#   project       = var.gcp_project
-#   visibility    = "private"
-# }
-
 resource "google_dns_managed_zone" "web-public" {
   dns_name      = "app.sandbox.judie.io."
   force_destroy = false
@@ -77,14 +57,53 @@ resource "google_dns_managed_zone" "app-service-public" {
   visibility    = "public"
 }
 
-# # Necessary?
-# resource "google_dns_managed_zone" "public_zone" {
-#   dns_name      = "sandbox.judie.io."
-#   force_destroy = false
-#   name          = "public-zone"
-#   project       = var.gcp_project
-#   visibility    = "public"
-# }
+
+// Need to make the IP on sandbox use the private IP of DB
+  // TODO: Need to add a private IP
+  # postgres://postgres:px8dzkgphkw7wrrw7wkhpgkzd8xp@34.105.90.155:5432/postgres?host=/cloudsql/sandbox-382905:us-west1:core
+  # postgres://postgres:d69rttv4bctzvjjpx8dzkgphkw7wr@10.60.16.4:5432/postgres?host=/cloudsql/production-382518:us-west1:core
+
+resource "google_compute_network" "private_network" {
+  provider = google-beta
+  name     = "private-network"
+}
+resource "google_compute_subnetwork" "private-subnetwork" {
+  name = "private-subnet"
+  ip_cidr_range = "10.10.0.0/28"
+  region = "us-west1"
+  network = google_compute_network.private_network.name
+}
+
+# Reserve global internal address range for the peering
+resource "google_compute_global_address" "private_ip_address" {
+  provider      = google-beta
+  name          = "private-ip"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.private_network.self_link
+}
+
+# Establish VPC network peering connection using the reserved address range
+resource "google_service_networking_connection" "private_vpc_connection" {
+  provider                = google-beta
+  network                 = google_compute_network.private_network.self_link
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+}
+
+resource "google_vpc_access_connector" "connector" {
+  name          = "vpc-access-conn"
+  # network = google_compute_network.private_network.self_link
+  subnet {
+    name = google_compute_subnetwork.private-subnetwork.name
+  }
+  # ip_cidr_range = google_compute_global_address.private_ip_address.address
+  min_instances = 2
+  max_instances = 3
+  project = var.gcp_project
+  region  = var.gcp_region
+}
 
 
 # Create a Cloud SQL DB
@@ -120,13 +139,14 @@ resource "google_sql_database_instance" "core" {
       }
 
       ipv4_enabled    = true
-      # private_network = google_compute_network.vpc_network.name
+      private_network = google_compute_network.private_network.self_link
     }
 
     location_preference {
       zone = "us-west1-a"
     }
   }
+  depends_on       = [google_service_networking_connection.private_vpc_connection]
 }
 
 resource "google_sql_user" "core_db_master_user" {
@@ -137,7 +157,7 @@ resource "google_sql_user" "core_db_master_user" {
 
 # Redis Instance
 resource "google_redis_instance" "redis-core" {
-  authorized_network      = google_compute_network.vpc_network.id
+  authorized_network      = google_compute_network.private_network.id
   connect_mode            = "DIRECT_PEERING"
   location_id             = "us-west1-a"
   memory_size_gb          = 1
@@ -181,8 +201,8 @@ resource "google_cloud_run_service" "app-service" {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
           name = "DATABASE_URL"
-          # value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.public_ip_address}:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
-          value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.public_ip_address}:5432/postgres"
+          # value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.private_ip_address}:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
+          value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
         }
         env {
           name = "REDIS_HOST"
@@ -196,7 +216,6 @@ resource "google_cloud_run_service" "app-service" {
           name = "NODE_ENV"
           value = "sandbox"
         }
-        // TODO: Add rest of ENV vars 
         env {
           name = "OPENAI_API_KEY"
           value = var.env_openai_api_key
@@ -243,16 +262,22 @@ resource "google_cloud_run_service" "app-service" {
         }
       }
     }
+
+    
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "100"
+        # Is this superfluous now?
         "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
         "run.googleapis.com/client-name"        = "cloud-console"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "all-traffic"
+        "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
       }
     }
   }
+  
+
 
   traffic {
     percent         = 100
@@ -315,6 +340,7 @@ resource "google_cloud_run_service" "web" {
       annotations = {
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "all-traffic"
+        "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
       }
     }
   }
