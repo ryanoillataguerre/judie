@@ -50,3 +50,15 @@ variable "env_stripe_employee_coupon_id" {
   type = string
   description = "Stripe employee coupon ID"
 }
+variable "web_domain_mapping" {
+  type = string
+  description = "Web domain mapping"
+}
+variable "app_service_domain_mapping" {
+  type = string
+  description = "App Service domain mapping"
+}
+variable "db_password" {
+  type = string
+  description = "DB password"
+}

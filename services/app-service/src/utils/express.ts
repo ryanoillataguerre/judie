@@ -25,7 +25,7 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
   const allowedOrigins = isProduction()
     ? ["https://judie.io", "https://app.judie.io"]
     : isSandbox()
-    ? ["https://sandbox.judie.io"]
+    ? ["https://app.sandbox.judie.io", "https://sandbox.judie.io"]
     : ["http://localhost:3000", "http://web:3000"];
 
   const origin = String(req.headers.origin);

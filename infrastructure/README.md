@@ -16,3 +16,15 @@
   - `terraform apply --var-file=sandbox.tfvars`
 - If you get 400 or authentication errors while initializing or planning/applying, run the following:
   - `export GOOGLE_APPLICATION_CREDENTIALS=./sandbox-sa-key.json // path to service account json file`
+
+### What has been manually created?
+
+#### Sandbox
+
+- Custom Cloud Run domain mappings for Cloud Run services `web` and `app-service`
+- DNS rules
+
+#### Prod
+
+- DNS rules
+- Everything, as of now

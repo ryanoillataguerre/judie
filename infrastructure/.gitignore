@@ -1,4 +1,4 @@
 prod-sa-key.json
 sandbox-sa-key.json
 .terraform/
-*.tfvars
+sandbox.tfvars

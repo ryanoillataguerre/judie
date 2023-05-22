@@ -48,6 +48,40 @@ resource "google_vpc_access_connector" "connector" {
   region  = var.gcp_region
 }
 
+# Necessary?
+# resource "google_dns_managed_zone" "private_zone" {
+#   dns_name      = "sandbox.services.judie.io."
+#   force_destroy = false
+#   name          = "private-zone"
+#   project       = var.gcp_project
+#   visibility    = "private"
+# }
+
+resource "google_dns_managed_zone" "web-public" {
+  dns_name      = "app.sandbox.judie.io."
+  force_destroy = false
+  name          = "web-public"
+  project       = var.gcp_project
+  visibility    = "public"
+}
+
+resource "google_dns_managed_zone" "app-service-public" {
+  dns_name      = "app-service.sandbox.judie.io."
+  force_destroy = false
+  name          = "app-service-public"
+  project       = var.gcp_project
+  visibility    = "public"
+}
+
+# # Necessary?
+# resource "google_dns_managed_zone" "public_zone" {
+#   dns_name      = "sandbox.judie.io."
+#   force_destroy = false
+#   name          = "public-zone"
+#   project       = var.gcp_project
+#   visibility    = "public"
+# }
+
 
 # Create a Cloud SQL DB
 resource "google_sql_database_instance" "core" {
@@ -91,14 +125,10 @@ resource "google_sql_database_instance" "core" {
   }
 }
 
-resource "random_password" "core_db_master_user_password" {
-  length = 16
-}
-
 resource "google_sql_user" "core_db_master_user" {
   instance = google_sql_database_instance.core.name
   name     = "postgres"
-  password = random_password.core_db_master_user_password.result
+  password = var.db_password
 }
 
 # Redis Instance
@@ -139,6 +169,7 @@ resource "google_artifact_registry_repository" "app-service" {
 resource "google_cloud_run_service" "app-service" {
   name = "app-service"
   location = "us-west1"
+  autogenerate_revision_name = true
 
   template {
     spec {
@@ -146,7 +177,7 @@ resource "google_cloud_run_service" "app-service" {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
           name = "DATABASE_URL"
-          value = "postgres://postgres:${random_password.core_db_master_user_password.result}@:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
+          value = "postgres://postgres:${var.db_password}@:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
         }
         env {
           name = "REDIS_HOST"
@@ -223,23 +254,55 @@ resource "google_cloud_run_service" "app-service" {
     latest_revision = true
   }
 
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["client.knative.dev/user-image"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
+      template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      metadata[0].annotations["client.knative.dev/user-image"],
+      metadata[0].annotations["run.googleapis.com/client-name"],
+      metadata[0].annotations["run.googleapis.com/client-version"],
+      metadata[0].annotations["run.googleapis.com/launch-stage"],
+      metadata[0].annotations["serving.knative.dev/creator"],
+      metadata[0].annotations["serving.knative.dev/lastModifier"],
+      metadata[0].annotations["run.googleapis.com/ingress-status"],
+      metadata[0].labels["cloud.googleapis.com/location"],
+      template[0].spec[0].containers[0].image
+    ]
+  }
+
   depends_on = [google_project_service.run_api, google_redis_instance.redis-core, google_sql_database_instance.core, google_artifact_registry_repository.app-service, google_vpc_access_connector.connector]
 }
+
 resource "google_cloud_run_service" "web" {
   name = "web"
   location = "us-west1"
+  autogenerate_revision_name = true
 
   template {
     spec {
       containers {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
-        env {
-          name = "NEXT_PUBLIC_NODE_ENV"
-          value = "sandbox"
+        # Env variables must be defined at build time for Next.js
+        # env {
+        #   name = "NEXT_PUBLIC_NODE_ENV"
+        #   value = "sandbox"
+        # }
+        # env {
+        #   name = "NEXT_PUBLIC_API_URI"
+        #   value = google_cloud_run_service.app-service.status[0].url
+        # }
+        liveness_probe {
+          initial_delay_seconds = 10
+          failure_threshold = 3
+          http_get {
+            path = "/api/healthcheck"
+            port = 3000
+          }
         }
-        env {
-          name = "NEXT_PUBLIC_API_URI"
-          value = google_cloud_run_service.app-service.status[0].url
+        ports {
+          container_port = 3000
         }
       }
     }
@@ -256,6 +319,24 @@ resource "google_cloud_run_service" "web" {
     latest_revision = true
   }
 
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["client.knative.dev/user-image"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
+      template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      metadata[0].annotations["client.knative.dev/user-image"],
+      metadata[0].annotations["run.googleapis.com/client-name"],
+      metadata[0].annotations["run.googleapis.com/client-version"],
+      metadata[0].annotations["run.googleapis.com/launch-stage"],
+      metadata[0].annotations["serving.knative.dev/creator"],
+      metadata[0].annotations["serving.knative.dev/lastModifier"],
+      metadata[0].annotations["run.googleapis.com/ingress-status"],
+      metadata[0].labels["cloud.googleapis.com/location"],
+      template[0].spec[0].containers[0].image
+    ]
+  }
+
   depends_on = [google_project_service.run_api, google_cloud_run_service.app-service, google_artifact_registry_repository.web]
 }
 
@@ -266,11 +347,36 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+# Allow unauthenticated users to invoke the service
+# TEMP: Remove this
+resource "google_cloud_run_service_iam_member" "run_all_users_service" {
+  service  = google_cloud_run_service.app-service.name
+  location = google_cloud_run_service.app-service.location
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+// This (and one for app-service) are defined locally in sandbox
+// Could not get the correct rights to create this
+// Issues with verified domain
+# resource "google_cloud_run_domain_mapping" "web" {
+#   name     = var.web_domain_mapping
+#   location = google_cloud_run_service.web.location
+#   metadata {
+#     annotations = {
+#       "run.googleapis.com/launch-stage" = "BETA"
+#     }
+#     namespace = var.gcp_project
+#   }
+#   spec {
+#     route_name = google_cloud_run_service.web.name
+#   }
+# }
 
 # Display the service URLs
-output "web_url" {
-  value = google_cloud_run_service.web.status[0].url
-}
-output "app_service_url" {
-  value = google_cloud_run_service.app-service.status[0].url
-}
+# output "web_url" {
+#   value = google_cloud_run_service.web.status[0].url
+# }
+# output "app_service_url" {
+#   value = google_cloud_run_service.app-service.status[0].url
+# }
