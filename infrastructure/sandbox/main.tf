@@ -5,32 +5,33 @@ resource "google_project_service" "run_api" {
   disable_on_destroy = true
 }
 
-# Enables the VPC Access API
+# Enable necessary management APIs
 resource "google_project_service" "vpcaccess-api" {
   project = var.gcp_project
   service = "vpcaccess.googleapis.com"
 }
-
 resource "google_project_service" "sqladmin-api" {
   project = var.gcp_project
   service = "sqladmin.googleapis.com"
 }
 
+# Create default VPC network
 resource "google_compute_network" "vpc_network" {
   name = "default-vpc"
 }
-resource "google_compute_subnetwork" "public-subnetwork" {
-  name = "default-subnet"
-  ip_cidr_range = "10.8.0.0/28"
-  region = "us-west1"
-  network = google_compute_network.vpc_network.name
-}
 
-# Store backend state in Cloud Storage
-# https://cloud.google.com/docs/terraform/resource-management/store-state
+# resource "google_compute_subnetwork" "public-subnetwork" {
+#   name = "default-subnet"
+#   ip_cidr_range = "10.8.0.0/28"
+#   region = "us-west1"
+#   network = google_compute_network.vpc_network.name
+# }
+
 resource "random_id" "bucket_prefix" {
   byte_length = 8
 }
+# Store backend state in Cloud Storage
+# https://cloud.google.com/docs/terraform/resource-management/store-state
 resource "google_storage_bucket" "default" {
   name          = "${random_id.bucket_prefix.hex}-bucket-tfstate"
   force_destroy = false
@@ -41,6 +42,7 @@ resource "google_storage_bucket" "default" {
   }
 }
 
+# Do these matter/make a difference?
 resource "google_dns_managed_zone" "web-public" {
   dns_name      = "app.sandbox.judie.io."
   force_destroy = false
@@ -57,16 +59,13 @@ resource "google_dns_managed_zone" "app-service-public" {
   visibility    = "public"
 }
 
-
-// Need to make the IP on sandbox use the private IP of DB
-  // TODO: Need to add a private IP
-  # postgres://postgres:px8dzkgphkw7wrrw7wkhpgkzd8xp@34.105.90.155:5432/postgres?host=/cloudsql/sandbox-382905:us-west1:core
-  # postgres://postgres:d69rttv4bctzvjjpx8dzkgphkw7wr@10.60.16.4:5432/postgres?host=/cloudsql/production-382518:us-west1:core
-
+# Private network
 resource "google_compute_network" "private_network" {
   provider = google-beta
   name     = "private-network"
 }
+
+# Private Subnet
 resource "google_compute_subnetwork" "private-subnetwork" {
   name = "private-subnet"
   ip_cidr_range = "10.10.0.0/28"
@@ -276,14 +275,13 @@ resource "google_cloud_run_service" "app-service" {
       }
     }
   }
-  
-
 
   traffic {
     percent         = 100
     latest_revision = true
   }
 
+  # This addresses an annoying bug where apply hangs after someone has manually edited the service in Cloud Run console
   lifecycle {
     ignore_changes = [
       template[0].metadata[0].annotations["client.knative.dev/user-image"],
@@ -315,14 +313,6 @@ resource "google_cloud_run_service" "web" {
       containers {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
         # Env variables must be defined at build time for Next.js
-        # env {
-        #   name = "NEXT_PUBLIC_NODE_ENV"
-        #   value = "sandbox"
-        # }
-        # env {
-        #   name = "NEXT_PUBLIC_API_URI"
-        #   value = google_cloud_run_service.app-service.status[0].url
-        # }
         liveness_probe {
           initial_delay_seconds = 10
           failure_threshold = 3
@@ -350,6 +340,7 @@ resource "google_cloud_run_service" "web" {
     latest_revision = true
   }
 
+  # This addresses an annoying bug where apply hangs after someone has manually edited the service in Cloud Run console
   lifecycle {
     ignore_changes = [
       template[0].metadata[0].annotations["client.knative.dev/user-image"],
@@ -402,12 +393,4 @@ resource "google_cloud_run_service_iam_member" "run_all_users_service" {
 #   spec {
 #     route_name = google_cloud_run_service.web.name
 #   }
-# }
-
-# Display the service URLs
-# output "web_url" {
-#   value = google_cloud_run_service.web.status[0].url
-# }
-# output "app_service_url" {
-#   value = google_cloud_run_service.app-service.status[0].url
 # }
