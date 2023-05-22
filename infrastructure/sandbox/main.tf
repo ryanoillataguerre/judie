@@ -11,6 +11,10 @@ resource "google_project_service" "vpcaccess-api" {
   service = "vpcaccess.googleapis.com"
 }
 
+resource "google_project_service" "sqladmin-api" {
+  project = var.gcp_project
+  service = "sqladmin.googleapis.com"
+}
 
 resource "google_compute_network" "vpc_network" {
   name = "default-vpc"
@@ -177,7 +181,8 @@ resource "google_cloud_run_service" "app-service" {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
           name = "DATABASE_URL"
-          value = "postgres://postgres:${var.db_password}@:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
+          # value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.public_ip_address}:5432/postgres?host=/cloudsql/${var.gcp_project}:us-west1:core"
+          value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.public_ip_address}:5432/postgres"
         }
         env {
           name = "REDIS_HOST"
