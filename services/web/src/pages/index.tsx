@@ -1,26 +1,15 @@
 import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
+<<<<<<< HEAD
 import { ButtonVariant } from "@judie/components/Button/Button";
 import { FormEventHandler, useEffect, useState } from "react";
+=======
+import { useEffect } from "react";
+>>>>>>> 1b40c84f85af22a73e9893b6c09bab9ace358941
 import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
-import { GetServerSidePropsContext, GetStaticPropsContext } from "next";
-import useAuth from "@judie/hooks/useAuth";
+import { GetServerSidePropsContext } from "next";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
-
-const DynamicNavbar = dynamic(() => import("@judie/components/Navbar/Navbar"), {
-  ssr: false,
-});
-const DynamicChatBox = dynamic(
-  () => import("@judie/components/ChatBox/ChatBox"),
-  {
-    ssr: false,
-  }
-);
-const DynamicButton = dynamic(() => import("@judie/components/Button/Button"), {
-  ssr: false,
-});
-
+import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
 const Home = () => {
   // const { userData } = useAuth({ allowUnauth: true });
   // const [query, setQuery] = useState<string>("");
@@ -44,7 +33,11 @@ const Home = () => {
     router.push("/signin", {
       query: router.query,
     });
+<<<<<<< HEAD
   }, []);
+=======
+  }, [router]);
+>>>>>>> 1b40c84f85af22a73e9893b6c09bab9ace358941
 
   return (
     <>
@@ -58,6 +51,7 @@ const Home = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+<<<<<<< HEAD
         <DynamicNavbar />
         <div className={styles.pageContentContainer}>
           <div className={styles.contentContainer}>
@@ -91,20 +85,21 @@ const Home = () => {
             </a>
           </div>
         </div>
+=======
+        <LoadingScreen />
+>>>>>>> 1b40c84f85af22a73e9893b6c09bab9ace358941
       </main>
     </>
   );
 };
 Home.displayName = "Home";
 
-// TEMP: Redirect users to /waitlist if they visit
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
-  serverRedirect(ctx, "/waitlist");
-
-// export async function getStaticProps(context: GetStaticPropsContext) {
-//   return {
-//     props: {},
-//   };
-// }
+// Redirect users to signin if unauthed, otherwise redirect to chat
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  if (ctx.req.cookies.judie_sid) {
+    return serverRedirect(ctx, "/chat");
+  }
+  return serverRedirect(ctx, "/signin");
+};
 
 export default Home;

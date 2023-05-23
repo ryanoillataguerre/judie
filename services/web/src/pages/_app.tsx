@@ -26,18 +26,13 @@ export default function App({ Component, pageProps }: AppProps) {
         window?.analytics?.page(Component.displayName);
       }
     }
-  }, []);
+  }, [Component.displayName]);
 
   if (!router.isReady) {
     return <LoadingScreen />;
   }
   return (
     <>
-      <style jsx global>{`
-        html {
-          font-family: ${openSans.style.fontFamily};
-        }
-      `}</style>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
           <Component {...pageProps} />
