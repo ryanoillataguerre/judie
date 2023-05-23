@@ -15,7 +15,6 @@ const transformUserForSegment = (user: User) => ({
   lastName: user.lastName,
   email: user.email,
   role: user.role,
-  district: user.district,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
   questionsAsked: user.questionsAsked,

@@ -27,7 +27,6 @@ export interface User {
   createdAt: Date;
   updatedAt: Date | null;
   role: UserRole;
-  district?: string;
   stripeCustomerId?: string;
   questionsAsked: number;
   subscription?: Subscription;
