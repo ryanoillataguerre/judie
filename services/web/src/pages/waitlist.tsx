@@ -161,26 +161,9 @@ const WaitlistPage = () => {
           </form>
         </Box>
       </main>
-      {/* <main className={styles.main}>
-        <div className={styles.pageContentContainer}>
-          <img
-            src={"/logo_dark.svg"}
-            alt={"Judie Logo"}
-            className={styles.logo}
-          />
-          <h1 className={styles.pageHeader}>Welcome back</h1>
-        </div>
-      </main> */}
     </>
   );
 };
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   const {
-//     req: { cookies },
-//   } = context;
-//   return { props: {} };
-// }
 
 WaitlistPage.displayName = "Waitlist";
 
