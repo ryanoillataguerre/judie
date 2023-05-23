@@ -1,17 +1,11 @@
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { NextApiResponse } from "next";
-import cookie from "cookie";
+import { Environment, getEnv } from "@judie/utils/env";
 
 export enum ServiceEnum {
   APP = "app",
   EXPLANATIONS = "explanations",
   ANALYTICS = "analytics",
-}
-
-export enum Environment {
-  LOCAL = "local",
-  DEV = "dev",
-  PROD = "production",
 }
 
 export const SESSION_COOKIE = "judie_sid";
@@ -21,16 +15,13 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
-  switch (process.env.NEXT_PUBLIC_NODE_ENV ?? Environment.LOCAL) {
-    case Environment.LOCAL:
+  const env = getEnv();
+  switch (env) {
+    case Environment.Local:
       if (isClient()) return "http://localhost:8080";
       return "http://app-service:8080";
-    case Environment.DEV:
-      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
-    case Environment.PROD:
-      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
     default:
-      return "http://app-service:8080";
+      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
   }
 };
 

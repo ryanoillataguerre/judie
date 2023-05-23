@@ -1,7 +1,7 @@
 import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
 import { ButtonVariant } from "@judie/components/Button/Button";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { GetServerSidePropsContext, GetStaticPropsContext } from "next";
@@ -22,23 +22,29 @@ const DynamicButton = dynamic(() => import("@judie/components/Button/Button"), {
 });
 
 const Home = () => {
+  // const { userData } = useAuth({ allowUnauth: true });
+  // const [query, setQuery] = useState<string>("");
+  // const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  //   e.preventDefault();
+  //   if (userData) {
+  //     const url = `/chat?query=${query}`;
+  //     if (router?.isReady) {
+  //       router?.push(url);
+  //     }
+  //   } else {
+  //     const url = `/signup?query=${query}`;
+  //     if (router?.isReady) {
+  //       router?.push(url);
+  //     }
+  //   }
+  // };
+  // Redirect to signin
   const router = useRouter();
-  const { userData } = useAuth({ allowUnauth: true });
-  const [query, setQuery] = useState<string>("");
-  const onSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    if (userData) {
-      const url = `/chat?query=${query}`;
-      if (router?.isReady) {
-        router?.push(url);
-      }
-    } else {
-      const url = `/signup?query=${query}`;
-      if (router?.isReady) {
-        router?.push(url);
-      }
-    }
-  };
+  useEffect(() => {
+    router.push("/signin", {
+      query: router.query,
+    });
+  }, []);
 
   return (
     <>
@@ -61,7 +67,7 @@ const Home = () => {
             <h2 className={styles.subtitle}>
               Any subject, any question, any time.
             </h2>
-            {/* Chat Box */}
+            {/* Chat Box
             <form className={styles.formContainer} onSubmit={onSubmit}>
               <DynamicChatBox onChange={(e) => setQuery(e.target.value)} />
               <div className={styles.buttonContainer}>
@@ -71,7 +77,7 @@ const Home = () => {
                   variant={ButtonVariant.Default}
                 />
               </div>
-            </form>
+            </form> */}
             {/* Extra Info */}
             <p className={styles.details}>
               Judie is built specifically to focus on the needs of students; we

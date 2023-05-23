@@ -5,8 +5,11 @@ export enum Environment {
 }
 
 export const isProduction = () =>
-  process.env.NODE_ENV === Environment.Production;
-export const isSandbox = () => process.env.NODE_ENV === Environment.Sandbox;
+  process.env.NEXT_PUBLIC_NODE_ENV === Environment.Production;
+export const isSandbox = () =>
+  process.env.NEXT_PUBLIC_NODE_ENV === Environment.Sandbox;
+export const isLocal = () =>
+  process.env.NEXT_PUBLIC_NODE_ENV === Environment.Local;
 
 export const getEnv = () => {
   if (isProduction()) {

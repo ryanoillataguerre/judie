@@ -1,6 +1,7 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
+import { isLocal, isProduction } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
@@ -33,7 +34,7 @@ export default function useAuth({
   }, [userData]);
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+    if (isProduction()) {
       window?.analytics?.identify(userData?.id ?? undefined);
     }
   }, [userData]);
@@ -41,10 +42,7 @@ export default function useAuth({
   const logout = () => {
     deleteCookie(SESSION_COOKIE, {
       path: "/",
-      domain:
-        process.env.NEXT_PUBLIC_NODE_ENV === "production"
-          ? "judie.io"
-          : undefined,
+      domain: !isLocal() ? "judie.io" : undefined,
     });
     setSessionCookie(undefined);
     setUserData(undefined);
