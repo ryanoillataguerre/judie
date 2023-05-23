@@ -19,6 +19,7 @@ import {
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 
+// TODO: Migrate
 const SubscribeCard = ({
   onClick,
   loading,

@@ -177,7 +177,7 @@ const SigninForm = () => {
               fontSize: "0.8rem",
             }}
           >
-            Don't have an account yet?
+            Don&apos;t have an account yet?
           </Text>
           <Link
             color="teal"

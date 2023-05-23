@@ -3,6 +3,7 @@ import { adminSubjects, subjects } from "../../data/static/subjects";
 import { useMemo } from "react";
 import useAuth from "@judie/hooks/useAuth";
 
+// TODO: Migrate
 const SubjectSelector = ({
   selectSubject,
 }: {

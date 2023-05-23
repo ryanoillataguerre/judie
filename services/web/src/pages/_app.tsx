@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
         window?.analytics?.page(Component.displayName);
       }
     }
-  }, []);
+  }, [Component.displayName]);
 
   if (!router.isReady) {
     return <LoadingScreen />;

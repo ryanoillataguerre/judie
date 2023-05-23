@@ -1,9 +1,7 @@
 import { GetServerSidePropsContext } from "next";
 import styles from "../../styles/Chat.module.scss";
 import Head from "next/head";
-import Navbar from "@judie/components/Navbar/Navbar";
 import Sidebar from "@judie/components/Sidebar/Sidebar";
-import Chat from "@judie/components/Chat/Chat";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
@@ -29,7 +27,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <SidebarPageContainer>
-          <Chat chatId={router.query.chatId as string} initialQuery={query} />
+          {/* <Chat chatId={router.query.chatId as string} initialQuery={query} /> */}
         </SidebarPageContainer>
       </main>
     </>

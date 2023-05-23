@@ -11,7 +11,7 @@ const Home = () => {
     router.push("/signin", {
       query: router.query,
     });
-  }, []);
+  }, [router]);
 
   return (
     <>

@@ -4,7 +4,7 @@ import { SubscriptionStatus, User } from "@judie/data/types/api";
 import { isLocal, isProduction } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -39,7 +39,7 @@ export default function useAuth({
     }
   }, [userData]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     deleteCookie(SESSION_COOKIE, {
       path: "/",
       domain: !isLocal() ? "judie.io" : undefined,
@@ -47,7 +47,7 @@ export default function useAuth({
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
-  };
+  }, [router, setUserData, setSessionCookie]);
 
   // GET /users/me
   const { isError, refetch, error, isLoading, isFetched } = useQuery(
