@@ -5,8 +5,7 @@ import styles from "../styles/Signin.module.scss";
 import { useMutation } from "react-query";
 import { signinMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import Input from "@judie/components/Input/Input";
-import Button, { ButtonVariant } from "@judie/components/Button/Button";
+import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useToast } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
@@ -64,7 +63,7 @@ const SigninForm = () => {
     >
       <h1>Sign In</h1>
       <label>Email</label>
-      <Input
+      {/* <Input
         placeholder={"judie@judie.io"}
         register={register}
         name={"email"}
@@ -84,12 +83,11 @@ const SigninForm = () => {
         >
           Sign Up
         </a>
-      </div>
+      </div> */}
       <Button
         loading={isLoading}
         className={styles.submitButton}
         label="Sign In"
-        variant={ButtonVariant.Blue}
         type="submit"
       />
     </form>
