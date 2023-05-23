@@ -2,13 +2,12 @@ import { HTTPResponseError } from "@judie/data/baseFetch";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { signinMutation, signupMutation } from "@judie/data/mutations";
+import { signinMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
