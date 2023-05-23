@@ -261,7 +261,7 @@ const SignupForm = () => {
               });
             }}
           >
-            Sign Up
+            Sign In
           </Link>
         </Flex>
         <Button
@@ -298,7 +298,7 @@ const SignupPage = () => {
           style={{
             height: "100%",
             width: "100%",
-            padding: "1rem",
+            padding: "1rem 0 3rem 0",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",

@@ -60,7 +60,8 @@ const checkStatus = async (response: Response) => {
   } else {
     const responseBody = await response.json();
     if (responseBody && response?.status) {
-      if (response.status === 401) {
+      // Not includes auth because we don't want to redirect on bad signin/signup
+      if (response.status === 401 && !response.url.includes("/auth")) {
         deleteCookie(SESSION_COOKIE, {
           path: "/",
         });
