@@ -196,7 +196,7 @@ const SignupForm = () => {
             <FormLabel htmlFor="firstName">First Name</FormLabel>
             <Input
               id="firstName"
-              autoComplete="firstName"
+              autoComplete="given-name"
               required
               placeholder="Judie"
               {...register("firstName", {})}
@@ -211,7 +211,7 @@ const SignupForm = () => {
             <FormLabel htmlFor="lastName">Last Name</FormLabel>
             <Input
               id="lastName"
-              autoComplete="lastName"
+              autoComplete="family-name"
               required
               placeholder="Thebot"
               {...register("lastName", {})}

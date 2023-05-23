@@ -193,6 +193,7 @@ resource "google_cloud_run_service" "app-service" {
   name = "app-service"
   location = "us-west1"
   autogenerate_revision_name = true
+  
 
   template {
     spec {
@@ -262,7 +263,7 @@ resource "google_cloud_run_service" "app-service" {
         liveness_probe {
           initial_delay_seconds = 10
           failure_threshold = 3
-          period_seconds = 3600
+          period_seconds = 360
           http_get {
             path = "/healthcheck"
             port = 8080
@@ -275,11 +276,12 @@ resource "google_cloud_run_service" "app-service" {
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "100"
+        "autoscaling.knative.dev/minScale"      = "1"
         # Is this superfluous now?
         "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
         "run.googleapis.com/client-name"        = "cloud-console"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
-        "run.googleapis.com/vpc-access-egress"    = "all-traffic"
+        "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
       }
     }
@@ -322,9 +324,18 @@ resource "google_cloud_run_service" "web" {
       containers {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
         # Env variables must be defined at build time for Next.js
+        startup_probe {
+          initial_delay_seconds = 10
+          failure_threshold = 3
+          http_get {
+            path = "/api/healthcheck"
+            port = 3000
+          }
+        }
         liveness_probe {
           initial_delay_seconds = 10
           failure_threshold = 3
+          period_seconds = 360
           http_get {
             path = "/api/healthcheck"
             port = 3000
@@ -337,8 +348,10 @@ resource "google_cloud_run_service" "web" {
     }
     metadata {
       annotations = {
+        "autoscaling.knative.dev/minScale"      = "1"
+        "autoscaling.knative.dev/maxScale"      = "100"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
-        "run.googleapis.com/vpc-access-egress"    = "all-traffic"
+        "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
       }
     }
