@@ -4,8 +4,11 @@ import { extendTheme } from "@chakra-ui/react";
 const config = {
   initialColorMode: "dark",
   useSystemColorMode: false,
-  // breakpoints: ["30em", "48em", "62em", "80em"],
   colors: {
+    brand: {
+      "900": "#202123",
+      "700": "#2a3448",
+    },
     red: {
       "50": "#FBE9E9",
       "100": "#F4C2C2",
