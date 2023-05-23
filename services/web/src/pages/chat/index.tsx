@@ -7,6 +7,7 @@ import Chat from "@judie/components/Chat/Chat";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
+import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
 
 interface ChatPageProps {
   query?: string;
@@ -26,20 +27,14 @@ export default function ChatPage({ query }: ChatPageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
-      <main className={styles.main}>
-        <div className={styles.pageContentContainer}>
-          <Sidebar />
+      <main>
+        <SidebarPageContainer>
           <Chat chatId={router.query.chatId as string} initialQuery={query} />
-        </div>
+        </SidebarPageContainer>
       </main>
     </>
   );
 }
-
-// TEMP: Redirect users to /waitlist if they visit
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
-  serverRedirect(ctx, "/waitlist");
 
 // export async function getServerSideProps(context: GetServerSidePropsContext) {
 //   // Get query parameter "query" and pass in as a prop

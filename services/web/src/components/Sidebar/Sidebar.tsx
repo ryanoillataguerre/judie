@@ -1,9 +1,6 @@
 import { useState } from "react";
-import styles from "./Sidebar.module.scss";
-import { TbMessages } from "react-icons/tb";
-import { MdOutlineAssignment } from "react-icons/md";
 import { BsClockHistory, BsPlusSquareDotted } from "react-icons/bs";
-import { Tooltip } from "@chakra-ui/react";
+import { Flex, Tooltip } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 const getActiveIconIndex = (path: string) => {
@@ -21,52 +18,17 @@ const getActiveIconIndex = (path: string) => {
 
 const Sidebar = () => {
   const router = useRouter();
-  const sidebarIcons = [
-    {
-      icon: <BsPlusSquareDotted size={20} color={"#FFFFFF"} />,
-      label: "New Chat",
-      enabled: true,
-      tooltipText: "New Chat",
-      onClick: () => {
-        router.push("/chat?newChat=true");
-      },
-    },
-    {
-      icon: <BsClockHistory size={20} color={"#FFFFFF"} />,
-      label: "Chats",
-      enabled: true,
-      tooltipText: "Chats",
-      onClick: () => {
-        router.push("/chats");
-      },
-    },
-  ];
   const activeIconIndex = getActiveIconIndex(router.pathname);
   const [activeIcon, setActiveIcon] = useState<number>(activeIconIndex);
 
   return (
-    <div className={styles.sidebarContainer}>
-      {sidebarIcons.map((icon, index) => {
-        return (
-          <Tooltip label={icon.tooltipText} placement="right" key={icon.label}>
-            <div
-              className={[
-                styles.baseIcon,
-                activeIcon === index ? styles.activeIcon : styles.iconContainer,
-              ].join(" ")}
-              onClick={() => {
-                if (icon.onClick && icon.enabled) {
-                  icon.onClick();
-                }
-                setActiveIcon(index);
-              }}
-            >
-              {icon.icon}
-            </div>
-          </Tooltip>
-        );
-      })}
-    </div>
+    <Flex
+      style={{
+        width: "15vw",
+        height: "100vh",
+        backgroundColor: "transparent",
+      }}
+    ></Flex>
   );
 };
 

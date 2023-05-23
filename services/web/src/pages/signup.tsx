@@ -245,25 +245,13 @@ const SignupPage = () => {
   );
 };
 
-// TEMP: Redirect users to /waitlist if they visit
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
-  serverRedirect(ctx, "/waitlist");
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   const {
-//     req: { cookies },
-//   } = context;
-
-//   if (cookies?.[SESSION_COOKIE]) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: "/chat",
-//       },
-//     };
-//   }
-//   return { props: {} };
-// }
+// Redirect users to chat if authed
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  if (ctx.req.cookies.judie_sid) {
+    return serverRedirect(ctx, "/chat");
+  }
+  return { props: {} };
+};
 
 SignupPage.displayName = "Sign Up";
 

@@ -1,6 +1,4 @@
-import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
-import styles from "../styles/Signin.module.scss";
 
 import { useMemo, useState } from "react";
 import {
@@ -11,7 +9,6 @@ import {
   Spinner,
   Text,
   useBreakpointValue,
-  useColorMode,
   useToast,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -46,6 +43,7 @@ const WaitlistPage = () => {
       });
     },
   });
+
   const onSubmit: SubmitHandler<{ email: string }> = async ({
     email,
   }: {
@@ -65,7 +63,6 @@ const WaitlistPage = () => {
       });
     } catch (err) {}
   };
-  // TODO: Success State
 
   const buttonVal = useMemo(() => {
     if (isLoading) {
