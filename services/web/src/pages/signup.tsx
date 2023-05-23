@@ -81,13 +81,6 @@ const SignupForm = () => {
     receivePromotions,
   }: SubmitData) => {
     try {
-      console.log({
-        email,
-        password,
-        firstName,
-        lastName,
-        receivePromotions,
-      });
       setHasSubmitted(true);
       if (!termsAndConditions) {
         toast({
