@@ -29,16 +29,12 @@ export const signup = async ({
   email,
   password,
   receivePromotions,
-  role,
-  district,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
-  role: UserRole;
-  district?: string;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -67,13 +63,13 @@ export const signup = async ({
       email,
       password: _password,
       receivePromotions,
-      role,
-      district,
     },
   });
 
   // Create Stripe customer
   await createCustomer(newUser.id);
+  // TODO: Create Customer.io Customer
+
   // Identify in Segment
   analytics.identify({
     userId: newUser.id,

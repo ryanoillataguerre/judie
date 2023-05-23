@@ -50,9 +50,9 @@ const SigninForm = () => {
       });
     },
     onError: (err: HTTPResponseError) => {
-      console.error("Error signing up", err);
+      console.error("Error signing in", err);
       toast({
-        title: "Error signing up",
+        title: "Error signing in",
         description: err.message,
         status: "error",
         duration: 5000,

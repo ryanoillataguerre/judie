@@ -261,7 +261,7 @@ const SignupForm = () => {
               });
             }}
           >
-            Sign In
+            Sign Up
           </Link>
         </Flex>
         <Button
@@ -310,8 +310,8 @@ const SignupPage = () => {
             style={{
               height: "6rem",
               width: "6rem",
-              marginBottom: "3rem",
-              marginTop: "3rem",
+              marginBottom: "1rem",
+              marginTop: "1rem",
             }}
           />
           <Text
