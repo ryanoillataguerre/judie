@@ -190,7 +190,7 @@ const SigninForm = () => {
               });
             }}
           >
-            Sign In
+            Sign Up
           </Link>
         </Flex>
         <Button

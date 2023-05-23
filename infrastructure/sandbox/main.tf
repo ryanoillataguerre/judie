@@ -250,9 +250,19 @@ resource "google_cloud_run_service" "app-service" {
           name = "STRIPE_EMPLOYEE_COUPON_ID"
           value = var.env_stripe_employee_coupon_id
         }
+        startup_probe {
+          initial_delay_seconds = 10
+          failure_threshold = 3
+          period_seconds = 10
+          http_get {
+            path = "/healthcheck"
+            port = 8080
+          }
+        }
         liveness_probe {
           initial_delay_seconds = 10
           failure_threshold = 3
+          period_seconds = 3600
           http_get {
             path = "/healthcheck"
             port = 8080
