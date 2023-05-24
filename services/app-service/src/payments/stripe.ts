@@ -1,6 +1,8 @@
 import Stripe from "stripe";
 import { User } from "@prisma/client";
-import { handleSubscriptionCreated } from "./service.js";
+import { createCustomer, handleSubscriptionCreated } from "./service.js";
+import { getUser } from "../user/service.js";
+import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const stripe = new Stripe(process.env.STRIPE_SK || "", {
   apiVersion: "2022-11-15",
@@ -80,5 +82,31 @@ export const handleStripeWebhookEvents = async (
     return;
   } catch (error) {
     throw error;
+  }
+};
+
+export const createStripeBillingPortalSession = async (
+  userId: string,
+  reqHeadersOrigin: string
+) => {
+  try {
+    const returnUrl = `${reqHeadersOrigin}/settings`;
+    const user = await getUser({
+      id: userId,
+    });
+    if (!user) {
+      throw new UnauthorizedError("User not found");
+    }
+    const customerId = String(user?.stripeCustomerId);
+    if (!customerId) {
+      await createCustomer(user.id);
+    }
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+    return session.url;
+  } catch (err) {
+    throw err;
   }
 };

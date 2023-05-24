@@ -1,8 +1,20 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Button, Flex, Link, Text } from "@chakra-ui/react";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
+import {
+  GET_PORTAL_LINK,
+  getBillingPortalLinkQuery,
+} from "@judie/data/queries";
 import Head from "next/head";
+import { useQuery } from "react-query";
 
 const SettingsPage = () => {
+  const getBillingPortal = useQuery([GET_PORTAL_LINK], {
+    queryFn: getBillingPortalLinkQuery,
+    enabled: false,
+    onSuccess: (data) => {
+      window.open(data, "_blank");
+    },
+  });
   return (
     <>
       <Head>
@@ -16,7 +28,27 @@ const SettingsPage = () => {
       </Head>
       <main>
         <SidebarPageContainer>
-          <Box></Box>
+          <Flex
+            style={{
+              height: "100%",
+              width: "100%",
+              padding: "1rem",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              justifyContent: "flex-start",
+            }}
+          >
+            <Text fontWeight="bold" fontSize={"2rem"}>
+              Manage Billing
+            </Text>
+            <Button
+              variant="solid"
+              colorScheme="blue"
+              onClick={() => getBillingPortal.refetch()}
+            >
+              Manage
+            </Button>
+          </Flex>
         </SidebarPageContainer>
       </main>
     </>

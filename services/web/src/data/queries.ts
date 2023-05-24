@@ -28,3 +28,14 @@ export const getChatByIdQuery = async (id: string): Promise<ChatResponse> => {
   });
   return response.data;
 };
+
+export const GET_PORTAL_LINK = "GET_PORTAL_LINK";
+export const getBillingPortalLinkQuery = async (
+  id: string
+): Promise<string> => {
+  const response = await baseFetch({
+    url: `/user/billing-portal-link`,
+    method: "GET",
+  });
+  return response.data;
+};

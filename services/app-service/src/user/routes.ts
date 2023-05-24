@@ -4,6 +4,7 @@ import { getUser, updateUser } from "./service.js";
 import { Chat, Message, Subscription, User } from "@prisma/client";
 import { body } from "express-validator";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
+import { createStripeBillingPortalSession } from "../payments/stripe.js";
 
 const router = Router();
 
@@ -76,4 +77,21 @@ router.put(
   })
 );
 
+router.get(
+  "/billing-portal-link",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const link = await createStripeBillingPortalSession(
+      session.userId,
+      req.headers.origin as string
+    );
+    res.status(200).send({
+      data: link,
+    });
+  })
+);
 export default router;
