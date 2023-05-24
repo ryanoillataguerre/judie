@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { BsClockHistory, BsPlusSquareDotted } from "react-icons/bs";
+import {
+  BsChevronRight,
+  BsClockHistory,
+  BsPlusSquareDotted,
+} from "react-icons/bs";
 import {
   Box,
   Button,
@@ -11,10 +15,12 @@ import {
   IconButton,
   Image,
   Input,
+  Slide,
   Spinner,
   Text,
   Tooltip,
   useColorModeValue,
+  useDisclosure,
   useEditableControls,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -32,7 +38,11 @@ import {
 } from "@judie/data/mutations";
 import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
 import { MessageType } from "@judie/data/types/api";
-import { BsChatRightText } from "react-icons/bs";
+import {
+  BsChatRightText,
+  BsChevronBarLeft,
+  BsChevronBarRight,
+} from "react-icons/bs";
 import { TbPencil } from "react-icons/tb";
 import { CheckIcon } from "@chakra-ui/icons";
 import { AiOutlineCheck } from "react-icons/ai";
@@ -241,15 +251,35 @@ const SidebarChat = ({
   );
 };
 
-const OpenCloseButton = ({
-  isOpen,
-  setIsOpen,
-}: {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}) => {};
+// const CloseButton = ({ toggle }: { toggle: () => void }) => {
+//   return (
+//     <BsChevronBarLeft
+//       onClick={toggle}
+//       size={16}
+//       style={{
+//         position: "absolute",
+//         top: "2rem",
+//         right: "-2rem",
+//       }}
+//     />
+//   );
+// };
 
-const Sidebar = () => {
+// const OpenButton = ({ toggle }: { toggle: () => void }) => {
+//   return (
+//     <BsChevronBarRight
+//       onClick={toggle}
+//       size={16}
+//       style={{
+//         position: "absolute",
+//         top: "2rem",
+//         right: "-2rem",
+//       }}
+//     />
+//   );
+// };
+
+const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const activeIconIndex = getActiveIconIndex(router.pathname);
@@ -342,13 +372,13 @@ const Sidebar = () => {
       },
     },
   ];
-  return (
+  return isOpen ? (
     <>
       <Flex
         style={{
-          width: "25vw",
+          width: "20rem",
           height: "100vh",
-          backgroundColor: "transparent",
+          backgroundColor: "#2a3448",
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "space-between",
@@ -465,6 +495,18 @@ const Sidebar = () => {
         </Flex>
       </Flex>
     </>
+  ) : (
+    <Flex
+      style={{
+        width: "1rem",
+        height: "100vh",
+        backgroundColor: "#2a3448",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+      }}
+      boxShadow={"lg"}
+    ></Flex>
   );
 };
 
