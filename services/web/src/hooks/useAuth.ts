@@ -1,7 +1,7 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
-import { isLocal, isProduction } from "@judie/utils/env";
+import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo, useCallback } from "react";
@@ -42,7 +42,11 @@ export default function useAuth({
   const logout = useCallback(() => {
     deleteCookie(SESSION_COOKIE, {
       path: "/",
-      domain: !isLocal() ? "judie.io" : undefined,
+      domain: !isLocal()
+        ? isSandbox()
+          ? "app.sandbox.judie.io"
+          : "app.judie.io"
+        : undefined,
     });
     setSessionCookie(undefined);
     setUserData(undefined);

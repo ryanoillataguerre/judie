@@ -20,7 +20,7 @@ const OpenCloseButton = ({
       style={{
         position: "fixed",
         top: "2rem",
-        left: isOpen ? "20rem" : "2rem",
+        left: isOpen ? "19rem" : "2rem",
       }}
     >
       {isOpen ? (

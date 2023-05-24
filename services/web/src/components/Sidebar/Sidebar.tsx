@@ -347,6 +347,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   ];
   const toast = useToast();
 
+  const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
   return isOpen ? (
     <>
       {/* Modals */}
@@ -479,10 +480,11 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       {/* Sidebar content */}
       <Flex
         style={{
-          width: "20rem",
-          maxWidth: "20rem",
+          width: "18rem",
+          maxWidth: "18rem",
+          minWidth: "18rem",
           height: "100vh",
-          backgroundColor: useColorModeValue("#2a3448", "#2a3448"),
+          backgroundColor: bgColor,
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "space-between",
