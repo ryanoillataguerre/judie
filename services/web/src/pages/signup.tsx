@@ -298,10 +298,11 @@ const SignupPage = () => {
           style={{
             height: "100%",
             width: "100%",
-            padding: "1rem 0 3rem 0",
+            padding: "1rem",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
+            paddingBottom: "3rem",
           }}
         >
           <Image

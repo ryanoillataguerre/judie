@@ -231,6 +231,7 @@ const SigninPage = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
+            paddingBottom: "3rem",
           }}
         >
           <Image

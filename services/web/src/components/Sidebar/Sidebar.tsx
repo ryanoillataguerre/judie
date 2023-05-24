@@ -53,6 +53,7 @@ import { TbPencil } from "react-icons/tb";
 import { CheckIcon } from "@chakra-ui/icons";
 import { AiOutlineCheck } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
+import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 
 const getActiveIconIndex = (path: string) => {
   switch (true) {
@@ -315,13 +316,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
 
-  // TODO: Edit title of chat
-  // TODO: Delete chat by ID
-  // TODO: Clear all conversations
-  const onClickClearConversations = async () => {
-    await clearConversations.mutateAsync();
-    setIsClearConversationsModalOpen(false);
-  };
   const footerIcons: SidebarButtonProps[] = [
     {
       icon: <TfiTrash />,
@@ -343,6 +337,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       onClick: () => {
         auth.logout();
       },
+    },
+    {
+      icon: <ColorModeSwitcher />,
     },
   ];
   const toast = useToast();
@@ -586,7 +583,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             width: "100%",
             flexDirection: "column",
             alignItems: "flex-start",
-            paddingBottom: "2rem",
+            paddingBottom: "1rem",
           }}
         >
           <Divider
