@@ -98,7 +98,7 @@ const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
     if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
       if (sliced) {
         const result = chat.messages?.[0]?.readableContent.slice(0, 25);
-        if (result.length >= 30) {
+        if (result.length >= 25) {
           return result + "...";
         }
       }
@@ -480,8 +480,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       <Flex
         style={{
           width: "20rem",
+          maxWidth: "20rem",
           height: "100vh",
-          backgroundColor: "#2a3448",
+          backgroundColor: useColorModeValue("#2a3448", "#2a3448"),
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "space-between",
