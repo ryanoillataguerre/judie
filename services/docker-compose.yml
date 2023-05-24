@@ -38,10 +38,11 @@ services:
       dockerfile: ./app-service/Dockerfile.local
     ports:
       - 8080:8080
+    restart: always
     environment:
       NODE_ENV: local
       PORT: 8080
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/postgres}
       REDIS_HOST: redis
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PINECONE_API_KEY: ${PINECONE_API_KEY}

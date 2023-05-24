@@ -12,7 +12,6 @@ const LoadingScreen = () => {
         alignItems: "center",
         paddingBottom: "50%",
         justifyContent: "center",
-        backgroundColor: "teal",
       }}
     >
       <Box

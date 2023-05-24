@@ -38,6 +38,20 @@ export const deleteChat = async (chatId: string) => {
   return chat;
 };
 
+export const deleteChatsForUser = async (userId: string) => {
+  if (!userId) {
+    throw new InternalError("User ID not provided");
+  }
+  await dbClient.chat.updateMany({
+    where: {
+      userId,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+};
+
 export const updateChat = async (
   chatId: string,
   params: Prisma.ChatUpdateInput

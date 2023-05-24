@@ -127,6 +127,15 @@ export const deleteChatMutation = async (chatId: string) => {
   return response.data;
 };
 
+export const DELETE_CHATS = "DELETE_CHATS";
+export const clearConversationsMutation = async () => {
+  const response = await baseFetch({
+    url: `/chat/clear`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
 // Waitlist
 export const waitlistMutation = async ({ email }: { email: string }) => {
   const response = await baseFetch({

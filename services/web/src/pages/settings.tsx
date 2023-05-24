@@ -6,7 +6,7 @@ const SettingsPage = () => {
   return (
     <>
       <Head>
-        <title>Judie - Waitlist</title>
+        <title>Judie - Settings</title>
         <meta
           name="description"
           content="Welcome to Judie! We're here to help with your classes, from elementary english to college level maths."
