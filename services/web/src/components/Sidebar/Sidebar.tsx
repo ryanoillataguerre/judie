@@ -222,7 +222,11 @@ const SidebarChat = ({
           setEditingValue(value);
         }}
         onSubmit={async () => {
-          await editTitleMutation.mutateAsync({ title: editingValue });
+          if (editingValue !== getTitleForChat(chat, true)) {
+            await editTitleMutation.mutateAsync({
+              title: editingValue as string,
+            });
+          }
           setEditingValue("");
           setBeingEditedChatId(null);
         }}
@@ -374,12 +378,15 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               Are you sure you want to delete this chat?
             </Text>
             <Stack
-              direction={{ base: "column", md: "row" }}
+              direction={{ base: "column-reverse", md: "row" }}
               spacing={8}
               alignItems="center"
               justifyContent="center"
             >
-              <Button type="button">
+              <Button
+                type="button"
+                onClick={() => setIsClearConversationsModalOpen(false)}
+              >
                 <Text>Cancel</Text>
               </Button>
               <Button
@@ -388,7 +395,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                 onClick={async () => {
                   if (beingDeletedChatId) {
                     await deleteChat.mutateAsync(beingDeletedChatId);
-                    setIsBeingDeletedChatId(null);
+                    setBeingDeletedChatId(null);
                     refetch();
                   } else {
                     toast({
@@ -443,13 +450,15 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               This action is not reversible.
             </Text>
             <Stack
-              direction={{ base: "column", md: "row" }}
+              direction={{ base: "column-reverse", md: "row" }}
               spacing={8}
               alignItems="center"
               justifyContent="center"
-              onClick={() => setIsClearConversationsModalOpen(false)}
             >
-              <Button type="button">
+              <Button
+                type="button"
+                onClick={() => setIsClearConversationsModalOpen(false)}
+              >
                 <Text>Cancel</Text>
               </Button>
               <Button
