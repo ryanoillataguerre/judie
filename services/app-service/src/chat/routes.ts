@@ -148,6 +148,22 @@ router.put(
 );
 
 router.delete(
+  "/clear",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    await deleteChatsForUser(session.userId);
+
+    res.status(200).json({
+      data: { success: true },
+    });
+  })
+);
+
+router.delete(
   "/:chatId",
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
@@ -157,22 +173,6 @@ router.delete(
     }
     const { chatId } = req.params;
     await deleteChat(chatId);
-
-    res.status(200).json({
-      data: { success: true },
-    });
-  })
-);
-
-router.delete(
-  "/clear",
-  requireAuth,
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    if (!session.userId) {
-      throw new UnauthorizedError("No user id found in session");
-    }
-    await deleteChatsForUser(session.userId);
 
     res.status(200).json({
       data: { success: true },

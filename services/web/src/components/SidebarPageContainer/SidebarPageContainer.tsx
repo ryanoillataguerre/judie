@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Flex, Collapse } from "@chakra-ui/react";
 import Sidebar from "../Sidebar/Sidebar";
 import { BsChevronBarLeft, BsChevronBarRight } from "react-icons/bs";
+import useStorageState from "@judie/hooks/useStorageState";
 
 interface SidebarPageContainerProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ const OpenCloseButton = ({
       style={{
         position: "fixed",
         top: "2rem",
-        left: isOpen ? "22rem" : "2rem",
+        left: isOpen ? "20rem" : "2rem",
       }}
     >
       {isOpen ? (
@@ -40,7 +41,7 @@ const OpenCloseButton = ({
 };
 
 const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useStorageState<boolean>(false, "sidebarOpen");
   return (
     <Flex
       style={{

@@ -27,6 +27,7 @@ import {
   useColorModeValue,
   useDisclosure,
   useEditableControls,
+  useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { TfiTrash } from "react-icons/tfi";
@@ -88,15 +89,15 @@ const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
 
 const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
   if (chat.userTitle) {
-    const result = chat.userTitle.slice(0, 30);
-    if (result.length === 30) {
+    const result = chat.userTitle.slice(0, 25);
+    if (result.length === 25) {
       return result + "...";
     }
   }
   if (chat.messages?.[0]?.readableContent) {
     if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
       if (sliced) {
-        const result = chat.messages?.[0]?.readableContent.slice(0, 30);
+        const result = chat.messages?.[0]?.readableContent.slice(0, 25);
         if (result.length >= 30) {
           return result + "...";
         }
@@ -340,6 +341,8 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
     },
   ];
+  const toast = useToast();
+
   return isOpen ? (
     <>
       {/* Modals */}
@@ -383,11 +386,82 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                 bgColor="red"
                 type="button"
                 onClick={async () => {
-                  await deleteChat.mutateAsync(beingDeletedChatId);
-                  refetch();
+                  if (beingDeletedChatId) {
+                    await deleteChat.mutateAsync(beingDeletedChatId);
+                    setIsBeingDeletedChatId(null);
+                    refetch();
+                  } else {
+                    toast({
+                      title: "Error deleting chat",
+                      description: "Please try again",
+                      status: "error",
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  }
                 }}
               >
                 <Text color="white">Yes, delete it</Text>
+              </Button>
+            </Stack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      {/* Clear Chat Modal */}
+      <Modal
+        isOpen={isClearConversationsModalOpen}
+        onClose={() => setIsClearConversationsModalOpen(false)}
+        size={"md"}
+        autoFocus={true}
+      >
+        <ModalOverlay
+          bg="blackAlpha.300"
+          backdropFilter="blur(5px)"
+          px={"5%"}
+        />
+        <ModalContent py={8}>
+          <ModalBody
+            alignItems={"center"}
+            textAlign={"center"}
+            flexDirection="column"
+            justifyContent={"center"}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                marginBottom: "1rem",
+              }}
+            >
+              Are you sure you want to delete all of your chats?
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                marginBottom: "2rem",
+              }}
+            >
+              This action is not reversible.
+            </Text>
+            <Stack
+              direction={{ base: "column", md: "row" }}
+              spacing={8}
+              alignItems="center"
+              justifyContent="center"
+              onClick={() => setIsClearConversationsModalOpen(false)}
+            >
+              <Button type="button">
+                <Text>Cancel</Text>
+              </Button>
+              <Button
+                bgColor="red"
+                type="button"
+                onClick={async () => {
+                  await clearConversations.mutateAsync();
+                  setIsClearConversationsModalOpen(false);
+                  refetch();
+                }}
+              >
+                <Text color="white">Yes, delete all chats</Text>
               </Button>
             </Stack>
           </ModalBody>
