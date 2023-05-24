@@ -17,8 +17,13 @@ import {
   Input,
   Slide,
   Spinner,
+  Stack,
   Text,
   Tooltip,
+  Modal,
+  ModalBody,
+  ModalOverlay,
+  ModalContent,
   useColorModeValue,
   useDisclosure,
   useEditableControls,
@@ -104,12 +109,12 @@ const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
 
 const SidebarChat = ({
   chat,
-  setIsDeleteModalOpen,
+  setBeingDeletedChatId,
   setBeingEditedChatId,
   beingEditedChatId,
 }: {
   chat: ChatResponse;
-  setIsDeleteModalOpen: (chatId: string) => void;
+  setBeingDeletedChatId: (chatId: string) => void;
   setBeingEditedChatId: (chatId: string | null) => void;
   beingEditedChatId?: string | null;
 }) => {
@@ -127,7 +132,6 @@ const SidebarChat = ({
       }),
   });
 
-  console.log(beingEditedChatId);
   // const isEditing = beingEditedChatId === chat.id;
 
   const EditableControls = () => {
@@ -173,7 +177,9 @@ const SidebarChat = ({
           zIndex={100}
           {...(isEditing
             ? getCancelButtonProps()
-            : setIsDeleteModalOpen(chat.id))}
+            : {
+                onClick: () => setBeingDeletedChatId(chat.id),
+              })}
           icon={
             isEditing ? (
               <RxCross2 size={18} color={"#A3A3A3"} />
@@ -185,8 +191,6 @@ const SidebarChat = ({
       </Flex>
     );
   };
-
-  console.log(editingValue);
 
   return (
     <Button
@@ -251,34 +255,6 @@ const SidebarChat = ({
   );
 };
 
-// const CloseButton = ({ toggle }: { toggle: () => void }) => {
-//   return (
-//     <BsChevronBarLeft
-//       onClick={toggle}
-//       size={16}
-//       style={{
-//         position: "absolute",
-//         top: "2rem",
-//         right: "-2rem",
-//       }}
-//     />
-//   );
-// };
-
-// const OpenButton = ({ toggle }: { toggle: () => void }) => {
-//   return (
-//     <BsChevronBarRight
-//       onClick={toggle}
-//       size={16}
-//       style={{
-//         position: "absolute",
-//         top: "2rem",
-//         right: "-2rem",
-//       }}
-//     />
-//   );
-// };
-
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
@@ -291,7 +267,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const [beingDeletedChatId, setBeingDeletedChatId] = useState<string | null>(
     null
   );
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isClearConversationsModalOpen, setIsClearConversationsModalOpen] =
     useState<boolean>(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
@@ -314,7 +289,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const deleteChat = useMutation({
     mutationFn: deleteChatMutation,
     onSuccess: () => {
-      setIsDeleteModalOpen(false);
       setBeingDeletedChatId(null);
       refetch();
     },
@@ -335,12 +309,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       );
     },
   });
-
-  // Modal logic
-  const openDeleteModal = (chatId: string) => {
-    setBeingDeletedChatId(chatId);
-    setIsDeleteModalOpen(true);
-  };
 
   // TODO: Edit title of chat
   // TODO: Delete chat by ID
@@ -374,6 +342,58 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   ];
   return isOpen ? (
     <>
+      {/* Modals */}
+      {/* Deletion Modal */}
+      <Modal
+        isOpen={!!beingDeletedChatId}
+        onClose={() => setBeingDeletedChatId(null)}
+        size={"md"}
+        autoFocus={true}
+      >
+        <ModalOverlay
+          bg="blackAlpha.300"
+          backdropFilter="blur(5px)"
+          px={"5%"}
+        />
+        <ModalContent py={8}>
+          <ModalBody
+            alignItems={"center"}
+            textAlign={"center"}
+            flexDirection="column"
+            justifyContent={"center"}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                marginBottom: "2rem",
+              }}
+            >
+              Are you sure you want to delete this chat?
+            </Text>
+            <Stack
+              direction={{ base: "column", md: "row" }}
+              spacing={8}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Button type="button">
+                <Text>Cancel</Text>
+              </Button>
+              <Button
+                bgColor="red"
+                type="button"
+                onClick={async () => {
+                  await deleteChat.mutateAsync(beingDeletedChatId);
+                  refetch();
+                }}
+              >
+                <Text color="white">Yes, delete it</Text>
+              </Button>
+            </Stack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      {/* Sidebar content */}
       <Flex
         style={{
           width: "20rem",
@@ -467,7 +487,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                 key={chat.id}
                 beingEditedChatId={beingEditedChatId}
                 setBeingEditedChatId={(chatId) => setBeingEditedChatId(chatId)}
-                setIsDeleteModalOpen={(chatId) => openDeleteModal(chatId)}
+                setBeingDeletedChatId={(chatId) =>
+                  setBeingDeletedChatId(chatId)
+                }
               />
             ))}
           </Flex>
