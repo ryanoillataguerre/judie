@@ -27,13 +27,13 @@ const OpenCloseButton = ({
         <BsChevronBarLeft
           cursor={"pointer"}
           onClick={() => setIsOpen(false)}
-          size={16}
+          size={18}
         />
       ) : (
         <BsChevronBarRight
           cursor={"pointer"}
           onClick={() => setIsOpen(true)}
-          size={16}
+          size={18}
         />
       )}
     </Box>
