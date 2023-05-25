@@ -257,6 +257,9 @@ export const createGPTRequestFromPrompt = async ({
       // If subject, mutate prompt
       if (chat.subject) {
         defaultPrompt = subjectToPromptMap[chat.subject] || prompt;
+      } else {
+        // Set subject = default on chat
+        await updateChat(chat.id, { subject: "default" });
       }
       let defaultMessage = {
         content: defaultPrompt,
