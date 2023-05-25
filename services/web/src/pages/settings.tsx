@@ -8,7 +8,7 @@ import Head from "next/head";
 import { useQuery } from "react-query";
 
 const SettingsPage = () => {
-  const getBillingPortal = useQuery([GET_PORTAL_LINK], {
+  const getBillingPortal = useQuery(GET_PORTAL_LINK, {
     queryFn: getBillingPortalLinkQuery,
     enabled: false,
     onSuccess: (data) => {

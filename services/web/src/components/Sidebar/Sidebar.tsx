@@ -289,6 +289,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   // Clear all conversations mutation
   const clearConversations = useMutation({
     mutationFn: clearConversationsMutation,
+    onSuccess: () => {
+      refetch();
+    },
   });
 
   // Delete single chat mutation
@@ -302,6 +305,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const createChat = useMutation({
     mutationFn: createChatMutation,
     onSuccess: (data) => {
+      refetch();
       router.push(
         "/chat",
         {

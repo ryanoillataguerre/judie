@@ -158,11 +158,11 @@ export const sessionLayer = () =>
       maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
       path: "/",
       domain: isProduction()
-        ? "app.judie.io"
+        ? "judie.io"
         : isSandbox()
-        ? "app.sandbox.judie.io"
+        ? "sandbox.judie.io"
         : undefined,
-      ...(isProduction() || isSandbox() ? { sameSite: "none" } : {}),
+      ...(isProduction() || isSandbox() ? { sameSite: "strict" } : {}),
     },
   });
 

@@ -44,8 +44,8 @@ export default function useAuth({
       path: "/",
       domain: !isLocal()
         ? isSandbox()
-          ? "app.sandbox.judie.io"
-          : "app.judie.io"
+          ? "sandbox.judie.io"
+          : "judie.io"
         : undefined,
     });
     setSessionCookie(undefined);
