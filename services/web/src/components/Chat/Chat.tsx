@@ -8,6 +8,7 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
+  return <></>;
   // const chatContext = useChatContext();
   // return (
   //   <div className={styles.chatContainer}>
