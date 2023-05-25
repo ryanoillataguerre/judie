@@ -39,6 +39,7 @@ const SubscribeCard = ({
         cursor: "pointer",
       }}
       boxShadow="md"
+      onClick={loading ? () => {} : onClick}
     >
       {loading ? (
         <Spinner height={12} width={12} colorScheme={"teal"} />
