@@ -141,18 +141,12 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
     mutationFn: createChatMutation,
     onSuccess: (data) => {
       existingChatQuery.refetch();
-      router.push(
-        "/chat",
-        {
-          query: {
-            id: data.id,
-          },
-          pathname: "/chat",
+      router.push({
+        query: {
+          id: data.id,
         },
-        {
-          shallow: true,
-        }
-      );
+        pathname: "/chat",
+      });
     },
   });
 

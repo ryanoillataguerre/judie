@@ -275,7 +275,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const activeIconIndex = getActiveIconIndex(router.pathname);
-  const [activeIcon, setActiveIcon] = useState<number>(activeIconIndex);
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
     null
@@ -285,7 +284,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   );
   const [isClearConversationsModalOpen, setIsClearConversationsModalOpen] =
     useState<boolean>(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
   // Existing user chats
   const {
     data,
