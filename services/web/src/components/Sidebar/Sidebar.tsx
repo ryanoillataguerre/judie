@@ -407,10 +407,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               alignItems="center"
               justifyContent="center"
             >
-              <Button
-                type="button"
-                onClick={() => setIsClearConversationsModalOpen(false)}
-              >
+              <Button type="button" onClick={() => setBeingDeletedChatId(null)}>
                 <Text>Cancel</Text>
               </Button>
               <Button

@@ -1,11 +1,9 @@
-import { GetServerSidePropsContext } from "next";
-import styles from "../../styles/Chat.module.scss";
 import Head from "next/head";
-import Sidebar from "@judie/components/Sidebar/Sidebar";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
+import Chat from "@judie/components/Chat/Chat";
+import { ChatContext } from "@judie/data/contexts/ChatContext";
 
 interface ChatPageProps {
   query?: string;
@@ -27,19 +25,12 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <SidebarPageContainer>
-          {/* <Chat chatId={router.query.chatId as string} initialQuery={query} /> */}
+          <Chat
+            chatId={router.query.chatId as string | undefined}
+            initialQuery={query}
+          />
         </SidebarPageContainer>
       </main>
     </>
   );
 }
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   // Get query parameter "query" and pass in as a prop
-//   const query = context.query.query;
-//   return {
-//     props: {
-//       query: query || null,
-//     },
-//   };
-// }

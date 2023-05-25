@@ -20,7 +20,7 @@ const OpenCloseButton = ({
       style={{
         position: "fixed",
         top: "2rem",
-        left: isOpen ? "19rem" : "2rem",
+        left: isOpen ? "18.5rem" : "1.5rem",
       }}
     >
       {isOpen ? (
@@ -55,6 +55,7 @@ const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
         style={{
           width: "100%",
           height: "100%",
+          padding: "0 1rem",
         }}
       >
         <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />
