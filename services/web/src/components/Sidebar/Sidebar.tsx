@@ -76,7 +76,7 @@ interface SidebarButtonProps {
 }
 const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   return (
-    <Button colorScheme="white" variant={"ghost"} onClick={onClick}>
+    <Button variant={"ghost"} onClick={onClick}>
       {icon}
       <Text
         style={{
@@ -314,6 +314,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           query: {
             id: data.id,
           },
+          pathname: "/chat",
         },
         {
           shallow: true,
@@ -357,7 +358,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
               display: "flex",
               width: "100%",
               alignItems: "center",
-              padding: "0.5rem 0",
+              padding: "1rem 0",
             }}
           >
             <UpgradeButton />

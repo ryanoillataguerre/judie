@@ -6,22 +6,19 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
-  useDisclosure,
   Text,
   Flex,
   Box,
   useColorModeValue,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
-import styles from "./Paywall.module.scss";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SubscriptionStatus } from "@judie/data/types/api";
-import { useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
 import {
   CREATE_CHECKOUT_SESSION,
   createCheckoutSessionMutation,
 } from "@judie/data/mutations";
-import { useRouter } from "next/router";
 
 const SubscribeCard = ({
   onClick,
@@ -37,6 +34,7 @@ const SubscribeCard = ({
         width: "100%",
         height: "100%",
         cursor: "pointer",
+        borderRadius: "0.5rem",
       }}
       boxShadow="md"
       onClick={loading ? () => {} : onClick}
