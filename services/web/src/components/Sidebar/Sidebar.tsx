@@ -96,6 +96,7 @@ const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
     if (result.length === 25) {
       return result + "...";
     }
+    return result;
   }
   if (chat.messages?.[0]?.readableContent) {
     if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
@@ -283,9 +284,10 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     data,
     refetch,
     isLoading: isGetChatsLoading,
-  } = useQuery(GET_USER_CHATS, {
+  } = useQuery([GET_USER_CHATS, auth?.userData?.id], {
     queryFn: getUserChatsQuery,
     staleTime: 60000,
+    enabled: !!auth?.userData?.id,
   });
 
   // Clear all conversations mutation
