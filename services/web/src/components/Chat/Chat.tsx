@@ -28,8 +28,19 @@ const Chat = ({
   if (loading) {
     return <LoadingScreen />;
   }
-  if (!chat) {
-    return <SubjectSelector selectSubject={submitSubject} />;
+  if (!chat || !chat.subject) {
+    return (
+      <Flex
+        style={{
+          width: "100%",
+          height: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <SubjectSelector selectSubject={submitSubject} />
+      </Flex>
+    );
   }
   // TODO:
   // Do we display welcome?

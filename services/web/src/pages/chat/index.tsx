@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
 import Chat from "@judie/components/Chat/Chat";
 import { ChatContext } from "@judie/data/contexts/ChatContext";
+import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
 
 interface ChatPageProps {
   query?: string;
@@ -25,6 +26,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <SidebarPageContainer>
+          <ChatNavbar />
           <Chat
             chatId={router.query.id as string | undefined}
             initialQuery={query}
