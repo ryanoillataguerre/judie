@@ -7,6 +7,10 @@ import {
   ModalOverlay,
   Spinner,
   useDisclosure,
+  Text,
+  Flex,
+  Box,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import styles from "./Paywall.module.scss";
@@ -19,7 +23,6 @@ import {
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 
-// TODO: Migrate
 const SubscribeCard = ({
   onClick,
   loading,
@@ -27,33 +30,113 @@ const SubscribeCard = ({
   onClick: () => void;
   loading: boolean;
 }) => {
+  const cardHoverBgColor = useColorModeValue("gray.200", "gray.800");
   return (
-    // TODO: WTF?
-    // eslint-disable-next-line
-    <div
-      className={styles.subscribeCard}
-      onClick={loading ? () => {} : onClick}
+    <Flex
+      style={{
+        width: "100%",
+        height: "100%",
+        cursor: "pointer",
+      }}
+      boxShadow="md"
     >
       {loading ? (
-        <Spinner height={12} width={12} color={"#3d7d72"} />
+        <Spinner height={12} width={12} colorScheme={"teal"} />
       ) : (
-        <>
-          <div className={styles.priceContainer}>
-            <h1 className={styles.price}>$29</h1>
-            <p className={styles.priceInterval}>/mo</p>
-          </div>
-          <div className={styles.descriptionContainer}>
-            <h1>Judie Premium</h1>
-            <p>
+        <Flex
+          style={{
+            width: "100%",
+            height: "100%",
+            flexDirection: "row",
+            padding: "1rem",
+            borderRadius: "0.5rem",
+          }}
+          _hover={{
+            backgroundColor: cardHoverBgColor,
+            transition: "all .2s ease-in-out",
+          }}
+        >
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 600,
+                marginRight: ".2rem",
+              }}
+            >
+              $29
+            </Text>
+            <Text
+              style={{
+                fontSize: "1rem",
+                fontWeight: 600,
+                marginRight: "1rem",
+              }}
+            >
+              /mo
+            </Text>
+          </Box>
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 600,
+              }}
+            >
+              Judie Premium
+            </Text>
+            <Text
+              style={{
+                fontSize: "0.8rem",
+                fontWeight: 500,
+              }}
+            >
               Unlimited questions, study guides, more tailored responses,
               customized quizzes coming soon, and more.
-            </p>
-          </div>
-        </>
+            </Text>
+          </Box>
+        </Flex>
       )}
-    </div>
+    </Flex>
   );
+  // <div
+  //   className={styles.subscribeCard}
+  //   onClick={loading ? () => {} : onClick}
+  // >
+  //   {loading ? (
+  //     <Spinner height={12} width={12} color={"#3d7d72"} />
+  //   ) : (
+  //     <>
+  // <div className={styles.priceContainer}>
+  //   <h1 className={styles.price}>$29</h1>
+  //   <p className={styles.priceInterval}>/mo</p>
+  // </div>
+  // <div className={styles.descriptionContainer}>
+  //   <h1>Judie Premium</h1>
+  //   <p>
+  //     Unlimited questions, study guides, more tailored responses,
+  //     customized quizzes coming soon, and more.
+  //   </p>
+  // </div>
+  //     </>
+  //   )}
+  // </div>
 };
+
 const Paywall = ({
   isOpen,
   setIsOpen,
@@ -101,12 +184,24 @@ const Paywall = ({
     <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size={"xl"}>
       <ModalOverlay />
       <ModalContent>
-        <div className={styles.modalContentContainer}>
+        <Flex
+          style={{
+            flexDirection: "column",
+            alignItems: "flex-start",
+            width: "100%",
+            padding: "1rem",
+          }}
+        >
           <ModalHeader>
-            <h1>
+            <Text
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 600,
+              }}
+            >
               Thank you for checking out Judie! We&apos;re so glad you&apos;re
               here learning with us 🎉
-            </h1>
+            </Text>
           </ModalHeader>
           <ModalBody>
             <p>
@@ -124,7 +219,7 @@ const Paywall = ({
           <ModalFooter>
             <SubscribeCard onClick={onClick} loading={loading} />
           </ModalFooter>
-        </div>
+        </Flex>
       </ModalContent>
     </Modal>
   );

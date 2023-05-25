@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { SubscriptionStatus, User } from "@judie/data/types/api";
 import {
   BsChevronRight,
   BsClockHistory,
@@ -54,6 +55,7 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { AiOutlineCheck } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
+import UpgradeButton from "../UpgradeButton/UpgradeButton";
 
 const getActiveIconIndex = (path: string) => {
   switch (true) {
@@ -320,32 +322,51 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
 
-  const footerIcons: SidebarButtonProps[] = [
-    {
-      icon: <TfiTrash />,
-      label: "Clear Conversations",
-      onClick: () => {
-        setIsClearConversationsModalOpen(true);
+  const footerIcons: SidebarButtonProps[] = useMemo(() => {
+    const options = [
+      {
+        icon: <TfiTrash />,
+        label: "Clear Conversations",
+        onClick: () => {
+          setIsClearConversationsModalOpen(true);
+        },
       },
-    },
-    {
-      icon: <FiSettings />,
-      label: "Settings",
-      onClick: () => {
-        router.push("/settings", undefined, { shallow: true });
+      {
+        icon: <FiSettings />,
+        label: "Settings",
+        onClick: () => {
+          router.push("/settings", undefined, { shallow: true });
+        },
       },
-    },
-    {
-      icon: <RiLogoutBoxLine />,
-      label: "Logout",
-      onClick: () => {
-        auth.logout();
+      {
+        icon: <RiLogoutBoxLine />,
+        label: "Logout",
+        onClick: () => {
+          auth.logout();
+        },
       },
-    },
-    {
-      icon: <ColorModeSwitcher />,
-    },
-  ];
+      {
+        icon: <ColorModeSwitcher />,
+      },
+    ];
+    if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE)) {
+      options.push({
+        icon: (
+          <Box
+            style={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              padding: "0.5rem 0",
+            }}
+          >
+            <UpgradeButton />
+          </Box>
+        ),
+      });
+    }
+    return options;
+  }, [auth, router, setIsClearConversationsModalOpen]);
   const toast = useToast();
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
@@ -597,8 +618,10 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             }}
           />
           {footerIcons.map((iconData) => {
-            return (
+            return iconData.label ? (
               <SidebarButton key={iconData.label as string} {...iconData} />
+            ) : (
+              iconData.icon
             );
           })}
         </Flex>

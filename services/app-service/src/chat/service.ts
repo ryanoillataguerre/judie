@@ -42,7 +42,6 @@ export const deleteChatsForUser = async (userId: string) => {
   if (!userId) {
     throw new InternalError("User ID not provided");
   }
-  console.log("deleting chats");
   await dbClient.chat.updateMany({
     where: {
       userId,
