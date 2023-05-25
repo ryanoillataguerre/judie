@@ -101,6 +101,7 @@ router.get(
 
 router.post(
   "/",
+  [body("subject").optional()],
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -113,6 +114,7 @@ router.post(
           id: session.userId,
         },
       },
+      subject: req.body?.subject || undefined,
     });
 
     res.status(200).json({

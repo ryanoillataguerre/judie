@@ -3,7 +3,7 @@ import useChat from "@judie/hooks/useChat";
 
 const ChatNavbar = ({ chatId }: { chatId?: string }) => {
   const chat = useChat({ chatId });
-  const bgColor = useColorModeValue("#D1E7E4", "#3D3E44");
+  const bgColor = useColorModeValue("#D1E7E4", "#3E4756");
   const subject = chat.chat?.subject;
   return (
     <Flex
@@ -19,7 +19,7 @@ const ChatNavbar = ({ chatId }: { chatId?: string }) => {
       {subject && (
         <Text
           style={{
-            fontSize: "1rem",
+            fontSize: "0.8rem",
             fontWeight: 400,
           }}
         >

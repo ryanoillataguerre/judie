@@ -26,7 +26,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <SidebarPageContainer>
-          <ChatNavbar />
+          <ChatNavbar chatId={router.query.id as string | undefined} />
           <Chat
             chatId={router.query.id as string | undefined}
             initialQuery={query}

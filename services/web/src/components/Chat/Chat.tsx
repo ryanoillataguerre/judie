@@ -1,4 +1,4 @@
-import { Box, Flex, VStack } from "@chakra-ui/react";
+import { Box, Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import { useState } from "react";
 // import { useChatContext } from "@judie/data/contexts/ChatContext";
 import useChat from "@judie/hooks/useChat";
@@ -24,7 +24,10 @@ const Chat = ({
   initialQuery?: string;
 }) => {
   const { chat, loading, submitSubject } = useChat({ chatId });
-  console.log(chat);
+  const subjectSelectorWidth = useBreakpointValue({
+    base: "100%",
+    md: "40%",
+  });
   if (loading) {
     return <LoadingScreen />;
   }
@@ -32,13 +35,28 @@ const Chat = ({
     return (
       <Flex
         style={{
-          width: "100%",
           height: "100%",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          padding: "1rem 1rem 1rem 2rem",
         }}
       >
-        <SubjectSelector selectSubject={submitSubject} />
+        <Flex width={subjectSelectorWidth}>
+          <Text
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: 600,
+              marginBottom: "2rem",
+            }}
+          >
+            What would you like to chat about?
+          </Text>
+        </Flex>
+        <SubjectSelector
+          width={subjectSelectorWidth}
+          selectSubject={submitSubject}
+        />
       </Flex>
     );
   }

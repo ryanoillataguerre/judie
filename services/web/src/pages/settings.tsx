@@ -32,7 +32,7 @@ const SettingsPage = () => {
             style={{
               height: "100%",
               width: "100%",
-              padding: "2rem",
+              padding: "1rem 1rem 1rem 2rem",
               flexDirection: "column",
               alignItems: "flex-start",
               justifyContent: "flex-start",

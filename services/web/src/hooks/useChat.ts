@@ -1,6 +1,7 @@
 import {
   ChatResponse,
   completionFromQueryMutation,
+  createChatMutation,
   putChatMutation,
 } from "@judie/data/mutations";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
@@ -10,6 +11,8 @@ import useAuth from "./useAuth";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
+import useStorageState from "./useStorageState";
+import { useRouter } from "next/router";
 
 export interface TempMessage {
   type?: MessageType.BOT | MessageType.USER;
@@ -33,27 +36,40 @@ interface UseChatData {
 const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
   const auth = useAuth();
   const toast = useToast();
+  const router = useRouter();
   const [displayWelcome, setDisplayWelcome] = useState(true);
   const [messages, setMessages] = useState<UIMessageType[]>([]);
-  const [beingStreamedMessage, setBeingStreamedMessage] = useState<
+  const [beingStreamedMessage, setBeingStreamedMessage] = useStorageState<
     string | undefined
-  >(undefined);
+  >(undefined, "beingStreamedMessage");
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
 
   const streamCallback = (message: string) => {
     setBeingStreamedMessage((prev) => prev + message);
   };
   const completionMutation = useMutation({
-    mutationFn: ({ query }: { query: string }) =>
-      completionFromQueryMutation({
-        query,
-        chatId,
-        setChatValue: streamCallback,
-        onStreamEnd: () => {
-          auth.refresh();
-          existingChatQuery.refetch();
-        },
-      }),
+    mutationFn: ({ query }: { query: string }) => {
+      if (chatId) {
+        return completionFromQueryMutation({
+          query,
+          chatId,
+          setChatValue: streamCallback,
+          onStreamEnd: () => {
+            auth.refresh();
+            existingChatQuery.refetch();
+          },
+        });
+      } else {
+        toast({
+          title: "Oops!",
+          description:
+            "Something went wrong, please create a new chat or refresh.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+    },
     onError: (err: HTTPResponseError) => {
       if (err.response?.status === 429) {
         // Rate limited - user is out of questions for the day
@@ -72,7 +88,8 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
-    queryFn: () => getChatByIdQuery(chatId),
+    enabled: !!chatId && !beingStreamedMessage,
+    queryFn: () => getChatByIdQuery(chatId as string),
     onSuccess: (data) => {
       if (data?.subject || data?.messages?.length > 0) {
         setDisplayWelcome(false);
@@ -94,7 +111,16 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
         setBeingStreamedMessage(undefined);
       }
     },
-    enabled: !!chatId && !beingStreamedMessage,
+    onError: (err: HTTPResponseError) => {
+      toast({
+        title: "Oops!",
+        description: err.message || "Something went wrong, please try again.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      router.push("/chat");
+    },
   });
 
   const putChat = useMutation({
@@ -109,6 +135,25 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
       });
     },
     retry: false,
+  });
+
+  const createChat = useMutation({
+    mutationFn: createChatMutation,
+    onSuccess: (data) => {
+      existingChatQuery.refetch();
+      router.push(
+        "/chat",
+        {
+          query: {
+            id: data.id,
+          },
+          pathname: "/chat",
+        },
+        {
+          shallow: true,
+        }
+      );
+    },
   });
 
   const addMessage = async (prompt: string) => {
@@ -151,14 +196,11 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
   // User sets a subject from the chat window
   const submitSubject = async (subject: string) => {
     if (!chatId) {
-      toast({
-        title: "Oops!",
-        description:
-          "Something went wrong, please create a new chat or refresh.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
+      // Create a chat
+      await createChat.mutateAsync({
+        subject,
       });
+      return;
     }
     await putChat.mutateAsync({
       chatId,
@@ -184,7 +226,8 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
     beingStreamedMessage,
     displayWelcome,
     paywallOpen,
-    existingChatQuery,
+    existingChatQuery.data,
+    existingChatQuery.isLoading,
     submitSubject,
   ]);
   return memoizedValue;
