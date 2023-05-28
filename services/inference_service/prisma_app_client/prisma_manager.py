@@ -1,15 +1,43 @@
 from typing import Optional
-from prisma import Prisma
+import prisma
+from typing import List, Dict
 
 
-def get_chat(chat_id: str, app_db: Optional[Prisma] = None):
+def get_chat(
+    chat_id: str, app_db: Optional[prisma.Prisma] = None
+) -> List[prisma.models.Message]:
     if not app_db:
-        app_db = Prisma()
+        app_db = prisma.Prisma()
 
-    await app_db.connect()
-    chats = await app_db.chat.find_many(
+    app_db.connect()
+
+    chats = app_db.message.find_many(
         where={
-            "id": chat_id,
+            "chatId": chat_id,
         },
     )
+
+    chats = sorted(chats, key=lambda x: x.createdAt)
     return chats
+
+
+def get_chat_openai_fmt(
+    chat_id: str, app_db: Optional[prisma.Prisma] = None
+) -> List[Dict]:
+    chats = get_chat(chat_id=chat_id, app_db=app_db)
+
+    chats_fmtd = []
+
+    for chat in chats:
+        if chat.type == "USER":
+            role = "user"
+        elif chat.type == "BOT":
+            role = "assistant"
+        else:
+            continue
+        chats_fmtd.append({"role": role, "content": chat.content})
+    return chats_fmtd
+
+
+def get_chat_local():
+    raise NotImplementedError
