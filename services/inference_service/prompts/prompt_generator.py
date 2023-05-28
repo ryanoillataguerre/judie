@@ -6,7 +6,8 @@ TOTAL_PROMPT_LIMIT = 7000
 
 
 def generate_question_answer_prompt(
-    question: str, subject_modifier: str = None, chat_history: Optional[List] = None
+    question: str,
+    subject_modifier: str = None,
 ) -> str:
     try:
         if subject_modifier:

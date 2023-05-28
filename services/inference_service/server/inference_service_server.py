@@ -23,7 +23,9 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     """
 
     def GetChatResponse(self, request, context) -> None:
-        for part in judie.yield_judie_response(request.chat_id):
+        for part in judie.yield_judie_response(
+            request.chat_id, subject=request.subject
+        ):
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
     def ServerConnectionCheck(self, request, context):
