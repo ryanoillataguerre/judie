@@ -28,18 +28,4 @@ def generate_question_answer_prompt(
             context_block,
         ]
     )
-    # print(subject_plus_context)
-
-    if chat_history:
-        for i, c in enumerate(reversed(chat_history)):
-            if i > 0:
-                # create chat block in reverse history in Question: Answer: format excluding final
-                # query
-                pass
-            break
-
-    prompt_context_and_question = subject_plus_context + "\n Question:\n" + question
-    print("Full prompt:")
-    print(prompt_context_and_question)
-
     return {"subject": subject_plus_context}

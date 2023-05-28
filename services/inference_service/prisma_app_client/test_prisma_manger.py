@@ -15,6 +15,13 @@ def test_get_chat(env_setup):
         print(i)
         print()
 
+    def yield_none():
+        yield None
+        return None
+
+    for i in yield_none():
+        print(i)
+
 
 def test_get_chat_openai(env_setup):
     chats = prisma_manager.get_chat_openai_fmt(

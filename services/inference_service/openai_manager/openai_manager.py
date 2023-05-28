@@ -1,4 +1,5 @@
 import openai
+from typing import List, Dict
 
 CHAT_MODEL = "gpt-4-0314"
 
@@ -22,3 +23,9 @@ def get_gpt_response(messages=None):
                 # catch any other attribute error other than missing `content`. That is expected
                 # on the first and last messages
                 print(f"ATTRIBUTE ERROR: {e}")
+
+
+def concat_sys_and_messages_openai(sys_prompt: str, messages: List[Dict]) -> List[Dict]:
+    full_messages = [{"role": "system", "content": sys_prompt}]
+    full_messages.extend(messages)
+    return full_messages

@@ -6,8 +6,7 @@ import pinecone
 import openai
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
-from inference_service.prompts import prompt_generator
-from inference_service.openai_manager import openai_manager
+from inference_service.server import judie
 
 
 def setup_env():
@@ -24,15 +23,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     """
 
     def GetChatResponse(self, request, context) -> None:
-        print(request.turns[-1].message)
-        prompt = prompt_generator.generate_question_answer_prompt(
-            question=request.turns[-1].message
-        )
-        logger.info(f"Full prompt: {prompt}")
-
-        openai_response = openai_manager.get_gpt_response()
-
-        for part in openai_response:
+        for part in judie.yield_judie_response(request.chat_id):
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
     def ServerConnectionCheck(self, request, context):
@@ -55,7 +46,7 @@ def serve():
     setup_env()
 
     server.start()
-    logger.info(f"Inference GRPC server running at on port {grpc_port}")
+    logger.info(f"Inference GRPC server running on port {grpc_port}")
     server.wait_for_termination()
     logger.info("Server ded")
 
