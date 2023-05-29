@@ -5,7 +5,6 @@ import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
 import { subjectToNamespaceMap, subjectToPromptMap } from "./consts.js";
-import { incrementUserQuestionsAsked } from "../user/service.js";
 import { IncomingMessage } from "http";
 import { Response } from "express";
 

@@ -1,8 +1,8 @@
 import { Flex, useColorModeValue, Text } from "@chakra-ui/react";
 import useChat from "@judie/hooks/useChat";
 
-const ChatNavbar = ({ chatId }: { chatId?: string }) => {
-  const chat = useChat({ chatId });
+const ChatNavbar = () => {
+  const chat = useChat();
   const bgColor = useColorModeValue("#D1E7E4", "#3E4756");
   const subject = chat.chat?.subject;
   return (

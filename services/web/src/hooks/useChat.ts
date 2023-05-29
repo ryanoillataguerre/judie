@@ -8,7 +8,7 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
-import { useEffect, useMemo, useState } from "react";
+import {  useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
@@ -23,6 +23,7 @@ export interface TempMessage {
 type UIMessageType = Message | TempMessage;
 
 interface UseChatData {
+  activeChatId?: string;
   chat?: ChatResponse;
   loading: boolean;
   addMessage: (message: string) => void;
@@ -33,7 +34,7 @@ interface UseChatData {
   submitSubject: (subject: string) => void;
 }
 
-const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
+const useChat = (): UseChatData => {
   const auth = useAuth();
   const toast = useToast();
   const router = useRouter();
@@ -43,6 +44,11 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
     string | undefined
   >(undefined, "beingStreamedMessage");
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
+
+  const chatId = useMemo(() => {
+    return router.query.id as string;
+  }, [router.query.id]);
+
 
   const streamCallback = (message: string) => {
     setBeingStreamedMessage((prev) => prev + message);
@@ -152,10 +158,11 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
 
   const addMessage = async (prompt: string) => {
     // Guard clauses
-    if (prompt.length === 0) {
+    if (!prompt || prompt.length === 0) {
       return;
     }
     if (!chatId) {
+      console.error("No chatId found")
       toast({
         title: "Oops!",
         description:
@@ -166,6 +173,7 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
       });
     }
     if ((beingStreamedMessage?.length || 0) > 0) {
+      console.error("Previous message not finished")
       toast({
         title: "Please wait for the previous message to respond",
         status: "warning",
@@ -174,6 +182,7 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
       });
       return;
     }
+    
     // Add TempMessage to messages arr
     setMessages((prev) => [
       ...prev,
@@ -213,6 +222,7 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
       displayWelcome,
       paywallOpen,
       submitSubject,
+      activeChatId: chatId,
     };
   }, [
     addMessage,
@@ -223,6 +233,7 @@ const useChat = ({ chatId }: { chatId?: string }): UseChatData => {
     existingChatQuery.data,
     existingChatQuery.isLoading,
     submitSubject,
+    chatId,
   ]);
   return memoizedValue;
 };

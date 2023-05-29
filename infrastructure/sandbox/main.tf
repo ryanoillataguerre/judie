@@ -148,10 +148,16 @@ resource "google_sql_database_instance" "core" {
   depends_on       = [google_service_networking_connection.private_vpc_connection]
 }
 
+resource "random_password" "password" {
+  length           = 32
+  special          = true
+  override_special = "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+}
+
 resource "google_sql_user" "core_db_master_user" {
   instance = google_sql_database_instance.core.name
   name     = "postgres"
-  password = var.db_password
+  password = random_password.password.result
 }
 
 # Redis Instance
@@ -201,7 +207,7 @@ resource "google_cloud_run_service" "app-service" {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
           name = "DATABASE_URL"
-          value = "postgres://postgres:${var.db_password}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
+          value = "postgres://postgres:${random_password.password.result}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
         }
         env {
           name = "REDIS_HOST"
