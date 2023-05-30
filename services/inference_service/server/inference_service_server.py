@@ -22,10 +22,11 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     Class to define the behavior of the Inference Service
     """
 
-    def GetChatResponse(self, request, context) -> None:
-        for part in judie.yield_judie_response(
-            request.chat_id, subject=request.subject
-        ):
+    def GetChatResponse(self, request, context):
+        logger.info(f"Request: \n{request}")
+
+        response = judie.yield_judie_response(request.chat_id, subject=request.subject)
+        for part in response:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
     def ServerConnectionCheck(self, request, context):

@@ -1,10 +1,13 @@
 import openai
 from typing import List, Dict
+import logging
 
 CHAT_MODEL = "gpt-4-0314"
 
+logger = logging.getLogger("inference_logger")
 
-def get_gpt_response(messages=None):
+
+def get_gpt_response(messages=None, modifier_config: Dict = None):
     chat_response = openai.ChatCompletion.create(
         model=CHAT_MODEL,
         messages=messages,
@@ -22,7 +25,7 @@ def get_gpt_response(messages=None):
             except AttributeError as e:
                 # catch any other attribute error other than missing `content`. That is expected
                 # on the first and last messages
-                print(f"ATTRIBUTE ERROR: {e}")
+                logger.info(f"ATTRIBUTE ERROR: {e}")
 
 
 def concat_sys_and_messages_openai(sys_prompt: str, messages: List[Dict]) -> List[Dict]:

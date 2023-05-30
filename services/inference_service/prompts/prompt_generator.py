@@ -29,4 +29,4 @@ def generate_question_answer_prompt(
             context_block,
         ]
     )
-    return {"subject": subject_plus_context}
+    return subject_plus_context

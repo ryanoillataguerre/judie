@@ -24,4 +24,4 @@ if __name__ == "__main__":
             )
         )
         for part in response:
-            print("Client received: " + str(part.responsePart))
+            print(str(part.responsePart), end="", flush=True)
