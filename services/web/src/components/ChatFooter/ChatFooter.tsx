@@ -1,51 +1,58 @@
-import { Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
+import { Button, Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
 import useChat from "@judie/hooks/useChat";
-import { FormEvent,useCallback,  FormEventHandler, useState } from "react";
+import { FormEvent,useCallback, useState, useRef, useEffect } from "react";
 import { BsSend } from "react-icons/bs";
 
 const SendButton = () => {
-  const chat = useChat()
-  const fill = useColorModeValue(
-    '#C0C1C4',
-    '#343541'
-  )
   return (
-    <Box
+    <Button
+      type="submit"
+      colorScheme="teal"
       style={{
         padding: "0 0.5rem",
         height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        borderRadius: "0 0.5rem 0.5rem 0",
       }}
     >
-      <BsSend fill={fill} size={18} />
-    </Box>
-
+      <BsSend fill={"white"} size={18} />
+    </Button>
   )
 }
 const ChatInput = () => {
-  const { addMessage} = useChat();
+  const { addMessage, chat} = useChat();
   const [chatValue, setChatValue] = useState<string>("")
-  const onSubmit = useCallback((e: FormEvent<HTMLFormElement>
-    ) => {
+  const onSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     addMessage(chatValue);
     setChatValue("");
   }, [addMessage])
+
+  // Autofocus the input once a user has set a subject
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current && chat?.subject) {
+      ref.current.focus();
+    }
+  }, [chat?.subject, ref]);
 
   return (
     <form onSubmit={onSubmit}>
     <InputGroup>
     <LightMode>
     <Input
+    autoFocus={chat?.subject ? true : false}
+    ref={ref}
     value={chatValue}
+    _hover={{
+      borderColor: "teal",
+    }}
     onChange={(e) => setChatValue(e.target.value)}
-      colorScheme="white"
       placeholder="Ask Judie anything..."
       style={{
         width: "100%",
-        backgroundColor: "white"
       }}
     />
     </LightMode>

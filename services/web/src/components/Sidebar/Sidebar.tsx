@@ -303,9 +303,10 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
 
+  console.log(beingDeletedChatId)
   // Delete single chat mutation
   const deleteChat = useMutation({
-    mutationFn: deleteChatMutation,
+    mutationFn: () => deleteChatMutation(beingDeletedChatId || ""),
     onSuccess: () => {
       setBeingDeletedChatId(null);
       refetch();
@@ -424,9 +425,12 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                 type="button"
                 onClick={async () => {
                   if (beingDeletedChatId) {
-                    await deleteChat.mutateAsync(beingDeletedChatId);
+                    await deleteChat.mutateAsync();
                     setBeingDeletedChatId(null);
                     refetch();
+                    if (router.pathname === "/chat" && router.query.id === beingDeletedChatId) {
+                      router.push("/chat");
+                    }
                   } else {
                     toast({
                       title: "Error deleting chat",

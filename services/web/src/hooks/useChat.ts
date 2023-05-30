@@ -8,7 +8,7 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
-import {  useMemo, useState } from "react";
+import {  useEffect, useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
@@ -51,17 +51,20 @@ const useChat = (): UseChatData => {
 
 
   const streamCallback = (message: string) => {
+    console.log(beingStreamedMessage)
     setBeingStreamedMessage((prev) => prev + message);
   };
   const completionMutation = useMutation({
     mutationFn: ({ query }: { query: string }) => {
       if (chatId) {
+        setBeingStreamedMessage(undefined);
         return completionFromQueryMutation({
           query,
           chatId,
           setChatValue: streamCallback,
           onStreamEnd: () => {
             auth.refresh();
+            setBeingStreamedMessage(undefined);
             existingChatQuery.refetch();
           },
         });
@@ -92,9 +95,14 @@ const useChat = (): UseChatData => {
     retry: false,
   });
 
+  useEffect(() => {
+    setBeingStreamedMessage(undefined);
+  }, [chatId])
+
+
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
-    enabled: !!chatId && !beingStreamedMessage,
+    enabled: !!chatId && !beingStreamedMessage?.length,
     queryFn: () => getChatByIdQuery(chatId as string),
     onSuccess: (data) => {
       if (data?.subject || data?.messages?.length > 0) {
@@ -105,7 +113,6 @@ const useChat = (): UseChatData => {
       setMessages(data?.messages);
       if (
         !completionMutation.isLoading &&
-        !beingStreamedMessage &&
         data?.messages?.length > 0
       ) {
         setMessages((prev) => {
@@ -129,6 +136,7 @@ const useChat = (): UseChatData => {
     },
   });
 
+  // console.log('data', existingChatQuery.data)
   const putChat = useMutation({
     mutationFn: putChatMutation,
     onError: (err: HTTPResponseError) => {
@@ -146,7 +154,6 @@ const useChat = (): UseChatData => {
   const createChat = useMutation({
     mutationFn: createChatMutation,
     onSuccess: (data) => {
-      existingChatQuery.refetch();
       router.push({
         query: {
           id: data.id,

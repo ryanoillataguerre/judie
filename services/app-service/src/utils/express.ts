@@ -59,7 +59,7 @@ export const messageRateLimit = async (
   req: Request,
   _: Response,
   next: NextFunction
-) => {
+) => errorPassthrough(async (req: Request, _: Response, next: NextFunction) => {
   const userId = req.session?.userId;
   if (!userId) {
     throw new UnauthorizedError("No user id found in session");
@@ -84,7 +84,7 @@ export const messageRateLimit = async (
     },
   });
   next();
-};
+});
 
 export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   try {

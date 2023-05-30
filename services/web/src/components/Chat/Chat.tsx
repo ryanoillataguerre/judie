@@ -13,44 +13,12 @@ const Chat = ({
   const { chat, loading, submitSubject } = useChat();
   const subjectSelectorWidth = useBreakpointValue({
     base: "100%",
-    md: "40%",
+    md: "50%",
   });
   if (loading) {
     return <LoadingScreen />;
   }
-  if (!chat || !chat.subject) {
-    return (
-      <Flex
-        style={{
-          height: "100%",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "1rem 1rem 1rem 2rem",
-        }}
-      >
-        <Flex width={subjectSelectorWidth}>
-          <Text
-            style={{
-              fontSize: "1.2rem",
-              fontWeight: 600,
-              marginBottom: "2rem",
-            }}
-          >
-            What would you like to chat about?
-          </Text>
-        </Flex>
-        <SubjectSelector
-          width={subjectSelectorWidth}
-          selectSubject={submitSubject}
-        />
-      </Flex>
-    );
-  }
-  // TODO:
-  // Populate messages based on existing chat
-  //
-  // onSubmit - same as before?
+  console.log('chat in chat.tsx: ', chat)
   return (
     <Flex
       style={{
@@ -62,20 +30,25 @@ const Chat = ({
       }}
     >
       {!chat || !chat.subject ? (
-        <VStack>
-      <Flex width={subjectSelectorWidth}>
+        <VStack style={{
+            width: subjectSelectorWidth,
+            padding: "2rem",
+            border: "#565555 0.5px solid",
+            borderRadius: "0.8rem",
+        }} boxShadow={"sm"}>
+      <Flex width={"100%"}>
         <Text
           style={{
             fontSize: "1.2rem",
             fontWeight: 600,
-            marginBottom: "2rem",
+            marginBottom: "1rem",
           }}
         >
           What would you like to chat about?
         </Text>
       </Flex>
       <SubjectSelector
-        width={subjectSelectorWidth}
+        width={"100%"}
         selectSubject={submitSubject}
       />
       </VStack>

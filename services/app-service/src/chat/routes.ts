@@ -18,7 +18,6 @@ import {
 import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
-import { incrementUserQuestionsAsked } from "../user/service.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
 
 const router = Router();
