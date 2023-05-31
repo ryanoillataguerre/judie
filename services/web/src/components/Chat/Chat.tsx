@@ -1,7 +1,6 @@
 import { memo, useContext, useEffect, useRef } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import  { ChatContext } from "@judie/hooks/useChat";
-import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
 import { MessageType } from "@judie/data/types/api";
@@ -17,7 +16,6 @@ const Chat = ({
   initialQuery?: string;
 }) => {
   const { chat, loading, submitSubject, messages, beingStreamedMessage, tempUserMessage } = useContext(ChatContext);
-  console.log('tempUserMessage', tempUserMessage)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = () => {

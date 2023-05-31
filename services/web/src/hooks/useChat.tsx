@@ -121,7 +121,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setBeingStreamedMessage(undefined);
   }, [chatId])
 
-  // console.log('beingStreamedMessage', beingStreamedMessage)
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -155,9 +154,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       router.push("/chat");
     },
   });
-
-  // console.log("existing", existingChatQuery.data)
-
 
   const putChat = useMutation({
     mutationFn: putChatMutation,
@@ -212,8 +208,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     
-    // Add TempMessage to messages arr
-    console.log('setting message', prompt)
     // Use this in the temp message because we can match on it
     // const newMessageCreatedAt = new Date();
     setTempUserMessage(() => 
@@ -226,8 +220,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     // Call mutation
     await completionMutation.mutateAsync({ query: prompt });
   };
-  // console.log('tempUserMessage', tempUserMessage)
-  // console.log('messages', messages)
 
   // User sets a subject from the chat window
   const submitSubject = async (subject: string) => {
