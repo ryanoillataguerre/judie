@@ -50,27 +50,27 @@ export const handleStripeWebhookEvents = async (
       try {
         switch (event.type) {
           case "customer.subscription.created":
-            console.log("customer.subscription.created");
-            console.log(event.data);
+            console.info("customer.subscription.created");
+            console.info(event.data);
             await handleSubscriptionCreated(
               event.data.object as Stripe.Subscription
             );
             break;
           case "customer.subscription.updated":
-            console.log("customer.subscription.updated");
-            console.log(event.data);
+            console.info("customer.subscription.updated");
+            console.info(event.data);
             break;
           case "customer.subscription.deleted":
-            console.log("customer.subscription.deleted");
-            console.log(event.data);
+            console.info("customer.subscription.deleted");
+            console.info(event.data);
             break;
           case "checkout.session.completed":
-            console.log("checkout.session.completed");
-            console.log(event.data);
+            console.info("checkout.session.completed");
+            console.info(event.data);
             break;
           case "charge.refunded":
-            console.log("charge.refunded");
-            console.log(event.data);
+            console.info("charge.refunded");
+            console.info(event.data);
             break;
           default:
             break;

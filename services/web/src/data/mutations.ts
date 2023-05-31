@@ -26,9 +26,7 @@ export const completionFromQueryMutation = async ({
     method: "POST",
     body: { query },
     stream: true,
-    onChunkReceived: (chunk) => {
-      setChatValue(chunk);
-    },
+    onChunkReceived: setChatValue,
     onStreamEnd,
   });
   return response;
@@ -76,10 +74,17 @@ export const signupMutation = async ({
   return response.data;
 };
 
-export const createChatMutation = async (): Promise<ChatResponse> => {
+export const createChatMutation = async ({
+  subject,
+}: {
+  subject?: string | undefined;
+}): Promise<ChatResponse> => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",
+    body: {
+      subject: subject || undefined,
+    },
   });
   return response.data;
 };

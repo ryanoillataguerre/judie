@@ -6,48 +6,26 @@
 
 import * as jspb from "google-protobuf";
 
-export class Conversation extends jspb.Message { 
-    clearTurnsList(): void;
-    getTurnsList(): Array<ConvTurn>;
-    setTurnsList(value: Array<ConvTurn>): Conversation;
-    addTurns(value?: ConvTurn, index?: number): ConvTurn;
+export class ChatDetails extends jspb.Message { 
+    getChatId(): string;
+    setChatId(value: string): ChatDetails;
+    getSubject(): string;
+    setSubject(value: string): ChatDetails;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): Conversation.AsObject;
-    static toObject(includeInstance: boolean, msg: Conversation): Conversation.AsObject;
+    toObject(includeInstance?: boolean): ChatDetails.AsObject;
+    static toObject(includeInstance: boolean, msg: ChatDetails): ChatDetails.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: Conversation, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): Conversation;
-    static deserializeBinaryFromReader(message: Conversation, reader: jspb.BinaryReader): Conversation;
+    static serializeBinaryToWriter(message: ChatDetails, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ChatDetails;
+    static deserializeBinaryFromReader(message: ChatDetails, reader: jspb.BinaryReader): ChatDetails;
 }
 
-export namespace Conversation {
+export namespace ChatDetails {
     export type AsObject = {
-        turnsList: Array<ConvTurn.AsObject>,
-    }
-}
-
-export class ConvTurn extends jspb.Message { 
-    getSender(): string;
-    setSender(value: string): ConvTurn;
-    getMessage(): string;
-    setMessage(value: string): ConvTurn;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ConvTurn.AsObject;
-    static toObject(includeInstance: boolean, msg: ConvTurn): ConvTurn.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ConvTurn, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ConvTurn;
-    static deserializeBinaryFromReader(message: ConvTurn, reader: jspb.BinaryReader): ConvTurn;
-}
-
-export namespace ConvTurn {
-    export type AsObject = {
-        sender: string,
-        message: string,
+        chatId: string,
+        subject: string,
     }
 }
 

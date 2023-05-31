@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Box, Flex, Collapse } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import Sidebar from "../Sidebar/Sidebar";
 import { BsChevronBarLeft, BsChevronBarRight } from "react-icons/bs";
 import useStorageState from "@judie/hooks/useStorageState";
@@ -55,7 +54,9 @@ const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
         style={{
           width: "100%",
           height: "100%",
-          // padding: "0 2rem",
+          maxHeight: "100vh",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
         <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />

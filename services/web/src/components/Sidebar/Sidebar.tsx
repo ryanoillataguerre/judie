@@ -29,6 +29,7 @@ import {
   useDisclosure,
   useEditableControls,
   useToast,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { TfiTrash } from "react-icons/tfi";
@@ -124,9 +125,15 @@ const SidebarChat = ({
   beingEditedChatId?: string | null;
 }) => {
   const router = useRouter();
-  const selectedChatId = router.query.id as string;
-  const isSelected = selectedChatId === chat.id;
+
   const [editingValue, setEditingValue] = useState<string>();
+
+  const selectedChatId = useMemo(() => {
+    if (router.query.id) {
+      return router.query.id;
+    }
+  }, [router]);
+  const isSelected = selectedChatId === chat.id;
 
   // Edit single chat title mutation
   const editTitleMutation = useMutation({
@@ -202,18 +209,18 @@ const SidebarChat = ({
       variant={isSelected ? "solid" : "ghost"}
       style={{ width: "100%", marginTop: "0.3rem", marginBottom: "0.3rem" }}
       zIndex={10}
-      onClick={() => {
-        if (!editingValue) {
-          router.push("/chat", {
-            query: {
-              id: chat.id,
-            },
-            pathname: "/chat",
-          });
-        }
-      }}
     >
       <Editable
+        onClick={() => {
+          if (!editingValue) {
+            router.push({
+              query: {
+                id: chat.id,
+              },
+              pathname: "/chat",
+            });
+          }
+        }}
         defaultValue={getTitleForChat(chat, true)}
         placeholder={getTitleForChat(chat, true)}
         style={{
@@ -268,7 +275,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const activeIconIndex = getActiveIconIndex(router.pathname);
-  const [activeIcon, setActiveIcon] = useState<number>(activeIconIndex);
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
     null
@@ -278,7 +284,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   );
   const [isClearConversationsModalOpen, setIsClearConversationsModalOpen] =
     useState<boolean>(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
   // Existing user chats
   const {
     data,
@@ -300,7 +305,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
 
   // Delete single chat mutation
   const deleteChat = useMutation({
-    mutationFn: deleteChatMutation,
+    mutationFn: () => deleteChatMutation(beingDeletedChatId || ""),
     onSuccess: () => {
       setBeingDeletedChatId(null);
       refetch();
@@ -310,18 +315,12 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     mutationFn: createChatMutation,
     onSuccess: (data) => {
       refetch();
-      router.push(
-        "/chat",
-        {
-          query: {
-            id: data.id,
-          },
-          pathname: "/chat",
+      router.push({
+        query: {
+          id: data.id,
         },
-        {
-          shallow: true,
-        }
-      );
+        pathname: "/chat",
+      });
     },
   });
 
@@ -350,6 +349,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
       {
         icon: <ColorModeSwitcher />,
+        key: "color-mode-switcher",
       },
     ];
     if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE)) {
@@ -373,6 +373,14 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const toast = useToast();
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
+  const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
+    base: {
+      position: "absolute",
+      left: 0,
+      zIndex: 100,
+    },
+    md: {},
+  });
   return isOpen ? (
     <>
       {/* Modals */}
@@ -417,9 +425,12 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                 type="button"
                 onClick={async () => {
                   if (beingDeletedChatId) {
-                    await deleteChat.mutateAsync(beingDeletedChatId);
+                    await deleteChat.mutateAsync();
                     setBeingDeletedChatId(null);
                     refetch();
+                    if (router.pathname === "/chat" && router.query.id === beingDeletedChatId) {
+                      router.push("/chat");
+                    }
                   } else {
                     toast({
                       title: "Error deleting chat",
@@ -511,6 +522,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           alignItems: "flex-start",
           justifyContent: "space-between",
           padding: "1rem",
+          ...sidebarRelativeOrAbsoluteProps,
         }}
         boxShadow={"lg"}
       >
@@ -557,7 +569,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             borderColor: "#565555",
             padding: "1.5rem",
           }}
-          onClick={() => createChat.mutate()}
+          onClick={() => createChat.mutate({})}
         >
           + New Chat
         </Button>
@@ -619,8 +631,8 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           />
           {footerIcons.map((iconData) => {
             return iconData.label ? (
-              <SidebarButton key={iconData.label as string} {...iconData} />
-            ) : (
+              <SidebarButton key={iconData.label || iconData.key} {...iconData} />
+              ) : (
               iconData.icon
             );
           })}
@@ -636,6 +648,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "space-between",
+        ...sidebarRelativeOrAbsoluteProps,
       }}
       boxShadow={"lg"}
     ></Flex>

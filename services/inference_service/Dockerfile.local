@@ -1,15 +1,17 @@
+# This must be run from the `services` directory
+
 FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY ./ ./inference_service
-# COPY build_protos.sh /opt/build_protos.sh
+COPY ./inference_service ./inference_service
+COPY ./app-service/prisma/schema.prisma ./app-service/prisma/schema.prisma
 
 RUN pip install --no-cache-dir -r inference_service/inference_requirements.txt
 
-# RUN /opt/build_protos.sh
 
 ENV PYTHONPATH "${PYTHONPATH}:/app/"
+RUN prisma generate --schema app-service/prisma/schema.prisma --generator client-py
 
 EXPOSE 443
 # Cloud run requires it

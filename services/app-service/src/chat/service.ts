@@ -5,7 +5,6 @@ import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
 import { subjectToNamespaceMap, subjectToPromptMap } from "./consts.js";
-import { incrementUserQuestionsAsked } from "../user/service.js";
 import { IncomingMessage } from "http";
 import { Response } from "express";
 
@@ -257,12 +256,16 @@ export const createGPTRequestFromPrompt = async ({
       // If subject, mutate prompt
       if (chat.subject) {
         defaultPrompt = subjectToPromptMap[chat.subject] || prompt;
+      } else {
+        // Set subject = default on chat
+        await updateChat(chat.id, { subject: "default" });
       }
+      defaultPrompt += "\nRespond in markdown.\n";
       let defaultMessage = {
         content: defaultPrompt,
         type: MessageType.SYSTEM,
         createdAt: new Date(),
-        readableContent: prompt,
+        readableContent: defaultPrompt,
       };
       newMessages.push(defaultMessage);
     }

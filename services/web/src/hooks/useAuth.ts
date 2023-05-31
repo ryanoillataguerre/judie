@@ -1,3 +1,4 @@
+import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
@@ -22,6 +23,7 @@ export default function useAuth({
   allowUnauth?: boolean;
 } = {}): AuthData {
   const router = useRouter();
+  const toast = useToast();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
@@ -32,6 +34,8 @@ export default function useAuth({
       SubscriptionStatus.ACTIVE
     );
   }, [userData]);
+
+  
 
   useEffect(() => {
     if (isProduction()) {
@@ -72,6 +76,27 @@ export default function useAuth({
       },
     }
   );
+
+  // Stripe callback url has paid=true query param
+  useEffect(() => {
+    if (router.query.paid === "true") {
+      refetch();
+      toast({
+        title: "Welcome to Judie Premium!",
+        description: "Enjoy the unlimited access.",
+        status: "success",
+        duration: 7000,
+        isClosable: true,
+
+      })
+      const newQuery = router.query;
+      delete newQuery.paid;
+      router.push({
+        pathname: router.pathname,
+        query: newQuery,
+      })
+    }
+  }, [router.query])
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
