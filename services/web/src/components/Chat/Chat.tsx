@@ -1,8 +1,12 @@
+import { memo } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import useChat from "@judie/hooks/useChat";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
+import { MessageType } from "@judie/data/types/api";
+
+const MemoizedMessageRow = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
 
 const Chat = ({
@@ -11,7 +15,7 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, loading, submitSubject, messages } = useChat();
+  const { chat, loading, submitSubject, messages, beingStreamedMessage } = useChat();
   const subjectSelectorWidth = useBreakpointValue({
     base: "100%",
     md: "50%",
@@ -24,7 +28,7 @@ const Chat = ({
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        padding: "1rem 1rem 1rem 2rem",
+        scrollPadding: "10rem"
       }}
     >
       {!chat || !chat.subject ? (
@@ -51,16 +55,31 @@ const Chat = ({
       />
       </VStack>
       ) : (
-        loading ? (
-          <LoadingScreen />
-        ) : (
-          messages?.map((message, index) => {
+          <Flex style={{
+            flexDirection: "column",
+            width: "100%",
+            height: "100%",
+            overflowY: "scroll",
+            paddingBottom: "10rem"
+          }}>
+          {messages?.map((message, index) => {
             return (
-              <MessageRow key={(String(message.createdAt || "") + index)} message={message} />
+              <MemoizedMessageRow index={index} key={`${message.readableContent}-${index}`} message={message} />
             )
-          })
+          })}
+          {beingStreamedMessage && (
+            <MemoizedMessageRow
+              index={messages.length}
+              message={{
+                type: MessageType.USER,
+                readableContent: beingStreamedMessage,
+                createdAt:  new Date(),
+              }}
+            />
+          )}
+          </Flex>
         )
-      )}
+      }
     </Flex>
   );
   // const chatContext = useChatContext();

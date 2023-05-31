@@ -303,7 +303,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
 
-  console.log(beingDeletedChatId)
   // Delete single chat mutation
   const deleteChat = useMutation({
     mutationFn: () => deleteChatMutation(beingDeletedChatId || ""),

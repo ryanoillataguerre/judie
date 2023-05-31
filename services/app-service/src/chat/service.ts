@@ -260,11 +260,11 @@ export const createGPTRequestFromPrompt = async ({
         // Set subject = default on chat
         await updateChat(chat.id, { subject: "default" });
       }
+      defaultPrompt += "\nRespond in markdown.\n";
       let defaultMessage = {
         content: defaultPrompt,
         type: MessageType.SYSTEM,
         createdAt: new Date(),
-        readableContent: prompt,
       };
       newMessages.push(defaultMessage);
     }

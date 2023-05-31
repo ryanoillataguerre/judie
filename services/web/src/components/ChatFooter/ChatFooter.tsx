@@ -28,7 +28,7 @@ const ChatInput = () => {
     e.preventDefault();
     addMessage(chatValue);
     setChatValue("");
-  }, [addMessage])
+  }, [addMessage, setChatValue, chatValue])
 
   // Autofocus the input once a user has set a subject
   const ref = useRef<HTMLInputElement>(null);
@@ -38,6 +38,10 @@ const ChatInput = () => {
     }
   }, [chat?.subject, ref]);
 
+  const bgColor = useColorModeValue(
+    "#FFFFFF",
+    "#202123",
+  );
   return (
     <form onSubmit={onSubmit}>
     <InputGroup>
@@ -53,6 +57,8 @@ const ChatInput = () => {
       placeholder="Ask Judie anything..."
       style={{
         width: "100%",
+        padding: "auto 2rem auto auto",
+        backgroundColor: bgColor,
       }}
     />
     </LightMode>
@@ -71,8 +77,8 @@ const ChatFooter = () => {
   });
 
   const gradientColor = useColorModeValue(
-    'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(209, 231, 228, 0.1) 20%, rgba(209, 231, 228, 0.2) 30%, rgba(209, 231, 228, 0.9) 100%)',
-    'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.9) 100%)',
+    'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(209, 231, 228, 0.1) 20%, rgba(209, 231, 228, 0.2) 30%, rgba(209, 231, 228, 0.6) 40%, rgba(209, 231, 228, 0.8) 80%, rgba(209, 231, 228, 1.0) 95%)',
+    'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)',
   );
   
   return (
@@ -87,7 +93,7 @@ const ChatFooter = () => {
         position: "absolute",
         bottom: 0,
         left: 0,
-        paddingTop: '4rem',
+        paddingTop: '5rem',
         backgroundImage: gradientColor
       }}
       

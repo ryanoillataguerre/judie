@@ -26,9 +26,7 @@ export const completionFromQueryMutation = async ({
     method: "POST",
     body: { query },
     stream: true,
-    onChunkReceived: (chunk) => {
-      setChatValue(chunk);
-    },
+    onChunkReceived: setChatValue,
     onStreamEnd,
   });
   return response;

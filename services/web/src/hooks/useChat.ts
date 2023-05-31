@@ -51,11 +51,11 @@ const useChat = (): UseChatData => {
 
 
   const streamCallback = (message: string) => {
-    console.log(beingStreamedMessage)
+    console.log('streaming callback', message)
     setBeingStreamedMessage((prev) => prev + message);
   };
   const completionMutation = useMutation({
-    mutationFn: ({ query }: { query: string }) => {
+    mutationFn: ({ query }: { query: string }): Promise<string> => {
       if (chatId) {
         setBeingStreamedMessage(undefined);
         return completionFromQueryMutation({
@@ -77,6 +77,7 @@ const useChat = (): UseChatData => {
           duration: 2000,
           isClosable: true,
         });
+        return Promise.reject();
       }
     },
     onError: (err: HTTPResponseError) => {
@@ -99,10 +100,12 @@ const useChat = (): UseChatData => {
     setBeingStreamedMessage(undefined);
   }, [chatId])
 
+  console.log('beingStreamedMessage', beingStreamedMessage)
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
     enabled: !!chatId && !beingStreamedMessage?.length,
+    refetchOnWindowFocus: false,
     queryFn: () => getChatByIdQuery(chatId as string),
     onSuccess: (data) => {
       if (data?.subject || data?.messages?.length > 0) {
@@ -136,7 +139,11 @@ const useChat = (): UseChatData => {
     },
   });
 
-  // console.log('data', existingChatQuery.data)
+  console.log("existing", existingChatQuery.data)
+
+  console.log('messages', messages)
+
+
   const putChat = useMutation({
     mutationFn: putChatMutation,
     onError: (err: HTTPResponseError) => {
@@ -191,6 +198,7 @@ const useChat = (): UseChatData => {
     }
     
     // Add TempMessage to messages arr
+    console.log('setting message', prompt)
     setMessages((prev) => [
       ...prev,
       {
@@ -219,30 +227,17 @@ const useChat = (): UseChatData => {
     existingChatQuery.refetch();
   };
 
-  const memoizedValue: UseChatData = useMemo(() => {
-    return {
-      chat: existingChatQuery.data,
-      loading: existingChatQuery.isLoading,
-      addMessage,
-      messages,
-      beingStreamedMessage,
-      displayWelcome,
-      paywallOpen,
-      submitSubject,
-      activeChatId: chatId,
-    };
-  }, [
+  return {
+    chat: existingChatQuery.data,
+    loading: existingChatQuery.isLoading,
     addMessage,
     messages,
     beingStreamedMessage,
     displayWelcome,
     paywallOpen,
-    existingChatQuery.data,
-    existingChatQuery.isLoading,
     submitSubject,
-    chatId,
-  ]);
-  return memoizedValue;
+    activeChatId: chatId,
+  };
 };
 
 export default useChat;

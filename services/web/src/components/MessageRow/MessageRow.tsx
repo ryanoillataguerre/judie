@@ -1,12 +1,52 @@
+import rehypeMathjax from 'rehype-mathjax';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import { Flex, Table, Td, Thead, useBreakpointValue } from "@chakra-ui/react"
+import { MessageType } from "@judie/data/types/api"
 import { UIMessageType } from "@judie/hooks/useChat"
+import { CodeBlock } from './CodeBlock';
+import { FC, memo } from 'react';
+import ReactMarkdown, { Options } from 'react-markdown';
 
-const MessageRow = ({ message}: { 
-    message: UIMessageType
+
+
+export const MemoizedReactMarkdown: FC<Options> = memo(
+  ReactMarkdown,
+  (prevProps, nextProps) => (
+      prevProps.children === nextProps.children
+  )
+);
+
+
+const MessageRow = ({ message, index }: { 
+    message: UIMessageType;
+    index: number;
 }) => {
-    return (
-        <div>
-            {message.readableContent}
-        </div>
-    )
+  const horizontalPadding = useBreakpointValue({
+    base: "1rem",
+    md: "20%",
+  })
+  return (
+    <Flex style={{
+      flexDirection: "column",
+      gap: "0.5rem",
+      width: "100%",
+      padding: `1rem ${horizontalPadding}`,
+      ...(index !== 0 ? {borderTop: "0.5px solid #565555"}: {})
+    }}>
+      {message.type === MessageType.BOT ? (
+        <MemoizedReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeMathjax]}
+        >
+          {message.readableContent || ""}
+        </MemoizedReactMarkdown>
+      ) : (
+        <Flex>
+          {message.readableContent}
+        </Flex>
+      )}
+    </Flex>
+  )
 }
 export default MessageRow

@@ -40,7 +40,7 @@ router.post(
   [query("chatId").optional()],
   requireAuth,
   handleValidationErrors,
-  messageRateLimit,
+  errorPassthrough(messageRateLimit),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages
