@@ -1,1 +1,0 @@
-Judie's migration configuration

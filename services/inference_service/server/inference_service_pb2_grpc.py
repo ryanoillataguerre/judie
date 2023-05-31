@@ -16,7 +16,7 @@ class InferenceServiceStub(object):
         """
         self.GetChatResponse = channel.unary_stream(
             "/inferenceServiceServer.InferenceService/GetChatResponse",
-            request_serializer=inference__service__pb2.Conversation.SerializeToString,
+            request_serializer=inference__service__pb2.ChatDetails.SerializeToString,
             response_deserializer=inference__service__pb2.TutorResponse.FromString,
         )
         self.ServerConnectionCheck = channel.unary_unary(
@@ -46,7 +46,7 @@ def add_InferenceServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
         "GetChatResponse": grpc.unary_stream_rpc_method_handler(
             servicer.GetChatResponse,
-            request_deserializer=inference__service__pb2.Conversation.FromString,
+            request_deserializer=inference__service__pb2.ChatDetails.FromString,
             response_serializer=inference__service__pb2.TutorResponse.SerializeToString,
         ),
         "ServerConnectionCheck": grpc.unary_unary_rpc_method_handler(
@@ -82,7 +82,7 @@ class InferenceService(object):
             request,
             target,
             "/inferenceServiceServer.InferenceService/GetChatResponse",
-            inference__service__pb2.Conversation.SerializeToString,
+            inference__service__pb2.ChatDetails.SerializeToString,
             inference__service__pb2.TutorResponse.FromString,
             options,
             channel_credentials,
