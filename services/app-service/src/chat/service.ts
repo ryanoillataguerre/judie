@@ -265,6 +265,7 @@ export const createGPTRequestFromPrompt = async ({
         content: defaultPrompt,
         type: MessageType.SYSTEM,
         createdAt: new Date(),
+        readableContent: defaultPrompt,
       };
       newMessages.push(defaultMessage);
     }

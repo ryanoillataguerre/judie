@@ -62,18 +62,25 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
     <Flex style={{
       position: "relative",
       fontSize: "1rem",
+      flexDirection: "column"
     }} >
       <Flex  style={{
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0.5rem 1rem"
+        padding: "0.5rem 1rem",
+          border: "1px solid #565555",
+          borderRadius: "0.5rem 0.5rem 0 0",
+          borderBottom: "none",
+          marginBottom: "-4px"
       }}>
         <Text style={{
           fontSize: "0.75rem",
           fontWeight: "bold",
         }}>{language}</Text>
 
-        <Flex alignItems={"center"}>
+        <Flex style={{
+          alignItems: "center",
+        }}>
           <Button variant="ghost"
             onClick={copyToClipboard}
           >
@@ -99,4 +106,4 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
     </Flex>
   );
 });
-CodeBlock.displayName = 'CodeBlock';
+

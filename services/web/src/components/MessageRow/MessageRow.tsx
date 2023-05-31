@@ -38,6 +38,24 @@ const MessageRow = ({ message, index }: {
         <MemoizedReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
           rehypePlugins={[rehypeMathjax]}
+          components={{
+            code({ node, inline, className, children, ...props }) {
+              const match = /language-(\w+)/.exec(className || '');
+
+              return !inline ? (
+                <CodeBlock
+                  key={Math.random()}
+                  language={(match && match[1]) || ''}
+                  value={String(children).replace(/\n$/, '')}
+                  {...props}
+                />
+              ) : (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              );
+            }
+          }}
         >
           {message.readableContent || ""}
         </MemoizedReactMarkdown>

@@ -28,7 +28,8 @@ const Chat = ({
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        scrollPadding: "10rem"
+        scrollPadding: "10rem",
+        padding: "0 3rem",
       }}
     >
       {!chat || !chat.subject ? (
