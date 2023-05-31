@@ -1,7 +1,7 @@
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue } from "@chakra-ui/react"
+import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue, Tr } from "@chakra-ui/react"
 import { MessageType } from "@judie/data/types/api"
 import { UIMessageType } from "@judie/hooks/useChat"
 import { CodeBlock } from './CodeBlock';
@@ -39,27 +39,18 @@ const MessageRow = ({ message, index }: {
     base: "center",
     md: "flex-end",
   })
-  const paddingProps = useBreakpointValue({
-    base: {
-      paddingLeft: "1rem",
-    },
-    md: {
-      padding: "0 1rem",
-    }
-  })
   return (
     <Flex style={{
       flexDirection: "row",
       width: "100%",
-      flex: 1,
       ...(message.type === MessageType.USER ? {backgroundColor: userBgColor} : {})
     }}>
       <Flex style={{
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "flex-start",
+        padding: "1rem",
         justifyContent: leftColumnJustify,
         width: leftColumnW,
-        ...paddingProps,
       }}>
         {message.type === MessageType.USER ? (
           <AiOutlineUser size={20} />
@@ -93,7 +84,36 @@ const MessageRow = ({ message, index }: {
                   {children}
                 </code>
               );
-            }
+            },
+            table({ children }) {
+              return (
+                <Table variant="simple">
+                  {children}
+                </Table>
+              )
+            },
+            tr({ children }) {
+              return (
+                <Tr>
+                  {children}
+                </Tr>
+              )
+            },
+            td({ children }) {
+              return (
+                <Td>
+                  {children}
+                </Td>
+              )
+            },
+            th({ children }) {
+              return (
+                <Thead>
+                  {children}
+                </Thead>
+              )
+            },
+
           }}
         >
           {message.readableContent || ""}
@@ -104,10 +124,11 @@ const MessageRow = ({ message, index }: {
         </Flex>
       )}
     </Flex>
-    <Flex style={{
+    <Flex
+      style={{
         width: rightColumnW
-      }}>
-      </Flex>
+      }}
+    />
     </Flex>
 
   )

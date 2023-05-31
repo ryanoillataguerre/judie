@@ -18,7 +18,7 @@ services:
     image: redis:latest
     command: redis-server
     volumes:
-      - judie-redis-data:/var/lib/redis
+      - judie-redis-data:/data
     environment:
       - REDIS_REPLICATION_MODE=master
     ports:

@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import useChat from "@judie/hooks/useChat";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
@@ -6,7 +6,7 @@ import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
 import { MessageType } from "@judie/data/types/api";
 
-const MemoizedMessageRow = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
+const MemoizedMessageRow = memo(MessageRow, (prevProps, nextProps) => `${prevProps.message?.type}-${prevProps.message?.createdAt}` === `${nextProps.message?.type}-${nextProps.message?.createdAt}`);
 
 
 const Chat = ({
@@ -15,11 +15,15 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, loading, submitSubject, messages, beingStreamedMessage } = useChat();
+  const { chat, loading, submitSubject, messages, beingStreamedMessage, tempUserMessage } = useChat();
+  console.log('tempUserMessage', tempUserMessage)
   const subjectSelectorWidth = useBreakpointValue({
     base: "100%",
     md: "50%",
   });
+  useEffect(() => {
+    // console.log('messages changed', messages)
+  }, [messages])
 
   return (
     <Flex
@@ -64,12 +68,18 @@ const Chat = ({
           }}>
           {messages?.map((message, index) => {
             return (
-              <MemoizedMessageRow index={index} key={`${message.readableContent}-${index}`} message={message} />
+              <MemoizedMessageRow index={index} key={`${message.type}-${message.createdAt}`} message={message} />
             )
           })}
-          {beingStreamedMessage && (
+          {tempUserMessage && (
             <MemoizedMessageRow
               index={messages.length}
+              message={tempUserMessage}
+            />
+          )}
+          {beingStreamedMessage && (
+            <MemoizedMessageRow
+              index={(messages.length || 0) + (tempUserMessage ? 1 : 0)}
               message={{
                 type: MessageType.USER,
                 readableContent: beingStreamedMessage,
@@ -82,55 +92,6 @@ const Chat = ({
       }
     </Flex>
   );
-  // const chatContext = useChatContext();
-  // return (
-  //   <div className={styles.chatContainer}>
-  //     <Paywall isOpen={isPaywallOpen} setIsOpen={setIsPaywallOpen} />
-  //     {displayWelcome ? (
-  //       <div className={styles.welcomeContainer}>
-  //         <ChatWelcome selectSubject={onSelectSubject} />
-  //       </div>
-  //     ) : (
-  //       <div className={styles.conversationContainer}>
-  //         <div className={styles.reverseFlexContainer}>
-  //           {messages?.map((message, index) => {
-  //             if (
-  //               message.type === MessageType.USER &&
-  //               message.readableContent ===
-  //                 mostRecentUserChat?.readableContent &&
-  //               index === messages.length - 1
-  //             ) {
-  //               setMostRecentUserChat(undefined);
-  //             }
-  //             return <MessageRow key={index} message={message} />;
-  //           })}
-  //           {mostRecentUserChat && <MessageRow message={mostRecentUserChat} />}
-  //           {beingStreamedMessage && (
-  //             <MessageRow
-  //               message={{
-  //                 type: MessageType.BOT,
-  //                 readableContent: beingStreamedMessage,
-  //                 createdAt: new Date(),
-  //               }}
-  //             />
-  //           )}
-  //         </div>
-  //       </div>
-  //     )}
-  //     <form onSubmit={onSubmit} className={styles.chatBoxContainer}>
-  //       {(isLoading || loading) && (
-  //         <Progress
-  //           size="xs"
-  //           isIndeterminate
-  //           width={"100%"}
-  //           colorScheme={"green"}
-  //           background="transparent"
-  //         />
-  //       )}
-  //       <ChatInput chatValue={chatValue} setChatValue={setChatValue} />
-  //     </form>
-  //   </div>
-  // );
 };
 
 export default Chat;

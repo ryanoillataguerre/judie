@@ -75,7 +75,7 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
         border: "1px solid #565555",
         borderRadius: "0.5rem 0.5rem 0 0",
         borderBottom: "none",
-        marginBottom: "-4px",
+        marginBottom: "-10px",
         width: "100%"
       }}>
         <Text style={{
@@ -91,7 +91,11 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
           <Button variant="ghost"
             onClick={copyToClipboard}
           >
-            {isCopied ? <HiOutlineClipboardCheck size={18} /> : <HiOutlineClipboardList size={18} />}
+            {isCopied ? <HiOutlineClipboardCheck size={18} style={{
+              marginRight: "0.2rem"
+            }} /> : <HiOutlineClipboardList size={18} style={{
+              marginRight: "0.2rem"
+            }} />}
             {isCopied ? 'Copied!' : 'Copy code'}
           </Button>
           <Button

@@ -349,6 +349,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
       {
         icon: <ColorModeSwitcher />,
+        key: "color-mode-switcher",
       },
     ];
     if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE)) {
@@ -630,8 +631,8 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           />
           {footerIcons.map((iconData) => {
             return iconData.label ? (
-              <SidebarButton key={iconData.label as string} {...iconData} />
-            ) : (
+              <SidebarButton key={iconData.label || iconData.key} {...iconData} />
+              ) : (
               iconData.icon
             );
           })}

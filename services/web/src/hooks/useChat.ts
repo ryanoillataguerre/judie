@@ -8,7 +8,7 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
-import {  useEffect, useMemo, useState } from "react";
+import {  createContext, useEffect, useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
@@ -27,23 +27,39 @@ interface UseChatData {
   chat?: ChatResponse;
   loading: boolean;
   addMessage: (message: string) => void;
-  messages: UIMessageType[];
+  messages: Message[];
   beingStreamedMessage?: string;
   displayWelcome: boolean;
   paywallOpen?: boolean;
   submitSubject: (subject: string) => void;
+  tempUserMessage?: TempMessage;
 }
+
+const ChatContext = createContext<UseChatData>({
+  activeChatId: undefined,
+  chat: undefined,
+  loading: false,
+  addMessage: () => {},
+  messages: [],
+  beingStreamedMessage: undefined,
+  displayWelcome: true,
+  paywallOpen: false,
+  submitSubject: () => {},
+  tempUserMessage: undefined,
+});
+
 
 const useChat = (): UseChatData => {
   const auth = useAuth();
   const toast = useToast();
   const router = useRouter();
   const [displayWelcome, setDisplayWelcome] = useState(true);
-  const [messages, setMessages] = useState<UIMessageType[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [beingStreamedMessage, setBeingStreamedMessage] = useStorageState<
     string | undefined
   >(undefined, "beingStreamedMessage");
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
+  const [tempUserMessage, setTempUserMessage] = useState<TempMessage>();
 
   const chatId = useMemo(() => {
     return router.query.id as string;
@@ -51,7 +67,6 @@ const useChat = (): UseChatData => {
 
 
   const streamCallback = (message: string) => {
-    console.log('streaming callback', message)
     setBeingStreamedMessage((prev) => prev + message);
   };
   const completionMutation = useMutation({
@@ -100,7 +115,7 @@ const useChat = (): UseChatData => {
     setBeingStreamedMessage(undefined);
   }, [chatId])
 
-  console.log('beingStreamedMessage', beingStreamedMessage)
+  // console.log('beingStreamedMessage', beingStreamedMessage)
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -114,17 +129,13 @@ const useChat = (): UseChatData => {
         setDisplayWelcome(true);
       }
       setMessages(data?.messages);
-      if (
-        !completionMutation.isLoading &&
-        data?.messages?.length > 0
-      ) {
-        setMessages((prev) => {
-          // Remove most recent message from arr - this is a TempMessage
-          let newMessages = prev;
-          newMessages.shift();
-          return newMessages;
-        });
-        setBeingStreamedMessage(undefined);
+      if (!completionMutation.isLoading) {
+        if (beingStreamedMessage) {
+          setBeingStreamedMessage(undefined);
+        }
+        if (tempUserMessage) {
+          setTempUserMessage(undefined);
+        }
       }
     },
     onError: (err: HTTPResponseError) => {
@@ -139,9 +150,7 @@ const useChat = (): UseChatData => {
     },
   });
 
-  console.log("existing", existingChatQuery.data)
-
-  console.log('messages', messages)
+  // console.log("existing", existingChatQuery.data)
 
 
   const putChat = useMutation({
@@ -199,17 +208,20 @@ const useChat = (): UseChatData => {
     
     // Add TempMessage to messages arr
     console.log('setting message', prompt)
-    setMessages((prev) => [
-      ...prev,
-      {
+    // Use this in the temp message because we can match on it
+    // const newMessageCreatedAt = new Date();
+    setTempUserMessage(() => 
+      ({
         type: MessageType.USER,
         readableContent: prompt,
         createdAt: new Date(),
-      },
-    ]);
+      })
+    );
     // Call mutation
-    await completionMutation.mutateAsync({ query: prompt });
+    // await completionMutation.mutateAsync({ query: prompt });
   };
+  // console.log('tempUserMessage', tempUserMessage)
+  // console.log('messages', messages)
 
   // User sets a subject from the chat window
   const submitSubject = async (subject: string) => {
@@ -227,7 +239,7 @@ const useChat = (): UseChatData => {
     existingChatQuery.refetch();
   };
 
-  return {
+  return useMemo(() => ({
     chat: existingChatQuery.data,
     loading: existingChatQuery.isLoading,
     addMessage,
@@ -237,7 +249,19 @@ const useChat = (): UseChatData => {
     paywallOpen,
     submitSubject,
     activeChatId: chatId,
-  };
+    tempUserMessage
+  }), [
+    existingChatQuery.data,
+    existingChatQuery.isLoading,
+    addMessage,
+    messages,
+    beingStreamedMessage,
+    displayWelcome,
+    paywallOpen,
+    submitSubject,
+    chatId,
+    tempUserMessage
+  ]);
 };
 
 export default useChat;
