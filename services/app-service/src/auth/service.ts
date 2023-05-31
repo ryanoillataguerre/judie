@@ -1,12 +1,11 @@
 import bcrypt from "bcryptjs";
 import {
   BadRequestError,
-  InternalError,
   UnauthorizedError,
 } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { User, UserRole } from "@prisma/client";
+import { User } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
 

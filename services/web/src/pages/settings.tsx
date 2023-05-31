@@ -32,13 +32,13 @@ const SettingsPage = () => {
             style={{
               height: "100%",
               width: "100%",
-              padding: "1rem",
+              padding: "1rem 1rem 1rem 2rem",
               flexDirection: "column",
               alignItems: "flex-start",
               justifyContent: "flex-start",
             }}
           >
-            <Text fontWeight="bold" fontSize={"2rem"}>
+            <Text fontWeight="bold" fontSize={"2rem"} marginBottom={"1rem"}>
               Manage Billing
             </Text>
             <Button

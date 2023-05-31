@@ -1,15 +1,15 @@
 import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
-import { useRouter } from "next/router";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
 import Chat from "@judie/components/Chat/Chat";
-import { ChatContext } from "@judie/data/contexts/ChatContext";
+import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
+import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
+import { ChatProvider } from "@judie/hooks/useChat";
 
 interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
-  const router = useRouter();
   useAuth();
 
   return (
@@ -24,12 +24,15 @@ export default function ChatPage({ query }: ChatPageProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <SidebarPageContainer>
-          <Chat
-            chatId={router.query.chatId as string | undefined}
-            initialQuery={query}
-          />
-        </SidebarPageContainer>
+        <ChatProvider>
+          <SidebarPageContainer>
+            <ChatNavbar />
+            <Chat
+              initialQuery={query}
+            />
+            <ChatFooter />
+          </SidebarPageContainer>
+        </ChatProvider>
       </main>
     </>
   );

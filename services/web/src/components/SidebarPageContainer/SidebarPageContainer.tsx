@@ -19,7 +19,7 @@ const OpenCloseButton = ({
     <Box
       style={{
         position: "fixed",
-        top: "2rem",
+        top: "1rem",
         left: isOpen ? "18.5rem" : "1.5rem",
       }}
     >
@@ -27,13 +27,13 @@ const OpenCloseButton = ({
         <BsChevronBarLeft
           cursor={"pointer"}
           onClick={() => setIsOpen(false)}
-          size={16}
+          size={18}
         />
       ) : (
         <BsChevronBarRight
           cursor={"pointer"}
           onClick={() => setIsOpen(true)}
-          size={16}
+          size={18}
         />
       )}
     </Box>
@@ -55,7 +55,9 @@ const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
         style={{
           width: "100%",
           height: "100%",
-          padding: "0 1rem",
+          maxHeight: "100vh",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
         <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />

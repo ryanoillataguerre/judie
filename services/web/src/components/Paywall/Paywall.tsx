@@ -31,10 +31,13 @@ const SubscribeCard = ({
   return (
     <Flex
       style={{
-        width: "100%",
+        width: "max-content",
         height: "100%",
         cursor: "pointer",
         borderRadius: "0.5rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
       boxShadow="md"
       onClick={loading ? () => {} : onClick}
@@ -215,7 +218,14 @@ const Paywall = ({
               questions, please consider subscribing!
             </p>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <SubscribeCard onClick={onClick} loading={loading} />
           </ModalFooter>
         </Flex>

@@ -18,7 +18,6 @@ import {
 import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
-import { incrementUserQuestionsAsked } from "../user/service.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
 
 const router = Router();
@@ -41,7 +40,7 @@ router.post(
   [query("chatId").optional()],
   requireAuth,
   handleValidationErrors,
-  messageRateLimit,
+  errorPassthrough(messageRateLimit),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages
@@ -101,6 +100,7 @@ router.get(
 
 router.post(
   "/",
+  [body("subject").optional()],
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -113,6 +113,7 @@ router.post(
           id: session.userId,
         },
       },
+      subject: req.body?.subject || undefined,
     });
 
     res.status(200).json({
