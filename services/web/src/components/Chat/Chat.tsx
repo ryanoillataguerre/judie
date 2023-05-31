@@ -2,6 +2,7 @@ import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import useChat from "@judie/hooks/useChat";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
+import MessageRow from "../MessageRow/MessageRow";
 
 
 const Chat = ({
@@ -10,15 +11,12 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, loading, submitSubject } = useChat();
+  const { chat, loading, submitSubject, messages } = useChat();
   const subjectSelectorWidth = useBreakpointValue({
     base: "100%",
     md: "50%",
   });
-  if (loading) {
-    return <LoadingScreen />;
-  }
-  console.log('chat in chat.tsx: ', chat)
+
   return (
     <Flex
       style={{
@@ -53,7 +51,15 @@ const Chat = ({
       />
       </VStack>
       ) : (
-        <div>Chat exists</div>
+        loading ? (
+          <LoadingScreen />
+        ) : (
+          messages?.map((message, index) => {
+            return (
+              <MessageRow key={(String(message.createdAt || "") + index)} message={message} />
+            )
+          })
+        )
       )}
     </Flex>
   );

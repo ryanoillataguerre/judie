@@ -20,7 +20,7 @@ export interface TempMessage {
   createdAt?: Date;
 }
 
-type UIMessageType = Message | TempMessage;
+export type UIMessageType = Message | TempMessage;
 
 interface UseChatData {
   activeChatId?: string;

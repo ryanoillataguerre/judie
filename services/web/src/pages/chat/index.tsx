@@ -1,6 +1,5 @@
 import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
-import { useRouter } from "next/router";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
 import Chat from "@judie/components/Chat/Chat";
 import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
