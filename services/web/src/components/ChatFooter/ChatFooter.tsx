@@ -1,6 +1,6 @@
 import { Button, Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
-import useChat from "@judie/hooks/useChat";
-import { FormEvent,useCallback, useState, useRef, useEffect } from "react";
+import {ChatContext} from "@judie/hooks/useChat";
+import { FormEvent,useCallback, useState, useRef, useEffect, useContext } from "react";
 import { BsSend } from "react-icons/bs";
 
 const SendButton = () => {
@@ -22,7 +22,7 @@ const SendButton = () => {
   )
 }
 const ChatInput = () => {
-  const { addMessage, chat} = useChat();
+  const { addMessage, chat} = useContext(ChatContext);
   const [chatValue, setChatValue] = useState<string>("")
   const onSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

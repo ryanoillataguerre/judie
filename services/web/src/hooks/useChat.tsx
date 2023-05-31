@@ -8,7 +8,7 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
-import {  createContext, useEffect, useMemo, useState } from "react";
+import {  createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
@@ -35,7 +35,7 @@ interface UseChatData {
   tempUserMessage?: TempMessage;
 }
 
-const ChatContext = createContext<UseChatData>({
+export const ChatContext = createContext<UseChatData>({
   activeChatId: undefined,
   chat: undefined,
   loading: false,
@@ -49,7 +49,8 @@ const ChatContext = createContext<UseChatData>({
 });
 
 
-const useChat = (): UseChatData => {
+
+export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth();
   const toast = useToast();
   const router = useRouter();
@@ -67,7 +68,9 @@ const useChat = (): UseChatData => {
 
 
   const streamCallback = (message: string) => {
-    setBeingStreamedMessage((prev) => prev + message);
+    if (message !== "undefined") {
+      setBeingStreamedMessage((prev) => prev + message);
+    }
   };
   const completionMutation = useMutation({
     mutationFn: ({ query }: { query: string }): Promise<string> => {
@@ -218,7 +221,7 @@ const useChat = (): UseChatData => {
       })
     );
     // Call mutation
-    // await completionMutation.mutateAsync({ query: prompt });
+    await completionMutation.mutateAsync({ query: prompt });
   };
   // console.log('tempUserMessage', tempUserMessage)
   // console.log('messages', messages)
@@ -239,10 +242,11 @@ const useChat = (): UseChatData => {
     existingChatQuery.refetch();
   };
 
-  return useMemo(() => ({
-    chat: existingChatQuery.data,
-    loading: existingChatQuery.isLoading,
-    addMessage,
+  const providerValue = useMemo(() => {
+    return {
+      chat: existingChatQuery.data,
+      loading: existingChatQuery.isLoading,
+      addMessage,
     messages,
     beingStreamedMessage,
     displayWelcome,
@@ -250,10 +254,11 @@ const useChat = (): UseChatData => {
     submitSubject,
     activeChatId: chatId,
     tempUserMessage
-  }), [
-    existingChatQuery.data,
-    existingChatQuery.isLoading,
-    addMessage,
+    };
+  }, [
+      existingChatQuery.data,
+      existingChatQuery.isLoading,
+      addMessage,
     messages,
     beingStreamedMessage,
     displayWelcome,
@@ -262,6 +267,9 @@ const useChat = (): UseChatData => {
     chatId,
     tempUserMessage
   ]);
+  return (
+    <ChatContext.Provider value={providerValue}>
+      {children}
+    </ChatContext.Provider>
+  );
 };
-
-export default useChat;

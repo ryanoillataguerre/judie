@@ -1,6 +1,6 @@
-import { memo, useEffect } from "react";
+import { memo, useContext, useEffect } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
-import useChat from "@judie/hooks/useChat";
+import  { ChatContext } from "@judie/hooks/useChat";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
@@ -15,7 +15,7 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, loading, submitSubject, messages, beingStreamedMessage, tempUserMessage } = useChat();
+  const { chat, loading, submitSubject, messages, beingStreamedMessage, tempUserMessage } = useContext(ChatContext);
   console.log('tempUserMessage', tempUserMessage)
   const subjectSelectorWidth = useBreakpointValue({
     base: "100%",
@@ -35,7 +35,7 @@ const Chat = ({
         scrollPadding: "10rem",
       }}
     >
-      {!chat || !chat.subject ? (
+      {!chat || !chat?.subject ? (
         <VStack style={{
             width: subjectSelectorWidth,
             padding: "2rem",
@@ -81,7 +81,7 @@ const Chat = ({
             <MemoizedMessageRow
               index={(messages.length || 0) + (tempUserMessage ? 1 : 0)}
               message={{
-                type: MessageType.USER,
+                type: MessageType.BOT,
                 readableContent: beingStreamedMessage,
                 createdAt:  new Date(),
               }}

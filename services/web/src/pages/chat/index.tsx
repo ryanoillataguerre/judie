@@ -4,6 +4,7 @@ import SidebarPageContainer from "@judie/components/SidebarPageContainer/Sidebar
 import Chat from "@judie/components/Chat/Chat";
 import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
 import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
+import { ChatProvider } from "@judie/hooks/useChat";
 
 interface ChatPageProps {
   query?: string;
@@ -23,13 +24,15 @@ export default function ChatPage({ query }: ChatPageProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <SidebarPageContainer>
-          <ChatNavbar />
-          <Chat
-            initialQuery={query}
-          />
-          <ChatFooter />
-        </SidebarPageContainer>
+        <ChatProvider>
+          <SidebarPageContainer>
+            <ChatNavbar />
+            <Chat
+              initialQuery={query}
+            />
+            <ChatFooter />
+          </SidebarPageContainer>
+        </ChatProvider>
       </main>
     </>
   );
