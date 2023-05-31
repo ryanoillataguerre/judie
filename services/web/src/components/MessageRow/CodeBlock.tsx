@@ -8,7 +8,7 @@ import {
   generateRandomString,
   programmingLanguages,
 } from '@judie/utils/markdown';
-import { Button, Flex, Text } from '@chakra-ui/react';
+import {useBreakpointValue,  Button, Flex, Text } from '@chakra-ui/react';
 
 interface Props {
   language: string;
@@ -58,6 +58,10 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+  const displayCopyCode = useBreakpointValue({
+    base: false,
+    md: true,
+  })
   return (
     <Flex style={{
       position: "relative",
@@ -68,15 +72,18 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0.5rem 1rem",
-          border: "1px solid #565555",
-          borderRadius: "0.5rem 0.5rem 0 0",
-          borderBottom: "none",
-          marginBottom: "-4px"
+        border: "1px solid #565555",
+        borderRadius: "0.5rem 0.5rem 0 0",
+        borderBottom: "none",
+        marginBottom: "-4px",
+        width: "100%"
       }}>
         <Text style={{
           fontSize: "0.75rem",
           fontWeight: "bold",
         }}>{language}</Text>
+
+        {displayCopyCode && (
 
         <Flex style={{
           alignItems: "center",
@@ -94,12 +101,14 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
             <BsDownload size={18} />
           </Button>
         </Flex>
+        )}
+
       </Flex>
 
       <SyntaxHighlighter
         language={language}
         style={oneDark}
-        customStyle={{ margin: 0 }}
+        customStyle={{ maxWidth: "100%" }}
       >
         {value}
       </SyntaxHighlighter>

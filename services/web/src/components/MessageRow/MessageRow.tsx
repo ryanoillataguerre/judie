@@ -1,13 +1,13 @@
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import { Flex, Table, Td, Thead, useBreakpointValue } from "@chakra-ui/react"
+import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue } from "@chakra-ui/react"
 import { MessageType } from "@judie/data/types/api"
 import { UIMessageType } from "@judie/hooks/useChat"
 import { CodeBlock } from './CodeBlock';
 import { FC, memo } from 'react';
 import ReactMarkdown, { Options } from 'react-markdown';
-
+import { AiOutlineUser, AiFillRobot } from 'react-icons/ai';
 
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
@@ -22,17 +22,56 @@ const MessageRow = ({ message, index }: {
     message: UIMessageType;
     index: number;
 }) => {
-  const horizontalPadding = useBreakpointValue({
-    base: "1rem",
-    md: "20%",
+  const userBgColor = useColorModeValue("#D9F0ED", "#373f58");
+  const leftColumnW = useBreakpointValue({
+    base: "20%",
+    md: "15%",
+  })
+  const rightColumnW = useBreakpointValue({
+    base: "10%",
+    md: "15%",
+  })
+  const middleColumnW = useBreakpointValue({
+    base: "75%",
+    md: "60%",
+  })
+  const leftColumnJustify = useBreakpointValue({
+    base: "center",
+    md: "flex-end",
+  })
+  const paddingProps = useBreakpointValue({
+    base: {
+      paddingLeft: "1rem",
+    },
+    md: {
+      padding: "0 1rem",
+    }
   })
   return (
     <Flex style={{
+      flexDirection: "row",
+      width: "100%",
+      flex: 1,
+      ...(message.type === MessageType.USER ? {backgroundColor: userBgColor} : {})
+    }}>
+      <Flex style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: leftColumnJustify,
+        width: leftColumnW,
+        ...paddingProps,
+      }}>
+        {message.type === MessageType.USER ? (
+          <AiOutlineUser size={20} />
+        ) : (
+          <AiFillRobot size={20} />
+        )}
+      </Flex>
+    <Flex style={{
       flexDirection: "column",
       gap: "0.5rem",
-      width: "100%",
-      padding: `1rem ${horizontalPadding}`,
-      ...(index !== 0 ? {borderTop: "0.5px solid #565555"}: {})
+      padding: "1rem",
+      width: middleColumnW
     }}>
       {message.type === MessageType.BOT ? (
         <MemoizedReactMarkdown
@@ -65,6 +104,12 @@ const MessageRow = ({ message, index }: {
         </Flex>
       )}
     </Flex>
+    <Flex style={{
+        width: rightColumnW
+      }}>
+      </Flex>
+    </Flex>
+
   )
 }
 export default MessageRow
