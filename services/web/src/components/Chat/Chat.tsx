@@ -1,10 +1,11 @@
-import { memo, useContext, useEffect } from "react";
+import { memo, useContext, useEffect, useRef } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import  { ChatContext } from "@judie/hooks/useChat";
 import LoadingScreen from "../LoadingScreen/LoadingScreen";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
 import { MessageType } from "@judie/data/types/api";
+import ScrollContainer from "../ScrollContainer/ScrollContainer";
 
 const MemoizedMessageRow = memo(MessageRow, (prevProps, nextProps) => `${prevProps.message?.type}-${prevProps.message?.createdAt}` === `${nextProps.message?.type}-${nextProps.message?.createdAt}`);
 
@@ -17,13 +18,26 @@ const Chat = ({
 }) => {
   const { chat, loading, submitSubject, messages, beingStreamedMessage, tempUserMessage } = useContext(ChatContext);
   console.log('tempUserMessage', tempUserMessage)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = () => {
+    const offsetHeight = scrollContainerRef.current?.offsetHeight || 0
+    const scrollHeight = scrollContainerRef.current?.scrollHeight || 0
+    const scrollTop = scrollContainerRef.current?.scrollTop || 0
+    if (scrollHeight <= scrollTop + offsetHeight + 100) {
+      scrollContainerRef.current?.scrollTo(0, scrollHeight)
+    }
+  }
   const subjectSelectorWidth = useBreakpointValue({
     base: "100%",
     md: "50%",
   });
   useEffect(() => {
-    // console.log('messages changed', messages)
-  }, [messages])
+    scroll();
+  }, []);
+  useEffect(() => {
+    scroll()
+  }, [messages, tempUserMessage, beingStreamedMessage])
 
   return (
     <Flex
@@ -59,13 +73,7 @@ const Chat = ({
       />
       </VStack>
       ) : (
-          <Flex style={{
-            flexDirection: "column",
-            width: "100%",
-            height: "100%",
-            overflowY: "scroll",
-            paddingBottom: "10rem"
-          }}>
+          <ScrollContainer>
           {messages?.map((message, index) => {
             return (
               <MemoizedMessageRow index={index} key={`${message.type}-${message.createdAt}`} message={message} />
@@ -87,7 +95,7 @@ const Chat = ({
               }}
             />
           )}
-          </Flex>
+          </ScrollContainer>
         )
       }
     </Flex>

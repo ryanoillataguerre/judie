@@ -68,7 +68,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
 
   const streamCallback = (message: string) => {
-    if (message !== "undefined") {
+    if (message.includes("undefined")) {
+      const newMessage = message.replace("undefined", "");
+      setBeingStreamedMessage((prev) => prev + newMessage);
+    } else {
       setBeingStreamedMessage((prev) => prev + message);
     }
   };
