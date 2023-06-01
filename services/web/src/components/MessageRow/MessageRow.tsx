@@ -43,6 +43,7 @@ const MessageRow = ({ message, index }: {
     <Flex style={{
       flexDirection: "row",
       width: "100%",
+      minWidth: "100%",
       ...(message.type === MessageType.USER ? {backgroundColor: userBgColor} : {})
     }}>
       <Flex style={{

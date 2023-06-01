@@ -8,7 +8,7 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
-import {  createContext, useContext, useEffect, useMemo, useState } from "react";
+import {  useCallback, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
@@ -181,7 +181,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
-  const addMessage = async (prompt: string) => {
+  const addMessage = useCallback(async (prompt: string) => {
     // Guard clauses
     if (!prompt || prompt.length === 0) {
       return;
@@ -219,10 +219,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     );
     // Call mutation
     await completionMutation.mutateAsync({ query: prompt });
-  };
+  }, [chatId, beingStreamedMessage, completionMutation, toast]);
 
   // User sets a subject from the chat window
-  const submitSubject = async (subject: string) => {
+  const submitSubject = useCallback(async (subject: string) => {
     if (!chatId) {
       // Create a chat
       await createChat.mutateAsync({
@@ -235,7 +235,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       subject,
     });
     existingChatQuery.refetch();
-  };
+  }, [chatId, createChat, putChat, existingChatQuery]);
 
   const providerValue = useMemo(() => {
     return {
