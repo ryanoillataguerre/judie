@@ -74,7 +74,7 @@ const Chat = ({
           <ScrollContainer>
           {messages?.map((message, index) => {
             return (
-              <MemoizedMessageRow index={index} key={`${message.type}-${message.createdAt}`} message={message} />
+              <MemoizedMessageRow index={index} key={`${message.type}-${message.readableContent.slice(0, 50)}`} message={message} />
             )
           })}
           {tempUserMessage && (

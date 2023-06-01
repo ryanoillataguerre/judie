@@ -82,4 +82,5 @@ export const adminSubjects = [
   "Test Taking - LSAT",
   "Test Taking - APWH",
   "Test Taking - APEngLit",
+  "Testing"
 ];
