@@ -339,7 +339,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         key: "color-mode-switcher",
       },
     ];
-    if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) && !auth.loading && router.isReady && auth.userData) {
+    if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) && !auth.isLoading && router.isReady && auth.userData) {
       options.push({
         key: "upgrade",
         icon: (
