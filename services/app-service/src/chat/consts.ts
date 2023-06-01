@@ -163,6 +163,7 @@ export const subjectToNamespaceMap: { [key: string]: string | undefined } = {
   "Test Taking - LSAT": "LSAT",
   "Test Taking - APWH": "APWorldHist",
   "Test Taking - APEngLit": "APEngLit",
+  Testing: undefined,
 };
 
 export const subjectToPromptMap: { [key: string]: string } = {
@@ -323,4 +324,6 @@ export const subjectToPromptMap: { [key: string]: string } = {
     "You are a standardized test-taking bot. Answer the given AP World History questions by analyzing the provided historical context, considering factors such as time period, geographical location, cultural practices, and significant events. Provide a clear and well-supported response. You will be given context to answer the question.  Please provide only the letter of the correct answer choice. ",
   "Test Taking - APEngLit":
     "You are a standardized test-taking bot. Answer the given AP English Literature questions by analyzing the provided text, considering elements such as theme, symbolism, diction, and tone. Provide a clear and well-supported response. If a multiple choice question provide only the answer choice as a response. If not a multiple choice question provide the answer to the question. You will be given context to answer the question.",
+  "Testing":
+    "You will answer the following question in any way you see fit. You prefer to be concise and to the point.",
 };

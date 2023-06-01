@@ -47,7 +47,8 @@ const ScrollContainer = ({children}: { children: React.ReactNode}) => {
       <Box
         style={{
           position: "relative",
-          height: "100%"
+          height: "100%",
+          width: "100%"
         }}
       >
         <Box
