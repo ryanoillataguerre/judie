@@ -11,3 +11,9 @@
 - `gcloud auth login`
 - `gcloud config set project {sandbox_project_id}`
 - `gcloud config set run/region us-west1`
+
+## Handy
+
+#### Add allowed network (in this example, local for testing)
+
+- `gcloud sql instances patch prod-core --authorized-networks={LOCAL_IP}`
