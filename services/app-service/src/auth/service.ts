@@ -8,6 +8,8 @@ import isEmail from "validator/lib/isEmail.js";
 import { User } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
+import cioClient from "../utils/customerio.js";
+import { IdentifierType } from 'customerio-node';
 
 const transformUserForSegment = (user: User) => ({
   firstName: user.firstName,
@@ -64,6 +66,16 @@ export const signup = async ({
     },
   });
 
+  cioClient.identify(newUser.id, {
+    email: newUser.email,
+    created_at: newUser.createdAt,
+    first_name: newUser.firstName,
+    last_name: newUser.lastName,
+    receive_promotions: newUser.receivePromotions,
+    last_logged_in: new Date().toISOString(),
+  });
+  cioClient.mergeCustomers(IdentifierType.Id, newUser.id, IdentifierType.Id, newUser.email);
+
   // Create Stripe customer
   await createCustomer(newUser.id);
   // TODO: Create Customer.io Customer
@@ -110,6 +122,11 @@ export const signin = async ({
     },
   });
 
+  cioClient.identify(user.id, {
+    email: user.email,
+    last_logged_in: new Date().toISOString(),
+  });
+
   return user.id;
 };
 
@@ -125,6 +142,10 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
       data: {
         email,
       },
+    });
+    cioClient.identify(email, {
+      email,
+      waitlist: true
     });
   } catch (err) {
     console.error(err);
