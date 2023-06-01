@@ -218,7 +218,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       })
     );
     // Call mutation
-    // await completionMutation.mutateAsync({ query: prompt });
+    await completionMutation.mutateAsync({ query: prompt });
   }, [chatId, beingStreamedMessage, completionMutation, toast]);
 
   // User sets a subject from the chat window
