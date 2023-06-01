@@ -1,7 +1,7 @@
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue, Tr } from "@chakra-ui/react"
+import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue, Tr, Code } from "@chakra-ui/react"
 import { MessageType } from "@judie/data/types/api"
 import { UIMessageType } from "@judie/hooks/useChat"
 import CodeBlock from './CodeBlock';
@@ -18,9 +18,9 @@ export const MemoizedReactMarkdown: FC<Options> = memo(
 );
 
 
-const MessageRow = ({ message, index }: { 
+const MessageRow = ({ message }: { 
     message: UIMessageType;
-    index: number;
+    memoKey: string;
 }) => {
   const userBgColor = useColorModeValue("#D9F0ED", "#373f58");
   const leftColumnW = useBreakpointValue({
@@ -81,9 +81,9 @@ const MessageRow = ({ message, index }: {
                   {...props}
                 />
               ) : (
-                <code className={className} {...props}>
+                <Code className={className} {...props}>
                   {children}
-                </code>
+                </Code>
               );
             },
             table({ children }) {
