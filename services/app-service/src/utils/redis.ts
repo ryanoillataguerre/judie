@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Redis } from "ioredis";
 
 const redis = new Redis({
@@ -41,5 +42,24 @@ export const getQuestionCountEntry = async ({ userId }: { userId: string }) => {
   const questionCount = await redis.get(`questionCount:${userId}`);
   return questionCount ? parseInt(questionCount) : 0;
 };
+
+export const createForgotPasswordToken = async ({
+  userId,
+}: {
+  userId: string;
+}) => {
+  const token = randomUUID();
+  // Expire in 24hr
+  await redis.set(`forgotPassword:${token}`, userId, "EX", 60 * 60 * 24);
+  return token;
+}
+export const getForgotPasswordToken = async ({
+  token,
+}: {
+  token: string;
+}) => {
+  await redis.get(`forgotPassword:${token}`);
+  return token;
+}  
 
 export { redis };

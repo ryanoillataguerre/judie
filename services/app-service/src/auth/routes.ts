@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import { errorPassthrough, handleValidationErrors } from "../utils/express.js";
-import { signup, signin, addToWaitlist } from "./service.js";
+import { signup, signin, addToWaitlist, forgotPassword } from "./service.js";
 
 const router = Router();
 
@@ -58,5 +58,15 @@ router.post(
     res.status(200).send({ success: true });
   })
 );
+
+router.post("/forgot-password", errorPassthrough(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  await forgotPassword(email);
+  res.status(200).send({
+    data: {
+      success: true,
+    },
+  });
+}))
 
 export default router;
