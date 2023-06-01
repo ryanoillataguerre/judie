@@ -73,6 +73,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
 
   const streamCallback = (message: string) => {
+    if (message.includes(`{"error":`)) {
+      return;
+    }
     if (message.includes("undefined")) {
       const newMessage = message.replace("undefined", "");
       setBeingStreamedMessage((prev) => prev + newMessage);
@@ -89,11 +92,18 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           chatId,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
+            console.log('stream ended')
             auth.refresh();
             await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
             setStreaming(false);
           },
+          onError: (err: HTTPResponseError) => {
+            if (err.response.code === 429) {
+              setPaywallOpen(true);
+              setTempUserMessage(undefined);
+            }
+          }
         });
       } else {
         toast({
@@ -109,6 +119,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     onError: (err: HTTPResponseError) => {
       setStreaming(false);
+      console.log('errResponse', err.response)
       if (err.response?.status === 429) {
         // Rate limited - user is out of questions for the day
         setPaywallOpen(true);
@@ -211,8 +222,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     
-    // Use this in the temp message because we can match on it
-    // const newMessageCreatedAt = new Date();
     setTempUserMessage(() => 
       ({
         type: MessageType.USER,
@@ -223,6 +232,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     // Call mutation
     setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
+    
   }, [chatId, beingStreamedMessage, completionMutation, toast]);
 
   // User sets a subject from the chat window

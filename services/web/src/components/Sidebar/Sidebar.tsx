@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, CSSProperties } from "react";
+import { useMemo, useState, useEffect, CSSProperties, useContext } from "react";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
 import {
   BsChevronRight,
@@ -36,6 +36,7 @@ import { TfiTrash } from "react-icons/tfi";
 import { FiServer, FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import useAuth from "@judie/hooks/useAuth";
+import {ChatContext} from "@judie/hooks/useChat";
 import { useMutation, useQuery } from "react-query";
 import {
   ChatResponse,
@@ -46,30 +47,12 @@ import {
 } from "@judie/data/mutations";
 import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
 import { MessageType } from "@judie/data/types/api";
-import {
-  BsChatRightText,
-  BsChevronBarLeft,
-  BsChevronBarRight,
-} from "react-icons/bs";
 import { TbPencil } from "react-icons/tb";
-import { CheckIcon } from "@chakra-ui/icons";
 import { AiOutlineCheck } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 import UpgradeButton from "../UpgradeButton/UpgradeButton";
 
-const getActiveIconIndex = (path: string) => {
-  switch (true) {
-    case path.includes("/chat/"):
-      return 0;
-    case path.includes("/chats"):
-      return 1;
-    case path.includes("/quiz"):
-      return 2;
-    default:
-      return 0;
-  }
-};
 interface SidebarButtonProps {
   icon?: JSX.Element;
   label?: string | JSX.Element;
@@ -275,7 +258,7 @@ const SidebarChat = ({
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
-  const activeIconIndex = getActiveIconIndex(router.pathname);
+  const chatContext = useContext(ChatContext)
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
     null
@@ -313,7 +296,11 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
   const createChat = useMutation({
-    mutationFn: createChatMutation,
+    mutationFn: ({ subject }: { subject?: string; }) => {
+      if (chatContext?.chat?.messages?.length > 0 && chatContext?.chat?.subject) {
+        return createChatMutation({ subject });
+      }
+    },
     onSuccess: (data) => {
       refetch();
       router.push({

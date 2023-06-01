@@ -1,4 +1,4 @@
-import { baseFetch } from "./baseFetch";
+import { HTTPResponseError, baseFetch } from "./baseFetch";
 import { Chat, Message, UserRole } from "./types/api";
 
 export interface ChatResponse {
@@ -15,11 +15,13 @@ export const completionFromQueryMutation = async ({
   chatId,
   setChatValue,
   onStreamEnd,
+  onError
 }: {
   query: string;
   chatId: string;
   setChatValue: (chat: string) => void;
   onStreamEnd?: () => void;
+  onError?: (error: HTTPResponseError) => void;
 }): Promise<string> => {
   const response = await baseFetch({
     url: `/chat/completion?chatId=${chatId}`,
@@ -28,6 +30,7 @@ export const completionFromQueryMutation = async ({
     stream: true,
     onChunkReceived: setChatValue,
     onStreamEnd,
+    onError
   });
   return response;
 };
