@@ -34,6 +34,7 @@ interface UseChatData {
   submitSubject: (subject: string) => void;
   tempUserMessage?: TempMessage;
   setTempUserMessage: (message: TempMessage | undefined) => void;
+  setPaywallOpen: (open: boolean) => void;
 }
 
 export const ChatContext = createContext<UseChatData>({
@@ -48,6 +49,7 @@ export const ChatContext = createContext<UseChatData>({
   submitSubject: () => {},
   tempUserMessage: undefined,
   setTempUserMessage: () => {},
+  setPaywallOpen: () => {},
 });
 
 
@@ -251,7 +253,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     submitSubject,
     activeChatId: chatId,
     tempUserMessage,
-    setTempUserMessage
+    setTempUserMessage,
+    setPaywallOpen
     };
   }, [
       existingChatQuery.data,
@@ -264,7 +267,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     chatId,
     tempUserMessage,
     setTempUserMessage,
-    streaming
+    streaming,
+    setPaywallOpen
   ]);
   return (
     <ChatContext.Provider value={providerValue}>

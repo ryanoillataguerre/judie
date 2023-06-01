@@ -5,6 +5,7 @@ import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
 import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
+import Paywall from "../Paywall/Paywall";
 
 // const MessageRow = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
@@ -15,7 +16,7 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage } = useContext(ChatContext);
+  const { chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage, paywallOpen, setPaywallOpen } = useContext(ChatContext);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = () => {
@@ -68,6 +69,7 @@ const Chat = ({
         scrollPadding: "10rem",
       }}
     >
+      <Paywall isOpen={paywallOpen ?? false} setIsOpen={setPaywallOpen}  />
       {!chat || !chat?.subject ? (
         <VStack style={{
             width: subjectSelectorWidth,
