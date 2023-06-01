@@ -296,11 +296,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
   const createChat = useMutation({
-    mutationFn: ({ subject }: { subject?: string; }) => {
-      if (chatContext?.chat?.messages?.length > 0 && chatContext?.chat?.subject) {
-        return createChatMutation({ subject });
-      }
-    },
+    mutationFn: createChatMutation,
     onSuccess: (data) => {
       refetch();
       router.push({
@@ -561,7 +557,11 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             borderColor: "#565555",
             padding: "1.5rem",
           }}
-          onClick={() => createChat.mutate({})}
+      onClick={() => {
+        if ((chatContext?.chat?.messages?.length || 0) > 0 && chatContext?.chat?.subject) {
+          createChat.mutate({})
+        }
+      }}
         >
           + New Chat
         </Button>
