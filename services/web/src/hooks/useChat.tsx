@@ -25,7 +25,7 @@ export type UIMessageType = Message | TempMessage;
 interface UseChatData {
   activeChatId?: string;
   chat?: ChatResponse;
-  loading: boolean;
+  streaming: boolean;
   addMessage: (message: string) => void;
   messages: Message[];
   beingStreamedMessage?: string;
@@ -33,12 +33,13 @@ interface UseChatData {
   paywallOpen?: boolean;
   submitSubject: (subject: string) => void;
   tempUserMessage?: TempMessage;
+  setTempUserMessage: (message: TempMessage | undefined) => void;
 }
 
 export const ChatContext = createContext<UseChatData>({
   activeChatId: undefined,
   chat: undefined,
-  loading: false,
+  streaming: false,
   addMessage: () => {},
   messages: [],
   beingStreamedMessage: undefined,
@@ -46,6 +47,7 @@ export const ChatContext = createContext<UseChatData>({
   paywallOpen: false,
   submitSubject: () => {},
   tempUserMessage: undefined,
+  setTempUserMessage: () => {},
 });
 
 
@@ -61,6 +63,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   >(undefined, "beingStreamedMessage");
   const [paywallOpen, setPaywallOpen] = useState<boolean>(false);
   const [tempUserMessage, setTempUserMessage] = useState<TempMessage>();
+  const [streaming, setStreaming] = useState<boolean>(false);
 
   const chatId = useMemo(() => {
     return router.query.id as string;
@@ -83,10 +86,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           query,
           chatId,
           setChatValue: streamCallback,
-          onStreamEnd: () => {
+          onStreamEnd: async () => {
             auth.refresh();
+            await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
-            existingChatQuery.refetch();
+            setStreaming(false);
           },
         });
       } else {
@@ -102,6 +106,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       }
     },
     onError: (err: HTTPResponseError) => {
+      setStreaming(false);
       if (err.response?.status === 429) {
         // Rate limited - user is out of questions for the day
         setPaywallOpen(true);
@@ -119,8 +124,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setBeingStreamedMessage(undefined);
-  }, [chatId])
-
+  }, [chatId, setBeingStreamedMessage])
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -137,9 +141,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       if (!completionMutation.isLoading) {
         if (beingStreamedMessage) {
           setBeingStreamedMessage(undefined);
-        }
-        if (tempUserMessage) {
-          setTempUserMessage(undefined);
         }
       }
     },
@@ -218,6 +219,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       })
     );
     // Call mutation
+    setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
   }, [chatId, beingStreamedMessage, completionMutation, toast]);
 
@@ -240,19 +242,19 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const providerValue = useMemo(() => {
     return {
       chat: existingChatQuery.data,
-      loading: existingChatQuery.isLoading,
       addMessage,
+      streaming,
     messages,
     beingStreamedMessage,
     displayWelcome,
     paywallOpen,
     submitSubject,
     activeChatId: chatId,
-    tempUserMessage
+    tempUserMessage,
+    setTempUserMessage
     };
   }, [
       existingChatQuery.data,
-      existingChatQuery.isLoading,
       addMessage,
     messages,
     beingStreamedMessage,
@@ -260,7 +262,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     paywallOpen,
     submitSubject,
     chatId,
-    tempUserMessage
+    tempUserMessage,
+    setTempUserMessage,
+    streaming
   ]);
   return (
     <ChatContext.Provider value={providerValue}>

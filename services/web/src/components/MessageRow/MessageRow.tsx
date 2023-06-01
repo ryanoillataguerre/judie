@@ -20,7 +20,6 @@ export const MemoizedReactMarkdown: FC<Options> = memo(
 
 const MessageRow = ({ message }: { 
     message: UIMessageType;
-    memoKey: string;
 }) => {
   const userBgColor = useColorModeValue("#D9F0ED", "#373f58");
   const leftColumnW = useBreakpointValue({

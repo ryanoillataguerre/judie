@@ -1,12 +1,12 @@
-import { memo, useContext, useEffect, useRef } from "react";
+import { memo, useContext, useEffect, useMemo, useRef } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
-import  { ChatContext } from "@judie/hooks/useChat";
+import  { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
 import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
 
-const MemoizedMessageRow = memo(MessageRow, (prevProps, nextProps) => `${prevProps.message?.type}-${prevProps.message?.createdAt}` === `${nextProps.message?.type}-${nextProps.message?.createdAt}`);
+// const MessageRow = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
 
 const Chat = ({
@@ -15,7 +15,7 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, loading, submitSubject, messages, beingStreamedMessage, tempUserMessage } = useContext(ChatContext);
+  const { chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage } = useContext(ChatContext);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = () => {
@@ -36,6 +36,27 @@ const Chat = ({
   useEffect(() => {
     scroll()
   }, [messages, tempUserMessage, beingStreamedMessage])
+
+  const renderedMessages = useMemo(() => {
+    let newMessages: UIMessageType[] = messages;
+    if (streaming) {
+      if (tempUserMessage) {
+        newMessages = [...newMessages, tempUserMessage]
+      }
+      // newMessages = [...newMessages, {
+      //   type: MessageType.BOT,
+      //   readableContent: beingStreamedMessage,
+      //   createdAt: new Date(),
+      // }]
+    }
+    return newMessages.map((message, index) => {
+      const isLast = ((index + 1) === messages.length);
+      const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 50)}`;
+      return (
+        <MessageRow key={key} message={message} />
+      )
+    })
+  }, [messages, tempUserMessage, streaming])
 
   return (
     <Flex
@@ -72,27 +93,39 @@ const Chat = ({
       </VStack>
       ) : (
           <ScrollContainer>
-          {messages?.map((message, index) => {
-            return (
-              <MemoizedMessageRow index={index} key={`${message.type}-${message.readableContent.slice(0, 50)}`} message={message} />
-            )
-          })}
-          {tempUserMessage && (
-            <MemoizedMessageRow
-              index={messages.length}
-              message={tempUserMessage}
-            />
-          )}
-          {beingStreamedMessage && (
-            <MemoizedMessageRow
-              index={(messages.length || 0) + (tempUserMessage ? 1 : 0)}
-              message={{
-                type: MessageType.BOT,
-                readableContent: beingStreamedMessage,
-                createdAt:  new Date(),
-              }}
-            />
-          )}
+            {renderedMessages}
+            {beingStreamedMessage && (
+              <MessageRow
+                key={`${MessageType.BOT}-mostRecent`}
+                message={{
+                  type: MessageType.BOT,
+                  readableContent: beingStreamedMessage.slice(9, -1),
+                  createdAt: new Date(),
+                }}
+              />
+            )}
+            {/* {messages?.map((message, index) => {
+              const isLast = (index + 1) === messages.length;
+              // if (isLast) {
+              //   console.log('isLast', isLast && message.type === MessageType.BOT, message.readableContent)
+              // }
+              const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent.slice(0, 50)}`;
+              // console.log(key)
+              if (message.readableContent === tempUserMessage?.readableContent) {
+                setTempUserMessage(undefined)
+              }
+              return (
+                <MessageRow key={key} message={message} />
+              )
+            })}
+            {tempUserMessage && (
+              <MessageRow
+                key={`${tempUserMessage.type}-${tempUserMessage.readableContent?.slice(0, 50)}`}
+                // memoKey={`${tempUserMessage.type}-${tempUserMessage.readableContent?.slice(0, 50)}`}
+                message={tempUserMessage}
+              />
+            )}
+             */}
           </ScrollContainer>
         )
       }
