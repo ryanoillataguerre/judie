@@ -8,14 +8,14 @@ import {
   generateRandomString,
   programmingLanguages,
 } from '@judie/utils/markdown';
-import {useBreakpointValue,  Button, Flex, Text } from '@chakra-ui/react';
+import { useBreakpointValue,  Button, Flex, Text } from '@chakra-ui/react';
 
 interface Props {
   language: string;
   value: string;
 }
 
-export const CodeBlock: FC<Props> = memo(({ language, value }) => {
+const CodeBlock: FC<Props> = memo(({ language, value }) => {
   const [isCopied, setIsCopied] = useState<Boolean>(false);
 
   const copyToClipboard = () => {
@@ -120,3 +120,6 @@ export const CodeBlock: FC<Props> = memo(({ language, value }) => {
   );
 });
 
+CodeBlock.displayName = 'CodeBlock';
+
+export default CodeBlock;

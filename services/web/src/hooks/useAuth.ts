@@ -96,7 +96,7 @@ export default function useAuth({
         query: newQuery,
       })
     }
-  }, [router.query])
+  }, [router.query, refetch, toast, router.pathname])
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {

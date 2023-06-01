@@ -4,7 +4,7 @@ import remarkMath from 'remark-math';
 import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue, Tr } from "@chakra-ui/react"
 import { MessageType } from "@judie/data/types/api"
 import { UIMessageType } from "@judie/hooks/useChat"
-import { CodeBlock } from './CodeBlock';
+import CodeBlock from './CodeBlock';
 import { FC, memo } from 'react';
 import ReactMarkdown, { Options } from 'react-markdown';
 import { AiOutlineUser, AiFillRobot } from 'react-icons/ai';

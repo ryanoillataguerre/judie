@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, CSSProperties } from "react";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
 import {
   BsChevronRight,
@@ -73,6 +73,7 @@ const getActiveIconIndex = (path: string) => {
 interface SidebarButtonProps {
   icon?: JSX.Element;
   label?: string | JSX.Element;
+  key?: string;
   onClick?: () => void;
 }
 const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
@@ -328,6 +329,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     const options = [
       {
         icon: <TfiTrash />,
+        key: "delete-chats",
         label: "Clear Conversations",
         onClick: () => {
           setIsClearConversationsModalOpen(true);
@@ -335,6 +337,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
       {
         icon: <FiSettings />,
+        key: "settings",
         label: "Settings",
         onClick: () => {
           router.push("/settings", undefined, { shallow: true });
@@ -342,6 +345,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
       {
         icon: <RiLogoutBoxLine />,
+        key: "logout",
         label: "Logout",
         onClick: () => {
           auth.logout();
@@ -354,6 +358,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     ];
     if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE)) {
       options.push({
+        key: "upgrade",
         icon: (
           <Box
             style={{
@@ -522,7 +527,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           alignItems: "flex-start",
           justifyContent: "space-between",
           padding: "1rem",
-          ...sidebarRelativeOrAbsoluteProps,
+          ...sidebarRelativeOrAbsoluteProps as CSSProperties,
         }}
         boxShadow={"lg"}
       >
@@ -631,7 +636,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           />
           {footerIcons.map((iconData) => {
             return iconData.label ? (
-              <SidebarButton key={iconData.label || iconData.key} {...iconData} />
+              <SidebarButton key={iconData.key} {...iconData} />
               ) : (
               iconData.icon
             );
@@ -648,7 +653,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        ...sidebarRelativeOrAbsoluteProps,
+        ...sidebarRelativeOrAbsoluteProps as CSSProperties,
       }}
       boxShadow={"lg"}
     ></Flex>
