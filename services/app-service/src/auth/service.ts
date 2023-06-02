@@ -8,9 +8,10 @@ import isEmail from "validator/lib/isEmail.js";
 import { User } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
-import cioClient from "../utils/customerio.js";
+import {cioClient} from "../utils/customerio.js";
 import { IdentifierType } from 'customerio-node';
 import { createForgotPasswordToken, getForgotPasswordToken } from "../utils/redis.js";
+import { sendUserForgotPasswordEmail } from "../cio/service.js";
 
 const transformUserForSegment = (user: User) => ({
   firstName: user.firstName,
@@ -154,7 +155,7 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
   }
 };
 
-export const forgotPassword = async (email: string) => {
+export const forgotPassword = async ({email, origin}: {email: string; origin: string}) => {
   const user = await dbClient.user.findUnique({
     where: {
       email,
@@ -165,6 +166,11 @@ export const forgotPassword = async (email: string) => {
   }
   // Create token and store in Redis
   const token = await createForgotPasswordToken({ userId: user.id });
-  // TODO: Send email with link to reset password
-
+  const url = `${origin || "https://app.judie.io"}/reset-password?token=${token}`;
+  // Send email with link to reset password
+  console.log('resetpassurl', url)
+  await sendUserForgotPasswordEmail({
+    user,
+    url,
+  });
 }

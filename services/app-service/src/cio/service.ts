@@ -1,14 +1,29 @@
-import cioClient from "../utils/customerio.js";
+import { User } from "@prisma/client";
+import { apiClient } from "../utils/customerio.js";
+import { SendEmailRequest } from 'customerio-node';
 
-
-
-export const sendUserForgotPasswordEmail = ({
-    email,
-    token,
+export const sendUserForgotPasswordEmail = async ({
+    user,
+    url,
 }: {
-    email: string;
-    token: string;
+    user: User;
+    url: string;
 }) => {
+    console.log({
+        first_name: user.firstName,
+        url,
+    })
     // Send email
-    return cioClient.
+    const newEmail = new SendEmailRequest({
+        to: user.email,
+        transactional_message_id: "2",
+        message_data: {
+            first_name: user.firstName,
+            url,
+        },
+        identifiers: {
+            id: user.id,
+        },
+    })
+    return await apiClient.sendEmail(newEmail);
 }

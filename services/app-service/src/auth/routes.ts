@@ -59,9 +59,10 @@ router.post(
   })
 );
 
-router.post("/forgot-password", errorPassthrough(async (req: Request, res: Response) => {
+router.post("/forgot-password", [body("email").exists().isEmail()], handleValidationErrors, errorPassthrough(async (req: Request, res: Response) => {
   const { email } = req.body;
-  await forgotPassword(email);
+  const origin = req.headers.origin;
+  await forgotPassword({email, origin: origin as string });
   res.status(200).send({
     data: {
       success: true,
