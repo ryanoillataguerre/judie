@@ -9,10 +9,6 @@ export const sendUserForgotPasswordEmail = async ({
     user: User;
     url: string;
 }) => {
-    console.log({
-        first_name: user.firstName,
-        url,
-    })
     // Send email
     const newEmail = new SendEmailRequest({
         to: user.email,

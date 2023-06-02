@@ -168,8 +168,7 @@ export const forgotPassword = async ({email, origin}: {email: string; origin: st
   const token = await createForgotPasswordToken({ userId: user.id });
   const url = `${origin || "https://app.judie.io"}/reset-password?token=${token}`;
   // Send email with link to reset password
-  console.log('resetpassurl', url)
-  await sendUserForgotPasswordEmail({
+  return await sendUserForgotPasswordEmail({
     user,
     url,
   });
