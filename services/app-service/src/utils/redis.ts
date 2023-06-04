@@ -58,8 +58,17 @@ export const getForgotPasswordToken = async ({
 }: {
   token: string;
 }) => {
-  await redis.get(`forgotPassword:${token}`);
-  return token;
-}  
+  const id = await redis.get(`forgotPassword:${token}`);
+  return id;
+}
+export const deleteForgotPasswordToken = async ({
+  token,
+}: {
+  token: string;
+}) => {
+  await redis.del(`forgotPassword:${token}`);
+  return token; 
+}
+
 
 export { redis };

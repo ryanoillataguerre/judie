@@ -2,7 +2,7 @@ import { HTTPResponseError } from "@judie/data/baseFetch";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { signinMutation } from "@judie/data/mutations";
+import { forgotPasswordMutation, resetPasswordMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "@judie/components/Button/Button";
@@ -11,11 +11,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  IconButton,
   Image,
   Input,
-  InputGroup,
-  InputRightElement,
   Link,
   Text,
   useBreakpointValue,
@@ -24,35 +21,32 @@ import {
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
-import { HiEye, HiEyeOff } from "react-icons/hi";
 
 interface SubmitData {
-  email: string;
   password: string;
+  confirmPassword: string;
 }
 
-const SigninForm = () => {
+const ResetPasswordForm = () => {
   const router = useRouter();
   const toast = useToast();
+  const [success, setSuccess] = useState(false);
   const { handleSubmit, register } = useForm<SubmitData>({
     defaultValues: {
-      email: "",
       password: "",
+      confirmPassword: "",
     },
     reValidateMode: "onBlur",
   });
   const { mutateAsync, isLoading } = useMutation({
-    mutationFn: signinMutation,
+    mutationFn: resetPasswordMutation,
     onSuccess: () => {
-      router.push({
-        pathname: "/chat",
-        query: router.query,
-      });
+      setSuccess(true);
     },
     onError: (err: HTTPResponseError) => {
-      console.error("Error signing in", err);
+      console.error("Error sending forgot password email in", err);
       toast({
-        title: "Error signing in",
+        title: "Error sending forgot password",
         description: err.message,
         status: "error",
         duration: 5000,
@@ -61,19 +55,38 @@ const SigninForm = () => {
     },
   });
 
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
-    email,
     password,
+    confirmPassword,
   }: SubmitData) => {
     try {
-      setHasSubmitted(true);
-
+      // Check for password match
+      if (password !== confirmPassword) {
+        toast({
+          title: "Passwords do not match",
+          description: "Please make sure your passwords match.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+      // Check for token
+      const token = router.query.token as string;
+      if (!token) {
+        toast({
+          title: "Missing token in link",
+          description: "Please check your email for the link to reset your password, or request a new one.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
       await mutateAsync({
-        email,
         password,
+        token,
       });
     } catch (err) {}
   };
@@ -97,8 +110,48 @@ const SigninForm = () => {
         borderRadius: "0.8rem",
       }}
       boxShadow={"lg"}
-    >
-      <form
+    >{success ? (
+        <Flex
+          style={{
+            flexDirection: "column",
+            alignItems: "flex-start",
+            width: "100%",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              marginBottom: "1rem",
+            }}
+          >
+            Password Reset
+          </Text>
+          <Text
+            style={{
+              fontSize: "1rem",
+              marginBottom: "1rem",
+            }}
+          >
+            Your password has been reset. You can now sign in with your new password.
+          </Text>
+          <Button
+            style={{
+              width: "100%",
+            }}
+            colorScheme="blue"
+            variant={"solid"}
+            label="Sign In"
+            onClick={() => {
+              router.push({
+                pathname: "/signin",
+                query: router.query,
+              });
+            }}
+          />
+        </Flex>
+    ): (
+<form
         onSubmit={handleSubmit(onSubmit)}
         style={{
           width: "100%",
@@ -113,10 +166,10 @@ const SigninForm = () => {
         >
           <Text
             style={{
-              fontSize: "1.5rem",
+              fontSize: "1rem",
             }}
           >
-            Sign In
+            Enter your new password below.
           </Text>
           <FormControl
             style={{
@@ -124,14 +177,14 @@ const SigninForm = () => {
               marginBottom: "0.5rem",
             }}
           >
-            <FormLabel htmlFor="email">Email</FormLabel>
+            <FormLabel htmlFor="password">Password</FormLabel>
             <Input
-              id="email"
-              type={"email"}
-              autoComplete="email"
+              id="password"
+              type={"password"}
+              autoComplete="password"
               required
-              placeholder="judie@judie.io"
-              {...register("email", {})}
+              placeholder="Password"
+              {...register("password", {})}
             />
           </FormControl>
           <FormControl
@@ -140,27 +193,15 @@ const SigninForm = () => {
               marginBottom: "0.5rem",
             }}
           >
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <InputGroup size="md">
-              <InputRightElement>
-                <IconButton
-                  variant="link"
-                  aria-label={
-                    showPassword ? "Mask password" : "Reveal password"
-                  }
-                  icon={showPassword ? <HiEyeOff /> : <HiEye />}
-                  onClick={() => setShowPassword(!showPassword)}
-                />
-              </InputRightElement>
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                placeholder="Password"
-                {...register("password", {})}
-              />
-            </InputGroup>
+            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+            <Input
+              id="confirmPassword"
+              type={"confirmPassword"}
+              autoComplete="confirmPassword"
+              required
+              placeholder="Confirm Password"
+              {...register("confirmPassword", {})}
+            />
           </FormControl>
         </Flex>
         <Flex
@@ -173,10 +214,10 @@ const SigninForm = () => {
         >
           <Text
             style={{
-              fontSize: "1rem",
+              fontSize: "0.8rem",
             }}
           >
-            Don&apos;t have an account yet?
+            Remembered it?
           </Text>
           <Link
             color="teal"
@@ -185,35 +226,12 @@ const SigninForm = () => {
             }}
             onClick={() => {
               router.push({
-                pathname: "/signup",
+                pathname: "/signin",
                 query: router.query,
               });
             }}
           >
-            Sign Up
-          </Link>
-        </Flex>
-        <Flex
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            marginBottom: "1rem",
-          }}
-        >
-          <Link
-            color="teal"
-            style={{
-              fontSize: "1rem",
-            }}
-            onClick={() => {
-              router.push({
-                pathname: "/forgot-password",
-                query: router.query,
-              });
-            }}
-          >
-            Forgot Password
+            Sign In
           </Link>
         </Flex>
         <Button
@@ -223,21 +241,23 @@ const SigninForm = () => {
           colorScheme="blue"
           variant={"solid"}
           loading={isLoading}
-          label="Sign In"
+          label="Reset Password"
           type="submit"
         />
       </form>
+    )}
+      
     </Flex>
   );
 };
 
-const SigninPage = () => {
+const ResetPassword = () => {
   useAuth({ allowUnauth: true });
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
     <>
       <Head>
-        <title>Judie - Sign In</title>
+        <title>Judie - Forgot Password</title>
         <meta
           name="description"
           content="Welcome to Judie! We're here to help with your classes, from elementary english to college level maths."
@@ -276,9 +296,9 @@ const SigninPage = () => {
               marginTop: "1rem",
             }}
           >
-            Welcome back!
+            Reset your password
           </Text>
-          <SigninForm />
+          <ResetPasswordForm />
         </Flex>
       </main>
     </>
@@ -293,6 +313,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   return { props: {} };
 };
 
-SigninPage.displayName = "Sign In";
+ResetPassword.displayName = "Reset Password";
 
-export default SigninPage;
+export default ResetPassword;

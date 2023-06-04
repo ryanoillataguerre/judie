@@ -10,7 +10,7 @@ import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
 import {cioClient} from "../utils/customerio.js";
 import { IdentifierType } from 'customerio-node';
-import { createForgotPasswordToken, getForgotPasswordToken } from "../utils/redis.js";
+import { createForgotPasswordToken, getForgotPasswordToken, deleteForgotPasswordToken } from "../utils/redis.js";
 import { sendUserForgotPasswordEmail } from "../cio/service.js";
 
 const transformUserForSegment = (user: User) => ({
@@ -172,4 +172,25 @@ export const forgotPassword = async ({email, origin}: {email: string; origin: st
     user,
     url,
   });
+}
+
+export const resetPassword = async ({token, password}: {token: string; password: string}) => {
+  // Check Redis for token
+  const userId = await getForgotPasswordToken({ token });
+  console.log('userId', userId)
+  if (!userId) {
+    throw new BadRequestError("Invalid token, try requesting another email.");
+  }
+  // Update user password
+  const _password = await bcrypt.hash(password, 10);
+  await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      password: _password,
+    },
+  });
+  // Delete token from Redis
+  await deleteForgotPasswordToken({ token });
 }
