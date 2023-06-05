@@ -1,4 +1,4 @@
-import { Button, Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue } from "@chakra-ui/react";
+import { Button, Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue, Textarea } from "@chakra-ui/react";
 import {ChatContext} from "@judie/hooks/useChat";
 import { FormEvent,useCallback, useState, useRef, useEffect, useContext } from "react";
 import { BsSend } from "react-icons/bs";
@@ -14,7 +14,7 @@ const SendButton = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: "0 0.5rem 0.5rem 0",
+        borderRadius: "0 0.5rem 0 0.5rem",
       }}
     >
       <BsSend fill={"white"} size={18} />
@@ -31,7 +31,7 @@ const ChatInput = () => {
   }, [addMessage, setChatValue, chatValue])
 
   // Autofocus the input once a user has set a subject
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     if (ref.current && chat?.subject) {
       ref.current.focus();
@@ -46,7 +46,7 @@ const ChatInput = () => {
     <form onSubmit={onSubmit}>
     <InputGroup>
     <LightMode>
-    <Input
+    <Textarea
     autoFocus={chat?.subject ? true : false}
     ref={ref}
     value={chatValue}
@@ -93,7 +93,7 @@ const ChatFooter = () => {
         position: "absolute",
         bottom: 0,
         left: 0,
-        paddingTop: '5rem',
+        paddingTop: '4rem',
         backgroundImage: gradientColor
       }}
       

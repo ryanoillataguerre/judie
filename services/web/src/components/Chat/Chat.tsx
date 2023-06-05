@@ -28,7 +28,7 @@ const Chat = ({
     }
   }
   const subjectSelectorWidth = useBreakpointValue({
-    base: "100%",
+    base: "80%",
     md: "50%",
   });
   useEffect(() => {
