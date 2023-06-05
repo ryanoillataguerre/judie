@@ -50,6 +50,32 @@ export const signinMutation = async ({
   return response.data;
 };
 
+export const forgotPasswordMutation = async ({
+  email,
+}: {
+  email: string;
+}) => {
+  const response = await baseFetch({
+    url: "/auth/forgot-password",
+    method: "POST",
+    body: { email },
+  });
+  return response.data;
+};
+
+export const resetPasswordMutation = async ({
+  password, token,
+}: {
+  password: string, token: string;
+}) => {
+  const response = await baseFetch({
+    url: "/auth/reset-password",
+    method: "POST",
+    body: { password, token },
+  });
+  return response.data;
+};
+
 export const signupMutation = async ({
   firstName,
   lastName,

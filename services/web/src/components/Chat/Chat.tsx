@@ -106,28 +106,6 @@ const Chat = ({
                 }}
               />
             )}
-            {/* {messages?.map((message, index) => {
-              const isLast = (index + 1) === messages.length;
-              // if (isLast) {
-              //   console.log('isLast', isLast && message.type === MessageType.BOT, message.readableContent)
-              // }
-              const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent.slice(0, 50)}`;
-              // console.log(key)
-              if (message.readableContent === tempUserMessage?.readableContent) {
-                setTempUserMessage(undefined)
-              }
-              return (
-                <MessageRow key={key} message={message} />
-              )
-            })}
-            {tempUserMessage && (
-              <MessageRow
-                key={`${tempUserMessage.type}-${tempUserMessage.readableContent?.slice(0, 50)}`}
-                // memoKey={`${tempUserMessage.type}-${tempUserMessage.readableContent?.slice(0, 50)}`}
-                message={tempUserMessage}
-              />
-            )}
-             */}
           </ScrollContainer>
         )
       }
