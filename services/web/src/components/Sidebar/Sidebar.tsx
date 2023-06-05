@@ -490,6 +490,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                   await clearConversations.mutateAsync();
                   setIsClearConversationsModalOpen(false);
                   refetch();
+                  if (router.pathname === "/chat") {
+                    router.push("/chat");
+                  }
                 }}
               >
                 <Text color="white">Yes, delete all chats</Text>
