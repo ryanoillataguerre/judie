@@ -58,7 +58,11 @@ variable "app_service_domain_mapping" {
   type = string
   description = "App Service domain mapping"
 }
-variable "db_password" {
+variable "customerio_api_key" {
   type = string
-  description = "DB password"
+  description = "CustomerIO API Key"
+}
+variable "customerio_app_api_key" {
+  type = string
+  description = "CustomerIO App API Key"
 }

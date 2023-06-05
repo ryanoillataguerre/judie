@@ -257,6 +257,14 @@ resource "google_cloud_run_service" "app-service" {
           name = "STRIPE_EMPLOYEE_COUPON_ID"
           value = var.env_stripe_employee_coupon_id
         }
+        env {
+          name = "CUSTOMERIO_API_KEY"
+          value = var.customerio_api_key
+        }
+        env {
+          name = "CUSTOMERIO_APP_API_KEY"
+          value = var.customerio_app_api_key
+        }
         startup_probe {
           initial_delay_seconds = 10
           failure_threshold = 3
