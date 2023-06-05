@@ -2,7 +2,7 @@ import { HTTPResponseError } from "@judie/data/baseFetch";
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { signinMutation } from "@judie/data/mutations";
+import { forgotPasswordMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "@judie/components/Button/Button";
@@ -11,11 +11,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  IconButton,
   Image,
   Input,
-  InputGroup,
-  InputRightElement,
   Link,
   Text,
   useBreakpointValue,
@@ -24,35 +21,30 @@ import {
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
-import { HiEye, HiEyeOff } from "react-icons/hi";
 
 interface SubmitData {
   email: string;
-  password: string;
 }
 
-const SigninForm = () => {
+const ForgotPasswordForm = () => {
   const router = useRouter();
   const toast = useToast();
+  const [success, setSuccess] = useState(false);
   const { handleSubmit, register } = useForm<SubmitData>({
     defaultValues: {
       email: "",
-      password: "",
     },
     reValidateMode: "onBlur",
   });
   const { mutateAsync, isLoading } = useMutation({
-    mutationFn: signinMutation,
+    mutationFn: forgotPasswordMutation,
     onSuccess: () => {
-      router.push({
-        pathname: "/chat",
-        query: router.query,
-      });
+        setSuccess(true);
     },
     onError: (err: HTTPResponseError) => {
-      console.error("Error signing in", err);
+      console.error("Error sending forgot password email in", err);
       toast({
-        title: "Error signing in",
+        title: "Error sending forgot password",
         description: err.message,
         status: "error",
         duration: 5000,
@@ -61,19 +53,13 @@ const SigninForm = () => {
     },
   });
 
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
     email,
-    password,
   }: SubmitData) => {
     try {
-      setHasSubmitted(true);
-
       await mutateAsync({
         email,
-        password,
       });
     } catch (err) {}
   };
@@ -113,10 +99,10 @@ const SigninForm = () => {
         >
           <Text
             style={{
-              fontSize: "1.5rem",
+              fontSize: "1rem",
             }}
           >
-            Sign In
+            Enter your email address and we'll send you a link to reset your password.
           </Text>
           <FormControl
             style={{
@@ -134,34 +120,6 @@ const SigninForm = () => {
               {...register("email", {})}
             />
           </FormControl>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <InputGroup size="md">
-              <InputRightElement>
-                <IconButton
-                  variant="link"
-                  aria-label={
-                    showPassword ? "Mask password" : "Reveal password"
-                  }
-                  icon={showPassword ? <HiEyeOff /> : <HiEye />}
-                  onClick={() => setShowPassword(!showPassword)}
-                />
-              </InputRightElement>
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                placeholder="Password"
-                {...register("password", {})}
-              />
-            </InputGroup>
-          </FormControl>
         </Flex>
         <Flex
           style={{
@@ -173,10 +131,10 @@ const SigninForm = () => {
         >
           <Text
             style={{
-              fontSize: "1rem",
+              fontSize: "0.8rem",
             }}
           >
-            Don&apos;t have an account yet?
+            Remembered it?
           </Text>
           <Link
             color="teal"
@@ -185,45 +143,22 @@ const SigninForm = () => {
             }}
             onClick={() => {
               router.push({
-                pathname: "/signup",
+                pathname: "/signin",
                 query: router.query,
               });
             }}
           >
-            Sign Up
-          </Link>
-        </Flex>
-        <Flex
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            marginBottom: "1rem",
-          }}
-        >
-          <Link
-            color="teal"
-            style={{
-              fontSize: "1rem",
-            }}
-            onClick={() => {
-              router.push({
-                pathname: "/forgot-password",
-                query: router.query,
-              });
-            }}
-          >
-            Forgot Password
+            Sign In
           </Link>
         </Flex>
         <Button
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
+          colorScheme={success ? "green" : "blue"}
           variant={"solid"}
           loading={isLoading}
-          label="Sign In"
+          label={success ? "Email Sent!" : "Send Email"}
           type="submit"
         />
       </form>
@@ -231,13 +166,13 @@ const SigninForm = () => {
   );
 };
 
-const SigninPage = () => {
+const ForgotPassword = () => {
   useAuth({ allowUnauth: true });
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
     <>
       <Head>
-        <title>Judie - Sign In</title>
+        <title>Judie - Forgot Password</title>
         <meta
           name="description"
           content="Welcome to Judie! We're here to help with your classes, from elementary english to college level maths."
@@ -276,9 +211,9 @@ const SigninPage = () => {
               marginTop: "1rem",
             }}
           >
-            Welcome back!
+            Forgot your password?
           </Text>
-          <SigninForm />
+          <ForgotPasswordForm />
         </Flex>
       </main>
     </>
@@ -293,6 +228,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   return { props: {} };
 };
 
-SigninPage.displayName = "Sign In";
+ForgotPassword.displayName = "Forgot Password";
 
-export default SigninPage;
+export default ForgotPassword;
