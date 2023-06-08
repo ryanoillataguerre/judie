@@ -4,7 +4,7 @@ import {
   createChatMutation,
   putChatMutation,
 } from "@judie/data/mutations";
-import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { GET_CHAT_BY_ID, getChatByIdQuery, getUserChatsQuery, GET_USER_CHATS } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
@@ -76,15 +76,18 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (tempUserMessage) {
-      setTempUserMessage(undefined);
+    const abortStream = () => {
+      if (beingStreamedMessage) {
+        abortController.abort();
+        setBeingStreamedMessage(undefined);
+        setTempUserMessage(undefined);
+      }
     }
-    if (beingStreamedMessage) {
-      abortController.abort();
-      setBeingStreamedMessage(undefined);
-      setTempUserMessage(undefined);
+    router.events.on('routeChangeStart', abortStream);
+    return () => {
+      router.events.off('routeChangeStart', abortStream);
     }
-  }, [router.asPath])
+}, [router, beingStreamedMessage, abortController]);
 
   const streamCallback = (message: string) => {
     if (message.includes(`{"error":`)) {
@@ -259,6 +262,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     
   }, [chatId, beingStreamedMessage, completionMutation, toast]);
 
+  const userChatsQuery = useQuery({
+    queryKey: [GET_USER_CHATS, auth.userData?.id],
+    enabled: false,
+    refetchOnWindowFocus: false,
+    queryFn: getUserChatsQuery
+  });
+
   // User sets a subject from the chat window
   const submitSubject = useCallback(async (subject: string) => {
     if (!chatId) {
@@ -273,6 +283,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       subject,
     });
     existingChatQuery.refetch();
+    userChatsQuery.refetch();
   }, [chatId, createChat, putChat, existingChatQuery]);
 
   const providerValue = useMemo(() => {
