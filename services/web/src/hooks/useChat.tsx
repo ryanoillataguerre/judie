@@ -4,7 +4,7 @@ import {
   createChatMutation,
   putChatMutation,
 } from "@judie/data/mutations";
-import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { GET_CHAT_BY_ID, getChatByIdQuery, getUserChatsQuery, GET_USER_CHATS } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
@@ -71,6 +71,23 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return router.query.id as string;
   }, [router.query.id]);
 
+  const abortController = useMemo(() => {
+    return new AbortController();
+  }, []);
+
+  useEffect(() => {
+    const abortStream = () => {
+      if (beingStreamedMessage) {
+        abortController.abort();
+        setBeingStreamedMessage(undefined);
+        setTempUserMessage(undefined);
+      }
+    }
+    router.events.on('routeChangeStart', abortStream);
+    return () => {
+      router.events.off('routeChangeStart', abortStream);
+    }
+}, [router, beingStreamedMessage, abortController]);
 
   const streamCallback = (message: string) => {
     if (message.includes(`{"error":`)) {
@@ -90,6 +107,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         return completionFromQueryMutation({
           query,
           chatId,
+          abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
             console.log('stream ended')
@@ -99,6 +117,15 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             setStreaming(false);
           },
           onError: (err: HTTPResponseError) => {
+            if (err.message.includes("AbortError")) {
+              toast({
+                title: "Oops!",
+                description: "Something went wrong changing pages, please try again.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+              });
+            }
             if (err.response.code === 429) {
               setPaywallOpen(true);
               setTempUserMessage(undefined);
@@ -235,6 +262,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     
   }, [chatId, beingStreamedMessage, completionMutation, toast]);
 
+  const userChatsQuery = useQuery({
+    queryKey: [GET_USER_CHATS, auth.userData?.id],
+    enabled: false,
+    refetchOnWindowFocus: false,
+    queryFn: getUserChatsQuery
+  });
+
   // User sets a subject from the chat window
   const submitSubject = useCallback(async (subject: string) => {
     if (!chatId) {
@@ -249,6 +283,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       subject,
     });
     existingChatQuery.refetch();
+    userChatsQuery.refetch();
   }, [chatId, createChat, putChat, existingChatQuery]);
 
   const providerValue = useMemo(() => {

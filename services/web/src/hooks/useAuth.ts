@@ -87,7 +87,7 @@ export default function useAuth({
         status: "success",
         duration: 7000,
         isClosable: true,
-
+        position: "top"
       })
       const newQuery = router.query;
       delete newQuery.paid;
