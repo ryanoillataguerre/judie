@@ -16,7 +16,7 @@ const Chat = ({
   chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage, abort, paywallOpen, setPaywallOpen } = useContext(ChatContext);
+  const { chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage, paywallOpen, setPaywallOpen } = useContext(ChatContext);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = () => {
@@ -34,7 +34,6 @@ const Chat = ({
   useEffect(() => {
     scroll();
     setTempUserMessage(undefined);
-    abort?.();
   }, []);
   useEffect(() => {
     scroll()
