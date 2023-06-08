@@ -5,14 +5,10 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ChatDetails(_message.Message):
-    __slots__ = ["chat_id", "subject"]
+    __slots__ = ["chat_id"]
     CHAT_ID_FIELD_NUMBER: _ClassVar[int]
-    SUBJECT_FIELD_NUMBER: _ClassVar[int]
     chat_id: str
-    subject: str
-    def __init__(
-        self, chat_id: _Optional[str] = ..., subject: _Optional[str] = ...
-    ) -> None: ...
+    def __init__(self, chat_id: _Optional[str] = ...) -> None: ...
 
 class ConnectedCheckResponse(_message.Message):
     __slots__ = ["connected"]

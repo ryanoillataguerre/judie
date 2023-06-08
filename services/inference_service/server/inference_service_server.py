@@ -7,6 +7,7 @@ import openai
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
 from inference_service.server import judie
+from inference_service.prisma_app_client import prisma_manager
 
 
 def setup_env():
@@ -24,8 +25,8 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
     def GetChatResponse(self, request, context):
         logger.info(f"Request: \n{request}")
-
-        response = judie.yield_judie_response(request.chat_id, subject=request.subject)
+        subject = prisma_manager.get_subject(chat_id=request.chat_id)
+        response = judie.yield_judie_response(request.chat_id, subject=subject)
         for part in response:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
