@@ -77,8 +77,8 @@ const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
 
 const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
   if (chat.userTitle) {
-    const result = chat.userTitle.slice(0, 25);
-    if (result.length === 25) {
+    const result = chat.userTitle.slice(0, 20);
+    if (result.length === 20) {
       return result + "...";
     }
     return result;
@@ -86,8 +86,8 @@ const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
   if (chat.messages?.[0]?.readableContent) {
     if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
       if (sliced) {
-        const result = chat.messages?.[0]?.readableContent.slice(0, 25);
-        if (result.length >= 25) {
+        const result = chat.messages?.[0]?.readableContent.slice(0, 20);
+        if (result.length >= 20) {
           return result + "...";
         }
       }
@@ -298,6 +298,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const createChat = useMutation({
     mutationFn: createChatMutation,
     onSuccess: (data) => {
+      // setTimeout(() => {refetch() }, 1000)
       refetch();
       router.push({
         query: {

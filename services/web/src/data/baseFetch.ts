@@ -37,6 +37,7 @@ export interface BaseFetchOptions {
   onChunkReceived?: (chunk: string) => void;
   onStreamEnd?: () => void;
   onError?: (error: HTTPResponseError) => void;
+  abortController?: AbortController;
 }
 
 export class HTTPResponseError extends Error {
@@ -85,7 +86,8 @@ export async function baseFetch({
   stream,
   onChunkReceived,
   onStreamEnd,
-  onError
+  onError,
+  abortController
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
@@ -104,6 +106,7 @@ export async function baseFetch({
         credentials: "include",
         method,
         body: body ? JSON.stringify(body) : null,
+        signal: abortController?.signal || null,
       }).then(async (res) => {
         if (res.status === 429) {
           onError?.(new HTTPResponseError({ error: "No messages remaining today" }, 429));

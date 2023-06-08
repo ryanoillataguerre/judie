@@ -15,13 +15,15 @@ export const completionFromQueryMutation = async ({
   chatId,
   setChatValue,
   onStreamEnd,
-  onError
+  onError,
+  abortController
 }: {
   query: string;
   chatId: string;
   setChatValue: (chat: string) => void;
   onStreamEnd?: () => void;
   onError?: (error: HTTPResponseError) => void;
+  abortController?: AbortController;
 }): Promise<string> => {
   const response = await baseFetch({
     url: `/chat/completion?chatId=${chatId}`,
@@ -30,7 +32,8 @@ export const completionFromQueryMutation = async ({
     stream: true,
     onChunkReceived: setChatValue,
     onStreamEnd,
-    onError
+    onError,
+    abortController,
   });
   return response;
 };

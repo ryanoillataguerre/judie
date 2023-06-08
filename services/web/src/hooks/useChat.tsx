@@ -71,6 +71,20 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return router.query.id as string;
   }, [router.query.id]);
 
+  const abortController = useMemo(() => {
+    return new AbortController();
+  }, []);
+
+  useEffect(() => {
+    if (tempUserMessage) {
+      setTempUserMessage(undefined);
+    }
+    if (beingStreamedMessage) {
+      abortController.abort();
+      setBeingStreamedMessage(undefined);
+      setTempUserMessage(undefined);
+    }
+  }, [router.asPath])
 
   const streamCallback = (message: string) => {
     if (message.includes(`{"error":`)) {
@@ -90,6 +104,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         return completionFromQueryMutation({
           query,
           chatId,
+          abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
             console.log('stream ended')
@@ -99,6 +114,15 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             setStreaming(false);
           },
           onError: (err: HTTPResponseError) => {
+            if (err.message.includes("AbortError")) {
+              toast({
+                title: "Oops!",
+                description: "Something went wrong changing pages, please try again.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+              });
+            }
             if (err.response.code === 429) {
               setPaywallOpen(true);
               setTempUserMessage(undefined);
