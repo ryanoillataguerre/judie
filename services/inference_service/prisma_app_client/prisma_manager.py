@@ -41,3 +41,17 @@ def get_chat_openai_fmt(
 
 def get_chat_local():
     raise NotImplementedError
+
+
+def get_subject(chat_id: str, app_db: Optional[prisma.Prisma] = None):
+    if not app_db:
+        app_db = prisma.Prisma()
+
+    app_db.connect()
+
+    selected_chat = app_db.chat.find_first(
+        where={
+            "id": chat_id,
+        },
+    )
+    return selected_chat.subject

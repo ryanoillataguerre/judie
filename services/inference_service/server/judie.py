@@ -1,3 +1,4 @@
+import prisma
 from inference_service.prompts import prompt_generator
 from inference_service.openai_manager import openai_manager
 from inference_service.prisma_app_client import prisma_manager
@@ -8,12 +9,13 @@ logger = logging.getLogger("inference_logger")
 
 
 def yield_judie_response(
-    chat_id: Optional[str], subject: str
+    chat_id: Optional[str], subject: str, app_db: Optional[prisma.Prisma] = None
 ) -> Optional[Iterator[str]]:
     """
     Wrapper around main logic for streaming based Judie Chat.
     :param chat_id: uuid string for chat objects in app DB
-    :param subject:
+    :param subject: string value for subject identifier
+    :param app_db: Prisma manager for app DB connection
     :return: Generator of response chunk strings
     """
     history = prisma_manager.get_chat_openai_fmt(chat_id=chat_id)

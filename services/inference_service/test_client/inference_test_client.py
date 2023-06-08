@@ -1,7 +1,6 @@
 import grpc
 from inference_service.server import inference_service_pb2_grpc, inference_service_pb2
 from inference_service.test_client.test_chats_config import (
-    TEST_CHAT_ID_1,
     TEST_CHAT_ID_2,
 )
 
@@ -19,9 +18,7 @@ if __name__ == "__main__":
 
         print("Chat response stream")
         response = stub.GetChatResponse(
-            inference_service_pb2.ChatDetails(
-                chat_id=TEST_CHAT_ID_2, subject="Microeconomics"
-            )
+            inference_service_pb2.ChatDetails(chat_id=TEST_CHAT_ID_2)
         )
         for part in response:
             print(str(part.responsePart), end="", flush=True)

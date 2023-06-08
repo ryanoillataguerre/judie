@@ -9,8 +9,6 @@ import * as jspb from "google-protobuf";
 export class ChatDetails extends jspb.Message { 
     getChatId(): string;
     setChatId(value: string): ChatDetails;
-    getSubject(): string;
-    setSubject(value: string): ChatDetails;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): ChatDetails.AsObject;
@@ -25,7 +23,6 @@ export class ChatDetails extends jspb.Message {
 export namespace ChatDetails {
     export type AsObject = {
         chatId: string,
-        subject: string,
     }
 }
 

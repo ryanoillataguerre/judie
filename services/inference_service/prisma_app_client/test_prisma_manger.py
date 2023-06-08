@@ -23,3 +23,8 @@ def test_get_chat_openai(env_setup):
     assert chats[0]["role"] == "user"
     assert "Gregory XIII" in chats[1]["content"]
     print(chats)
+
+
+def test_get_subject(env_setup):
+    subject = prisma_manager.get_subject(chat_id=TEST_CHAT_ID_1)
+    assert subject == "AP Art History"
