@@ -59,6 +59,7 @@ const Chat = ({
       )
     })
   }, [messages, tempUserMessage, streaming])
+  
 
   return (
     <Flex
