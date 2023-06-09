@@ -79,7 +79,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
-      abortController.abort();
       setBeingStreamedMessage(undefined);
       setTempUserMessage(undefined);
     }
@@ -249,7 +248,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    if ((beingStreamedMessage?.length || 0) > 0) {
+    if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
       console.error("Previous message not finished")
       toast({
         title: "Please wait for the previous message to respond",
@@ -271,7 +270,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
     
-  }, [chatId, beingStreamedMessage, completionMutation, toast]);
+  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage]);
 
   const userChatsQuery = useQuery({
     queryKey: [GET_USER_CHATS, auth.userData?.id],
