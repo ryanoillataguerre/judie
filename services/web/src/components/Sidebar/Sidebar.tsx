@@ -571,7 +571,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         </Button>
         <Divider backgroundColor="#565555" />
         {/* Chats container - scrollable */}
-        {isGetChatsLoading ? (
+        {isGetChatsLoading || !auth?.userData?.id ? (
           <Flex
             style={{
               width: "100%",
