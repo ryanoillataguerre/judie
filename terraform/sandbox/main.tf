@@ -199,7 +199,6 @@ resource "google_cloud_run_service" "app-service" {
   name = "app-service"
   location = "us-west1"
   autogenerate_revision_name = true
-  
 
   template {
     spec {
