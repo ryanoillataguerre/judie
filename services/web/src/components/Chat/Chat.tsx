@@ -53,7 +53,7 @@ const Chat = ({
     }
     return newMessages.map((message, index) => {
       const isLast = ((index + 1) === messages.length);
-      const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 50)}`;
+      const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 9).includes("undefined") ? message.readableContent?.slice(9, 50) : message.readableContent?.slice(0, 50)}`;
       return (
         <MessageRow key={key} message={message} />
       )
