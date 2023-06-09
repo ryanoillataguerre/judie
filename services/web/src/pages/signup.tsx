@@ -22,6 +22,7 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useToast,
+  Spinner
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
@@ -111,7 +112,7 @@ const SignupForm = () => {
   });
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return (
+  return typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
     <Flex
       style={{
         width: formWidth,

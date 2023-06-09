@@ -21,6 +21,7 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useToast,
+  Spinner
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
@@ -83,10 +84,10 @@ const SigninForm = () => {
     base: "100%",
     md: "60%",
     lg: "40%",
-  });
+  }, { fallback: "60%" });
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return (
+  return (typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
     <Flex
       style={{
         width: formWidth,
@@ -228,10 +229,12 @@ const SigninForm = () => {
         />
       </form>
     </Flex>
+  )
   );
 };
 
 const SigninPage = () => {
+  const router = useRouter();
   useAuth({ allowUnauth: true });
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
@@ -278,7 +281,9 @@ const SigninPage = () => {
           >
             Welcome back!
           </Text>
-          <SigninForm />
+          {router.isReady && (
+            <SigninForm />
+          )}
         </Flex>
       </main>
     </>

@@ -33,7 +33,8 @@ const Chat = ({
   });
   useEffect(() => {
     scroll();
-  }, []);
+    setTempUserMessage(undefined);
+  }, [setTempUserMessage]);
   useEffect(() => {
     scroll()
   }, [messages, tempUserMessage, beingStreamedMessage])
@@ -52,12 +53,13 @@ const Chat = ({
     }
     return newMessages.map((message, index) => {
       const isLast = ((index + 1) === messages.length);
-      const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 50)}`;
+      const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 9).includes("undefined") ? message.readableContent?.slice(9, 50) : message.readableContent?.slice(0, 50)}`;
       return (
         <MessageRow key={key} message={message} />
       )
     })
   }, [messages, tempUserMessage, streaming])
+  
 
   return (
     <Flex
@@ -70,25 +72,39 @@ const Chat = ({
       }}
     >
       <Paywall isOpen={paywallOpen ?? false} setIsOpen={setPaywallOpen}  />
-      {!chat || !chat?.subject ? (
+      {!chat || !chat?.subject || (!chat?.messages?.length && !beingStreamedMessage && !tempUserMessage) ? (
         <VStack style={{
             width: subjectSelectorWidth,
             padding: "2rem",
             border: "#565555 0.5px solid",
             borderRadius: "0.8rem",
         }} boxShadow={"sm"}>
-      <Flex width={"100%"}>
-        <Text
-          style={{
-            fontSize: "1.2rem",
-            fontWeight: 600,
-            marginBottom: "1rem",
-          }}
-        >
-          What would you like to chat about?
-        </Text>
-      </Flex>
-      <SubjectSelector
+          {!chat?.subject ? (
+                <Flex width={"100%"}>
+                  <Text
+                    style={{
+                      fontSize: "1.2rem",
+                      fontWeight: 600,
+                      marginBottom: "1rem",
+                    }}
+                  >
+                      What would you like to chat about?
+                    </Text>
+                  </Flex>
+            ) : (
+              <Flex width={"100%"}>
+                <Text
+                  style={{
+                    fontSize: "0.8rem",
+                    fontWeight: 400,
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  You can change your subject until you send your first message
+                </Text>
+              </Flex>
+            )}
+            <SubjectSelector
         width={"100%"}
         selectSubject={submitSubject}
       />

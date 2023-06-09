@@ -4,7 +4,7 @@ import {
   createChatMutation,
   putChatMutation,
 } from "@judie/data/mutations";
-import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { GET_CHAT_BY_ID, getChatByIdQuery, getUserChatsQuery, GET_USER_CHATS } from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
@@ -13,6 +13,7 @@ import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
 import { useRouter } from "next/router";
+import { set } from "react-hook-form";
 
 export interface TempMessage {
   type?: MessageType.BOT | MessageType.USER;
@@ -71,6 +72,32 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return router.query.id as string;
   }, [router.query.id]);
 
+  const abortController = useMemo(() => {
+    return new AbortController();
+  }, []);
+
+  const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (beingStreamedMessage && chatId !== prevChatId) {
+      setBeingStreamedMessage(undefined);
+      setTempUserMessage(undefined);
+    }
+    setPrevChatId(chatId);
+  }, [chatId, beingStreamedMessage, prevChatId, setBeingStreamedMessage]);
+
+  useEffect(() => {
+    const abortStream = () => {
+      if (beingStreamedMessage) {
+        abortController.abort();
+        setBeingStreamedMessage(undefined);
+        setTempUserMessage(undefined);
+      }
+    }
+    router.events.on('routeChangeStart', abortStream);
+    return () => {
+      router.events.off('routeChangeStart', abortStream);
+    }
+}, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
 
   const streamCallback = (message: string) => {
     if (message.includes(`{"error":`)) {
@@ -90,6 +117,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         return completionFromQueryMutation({
           query,
           chatId,
+          abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
             console.log('stream ended')
@@ -99,6 +127,15 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             setStreaming(false);
           },
           onError: (err: HTTPResponseError) => {
+            if (err.message.includes("AbortError")) {
+              toast({
+                title: "Oops!",
+                description: "Something went wrong changing pages, please try again.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+              });
+            }
             if (err.response.code === 429) {
               setPaywallOpen(true);
               setTempUserMessage(undefined);
@@ -211,7 +248,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    if ((beingStreamedMessage?.length || 0) > 0) {
+    if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
       console.error("Previous message not finished")
       toast({
         title: "Please wait for the previous message to respond",
@@ -233,7 +270,14 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
     
-  }, [chatId, beingStreamedMessage, completionMutation, toast]);
+  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage]);
+
+  const userChatsQuery = useQuery({
+    queryKey: [GET_USER_CHATS, auth.userData?.id],
+    enabled: false,
+    refetchOnWindowFocus: false,
+    queryFn: getUserChatsQuery
+  });
 
   // User sets a subject from the chat window
   const submitSubject = useCallback(async (subject: string) => {
@@ -249,7 +293,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       subject,
     });
     existingChatQuery.refetch();
-  }, [chatId, createChat, putChat, existingChatQuery]);
+    userChatsQuery.refetch();
+  }, [chatId, createChat, putChat, existingChatQuery, userChatsQuery]);
 
   const providerValue = useMemo(() => {
     return {

@@ -59,7 +59,7 @@ export default function useAuth({
 
   // GET /users/me
   const { isError, refetch, error, isLoading, isFetched } = useQuery(
-    [GET_ME],
+    [GET_ME, sessionCookie],
     () => getMeQuery(),
     {
       enabled: !!sessionCookie,
@@ -87,7 +87,7 @@ export default function useAuth({
         status: "success",
         duration: 7000,
         isClosable: true,
-
+        position: "top"
       })
       const newQuery = router.query;
       delete newQuery.paid;
