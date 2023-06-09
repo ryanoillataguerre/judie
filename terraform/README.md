@@ -5,7 +5,7 @@
 - Access to GCP
 - Locally authenticated with GCP. Run: `gcloud auth application-default login`
 - A downloaded Service Account JSON file for the corresponding environment's `terraform` Service Account
-  - These should be named `prod-sa-key.json` and `sandbox-sa-key.json`, and should be in this README document's folder (parallel to README)
+  - These should be named `prod-sa-key.json` and `sandbox-sa-key.json`, and should be in the corresponding environment's folder
 
 ### How to make changes
 
