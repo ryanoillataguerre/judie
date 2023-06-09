@@ -111,7 +111,7 @@ const SignupForm = () => {
   });
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return (
+  return typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
     <Flex
       style={{
         width: formWidth,

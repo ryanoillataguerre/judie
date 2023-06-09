@@ -40,7 +40,7 @@ const OpenCloseButton = ({
 };
 
 const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
-  const [isOpen, setIsOpen] = useStorageState<boolean>(false, "sidebarOpen");
+  const [isOpen, setIsOpen] = useStorageState<boolean>(true, "sidebarOpen");
   return (
     <Flex
       style={{
