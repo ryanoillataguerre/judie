@@ -34,7 +34,7 @@ const Chat = ({
   useEffect(() => {
     scroll();
     setTempUserMessage(undefined);
-  }, []);
+  }, [setTempUserMessage]);
   useEffect(() => {
     scroll()
   }, [messages, tempUserMessage, beingStreamedMessage])

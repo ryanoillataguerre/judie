@@ -83,7 +83,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       setTempUserMessage(undefined);
     }
     setPrevChatId(chatId);
-  }, [chatId])
+  }, [chatId, beingStreamedMessage, prevChatId, setBeingStreamedMessage]);
 
   useEffect(() => {
     const abortStream = () => {
@@ -97,7 +97,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       router.events.off('routeChangeStart', abortStream);
     }
-}, [router, beingStreamedMessage, abortController]);
+}, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
 
   const streamCallback = (message: string) => {
     if (message.includes(`{"error":`)) {
@@ -294,7 +294,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     });
     existingChatQuery.refetch();
     userChatsQuery.refetch();
-  }, [chatId, createChat, putChat, existingChatQuery]);
+  }, [chatId, createChat, putChat, existingChatQuery, userChatsQuery]);
 
   const providerValue = useMemo(() => {
     return {
