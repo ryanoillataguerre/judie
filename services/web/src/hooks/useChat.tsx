@@ -13,6 +13,7 @@ import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
 import { useRouter } from "next/router";
+import { set } from "react-hook-form";
 
 export interface TempMessage {
   type?: MessageType.BOT | MessageType.USER;
@@ -74,6 +75,16 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const abortController = useMemo(() => {
     return new AbortController();
   }, []);
+
+  const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (beingStreamedMessage && chatId !== prevChatId) {
+      abortController.abort();
+      setBeingStreamedMessage(undefined);
+      setTempUserMessage(undefined);
+    }
+    setPrevChatId(chatId);
+  }, [chatId])
 
   useEffect(() => {
     const abortStream = () => {
