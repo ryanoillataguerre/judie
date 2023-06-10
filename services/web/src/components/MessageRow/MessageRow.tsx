@@ -17,7 +17,6 @@ export const MemoizedReactMarkdown: FC<Options> = memo(
   )
 );
 
-
 const MessageRow = ({ message }: { 
     message: UIMessageType;
 }) => {
