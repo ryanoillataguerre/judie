@@ -90,7 +90,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
-        abortController.abort();
         setBeingStreamedMessage(undefined);
         setTempUserMessage(undefined);
       }
