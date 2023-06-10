@@ -7,8 +7,7 @@ import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
 import Paywall from "../Paywall/Paywall";
 
-// const MessageRow = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
-
+// const MessageRowMemo = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
 const Chat = ({
   initialQuery,
@@ -45,11 +44,6 @@ const Chat = ({
       if (tempUserMessage) {
         newMessages = [...newMessages, tempUserMessage]
       }
-      // newMessages = [...newMessages, {
-      //   type: MessageType.BOT,
-      //   readableContent: beingStreamedMessage,
-      //   createdAt: new Date(),
-      // }]
     }
     return newMessages.map((message, index) => {
       const isLast = ((index + 1) === messages.length);
@@ -105,9 +99,9 @@ const Chat = ({
               </Flex>
             )}
             <SubjectSelector
-        width={"100%"}
-        selectSubject={submitSubject}
-      />
+              width={"100%"}
+              selectSubject={submitSubject}
+            />
       </VStack>
       ) : (
           <ScrollContainer>
