@@ -69,9 +69,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [streaming, setStreaming] = useState<boolean>(false);
 
   const chatId = useMemo(() => {
-    return router.query.id as string;
-  }, [router.query.id]);
+    return router.query?.id as string;
+  }, [router.query]);
 
+
+  useEffect(() => {
+    console.log('streaming', streaming)
+  }, [streaming])
   const abortController = useMemo(() => {
     return new AbortController();
   }, []);
@@ -79,8 +83,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
+      console.log('firing reset hook')
       setBeingStreamedMessage(undefined);
       setTempUserMessage(undefined);
+      setStreaming(false);
     }
     setPrevChatId(chatId);
   }, [chatId, beingStreamedMessage, prevChatId, setBeingStreamedMessage]);
@@ -121,7 +127,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           setChatValue: streamCallback,
           onStreamEnd: async () => {
             console.log('stream ended')
-            auth.refresh();
+            // auth.refresh();
             await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
             setStreaming(false);
@@ -172,9 +178,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     retry: false,
   });
 
-  useEffect(() => {
-    setBeingStreamedMessage(undefined);
-  }, [chatId, setBeingStreamedMessage])
+  // useEffect(() => {
+  //   setBeingStreamedMessage(undefined);
+  // }, [chatId, setBeingStreamedMessage])
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -248,7 +254,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
+    if (streaming) {
       console.error("Previous message not finished")
       toast({
         title: "Please wait for the previous message to respond",
