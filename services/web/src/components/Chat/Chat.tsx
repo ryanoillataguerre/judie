@@ -7,7 +7,7 @@ import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
 import Paywall from "../Paywall/Paywall";
 
-const MessageRowMemo = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
+// const MessageRowMemo = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
 const Chat = ({
   initialQuery,
@@ -44,17 +44,12 @@ const Chat = ({
       if (tempUserMessage) {
         newMessages = [...newMessages, tempUserMessage]
       }
-      // newMessages = [...newMessages, {
-      //   type: MessageType.BOT,
-      //   readableContent: beingStreamedMessage,
-      //   createdAt: new Date(),
-      // }]
     }
     return newMessages.map((message, index) => {
       const isLast = ((index + 1) === messages.length);
       const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 9).includes("undefined") ? message.readableContent?.slice(9, 50) : message.readableContent?.slice(0, 50)}`;
       return (
-        <MessageRowMemo key={key} message={message} />
+        <MessageRow key={key} message={message} />
       )
     })
   }, [messages, tempUserMessage, streaming])
@@ -104,15 +99,15 @@ const Chat = ({
               </Flex>
             )}
             <SubjectSelector
-        width={"100%"}
-        selectSubject={submitSubject}
-      />
+              width={"100%"}
+              selectSubject={submitSubject}
+            />
       </VStack>
       ) : (
           <ScrollContainer>
             {renderedMessages}
             {beingStreamedMessage && (
-              <MessageRowMemo
+              <MessageRow
                 key={`${MessageType.BOT}-mostRecent`}
                 message={{
                   type: MessageType.BOT,
