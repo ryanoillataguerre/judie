@@ -127,10 +127,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           setChatValue: streamCallback,
           onStreamEnd: async () => {
             console.log('stream ended')
-            // auth.refresh();
-            await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
             setStreaming(false);
+            // auth.refresh();
+            await existingChatQuery.refetch();
           },
           onError: (err: HTTPResponseError) => {
             if (err.message.includes("AbortError")) {
