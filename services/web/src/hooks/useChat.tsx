@@ -73,9 +73,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, [router.query]);
 
 
-  useEffect(() => {
-    console.log('streaming', streaming)
-  }, [streaming])
   const abortController = useMemo(() => {
     return new AbortController();
   }, []);
@@ -83,7 +80,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
-      console.log('firing reset hook')
       setBeingStreamedMessage(undefined);
       setTempUserMessage(undefined);
       setStreaming(false);
@@ -126,10 +122,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
-            console.log('stream ended')
             setBeingStreamedMessage(undefined);
             setStreaming(false);
-            // auth.refresh();
             await existingChatQuery.refetch();
           },
           onError: (err: HTTPResponseError) => {
