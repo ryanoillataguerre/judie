@@ -69,8 +69,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [streaming, setStreaming] = useState<boolean>(false);
 
   const chatId = useMemo(() => {
-    return router.query.id as string;
-  }, [router.query.id]);
+    return router.query?.id as string;
+  }, [router.query]);
+
 
   const abortController = useMemo(() => {
     return new AbortController();
@@ -81,6 +82,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     if (beingStreamedMessage && chatId !== prevChatId) {
       setBeingStreamedMessage(undefined);
       setTempUserMessage(undefined);
+      setStreaming(false);
     }
     setPrevChatId(chatId);
   }, [chatId, beingStreamedMessage, prevChatId, setBeingStreamedMessage]);
@@ -88,7 +90,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
-        abortController.abort();
         setBeingStreamedMessage(undefined);
         setTempUserMessage(undefined);
       }
@@ -120,11 +121,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
-            console.log('stream ended')
-            auth.refresh();
-            await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
             setStreaming(false);
+            await existingChatQuery.refetch();
           },
           onError: (err: HTTPResponseError) => {
             if (err.message.includes("AbortError")) {
@@ -172,9 +171,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     retry: false,
   });
 
-  useEffect(() => {
-    setBeingStreamedMessage(undefined);
-  }, [chatId, setBeingStreamedMessage])
+  // useEffect(() => {
+  //   setBeingStreamedMessage(undefined);
+  // }, [chatId, setBeingStreamedMessage])
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -248,7 +247,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
+    if (streaming) {
       console.error("Previous message not finished")
       toast({
         title: "Please wait for the previous message to respond",
