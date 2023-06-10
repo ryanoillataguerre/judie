@@ -7,8 +7,7 @@ import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
 import Paywall from "../Paywall/Paywall";
 
-// const MessageRow = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
-
+const MessageRowMemo = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
 const Chat = ({
   initialQuery,
@@ -55,7 +54,7 @@ const Chat = ({
       const isLast = ((index + 1) === messages.length);
       const key = `${message.type}-${isLast && message.type === MessageType.BOT ? `mostRecent` : message.readableContent?.slice(0, 9).includes("undefined") ? message.readableContent?.slice(9, 50) : message.readableContent?.slice(0, 50)}`;
       return (
-        <MessageRow key={key} message={message} />
+        <MessageRowMemo key={key} message={message} />
       )
     })
   }, [messages, tempUserMessage, streaming])
@@ -113,7 +112,7 @@ const Chat = ({
           <ScrollContainer>
             {renderedMessages}
             {beingStreamedMessage && (
-              <MessageRow
+              <MessageRowMemo
                 key={`${MessageType.BOT}-mostRecent`}
                 message={{
                   type: MessageType.BOT,
