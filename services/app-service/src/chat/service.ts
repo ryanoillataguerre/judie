@@ -389,56 +389,62 @@ export const getChatGPTCompletion = async (
       );
 
     let fullContent = "";
-    await new Promise(async (resolve, reject) => {
-      const response = await openaiClient.createChatCompletion(
-        {
-          model: OPENAI_COMPLETION_MODEL,
-          messages: maxLengthLimitedMessages,
-          user: chat.userId,
-          temperature: 0.7,
-          max_tokens: 600,
-          top_p: 1,
-          frequency_penalty: 0,
-          presence_penalty: 0,
-          stream: true,
-        },
-        { responseType: "stream" }
-      );
+    try {
+      await new Promise(async (resolve, reject) => {
+        const response = await openaiClient.createChatCompletion(
+          {
+            model: OPENAI_COMPLETION_MODEL,
+            messages: maxLengthLimitedMessages,
+            user: chat.userId,
+            temperature: 0.7,
+            max_tokens: 600,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            stream: true,
+          },
+          { responseType: "stream" }
+        );
 
-      const stream = response.data as unknown as IncomingMessage;
+        const stream = response.data as unknown as IncomingMessage;
 
-      stream.on("data", (chunk: Buffer) => {
-        // Messages in the event stream are separated by a pair of newline characters.
-        const payloads = chunk.toString().split("\n\n");
-        for (const payload of payloads) {
-          if (payload.includes("[DONE]")) {
-            return;
-          }
-          if (payload.startsWith("data:")) {
-            const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
-            try {
-              const delta = JSON.parse(data.trim());
-              const content = delta.choices[0].delta?.content;
-              const filteredContent = content?.replace("undefined", "");
-              if (filteredContent) {
-                fullContent += filteredContent;
-                onChunkReceived(filteredContent);
+        stream.on("data", (chunk: Buffer) => {
+          // Messages in the event stream are separated by a pair of newline characters.
+          const payloads = chunk.toString().split("\n\n");
+          for (const payload of payloads) {
+            if (payload.includes("[DONE]")) {
+              return;
+            }
+            if (payload.startsWith("data:")) {
+              const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
+              try {
+                const delta = JSON.parse(data.trim());
+                const content = delta.choices[0].delta?.content;
+                const filteredContent = content?.replace("undefined", "");
+                if (filteredContent) {
+                  fullContent += filteredContent;
+                  onChunkReceived(filteredContent);
+                }
+              } catch (error) {
+                throw new InternalError("Error parsing OpenAI stream");
               }
-            } catch (error) {
-              throw new InternalError("Error parsing OpenAI stream");
             }
           }
-        }
-      });
+        });
 
-      stream.on("end", () => {
-        resolve(fullContent);
+        stream.on("end", () => {
+          resolve(fullContent);
+        });
+        stream.on("error", (e: Error) => {
+          console.error("Stream error: ", e);
+          reject(e);
+        });
       });
-      stream.on("error", (e: Error) => {
-        console.error("Stream error: ", e);
-        reject(e);
-      });
-    });
+    } catch (err) {
+      console.error("Error getting completion: ", err);
+      throw err;
+    }
+
 
     if (fullContent) {
       const newMessage = {
