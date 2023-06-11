@@ -106,7 +106,7 @@ const Chat = ({
       ) : (
           <ScrollContainer>
             {renderedMessages}
-            {beingStreamedMessage && (
+            {beingStreamedMessage && streaming && (
               <MessageRow
                 key={`${MessageType.BOT}-mostRecent`}
                 message={{

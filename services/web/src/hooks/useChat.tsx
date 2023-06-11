@@ -76,6 +76,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return new AbortController();
   }, []);
 
+  useEffect(() => {
+    setStreaming(false);
+  }, [chatId]);
+
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
@@ -88,7 +92,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
-        abortController.abort();
         setBeingStreamedMessage(undefined);
         setTempUserMessage(undefined);
       }
@@ -97,9 +100,15 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       router.events.off('routeChangeStart', abortStream);
     }
-}, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
+  }, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
 
-  const streamCallback = (message: string) => {
+  const userChatsQuery = useQuery({
+    queryKey: [GET_USER_CHATS, auth.userData?.id],
+    enabled: false,
+    refetchOnWindowFocus: false,
+    queryFn: getUserChatsQuery
+  });
+  const streamCallback = useCallback((message: string) => {
     if (message.includes(`{"error":`)) {
       return;
     }
@@ -109,10 +118,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setBeingStreamedMessage((prev) => prev + message);
     }
-  };
+  }, [streaming, setBeingStreamedMessage]);
   const completionMutation = useMutation({
     mutationFn: ({ query }: { query: string }): Promise<string> => {
       if (chatId) {
+        setStreaming(true);
         setBeingStreamedMessage(undefined);
         return completionFromQueryMutation({
           query,
@@ -120,8 +130,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
-            console.log('stream ended')
             auth.refresh();
+            userChatsQuery.refetch();
             await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
             setStreaming(false);
@@ -156,18 +166,20 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     onError: (err: HTTPResponseError) => {
       setStreaming(false);
-      console.log('errResponse', err.response)
+      console.error('Completion error: ', err.response)
       if (err.response?.status === 429) {
         // Rate limited - user is out of questions for the day
         setPaywallOpen(true);
+      } else {
+        toast({
+          title: "Oops!",
+          description: err.message || "Something went wrong, please try again.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
       }
-      toast({
-        title: "Oops!",
-        description: err.message || "Something went wrong, please try again.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+
     },
     retry: false,
   });
@@ -249,7 +261,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       });
     }
     if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
-      console.error("Previous message not finished")
       toast({
         title: "Please wait for the previous message to respond",
         status: "warning",
@@ -271,13 +282,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     await completionMutation.mutateAsync({ query: prompt });
     
   }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage]);
-
-  const userChatsQuery = useQuery({
-    queryKey: [GET_USER_CHATS, auth.userData?.id],
-    enabled: false,
-    refetchOnWindowFocus: false,
-    queryFn: getUserChatsQuery
-  });
 
   // User sets a subject from the chat window
   const submitSubject = useCallback(async (subject: string) => {
