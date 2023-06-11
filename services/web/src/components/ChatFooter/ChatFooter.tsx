@@ -1,7 +1,8 @@
-import { Button, Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue, Textarea } from "@chakra-ui/react";
+import { Button, Box, Flex, Input, InputGroup, InputRightElement, LightMode, useBreakpointValue, useColorModeValue, Textarea, useToast, Text, ToastPosition } from "@chakra-ui/react";
 import {ChatContext} from "@judie/hooks/useChat";
 import { FormEvent,useCallback, useState, useRef, useEffect, useContext } from "react";
-import { BsSend } from "react-icons/bs";
+import { AiOutlineEnter } from "react-icons/ai";
+import { BsSend, BsShift } from "react-icons/bs";
 
 const SendButton = () => {
   return (
@@ -10,11 +11,11 @@ const SendButton = () => {
       colorScheme="teal"
       style={{
         padding: "0 0.5rem",
-        height: "100%",
+        height: "99%", // 100% extends a LITTLE over the bottom of the textArea
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: "0 0.5rem 0 0.5rem",
+        borderRadius: "0 0.5rem 0.5rem 0",
       }}
     >
       <BsSend fill={"white"} size={18} />
@@ -24,7 +25,7 @@ const SendButton = () => {
 const ChatInput = () => {
   const { addMessage, chat} = useContext(ChatContext);
   const [chatValue, setChatValue] = useState<string>("")
-  const onSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = useCallback((e: FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     addMessage(chatValue);
     setChatValue("");
@@ -42,29 +43,62 @@ const ChatInput = () => {
     "#FFFFFF",
     "#202123",
   );
+
+  const toastPosition = useBreakpointValue({
+    base: "top-left" as ToastPosition,
+    md: "bottom-left" as ToastPosition,
+  }, {
+    fallback: "top-left" as ToastPosition
+  });
+  const toast = useToast();
+  const [shiftPressedRecently, setShiftPressedRecently] = useState<boolean>(false);
+  const onKeyUp = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!shiftPressedRecently) {
+        toast({
+          title: <Flex direction={"row"} alignItems={"center"} gap={2}><Text>Press </Text><BsShift /><Text> and </Text><AiOutlineEnter /><Text> to submit</Text></Flex>,
+          status: "info",
+          duration: 4000,
+          isClosable: true,
+          position: toastPosition
+        })
+        setShiftPressedRecently(true);
+      }
+      setTimeout(() => {
+        setShiftPressedRecently(false);
+      }, 15000);
+    }
+    if (e.key === "Enter" && e.shiftKey) {
+      e.preventDefault();
+      onSubmit(e);
+    }
+  }, [onSubmit, toast, shiftPressedRecently, setShiftPressedRecently, toastPosition]);
+
   return (
     <form onSubmit={onSubmit}>
     <InputGroup>
-    <LightMode>
-    <Textarea
-    autoFocus={chat?.subject ? true : false}
-    ref={ref}
-    value={chatValue}
-    _hover={{
-      borderColor: "teal",
-    }}
-    onChange={(e) => setChatValue(e.target.value)}
-      placeholder="Ask Judie anything..."
-      style={{
-        width: "100%",
-        padding: "auto 2rem auto auto",
-        backgroundColor: bgColor,
+      <LightMode>
+      <Textarea
+        onKeyUp={onKeyUp}
+      autoFocus={chat?.subject ? true : false}
+      ref={ref}
+      value={chatValue}
+      _hover={{
+        borderColor: "teal",
       }}
-    />
-    </LightMode>
-    <InputRightElement>
-      <SendButton />
-    </InputRightElement>
+      onChange={(e) => setChatValue(e.target.value)}
+        placeholder="Ask Judie anything..."
+        style={{
+          width: "100%",
+          padding: "auto 2rem auto auto",
+          backgroundColor: bgColor,
+        }}
+      />
+      </LightMode>
+      <InputRightElement style={{ height: "100%" }}>
+        <SendButton />
+      </InputRightElement>
     </InputGroup>
     </form>
   );
