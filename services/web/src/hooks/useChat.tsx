@@ -36,6 +36,8 @@ interface UseChatData {
   tempUserMessage?: TempMessage;
   setTempUserMessage: (message: TempMessage | undefined) => void;
   setPaywallOpen: (open: boolean) => void;
+  beingStreamedChatId?: string;
+  tempUserMessageChatId?: string;
 }
 
 export const ChatContext = createContext<UseChatData>({
@@ -51,6 +53,8 @@ export const ChatContext = createContext<UseChatData>({
   tempUserMessage: undefined,
   setTempUserMessage: () => {},
   setPaywallOpen: () => {},
+  beingStreamedChatId: undefined,
+  tempUserMessageChatId: undefined,
 });
 
 
@@ -72,9 +76,20 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return router.query.id as string;
   }, [router.query.id]);
 
+  const [beingStreamedChatId, setBeingStreamedChatId] = useStorageState<
+    string | undefined
+  >(undefined, "beingStreamedChatId");
+  const [tempUserMessageChatId, setTempUserMessageChatId] = useStorageState<
+    string | undefined
+  >(undefined, "tempUserMessageChatId");
+
   const abortController = useMemo(() => {
     return new AbortController();
   }, []);
+
+  // useEffect(() => {
+  //   setBeingStreamedChatId(undefined);
+  // }, [chatId])
 
   useEffect(() => {
     setStreaming(false);
@@ -83,7 +98,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
-      setBeingStreamedMessage(undefined);
+      // setBeingStreamedMessage(undefined);
       setTempUserMessage(undefined);
     }
     setPrevChatId(chatId);
@@ -92,7 +107,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
-        setBeingStreamedMessage(undefined);
+        // setBeingStreamedMessage(undefined);
         setTempUserMessage(undefined);
       }
     }
@@ -124,12 +139,14 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       if (chatId) {
         setStreaming(true);
         setBeingStreamedMessage(undefined);
+        setBeingStreamedChatId(chatId);
         return completionFromQueryMutation({
           query,
           chatId,
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
+            setBeingStreamedChatId(undefined);
             auth.refresh();
             userChatsQuery.refetch();
             await existingChatQuery.refetch();
@@ -184,13 +201,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     retry: false,
   });
 
-  useEffect(() => {
-    setBeingStreamedMessage(undefined);
-  }, [chatId, setBeingStreamedMessage])
-
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
-    enabled: !!chatId && !beingStreamedMessage?.length,
+    enabled: !!chatId,
     refetchOnWindowFocus: false,
     queryFn: () => getChatByIdQuery(chatId as string),
     onSuccess: (data) => {
@@ -200,11 +213,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         setDisplayWelcome(true);
       }
       setMessages(data?.messages);
-      if (!completionMutation.isLoading) {
-        if (beingStreamedMessage) {
-          setBeingStreamedMessage(undefined);
-        }
-      }
+      // if (!completionMutation.isLoading) {
+      //   if (beingStreamedMessage) {
+      //     setBeingStreamedMessage(undefined);
+      //   }
+      // }
     },
     onError: (err: HTTPResponseError) => {
       toast({
@@ -277,6 +290,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         createdAt: new Date(),
       })
     );
+    setTempUserMessageChatId(chatId);
     // Call mutation
     setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
@@ -301,34 +315,38 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, [chatId, createChat, putChat, existingChatQuery, userChatsQuery]);
 
   const providerValue = useMemo(() => {
-    return {
-      chat: existingChatQuery.data,
-      addMessage,
-      streaming,
-    messages,
-    beingStreamedMessage,
-    displayWelcome,
-    paywallOpen,
-    submitSubject,
-    activeChatId: chatId,
-    tempUserMessage,
-    setTempUserMessage,
-    setPaywallOpen
-    };
-  }, [
+      return {
+        chat: existingChatQuery.data,
+        addMessage,
+        streaming,
+        messages,
+        beingStreamedMessage,
+        displayWelcome,
+        paywallOpen,
+        submitSubject,
+        activeChatId: chatId,
+        tempUserMessage,
+        setTempUserMessage,
+        setPaywallOpen,
+        beingStreamedChatId,
+        tempUserMessageChatId,
+      };
+    }, [
       existingChatQuery.data,
       addMessage,
-    messages,
-    beingStreamedMessage,
-    displayWelcome,
-    paywallOpen,
-    submitSubject,
-    chatId,
-    tempUserMessage,
-    setTempUserMessage,
-    streaming,
-    setPaywallOpen
-  ]);
+      messages,
+      beingStreamedMessage,
+      displayWelcome,
+      paywallOpen,
+      submitSubject,
+      chatId,
+      tempUserMessage,
+      setTempUserMessage,
+      streaming,
+      setPaywallOpen,
+      beingStreamedChatId,
+      tempUserMessageChatId,
+    ]);
   return (
     <ChatContext.Provider value={providerValue}>
       {children}

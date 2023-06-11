@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useMemo, useRef } from "react";
+import { memo, use, useContext, useEffect, useMemo, useRef } from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import  { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
@@ -6,17 +6,20 @@ import MessageRow from "../MessageRow/MessageRow";
 import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
 import Paywall from "../Paywall/Paywall";
+import { useRouter } from "next/router";
 
 // const MessageRowMemo = memo(MessageRow, (prevProps, nextProps) => prevProps.message.readableContent === nextProps.message.readableContent);
 
 const Chat = ({
   initialQuery,
 }: {
-  chatId?: string;
   initialQuery?: string;
 }) => {
-  const { chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage, paywallOpen, setPaywallOpen } = useContext(ChatContext);
+  const { tempUserMessageChatId, beingStreamedChatId, chat, streaming, submitSubject, messages, beingStreamedMessage, tempUserMessage, setTempUserMessage, paywallOpen, setPaywallOpen } = useContext(ChatContext);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const router = useRouter();
+  const chatId = router.query.id;
 
   const scroll = () => {
     const offsetHeight = scrollContainerRef.current?.offsetHeight || 0
@@ -41,7 +44,7 @@ const Chat = ({
   const renderedMessages = useMemo(() => {
     let newMessages: UIMessageType[] = messages;
     if (streaming) {
-      if (tempUserMessage) {
+      if (tempUserMessage && (tempUserMessageChatId === chatId)) {
         newMessages = [...newMessages, tempUserMessage]
       }
     }
@@ -52,7 +55,7 @@ const Chat = ({
         <MessageRow key={key} message={message} />
       )
     })
-  }, [messages, tempUserMessage, streaming])
+  }, [messages, tempUserMessage, streaming, chatId, tempUserMessageChatId])
   
 
   return (
@@ -106,7 +109,7 @@ const Chat = ({
       ) : (
           <ScrollContainer>
             {renderedMessages}
-            {beingStreamedMessage && streaming && (
+            {beingStreamedMessage && (streaming || (beingStreamedChatId === chatId)) && (
               <MessageRow
                 key={`${MessageType.BOT}-mostRecent`}
                 message={{
