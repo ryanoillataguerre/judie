@@ -562,7 +562,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             padding: "1.5rem",
           }}
       onClick={() => {
-        if ((chatContext?.chat?.messages?.length || 0) > 0 && chatContext?.chat?.subject) {
+        if (((chatContext?.chat?.messages?.length || 0) > 0 && chatContext?.chat?.subject) || !chatContext.chat) {
           createChat.mutate({})
         }
       }}
