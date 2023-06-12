@@ -258,11 +258,15 @@ resource "google_cloud_run_service" "app-service" {
         }
         env {
           name = "CUSTOMERIO_API_KEY"
-          value = var.customerio_api_key
+          value = var.env_customerio_api_key
         }
         env {
           name = "CUSTOMERIO_APP_API_KEY"
-          value = var.customerio_app_api_key
+          value = var.env_customerio_app_api_key
+        }
+        env {
+          name = "CUSTOMERIO_SITE_ID"
+          value = var.env_customerio_site_id
         }
         startup_probe {
           initial_delay_seconds = 10

@@ -36,6 +36,8 @@ interface UseChatData {
   tempUserMessage?: TempMessage;
   setTempUserMessage: (message: TempMessage | undefined) => void;
   setPaywallOpen: (open: boolean) => void;
+  beingStreamedChatId?: string;
+  tempUserMessageChatId?: string;
 }
 
 export const ChatContext = createContext<UseChatData>({
@@ -51,6 +53,8 @@ export const ChatContext = createContext<UseChatData>({
   tempUserMessage: undefined,
   setTempUserMessage: () => {},
   setPaywallOpen: () => {},
+  beingStreamedChatId: undefined,
+  tempUserMessageChatId: undefined,
 });
 
 
@@ -72,14 +76,29 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return router.query.id as string;
   }, [router.query.id]);
 
+  const [beingStreamedChatId, setBeingStreamedChatId] = useStorageState<
+    string | undefined
+  >(undefined, "beingStreamedChatId");
+  const [tempUserMessageChatId, setTempUserMessageChatId] = useStorageState<
+    string | undefined
+  >(undefined, "tempUserMessageChatId");
+
   const abortController = useMemo(() => {
     return new AbortController();
   }, []);
 
+  // useEffect(() => {
+  //   setBeingStreamedChatId(undefined);
+  // }, [chatId])
+
+  useEffect(() => {
+    setStreaming(false);
+  }, [chatId]);
+
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
-      setBeingStreamedMessage(undefined);
+      // setBeingStreamedMessage(undefined);
       setTempUserMessage(undefined);
     }
     setPrevChatId(chatId);
@@ -88,8 +107,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
-        abortController.abort();
-        setBeingStreamedMessage(undefined);
+        // setBeingStreamedMessage(undefined);
         setTempUserMessage(undefined);
       }
     }
@@ -97,9 +115,15 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       router.events.off('routeChangeStart', abortStream);
     }
-}, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
+  }, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
 
-  const streamCallback = (message: string) => {
+  const userChatsQuery = useQuery({
+    queryKey: [GET_USER_CHATS, auth.userData?.id],
+    enabled: false,
+    refetchOnWindowFocus: false,
+    queryFn: getUserChatsQuery
+  });
+  const streamCallback = useCallback((message: string) => {
     if (message.includes(`{"error":`)) {
       return;
     }
@@ -109,19 +133,22 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setBeingStreamedMessage((prev) => prev + message);
     }
-  };
+  }, [streaming, setBeingStreamedMessage]);
   const completionMutation = useMutation({
     mutationFn: ({ query }: { query: string }): Promise<string> => {
       if (chatId) {
+        setStreaming(true);
         setBeingStreamedMessage(undefined);
+        setBeingStreamedChatId(chatId);
         return completionFromQueryMutation({
           query,
           chatId,
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
-            console.log('stream ended')
+            setBeingStreamedChatId(undefined);
             auth.refresh();
+            userChatsQuery.refetch();
             await existingChatQuery.refetch();
             setBeingStreamedMessage(undefined);
             setStreaming(false);
@@ -156,29 +183,27 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     onError: (err: HTTPResponseError) => {
       setStreaming(false);
-      console.log('errResponse', err.response)
+      console.error('Completion error: ', err.response)
       if (err.response?.status === 429) {
         // Rate limited - user is out of questions for the day
         setPaywallOpen(true);
+      } else {
+        toast({
+          title: "Oops!",
+          description: err.message || "Something went wrong, please try again.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
       }
-      toast({
-        title: "Oops!",
-        description: err.message || "Something went wrong, please try again.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+
     },
     retry: false,
   });
 
-  useEffect(() => {
-    setBeingStreamedMessage(undefined);
-  }, [chatId, setBeingStreamedMessage])
-
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
-    enabled: !!chatId && !beingStreamedMessage?.length,
+    enabled: !!chatId,
     refetchOnWindowFocus: false,
     queryFn: () => getChatByIdQuery(chatId as string),
     onSuccess: (data) => {
@@ -188,11 +213,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         setDisplayWelcome(true);
       }
       setMessages(data?.messages);
-      if (!completionMutation.isLoading) {
-        if (beingStreamedMessage) {
-          setBeingStreamedMessage(undefined);
-        }
-      }
+      // if (!completionMutation.isLoading) {
+      //   if (beingStreamedMessage) {
+      //     setBeingStreamedMessage(undefined);
+      //   }
+      // }
     },
     onError: (err: HTTPResponseError) => {
       toast({
@@ -232,6 +257,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
+
+  // console.log('outside callback - streaming', streaming)
+  // console.log('outside callback - beingStreamedMessage', beingStreamedMessage)
+  // console.log('outside callback - beingStreamedChatId', beingStreamedChatId)
+
   const addMessage = useCallback(async (prompt: string) => {
     // Guard clauses
     if (!prompt || prompt.length === 0) {
@@ -248,8 +278,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
-      console.error("Previous message not finished")
+    console.log('inside callback - streaming', streaming)
+    console.log('inside callback - beingStreamedMessage', beingStreamedMessage)
+    console.log('inside callback - beingStreamedChatId', beingStreamedChatId)
+    if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",
         status: "warning",
@@ -266,18 +298,12 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         createdAt: new Date(),
       })
     );
+    setTempUserMessageChatId(chatId);
     // Call mutation
     setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
     
-  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage]);
-
-  const userChatsQuery = useQuery({
-    queryKey: [GET_USER_CHATS, auth.userData?.id],
-    enabled: false,
-    refetchOnWindowFocus: false,
-    queryFn: getUserChatsQuery
-  });
+  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage, beingStreamedChatId]);
 
   // User sets a subject from the chat window
   const submitSubject = useCallback(async (subject: string) => {
@@ -297,34 +323,38 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, [chatId, createChat, putChat, existingChatQuery, userChatsQuery]);
 
   const providerValue = useMemo(() => {
-    return {
-      chat: existingChatQuery.data,
-      addMessage,
-      streaming,
-    messages,
-    beingStreamedMessage,
-    displayWelcome,
-    paywallOpen,
-    submitSubject,
-    activeChatId: chatId,
-    tempUserMessage,
-    setTempUserMessage,
-    setPaywallOpen
-    };
-  }, [
+      return {
+        chat: existingChatQuery.data,
+        addMessage,
+        streaming,
+        messages,
+        beingStreamedMessage,
+        displayWelcome,
+        paywallOpen,
+        submitSubject,
+        activeChatId: chatId,
+        tempUserMessage,
+        setTempUserMessage,
+        setPaywallOpen,
+        beingStreamedChatId,
+        tempUserMessageChatId,
+      };
+    }, [
       existingChatQuery.data,
       addMessage,
-    messages,
-    beingStreamedMessage,
-    displayWelcome,
-    paywallOpen,
-    submitSubject,
-    chatId,
-    tempUserMessage,
-    setTempUserMessage,
-    streaming,
-    setPaywallOpen
-  ]);
+      messages,
+      beingStreamedMessage,
+      displayWelcome,
+      paywallOpen,
+      submitSubject,
+      chatId,
+      tempUserMessage,
+      setTempUserMessage,
+      streaming,
+      setPaywallOpen,
+      beingStreamedChatId,
+      tempUserMessageChatId,
+    ]);
   return (
     <ChatContext.Provider value={providerValue}>
       {children}

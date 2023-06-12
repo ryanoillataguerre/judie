@@ -177,7 +177,6 @@ export const forgotPassword = async ({email, origin}: {email: string; origin: st
 export const resetPassword = async ({token, password}: {token: string; password: string}) => {
   // Check Redis for token
   const userId = await getForgotPasswordToken({ token });
-  console.log('userId', userId)
   if (!userId) {
     throw new BadRequestError("Invalid token, try requesting another email.");
   }

@@ -1,7 +1,7 @@
 import rehypeMathjax from 'rehype-mathjax';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import { useColorModeValue, Flex, Table, Td, Thead, useBreakpointValue, Tr, Code } from "@chakra-ui/react"
+import { useColorModeValue, Flex, Table, Td, Thead, Tr, Code } from "@chakra-ui/react"
 import { MessageType } from "@judie/data/types/api"
 import { UIMessageType } from "@judie/hooks/useChat"
 import CodeBlock from './CodeBlock';
@@ -17,27 +17,10 @@ export const MemoizedReactMarkdown: FC<Options> = memo(
   )
 );
 
-
 const MessageRow = ({ message }: { 
     message: UIMessageType;
 }) => {
   const userBgColor = useColorModeValue("#D9F0ED", "#373f58");
-  const leftColumnW = useBreakpointValue({
-    base: "20%",
-    md: "15%",
-  })
-  const rightColumnW = useBreakpointValue({
-    base: "10%",
-    md: "15%",
-  })
-  const middleColumnW = useBreakpointValue({
-    base: "75%",
-    md: "60%",
-  })
-  const leftColumnJustify = useBreakpointValue({
-    base: "center",
-    md: "flex-end",
-  })
   return (
     <Flex style={{
       flexDirection: "row",
@@ -49,8 +32,8 @@ const MessageRow = ({ message }: {
         flexDirection: "row",
         alignItems: "flex-start",
         padding: "1rem",
-        justifyContent: leftColumnJustify,
-        width: leftColumnW,
+        justifyContent: "flex-end",
+        width: "15%",
       }}>
         {message.type === MessageType.USER ? (
           <AiOutlineUser size={20} />
@@ -62,7 +45,7 @@ const MessageRow = ({ message }: {
       flexDirection: "column",
       gap: "0.5rem",
       padding: "1rem",
-      width: middleColumnW
+      width: "60%",
     }}>
       {message.type === MessageType.BOT ? (
         <MemoizedReactMarkdown
@@ -126,7 +109,7 @@ const MessageRow = ({ message }: {
     </Flex>
     <Flex
       style={{
-        width: rightColumnW
+        width: "15%"
       }}
     />
     </Flex>

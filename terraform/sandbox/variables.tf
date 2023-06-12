@@ -50,11 +50,17 @@ variable "env_stripe_employee_coupon_id" {
   type = string
   description = "Stripe employee coupon ID"
 }
-variable "customerio_api_key" {
+
+variable "env_customerio_api_key" {
   type = string
   description = "CustomerIO API Key"
 }
-variable "customerio_app_api_key" {
+variable "env_customerio_app_api_key" {
   type = string
   description = "CustomerIO App API Key"
+}
+
+variable "env_customerio_site_id" {
+  type = string
+  description = "CustomerIO site ID"
 }
