@@ -257,6 +257,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
+
+  // console.log('outside callback - streaming', streaming)
+  // console.log('outside callback - beingStreamedMessage', beingStreamedMessage)
+  // console.log('outside callback - beingStreamedChatId', beingStreamedChatId)
+
   const addMessage = useCallback(async (prompt: string) => {
     // Guard clauses
     if (!prompt || prompt.length === 0) {
@@ -273,7 +278,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    if ((beingStreamedMessage?.length || 0) > 0 || (streaming)) {
+    console.log('inside callback - streaming', streaming)
+    console.log('inside callback - beingStreamedMessage', beingStreamedMessage)
+    console.log('inside callback - beingStreamedChatId', beingStreamedChatId)
+    if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",
         status: "warning",
@@ -295,7 +303,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
     
-  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage]);
+  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage, beingStreamedChatId]);
 
   // User sets a subject from the chat window
   const submitSubject = useCallback(async (subject: string) => {
