@@ -69,7 +69,7 @@ const Chat = ({
       }}
     >
       <Paywall isOpen={paywallOpen ?? false} setIsOpen={setPaywallOpen}  />
-      {!chat || !chat?.subject || (!chat?.messages?.length && !beingStreamedMessage && !tempUserMessage) ? (
+      {!chat || !chat?.subject || (!chat.messages?.length && !tempUserMessage && !(beingStreamedChatId === chatId)) ? (
         <VStack style={{
             width: subjectSelectorWidth,
             padding: "2rem",
