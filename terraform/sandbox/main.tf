@@ -401,6 +401,15 @@ resource "google_cloud_run_service" "web" {
   depends_on = [google_project_service.run_api, google_cloud_run_service.app-service, google_artifact_registry_repository.web]
 }
 
+# tf vars secret
+resource "google_secret_manager_secret" "tf-vars_secret" {
+  secret_id = "sandbox_tf_vars"
+
+  replication{
+    automatic = true
+  }
+}
+
 # Allow unauthenticated users to invoke the service
 resource "google_cloud_run_service_iam_member" "run_all_users" {
   service  = google_cloud_run_service.web.name

@@ -50,6 +50,7 @@ variable "env_stripe_employee_coupon_id" {
   type = string
   description = "Stripe employee coupon ID"
 }
+
 variable "env_customerio_api_key" {
   type = string
   description = "CustomerIO API Key"
