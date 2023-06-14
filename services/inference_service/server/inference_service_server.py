@@ -50,7 +50,7 @@ def serve():
     )
 
     inference_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    inference_server.add_insecure_port(f"[::]:{grpc_port}")
+    inference_server.add_insecure_port(f"0.0.0.0:{grpc_port}")
 
     inference_service_pb2_grpc.add_InferenceServiceServicer_to_server(
         InferenceServiceServicer(), inference_server
@@ -63,7 +63,7 @@ def serve():
         f"Attempting health check connection on port: {grpc_health_port}",
     )
     health_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    health_server.add_insecure_port(f"[::]:{grpc_health_port}")
+    health_server.add_insecure_port(f"0.0.0.0:{grpc_health_port}")
 
     health_servicer = health.HealthServicer(experimental_non_blocking=True)
     health_servicer.set("", health_pb2.HealthCheckResponse.SERVING)

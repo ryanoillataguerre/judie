@@ -441,15 +441,15 @@ resource "google_cloud_run_service" "inference-service" {
           value = var.grpc_health_port
         }
         startup_probe {
-          initial_delay_seconds = 10
+          initial_delay_seconds = 100
           failure_threshold = 3
-          period_seconds = 10
+          period_seconds = 60
           grpc {
             service = "grpc.health.v1.Health"
           }
         }
         liveness_probe {
-          initial_delay_seconds = 10
+          initial_delay_seconds = 100
           failure_threshold = 3
           period_seconds = 360
           grpc {
