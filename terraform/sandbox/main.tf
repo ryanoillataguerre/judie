@@ -193,6 +193,12 @@ resource "google_artifact_registry_repository" "app-service" {
   project       = var.gcp_project
   repository_id = "app-service"
 }
+resource "google_artifact_registry_repository" "inference-service" {
+  format        = "DOCKER"
+  location      = "us-west1"
+  project       = var.gcp_project
+  repository_id = "inference-service"
+}
 
 # Create the Cloud Run service
 resource "google_cloud_run_service" "app-service" {
@@ -399,6 +405,15 @@ resource "google_cloud_run_service" "web" {
   }
 
   depends_on = [google_project_service.run_api, google_cloud_run_service.app-service, google_artifact_registry_repository.web]
+}
+
+# tf vars secret
+resource "google_secret_manager_secret" "tf-vars_secret" {
+  secret_id = "sandbox_tf_vars"
+
+  replication{
+    automatic = true
+  }
 }
 
 # Allow unauthenticated users to invoke the service
