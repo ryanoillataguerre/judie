@@ -9,7 +9,9 @@ if __name__ == "__main__":
     with grpc.insecure_channel("localhost:8080") as channel:
         stub = health_pb2_grpc.HealthStub(channel)
         print("Liveliness health check")
-        response = stub.Check(health_pb2.HealthCheckRequest(service="grpc.health.v1.Health"))
+        response = stub.Check(
+            health_pb2.HealthCheckRequest(service="grpc.health.v1.Health")
+        )
         print(response)
 
     with grpc.insecure_channel("localhost:443") as channel:
