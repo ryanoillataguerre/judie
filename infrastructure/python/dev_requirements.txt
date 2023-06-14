@@ -5,6 +5,7 @@ sqlalchemy
 uvicorn
 grpcio
 grpcio-tools
+grpcio-health-checking
 jupyter
 protoletariat
 openai

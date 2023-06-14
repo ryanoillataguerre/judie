@@ -64,3 +64,12 @@ variable "env_customerio_site_id" {
   type = string
   description = "CustomerIO site ID"
 }
+
+variable "grpc_port" {
+  type = string
+  description = "Port Cloud Run sends gRPC traffic over"
+}
+variable "grpc_health_port" {
+  type = string
+  description = "Port Cloud Run sends gRPC based health and liveliness checks over"
+}
