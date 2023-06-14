@@ -87,13 +87,33 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return new AbortController();
   }, []);
 
-  // useEffect(() => {
-  //   setBeingStreamedChatId(undefined);
-  // }, [chatId])
-
   useEffect(() => {
     setStreaming(false);
   }, [chatId]);
+
+  useEffect(() => {
+    if (beingStreamedMessage) {
+      setBeingStreamedMessage(undefined);
+      setBeingStreamedChatId(undefined);
+      setTempUserMessage(undefined);
+      setTempUserMessageChatId(undefined);
+    }
+  }, [auth?.userData?.id, setBeingStreamedMessage, setBeingStreamedChatId, setTempUserMessage, setTempUserMessageChatId]);
+
+  // If beingStreamedMessage hasn't been updated in 5 seconds, reset it
+  useEffect(() => {
+    if (beingStreamedMessage) {
+      const timeout = setTimeout(() => {
+        setBeingStreamedMessage(undefined);
+        setBeingStreamedChatId(undefined);
+        setTempUserMessage(undefined);
+      setTempUserMessageChatId(undefined);
+      }, 5000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [beingStreamedMessage, setBeingStreamedMessage, setBeingStreamedChatId, setTempUserMessage, setTempUserMessageChatId]);
 
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -278,9 +298,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    console.log('inside callback - streaming', streaming)
-    console.log('inside callback - beingStreamedMessage', beingStreamedMessage)
-    console.log('inside callback - beingStreamedChatId', beingStreamedChatId)
+    // console.log('inside callback - streaming', streaming)
+    // console.log('inside callback - beingStreamedMessage', beingStreamedMessage)
+    // console.log('inside callback - beingStreamedChatId', beingStreamedChatId)
     if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",

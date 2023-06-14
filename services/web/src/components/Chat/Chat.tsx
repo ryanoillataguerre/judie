@@ -55,8 +55,18 @@ const Chat = ({
         <MessageRow key={key} message={message} />
       )
     })
-  }, [messages, tempUserMessage, streaming, chatId, tempUserMessageChatId])
-  
+  }, [messages, tempUserMessage, streaming, chatId, tempUserMessageChatId]);
+
+  const showSubjectSelector: boolean = useMemo(() => {
+    let shouldShowSubjectSelector: boolean = true;
+    if (chat?.messages?.length) {
+      shouldShowSubjectSelector = false;
+    }
+    if (tempUserMessage && tempUserMessageChatId === chatId) {
+      shouldShowSubjectSelector = false;
+    }
+    return shouldShowSubjectSelector;
+  }, [chat?.messages?.length, tempUserMessage, chatId, tempUserMessageChatId])
 
   return (
     <Flex
@@ -69,7 +79,7 @@ const Chat = ({
       }}
     >
       <Paywall isOpen={paywallOpen ?? false} setIsOpen={setPaywallOpen}  />
-      {!chat || !chat?.subject || (!chat.messages?.length && !tempUserMessage && !(beingStreamedChatId === chatId)) ? (
+      {showSubjectSelector ? (
         <VStack style={{
             width: subjectSelectorWidth,
             padding: "2rem",
