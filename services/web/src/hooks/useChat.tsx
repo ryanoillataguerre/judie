@@ -187,6 +187,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
               setPaywallOpen(true);
               setTempUserMessage(undefined);
             }
+            toast({
+              title: "Oops!",
+              description: err.message || "Something went wrong changing pages, please try again.",
+              status: "error",
+              duration: 2000,
+              isClosable: true,
+            });
           }
         });
       } else {
