@@ -174,6 +174,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             setStreaming(false);
           },
           onError: (err: HTTPResponseError) => {
+            console.log('errored!')
             if (err.message.includes("AbortError")) {
               toast({
                 title: "Oops!",
@@ -291,7 +292,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addMessage = useCallback(async (prompt: string) => {
     // Guard clauses
-    if (!prompt || prompt.length === 0) {
+    if (!prompt || prompt.length === 0 || (prompt.replace("\n", "").length === 0)) {
       return;
     }
     if (!chatId) {

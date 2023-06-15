@@ -53,11 +53,11 @@ const ChatInput = () => {
   const toast = useToast();
   const [shiftPressedRecently, setShiftPressedRecently] = useState<boolean>(false);
   const onKeyUp = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault();
       if (!shiftPressedRecently) {
         toast({
-          title: <Flex direction={"row"} alignItems={"center"} gap={2}><Text>Press </Text><BsShift /><Text> and </Text><AiOutlineEnter /><Text> to submit</Text></Flex>,
+          title: <Flex direction={"row"} alignItems={"center"} gap={2}><Text>Press only </Text><AiOutlineEnter /><Text> to submit</Text></Flex>,
           status: "info",
           duration: 4000,
           isClosable: true,
@@ -69,7 +69,8 @@ const ChatInput = () => {
         setShiftPressedRecently(false);
       }, 15000);
     }
-    if (e.key === "Enter" && e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
+    
       e.preventDefault();
       onSubmit(e);
     }
@@ -81,13 +82,13 @@ const ChatInput = () => {
       <LightMode>
       <Textarea
         onKeyUp={onKeyUp}
-      autoFocus={chat?.subject ? true : false}
-      ref={ref}
-      value={chatValue}
-      _hover={{
-        borderColor: "teal",
-      }}
-      onChange={(e) => setChatValue(e.target.value)}
+        autoFocus={chat?.subject ? true : false}
+        ref={ref}
+        value={chatValue}
+        _hover={{
+          borderColor: "teal",
+        }}
+        onChange={(e) => setChatValue(e.target.value)}
         placeholder="Ask Judie anything..."
         style={{
           width: "100%",
@@ -111,7 +112,7 @@ const ChatFooter = () => {
   });
 
   const gradientColor = useColorModeValue(
-    'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(209, 231, 228, 0.1) 20%, rgba(209, 231, 228, 0.2) 30%, rgba(209, 231, 228, 0.6) 40%, rgba(209, 231, 228, 0.8) 80%, rgba(209, 231, 228, 1.0) 95%)',
+    'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)',
     'linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)',
   );
   
