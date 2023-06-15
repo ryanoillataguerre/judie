@@ -269,47 +269,51 @@ export const createGPTRequestFromPrompt = async ({
       };
       newMessages.push(defaultMessage);
     }
-
-    // Get embedding vector from OpenAI
-    const embeddingResponse = await openaiClient.createEmbedding({
-      input: prompt,
-      model: "text-embedding-ada-002",
-    });
-    const embeddingVector = embeddingResponse.data?.data?.[0]?.embedding;
-    // Get matching vectors from Pinecone
-    const pcIndex = pinecone.Index("judieai");
-    let queryRequest: QueryRequest = {
-      vector: embeddingVector,
-      topK: 3,
-      includeValues: false,
-      includeMetadata: true,
-    };
-    if (chat.subject && subjectToNamespaceMap[chat.subject]) {
-      queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
-    }
-    const pineconeResponse = await pcIndex.query({
-      queryRequest,
-    });
-    const matches = pineconeResponse.matches;
-    // Get metadata from each matching vector
-    const matchMetadatas =
-      matches
-        ?.filter(
-          (match) =>
-            match &&
-            !!(match.metadata as { [key: string]: string }).Sentence &&
-            (match?.score || 0) > 0.9
-        )
-        ?.map(
-          (match) => (match.metadata as { [key: string]: string }).Sentence
-        ) || [];
-    // Build latest prompt object
     let promptChunks = [];
-    if (matchMetadatas.length > 0) {
-      promptChunks.push("Context: \n");
-      for (const matchMetadata of matchMetadatas) {
-        promptChunks.push(`${matchMetadata}\n`);
+    try {
+      // Get embedding vector from OpenAI
+      const embeddingResponse = await openaiClient.createEmbedding({
+        input: prompt,
+        model: "text-embedding-ada-002",
+      });
+      const embeddingVector = embeddingResponse.data?.data?.[0]?.embedding;
+      // Get matching vectors from Pinecone
+      const pcIndex = pinecone.Index("judieai");
+      let queryRequest: QueryRequest = {
+        vector: embeddingVector,
+        topK: 3,
+        includeValues: false,
+        includeMetadata: true,
+      };
+      if (chat.subject && subjectToNamespaceMap[chat.subject]) {
+        queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
       }
+      const pineconeResponse = await pcIndex.query({
+        queryRequest,
+      });
+      const matches = pineconeResponse.matches;
+      // Get metadata from each matching vector
+      const matchMetadatas =
+        matches
+          ?.filter(
+            (match) =>
+              match &&
+              !!(match.metadata as { [key: string]: string }).Sentence &&
+              (match?.score || 0) > 0.9
+          )
+          ?.map(
+            (match) => (match.metadata as { [key: string]: string }).Sentence
+          ) || [];
+      // Build latest prompt object
+      if (matchMetadatas.length > 0) {
+        promptChunks.push("Context: \n");
+        for (const matchMetadata of matchMetadatas) {
+          promptChunks.push(`${matchMetadata}\n`);
+        }
+      }
+    } catch (err) {
+      // Swallow error - doesn't matter
+      console.error("Error getting context from Pinecone: ", err);
     }
 
     promptChunks.push("Question: \n");
