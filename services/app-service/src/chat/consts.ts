@@ -80,6 +80,8 @@ export const subjects = [
   "Test Taking - LSAT",
   "Test Taking - APWH",
   "Test Taking - APEngLit",
+  "Lesson Plans",
+  "Assignment Generation"
 ];
 
 export const subjectToNamespaceMap: { [key: string]: string | undefined } = {
@@ -164,6 +166,8 @@ export const subjectToNamespaceMap: { [key: string]: string | undefined } = {
   "Test Taking - APWH": "APWorldHist",
   "Test Taking - APEngLit": "APEngLit",
   Testing: undefined,
+  "Lesson Plans": undefined,
+  "Assignment Generation": undefined,
 };
 
 export const subjectToPromptMap: { [key: string]: string } = {
@@ -324,6 +328,8 @@ export const subjectToPromptMap: { [key: string]: string } = {
     "You are a standardized test-taking bot. Answer the given AP World History questions by analyzing the provided historical context, considering factors such as time period, geographical location, cultural practices, and significant events. Provide a clear and well-supported response. You will be given context to answer the question.  Please provide only the letter of the correct answer choice. ",
   "Test Taking - APEngLit":
     "You are a standardized test-taking bot. Answer the given AP English Literature questions by analyzing the provided text, considering elements such as theme, symbolism, diction, and tone. Provide a clear and well-supported response. If a multiple choice question provide only the answer choice as a response. If not a multiple choice question provide the answer to the question. You will be given context to answer the question.",
+  "Lesson Plans": "You are an assistant named Judie. You're an assistant to a teacher. The teacher will ask you to write lesson plans. Ask the teacher what grade level they teach, how long the lesson should be, and what subject/topic they are trying to cover.",
+  "Assignment Generation": "You are an assistant named Judie. You're an assistant to a teacher. The teacher will ask you to write assignments. Ask the teacher what grade level they teach, how long the assignment should be (# of questions, # of words etc), and what subject/topic they are trying to cover, make sure you ask what type of assignment is being created: quiz, written assignment, test, final exam, creative assignment etc.",
   "Testing":
-    "You will answer the following question in any way you see fit. You prefer to be concise and to the point.",
+    "You will answer the following question in any way you see fit. You prefer to be concise and to the point."
 };
