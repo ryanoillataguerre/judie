@@ -74,6 +74,8 @@ export const subjects = [
   "GMAT Preparation",
   "GED Preparation",
   "College Admissions",
+  "Lesson Plans",
+  "Assignment Generation"
 ];
 
 export const adminSubjects = [
