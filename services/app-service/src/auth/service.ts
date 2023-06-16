@@ -1,21 +1,23 @@
 import bcrypt from "bcryptjs";
 import {
   BadRequestError,
-  InternalError,
   UnauthorizedError,
 } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { User, UserRole } from "@prisma/client";
+import { User } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
+import {cioClient} from "../utils/customerio.js";
+import { IdentifierType } from 'customerio-node';
+import { createForgotPasswordToken, getForgotPasswordToken, deleteForgotPasswordToken } from "../utils/redis.js";
+import { sendUserForgotPasswordEmail } from "../cio/service.js";
 
 const transformUserForSegment = (user: User) => ({
   firstName: user.firstName,
   lastName: user.lastName,
   email: user.email,
   role: user.role,
-  district: user.district,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
   questionsAsked: user.questionsAsked,
@@ -29,16 +31,12 @@ export const signup = async ({
   email,
   password,
   receivePromotions,
-  role,
-  district,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
-  role: UserRole;
-  district?: string;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -67,13 +65,23 @@ export const signup = async ({
       email,
       password: _password,
       receivePromotions,
-      role,
-      district,
     },
   });
 
+  cioClient.identify(newUser.id, {
+    email: newUser.email,
+    created_at: newUser.createdAt,
+    first_name: newUser.firstName,
+    last_name: newUser.lastName,
+    receive_promotions: newUser.receivePromotions,
+    last_logged_in: new Date().toISOString(),
+  });
+  cioClient.mergeCustomers(IdentifierType.Id, newUser.id, IdentifierType.Id, newUser.email);
+
   // Create Stripe customer
   await createCustomer(newUser.id);
+  // TODO: Create Customer.io Customer
+
   // Identify in Segment
   analytics.identify({
     userId: newUser.id,
@@ -116,6 +124,11 @@ export const signin = async ({
     },
   });
 
+  cioClient.identify(user.id, {
+    email: user.email,
+    last_logged_in: new Date().toISOString(),
+  });
+
   return user.id;
 };
 
@@ -132,8 +145,51 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
         email,
       },
     });
+    cioClient.identify(email, {
+      email,
+      waitlist: true
+    });
   } catch (err) {
     console.error(err);
     // Swallow bc it's most likely a duplicate entry
   }
 };
+
+export const forgotPassword = async ({email, origin}: {email: string; origin: string}) => {
+  const user = await dbClient.user.findUnique({
+    where: {
+      email,
+    },
+  });
+  if (!user) {
+    throw new BadRequestError("Invalid email");
+  }
+  // Create token and store in Redis
+  const token = await createForgotPasswordToken({ userId: user.id });
+  const url = `${origin || "https://app.judie.io"}/reset-password?token=${token}`;
+  // Send email with link to reset password
+  return await sendUserForgotPasswordEmail({
+    user,
+    url,
+  });
+}
+
+export const resetPassword = async ({token, password}: {token: string; password: string}) => {
+  // Check Redis for token
+  const userId = await getForgotPasswordToken({ token });
+  if (!userId) {
+    throw new BadRequestError("Invalid token, try requesting another email.");
+  }
+  // Update user password
+  const _password = await bcrypt.hash(password, 10);
+  await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      password: _password,
+    },
+  });
+  // Delete token from Redis
+  await deleteForgotPasswordToken({ token });
+}

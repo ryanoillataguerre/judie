@@ -1,18 +1,15 @@
-import { GetServerSidePropsContext } from "next";
-import styles from "../../styles/Chat.module.scss";
 import Head from "next/head";
-import Navbar from "@judie/components/Navbar/Navbar";
-import Sidebar from "@judie/components/Sidebar/Sidebar";
-import Chat from "@judie/components/Chat/Chat";
 import useAuth from "@judie/hooks/useAuth";
-import { useRouter } from "next/router";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
+import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
+import Chat from "@judie/components/Chat/Chat";
+import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
+import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
+import { ChatProvider } from "@judie/hooks/useChat";
 
 interface ChatPageProps {
   query?: string;
 }
 export default function ChatPage({ query }: ChatPageProps) {
-  const router = useRouter();
   useAuth();
 
   return (
@@ -26,27 +23,17 @@ export default function ChatPage({ query }: ChatPageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar />
-      <main className={styles.main}>
-        <div className={styles.pageContentContainer}>
-          <Sidebar />
-          <Chat chatId={router.query.chatId as string} initialQuery={query} />
-        </div>
+      <main>
+        <ChatProvider>
+          <SidebarPageContainer>
+            <ChatNavbar />
+            <Chat
+              initialQuery={query}
+            />
+            <ChatFooter />
+          </SidebarPageContainer>
+        </ChatProvider>
       </main>
     </>
   );
 }
-
-// TEMP: Redirect users to /waitlist if they visit
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) =>
-  serverRedirect(ctx, "/waitlist");
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   // Get query parameter "query" and pass in as a prop
-//   const query = context.query.query;
-//   return {
-//     props: {
-//       query: query || null,
-//     },
-//   };
-// }

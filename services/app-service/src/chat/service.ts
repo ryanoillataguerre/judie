@@ -5,7 +5,6 @@ import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { ChatAndMessageResponse } from "./types.js";
 import { subjectToNamespaceMap, subjectToPromptMap } from "./consts.js";
-import { incrementUserQuestionsAsked } from "../user/service.js";
 import { IncomingMessage } from "http";
 import { Response } from "express";
 
@@ -36,6 +35,20 @@ export const deleteChat = async (chatId: string) => {
     },
   });
   return chat;
+};
+
+export const deleteChatsForUser = async (userId: string) => {
+  if (!userId) {
+    throw new InternalError("User ID not provided");
+  }
+  await dbClient.chat.updateMany({
+    where: {
+      userId,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
 };
 
 export const updateChat = async (
@@ -243,56 +256,64 @@ export const createGPTRequestFromPrompt = async ({
       // If subject, mutate prompt
       if (chat.subject) {
         defaultPrompt = subjectToPromptMap[chat.subject] || prompt;
+      } else {
+        // Set subject = default on chat
+        await updateChat(chat.id, { subject: "default" });
       }
+      defaultPrompt += "\nRespond in markdown.\n";
       let defaultMessage = {
         content: defaultPrompt,
         type: MessageType.SYSTEM,
         createdAt: new Date(),
-        readableContent: prompt,
+        readableContent: defaultPrompt,
       };
       newMessages.push(defaultMessage);
     }
-
-    // Get embedding vector from OpenAI
-    const embeddingResponse = await openaiClient.createEmbedding({
-      input: prompt,
-      model: "text-embedding-ada-002",
-    });
-    const embeddingVector = embeddingResponse.data?.data?.[0]?.embedding;
-    // Get matching vectors from Pinecone
-    const pcIndex = pinecone.Index("judieai");
-    let queryRequest: QueryRequest = {
-      vector: embeddingVector,
-      topK: 3,
-      includeValues: false,
-      includeMetadata: true,
-    };
-    if (chat.subject && subjectToNamespaceMap[chat.subject]) {
-      queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
-    }
-    const pineconeResponse = await pcIndex.query({
-      queryRequest,
-    });
-    const matches = pineconeResponse.matches;
-    // Get metadata from each matching vector
-    const matchMetadatas =
-      matches
-        ?.filter(
-          (match) =>
-            match &&
-            !!(match.metadata as { [key: string]: string }).Sentence &&
-            (match?.score || 0) > 0.9
-        )
-        ?.map(
-          (match) => (match.metadata as { [key: string]: string }).Sentence
-        ) || [];
-    // Build latest prompt object
     let promptChunks = [];
-    if (matchMetadatas.length > 0) {
-      promptChunks.push("Context: \n");
-      for (const matchMetadata of matchMetadatas) {
-        promptChunks.push(`${matchMetadata}\n`);
+    try {
+      // Get embedding vector from OpenAI
+      const embeddingResponse = await openaiClient.createEmbedding({
+        input: prompt,
+        model: "text-embedding-ada-002",
+      });
+      const embeddingVector = embeddingResponse.data?.data?.[0]?.embedding;
+      // Get matching vectors from Pinecone
+      const pcIndex = pinecone.Index("judieai");
+      let queryRequest: QueryRequest = {
+        vector: embeddingVector,
+        topK: 3,
+        includeValues: false,
+        includeMetadata: true,
+      };
+      if (chat.subject && subjectToNamespaceMap[chat.subject]) {
+        queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
       }
+      const pineconeResponse = await pcIndex.query({
+        queryRequest,
+      });
+      const matches = pineconeResponse.matches;
+      // Get metadata from each matching vector
+      const matchMetadatas =
+        matches
+          ?.filter(
+            (match) =>
+              match &&
+              !!(match.metadata as { [key: string]: string }).Sentence &&
+              (match?.score || 0) > 0.9
+          )
+          ?.map(
+            (match) => (match.metadata as { [key: string]: string }).Sentence
+          ) || [];
+      // Build latest prompt object
+      if (matchMetadatas.length > 0) {
+        promptChunks.push("Context: \n");
+        for (const matchMetadata of matchMetadatas) {
+          promptChunks.push(`${matchMetadata}\n`);
+        }
+      }
+    } catch (err) {
+      // Swallow error - doesn't matter
+      console.error("Error getting context from Pinecone: ", err);
     }
 
     promptChunks.push("Question: \n");
@@ -372,56 +393,62 @@ export const getChatGPTCompletion = async (
       );
 
     let fullContent = "";
-    await new Promise(async (resolve, reject) => {
-      const response = await openaiClient.createChatCompletion(
-        {
-          model: OPENAI_COMPLETION_MODEL,
-          messages: maxLengthLimitedMessages,
-          user: chat.userId,
-          temperature: 0.7,
-          max_tokens: 600,
-          top_p: 1,
-          frequency_penalty: 0,
-          presence_penalty: 0,
-          stream: true,
-        },
-        { responseType: "stream" }
-      );
+    try {
+      await new Promise(async (resolve, reject) => {
+        const response = await openaiClient.createChatCompletion(
+          {
+            model: OPENAI_COMPLETION_MODEL,
+            messages: maxLengthLimitedMessages,
+            user: chat.userId,
+            temperature: 0.7,
+            max_tokens: 600,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            stream: true,
+          },
+          { responseType: "stream" }
+        );
 
-      const stream = response.data as unknown as IncomingMessage;
+        const stream = response.data as unknown as IncomingMessage;
 
-      stream.on("data", (chunk: Buffer) => {
-        // Messages in the event stream are separated by a pair of newline characters.
-        const payloads = chunk.toString().split("\n\n");
-        for (const payload of payloads) {
-          if (payload.includes("[DONE]")) {
-            return;
-          }
-          if (payload.startsWith("data:")) {
-            const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
-            try {
-              const delta = JSON.parse(data.trim());
-              const content = delta.choices[0].delta?.content;
-              const filteredContent = content?.replace("undefined", "");
-              if (filteredContent) {
-                fullContent += filteredContent;
-                onChunkReceived(filteredContent);
+        stream.on("data", (chunk: Buffer) => {
+          // Messages in the event stream are separated by a pair of newline characters.
+          const payloads = chunk.toString().split("\n\n");
+          for (const payload of payloads) {
+            if (payload.includes("[DONE]")) {
+              return;
+            }
+            if (payload.startsWith("data:")) {
+              const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
+              try {
+                const delta = JSON.parse(data.trim());
+                const content = delta.choices[0].delta?.content;
+                const filteredContent = content?.replace("undefined", "");
+                if (filteredContent) {
+                  fullContent += filteredContent;
+                  onChunkReceived(filteredContent);
+                }
+              } catch (error) {
+                throw new InternalError("Error parsing OpenAI stream");
               }
-            } catch (error) {
-              throw new InternalError("Error parsing OpenAI stream");
             }
           }
-        }
-      });
+        });
 
-      stream.on("end", () => {
-        resolve(fullContent);
+        stream.on("end", () => {
+          resolve(fullContent);
+        });
+        stream.on("error", (e: Error) => {
+          console.error("Stream error: ", e);
+          reject(e);
+        });
       });
-      stream.on("error", (e: Error) => {
-        console.error("Stream error: ", e);
-        reject(e);
-      });
-    });
+    } catch (err) {
+      console.error("Error getting completion: ", err);
+      throw err;
+    }
+
 
     if (fullContent) {
       const newMessage = {

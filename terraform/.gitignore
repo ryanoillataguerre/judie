@@ -1,0 +1,4 @@
+prod-sa-key.json
+sandbox/sandbox-sa-key.json
+.terraform/
+sandbox.tfvars

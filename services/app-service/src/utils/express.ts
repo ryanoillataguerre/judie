@@ -23,9 +23,9 @@ export const headers = (req: Request, res: Response, next: NextFunction) => {
     "Origin, X-Requested-With, Content-Type, Accept, Credentials, Set-Cookie, Cookie, Cookies, Cross-Origin, Access-Control-Allow-Credentials, Authorization, Access-Control-Allow-Origin"
   );
   const allowedOrigins = isProduction()
-    ? ["https://judie.io", "https://app.judie.io"]
+    ? ["https://app.judie.io"]
     : isSandbox()
-    ? ["https://sandbox.judie.io"]
+    ? ["https://app.sandbox.judie.io"]
     : ["http://localhost:3000", "http://web:3000"];
 
   const origin = String(req.headers.origin);
@@ -157,8 +157,12 @@ export const sessionLayer = () =>
       httpOnly: false, // if true prevent client side JS from reading the cookie
       maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
       path: "/",
-      domain: isProduction() || isSandbox() ? "judie.io" : undefined,
-      ...(isProduction() || isSandbox() ? { sameSite: "none" } : {}),
+      domain: isProduction()
+        ? "judie.io"
+        : isSandbox()
+        ? "sandbox.judie.io"
+        : undefined,
+      ...(isProduction() || isSandbox() ? { sameSite: "strict" } : {}),
     },
   });
 

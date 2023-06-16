@@ -2,8 +2,20 @@ import inference_service_pb2
 import inference_service_pb2_grpc
 import os
 import grpc
+import pinecone
+import openai
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
+from inference_service.server import judie
+from inference_service.prisma_app_client import prisma_manager
+
+
+def setup_env():
+    pinecone.init(
+        api_key=os.getenv("PINECONE_API_KEY"),
+        environment=os.getenv("PINECONE_ENVIRONMENT"),
+    )
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServicer):
@@ -11,8 +23,11 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     Class to define the behavior of the Inference Service
     """
 
-    def GetChatResponse(self, request, context) -> None:
-        for part in ["Do.", "Or do not.", "There is no try."]:
+    def GetChatResponse(self, request, context):
+        logger.info(f"Request: \n{request}")
+        subject = prisma_manager.get_subject(chat_id=request.chat_id)
+        response = judie.yield_judie_response(request.chat_id, subject=subject)
+        for part in response:
             yield inference_service_pb2.TutorResponse(responsePart=part)
 
     def ServerConnectionCheck(self, request, context):
@@ -21,6 +36,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
 def serve():
     grpc_port = os.getenv("GRPC_PORT")
+
     logger.info(
         f"Attempting grpc connection on port: {grpc_port}",
     )
@@ -31,8 +47,10 @@ def serve():
         InferenceServiceServicer(), server
     )
 
+    setup_env()
+
     server.start()
-    logger.info(f"Inference GRPC server running at on port {grpc_port}")
+    logger.info(f"Inference GRPC server running on port {grpc_port}")
     server.wait_for_termination()
     logger.info("Server ded")
 

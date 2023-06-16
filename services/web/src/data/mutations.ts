@@ -1,4 +1,4 @@
-import { baseFetch } from "./baseFetch";
+import { HTTPResponseError, baseFetch } from "./baseFetch";
 import { Chat, Message, UserRole } from "./types/api";
 
 export interface ChatResponse {
@@ -15,21 +15,25 @@ export const completionFromQueryMutation = async ({
   chatId,
   setChatValue,
   onStreamEnd,
+  onError,
+  abortController
 }: {
   query: string;
   chatId: string;
   setChatValue: (chat: string) => void;
   onStreamEnd?: () => void;
+  onError?: (error: HTTPResponseError) => void;
+  abortController?: AbortController;
 }): Promise<string> => {
   const response = await baseFetch({
     url: `/chat/completion?chatId=${chatId}`,
     method: "POST",
     body: { query },
     stream: true,
-    onChunkReceived: (chunk) => {
-      setChatValue(chunk);
-    },
+    onChunkReceived: setChatValue,
     onStreamEnd,
+    onError,
+    abortController,
   });
   return response;
 };
@@ -49,22 +53,44 @@ export const signinMutation = async ({
   return response.data;
 };
 
+export const forgotPasswordMutation = async ({
+  email,
+}: {
+  email: string;
+}) => {
+  const response = await baseFetch({
+    url: "/auth/forgot-password",
+    method: "POST",
+    body: { email },
+  });
+  return response.data;
+};
+
+export const resetPasswordMutation = async ({
+  password, token,
+}: {
+  password: string, token: string;
+}) => {
+  const response = await baseFetch({
+    url: "/auth/reset-password",
+    method: "POST",
+    body: { password, token },
+  });
+  return response.data;
+};
+
 export const signupMutation = async ({
   firstName,
   lastName,
   email,
   password,
   receivePromotions,
-  role,
-  district,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
-  role: UserRole;
-  district?: string;
 }) => {
   const response = await baseFetch({
     url: "/auth/signup",
@@ -75,17 +101,22 @@ export const signupMutation = async ({
       firstName,
       lastName,
       receivePromotions,
-      role,
-      district,
     },
   });
   return response.data;
 };
 
-export const createChatMutation = async (): Promise<ChatResponse> => {
+export const createChatMutation = async ({
+  subject,
+}: {
+  subject?: string | undefined;
+}): Promise<ChatResponse> => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",
+    body: {
+      subject: subject || undefined,
+    },
   });
   return response.data;
 };
@@ -128,6 +159,15 @@ export const DELETE_CHAT = "DELETE_CHAT";
 export const deleteChatMutation = async (chatId: string) => {
   const response = await baseFetch({
     url: `/chat/${chatId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
+export const DELETE_CHATS = "DELETE_CHATS";
+export const clearConversationsMutation = async () => {
+  const response = await baseFetch({
+    url: `/chat/clear`,
     method: "DELETE",
   });
   return response.data;

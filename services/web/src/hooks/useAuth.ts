@@ -1,9 +1,11 @@
+import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
+import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   QueryObserverResult,
   RefetchOptions,
@@ -21,6 +23,7 @@ export default function useAuth({
   allowUnauth?: boolean;
 } = {}): AuthData {
   const router = useRouter();
+  const toast = useToast();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
@@ -32,28 +35,31 @@ export default function useAuth({
     );
   }, [userData]);
 
+  
+
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+    if (isProduction()) {
       window?.analytics?.identify(userData?.id ?? undefined);
     }
   }, [userData]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     deleteCookie(SESSION_COOKIE, {
       path: "/",
-      domain:
-        process.env.NEXT_PUBLIC_NODE_ENV === "production"
-          ? "judie.io"
-          : undefined,
+      domain: !isLocal()
+        ? isSandbox()
+          ? "sandbox.judie.io"
+          : "judie.io"
+        : undefined,
     });
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
-  };
+  }, [router, setUserData, setSessionCookie]);
 
   // GET /users/me
   const { isError, refetch, error, isLoading, isFetched } = useQuery(
-    [GET_ME],
+    [GET_ME, sessionCookie],
     () => getMeQuery(),
     {
       enabled: !!sessionCookie,
@@ -70,6 +76,27 @@ export default function useAuth({
       },
     }
   );
+
+  // Stripe callback url has paid=true query param
+  useEffect(() => {
+    if (router.query.paid === "true") {
+      refetch();
+      toast({
+        title: "Welcome to Judie Premium!",
+        description: "Enjoy the unlimited access.",
+        status: "success",
+        duration: 7000,
+        isClosable: true,
+        position: "top"
+      })
+      const newQuery = router.query;
+      delete newQuery.paid;
+      router.push({
+        pathname: router.pathname,
+        query: newQuery,
+      })
+    }
+  }, [router.query, refetch, toast, router])
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
@@ -92,14 +119,6 @@ export default function useAuth({
       logout();
     }
   }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
-
-  // useEffect(() => {
-  //   // Redirect away from sign in and sign up pages if logged in
-  //   if (redirToChatFrom.includes(router.asPath) && userData) {
-  //     refetch();
-  //     router.push("/chat");
-  //   }
-  // }, [userData, refetch, router]);
 
   return { userData, isPaid, isLoading, refresh: refetch, logout };
 }

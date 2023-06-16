@@ -74,6 +74,8 @@ export const subjects = [
   "GMAT Preparation",
   "GED Preparation",
   "College Admissions",
+  "Lesson Plans",
+  "Assignment Generation"
 ];
 
 export const adminSubjects = [
@@ -82,4 +84,5 @@ export const adminSubjects = [
   "Test Taking - LSAT",
   "Test Taking - APWH",
   "Test Taking - APEngLit",
+  "Testing"
 ];

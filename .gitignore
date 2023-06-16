@@ -12,13 +12,6 @@ infrastructure/python/ve
 .DS_Store
 Thumbs.db
 
-# Solid
-.solid
-.output
-.vercel
-.netlify
-netlify
-
 # IDEs and editors
 /.idea
 .project

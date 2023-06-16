@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
 import server from "./server.js";
+import { Environment, getEnv } from "./utils/env.js";
 
-if (process.env.NODE_ENV !== "production") {
+if (getEnv() === Environment.Local) {
   dotenv.config();
 }
 

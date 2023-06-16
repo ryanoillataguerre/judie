@@ -13,11 +13,11 @@ import {
   getCompletion,
   getUserChats,
   updateChat,
+  deleteChatsForUser,
 } from "./service.js";
 import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
-import { incrementUserQuestionsAsked } from "../user/service.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
 
 const router = Router();
@@ -40,7 +40,7 @@ router.post(
   [query("chatId").optional()],
   requireAuth,
   handleValidationErrors,
-  messageRateLimit,
+  errorPassthrough(messageRateLimit),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages
@@ -100,6 +100,7 @@ router.get(
 
 router.post(
   "/",
+  [body("subject").optional()],
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -112,6 +113,7 @@ router.post(
           id: session.userId,
         },
       },
+      subject: req.body?.subject || undefined,
     });
 
     res.status(200).json({
@@ -142,6 +144,22 @@ router.put(
 
     res.status(200).json({
       data: transformChat(newChat),
+    });
+  })
+);
+
+router.delete(
+  "/clear",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    await deleteChatsForUser(session.userId);
+
+    res.status(200).json({
+      data: { success: true },
     });
   })
 );

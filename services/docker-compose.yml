@@ -18,7 +18,7 @@ services:
     image: redis:latest
     command: redis-server
     volumes:
-      - judie-redis-data:/var/lib/redis
+      - judie-redis-data:/data
     environment:
       - REDIS_REPLICATION_MODE=master
     ports:
@@ -38,10 +38,11 @@ services:
       dockerfile: ./app-service/Dockerfile.local
     ports:
       - 8080:8080
+    restart: always
     environment:
       NODE_ENV: local
       PORT: 8080
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/postgres}
       REDIS_HOST: redis
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PINECONE_API_KEY: ${PINECONE_API_KEY}
@@ -51,6 +52,9 @@ services:
       STRIPE_COUPON_ID: ${STRIPE_COUPON_ID}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       SEGMENT_WRITE_KEY: ${SEGMENT_WRITE_KEY}
+      CUSTOMERIO_SITE_ID: ${CUSTOMERIO_SITE_ID}
+      CUSTOMERIO_API_KEY: ${CUSTOMERIO_API_KEY}
+      CUSTOMERIO_APP_API_KEY: ${CUSTOMERIO_APP_API_KEY}
   web:
     networks:
       - dev
@@ -70,24 +74,24 @@ services:
       NEXT_PUBLIC_NODE_ENV: local
       NEXT_PUBLIC_API_URI: http://app-service:8080
       NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${NEXT_PUBLIC_SEGMENT_WRITE_KEY}
-  inference-service:
-    networks:
-      - dev
-    privileged: true
-    working_dir: /app
-    build:
-      context: ./inference_service
-      dockerfile: ./Dockerfile.local
-    ports:
-      - 8081:8080
-    environment:
-      ENV: development
-      SERVER_PORT: 8080
-      PG_USER: postgres
-      PG_PASSWORD: postgres
-      PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DB_NAME: postgres
+  # inference-service:
+  #   networks:
+  #     - dev
+  #   privileged: true
+  #   working_dir: /app
+  #   build:
+  #     context: ./inference_service
+  #     dockerfile: ./Dockerfile.local
+  #   ports:
+  #     - 8081:8080
+  #   environment:
+  #     ENV: development
+  #     SERVER_PORT: 8080
+  #     PG_USER: postgres
+  #     PG_PASSWORD: postgres
+  #     PG_HOST: postgres
+  #     PG_PORT: 5432
+  #     PG_DB_NAME: postgres
 networks:
   dev:
     driver: bridge

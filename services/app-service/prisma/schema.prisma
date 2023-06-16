@@ -6,6 +6,11 @@ generator client {
   binaryTargets = ["native", "darwin-arm64", "linux-arm64-openssl-1.1.x", "debian-openssl-1.1.x"]
 }
 
+generator client-py {
+  provider      = "prisma-client-py"
+  interface = "sync"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -68,7 +73,6 @@ model User {
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime?     @updatedAt @map("updated_at")
   role              UserRole      @default(STUDENT)
-  district          String?
   stripeCustomerId  String?       @map("stripe_customer_id")
   questionsAsked    Int           @default(0) @map("questions_asked")
   subscription      Subscription?

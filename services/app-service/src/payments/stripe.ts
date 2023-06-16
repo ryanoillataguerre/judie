@@ -1,6 +1,8 @@
 import Stripe from "stripe";
 import { User } from "@prisma/client";
-import { handleSubscriptionCreated } from "./service.js";
+import { createCustomer, handleSubscriptionCreated } from "./service.js";
+import { getUser } from "../user/service.js";
+import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const stripe = new Stripe(process.env.STRIPE_SK || "", {
   apiVersion: "2022-11-15",
@@ -48,27 +50,27 @@ export const handleStripeWebhookEvents = async (
       try {
         switch (event.type) {
           case "customer.subscription.created":
-            console.log("customer.subscription.created");
-            console.log(event.data);
+            console.info("customer.subscription.created");
+            console.info(event.data);
             await handleSubscriptionCreated(
               event.data.object as Stripe.Subscription
             );
             break;
           case "customer.subscription.updated":
-            console.log("customer.subscription.updated");
-            console.log(event.data);
+            console.info("customer.subscription.updated");
+            console.info(event.data);
             break;
           case "customer.subscription.deleted":
-            console.log("customer.subscription.deleted");
-            console.log(event.data);
+            console.info("customer.subscription.deleted");
+            console.info(event.data);
             break;
           case "checkout.session.completed":
-            console.log("checkout.session.completed");
-            console.log(event.data);
+            console.info("checkout.session.completed");
+            console.info(event.data);
             break;
           case "charge.refunded":
-            console.log("charge.refunded");
-            console.log(event.data);
+            console.info("charge.refunded");
+            console.info(event.data);
             break;
           default:
             break;
@@ -80,5 +82,31 @@ export const handleStripeWebhookEvents = async (
     return;
   } catch (error) {
     throw error;
+  }
+};
+
+export const createStripeBillingPortalSession = async (
+  userId: string,
+  reqHeadersOrigin: string
+) => {
+  try {
+    const returnUrl = `${reqHeadersOrigin}/settings`;
+    const user = await getUser({
+      id: userId,
+    });
+    if (!user) {
+      throw new UnauthorizedError("User not found");
+    }
+    const customerId = String(user?.stripeCustomerId);
+    if (!customerId) {
+      await createCustomer(user.id);
+    }
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+    return session.url;
+  } catch (err) {
+    throw err;
   }
 };

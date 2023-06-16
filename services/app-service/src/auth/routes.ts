@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import { errorPassthrough, handleValidationErrors } from "../utils/express.js";
-import { signup, signin, addToWaitlist } from "./service.js";
+import { signup, signin, addToWaitlist, forgotPassword, resetPassword } from "./service.js";
 
 const router = Router();
 
@@ -17,15 +17,8 @@ router.post(
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      receivePromotions,
-      role,
-      district,
-    } = req.body;
+    const { email, password, firstName, lastName, receivePromotions } =
+      req.body;
     // Create user
     const userId = await signup({
       email,
@@ -33,8 +26,6 @@ router.post(
       firstName,
       lastName,
       receivePromotions,
-      role,
-      district,
     });
     // Create session for user
     session.userId = userId;
@@ -67,5 +58,29 @@ router.post(
     res.status(200).send({ success: true });
   })
 );
+
+router.post("/forgot-password", [body("email").exists().isEmail()], handleValidationErrors, errorPassthrough(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const origin = req.headers.origin;
+  await forgotPassword({email, origin: origin as string });
+  res.status(200).send({
+    data: {
+      success: true,
+    },
+  });
+}))
+
+router.post("/reset-password", [
+  body("password").exists(), 
+  body("token").exists(), 
+], handleValidationErrors, errorPassthrough(async (req: Request, res: Response) => {
+  const { password, token } = req.body;
+  await resetPassword({password, token });
+  res.status(200).send({
+    data: {
+      success: true,
+    },
+  });
+}))
 
 export default router;

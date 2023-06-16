@@ -1,17 +1,11 @@
 import { deleteCookie, getCookie, setCookie } from "cookies-next";
 import { NextApiResponse } from "next";
-import cookie from "cookie";
+import { Environment, getEnv } from "@judie/utils/env";
 
 export enum ServiceEnum {
   APP = "app",
   EXPLANATIONS = "explanations",
   ANALYTICS = "analytics",
-}
-
-export enum Environment {
-  LOCAL = "local",
-  DEV = "dev",
-  PROD = "production",
 }
 
 export const SESSION_COOKIE = "judie_sid";
@@ -21,16 +15,13 @@ const isClient = () => {
 };
 
 const getApiUri = () => {
-  switch (process.env.NEXT_PUBLIC_NODE_ENV ?? Environment.LOCAL) {
-    case Environment.LOCAL:
+  const env = getEnv();
+  switch (env) {
+    case Environment.Local:
       if (isClient()) return "http://localhost:8080";
       return "http://app-service:8080";
-    case Environment.DEV:
-      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
-    case Environment.PROD:
-      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
     default:
-      return "http://app-service:8080";
+      return process.env.NEXT_PUBLIC_API_URI || "http://app-service:8080";
   }
 };
 
@@ -45,6 +36,8 @@ export interface BaseFetchOptions {
   stream?: boolean;
   onChunkReceived?: (chunk: string) => void;
   onStreamEnd?: () => void;
+  onError?: (error: HTTPResponseError) => void;
+  abortController?: AbortController;
 }
 
 export class HTTPResponseError extends Error {
@@ -69,7 +62,8 @@ const checkStatus = async (response: Response) => {
   } else {
     const responseBody = await response.json();
     if (responseBody && response?.status) {
-      if (response.status === 401) {
+      // Not includes auth because we don't want to redirect on bad signin/signup
+      if (response.status === 401 && !response.url.includes("/auth")) {
         deleteCookie(SESSION_COOKIE, {
           path: "/",
         });
@@ -92,6 +86,8 @@ export async function baseFetch({
   stream,
   onChunkReceived,
   onStreamEnd,
+  onError,
+  abortController
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
@@ -110,7 +106,12 @@ export async function baseFetch({
         credentials: "include",
         method,
         body: body ? JSON.stringify(body) : null,
+        signal: abortController?.signal || null,
       }).then(async (res) => {
+        if (res.status === 429) {
+          onError?.(new HTTPResponseError({ error: "No messages remaining today" }, 429));
+          return;
+        }
         const reader = res.body?.getReader();
         while (true) {
           const result = await reader?.read();
