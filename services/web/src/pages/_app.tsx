@@ -28,6 +28,11 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, [Component.displayName]);
 
+  // Global navigate to waitlist
+  // useEffect(() => {
+  //   router.push("/waitlist");
+  // }, [router.asPath]);
+
   if (!router.isReady) {
     return <LoadingScreen />;
   }
