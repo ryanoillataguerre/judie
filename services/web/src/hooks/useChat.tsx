@@ -175,15 +175,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           },
           onError: (err: HTTPResponseError) => {
             console.log('errored!')
-            if (err.message.includes("AbortError")) {
-              toast({
-                title: "Oops!",
-                description: "Something went wrong changing pages, please try again.",
-                status: "error",
-                duration: 2000,
-                isClosable: true,
-              });
-            }
             if (err.response.code === 429) {
               setPaywallOpen(true);
               setTempUserMessage(undefined);
