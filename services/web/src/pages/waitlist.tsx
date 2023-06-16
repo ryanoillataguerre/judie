@@ -1,4 +1,5 @@
 import Head from "next/head";
+import ReactPlayer from "react-player/youtube";
 
 import { useMemo, useState } from "react";
 import {
@@ -9,6 +10,7 @@ import {
   Spinner,
   Text,
   useBreakpointValue,
+  useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -75,6 +77,7 @@ const WaitlistPage = () => {
   }, [isLoading, submitted]);
 
   const containerWidth = useBreakpointValue({ base: "100%", md: "50%" });
+  const backgroundSrc = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
     <>
       <Head>
@@ -93,13 +96,13 @@ const WaitlistPage = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: "100vh",
-            width: "100vw",
-            padding: "1rem",
+            height: "100%",
+            width: "100%",
+            padding: "1rem 1rem 3rem 1rem",
           }}
         >
           <Image
-            src={"/logo_dark.svg"}
+            src={backgroundSrc}
             alt={"Judie Logo"}
             style={{
               width: "5rem",
@@ -152,6 +155,7 @@ const WaitlistPage = () => {
               variant={"solid"}
               style={{
                 marginTop: "1rem",
+                marginBottom: "1rem",
                 width: "100%",
               }}
               colorScheme="teal"
@@ -159,6 +163,16 @@ const WaitlistPage = () => {
               {buttonVal}
             </Button>
           </form>
+          <Text fontSize={"1rem"} fontWeight={600} marginY={"1rem"}>
+            In the meantime, check out a demo of Judie below:
+          </Text>
+          <ReactPlayer
+            style={{
+              maxWidth: "90%",
+              aspectRatio: "16/9",
+            }}
+            url={"https://www.youtube.com/watch?v=mNLcoqCwR9o"}
+          />
         </Box>
       </main>
     </>
