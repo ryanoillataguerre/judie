@@ -8,11 +8,16 @@ RUN yarn
 
 # Rebuild the source code only when needed
 FROM node:18-alpine AS builder
+
+# ENV vars required at build time - pass as "--build-arg" to build command
+ARG NEXT_PUBLIC_API_URI
+ENV NEXT_PUBLIC_API_URI=$NEXT_PUBLIC_API_URI
+ARG NEXT_PUBLIC_NODE_ENV
+ENV NEXT_PUBLIC_NODE_ENV=$NEXT_PUBLIC_NODE_ENV
+
 WORKDIR /app
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
-ENV NEXT_PUBLIC_API_URI https://app-service.sandbox.judie.io
-ENV NEXT_PUBLIC_NODE_ENV sandbox
 RUN yarn build
 
 # Production image, copy all the files and run next
