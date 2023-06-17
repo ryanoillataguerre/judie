@@ -1,0 +1,1 @@
+### All `docker build` functionality must be run from the `services` directory to pull in neccessary files
