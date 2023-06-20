@@ -12,7 +12,7 @@ import {
   sessionLayer,
 } from "./utils/express.js";
 
-const app = express();
+export const app = express();
 
 // Helpers
 app.use(headers);

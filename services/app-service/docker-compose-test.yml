@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  postgres-test:
+    image: postgres:10.5
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    logging:
+      driver: none
+    ports:
+      - 5439:5432
+  redis-test:
+    image: redis:latest
+    command: redis-server
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    ports:
+      - 6372:6379
+  app-service-test:
+    working_dir: /app
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    restart: always
+    environment:
+      NODE_ENV: local
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@localhost:5439/postgres}
+      REDIS_HOST: locahost
+      REDIS_PORT: 6372
+    env_file:
+      - .env.test
+    logging:
+      driver: none
