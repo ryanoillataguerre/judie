@@ -4,3 +4,4 @@ grpcio-health-checking
 openai
 pinecone-client
 prisma
+lxml
