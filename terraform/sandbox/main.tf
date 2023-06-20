@@ -440,6 +440,10 @@ resource "google_cloud_run_service" "inference-service" {
           name = "GRPC_HEALTH_PORT"
           value = var.grpc_health_port
         }
+        env {
+          name = "WOLFRAM_APP_ID"
+          value = var.wolfram_app_id
+        }
         startup_probe {
           initial_delay_seconds = 100
           failure_threshold = 3
