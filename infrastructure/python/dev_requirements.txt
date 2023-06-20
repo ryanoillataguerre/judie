@@ -20,3 +20,4 @@ altair
 pandas
 altair_saver
 vl-convert-python
+lxml
