@@ -4,4 +4,5 @@ from inference_service.wolfram_manager import math_api_handler
 
 def test_pull_show_steps(env_setup):
     response = math_api_handler.pull_show_steps("Integral of ln(x)cos(x)")
-    print(response)
+    assert "sin(x)" in response
+    assert len(response.split("\n")) > 1
