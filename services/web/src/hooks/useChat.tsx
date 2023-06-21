@@ -172,7 +172,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setTempUserMessageChatId(() => undefined);
     setTempUserMessage(() => undefined);
     setStreaming(() => false);
-    
+
     if (err.response.code === 429) {
       setPaywallOpen(true);
     } else {
@@ -278,11 +278,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
-
-  // console.log('outside callback - streaming', streaming)
-  // console.log('outside callback - beingStreamedMessage', beingStreamedMessage)
-  // console.log('outside callback - beingStreamedChatId', beingStreamedChatId)
-
   const addMessage = useCallback(async (prompt: string) => {
     // Guard clauses
     if (!prompt || prompt.length === 0 || (prompt.replace("\n", "").length === 0)) {
@@ -299,9 +294,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    // console.log('inside callback - streaming', streaming)
-    // console.log('inside callback - beingStreamedMessage', beingStreamedMessage)
-    // console.log('inside callback - beingStreamedChatId', beingStreamedChatId)
     if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",
