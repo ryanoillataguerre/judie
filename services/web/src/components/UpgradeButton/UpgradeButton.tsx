@@ -15,7 +15,7 @@ const UpgradeButton = () => {
         }}
         onClick={() => setIsModalOpen(true)}
       >
-        Upgrade now! 🚀
+        Upgrade now 🚀
       </Button>
     </>
   );

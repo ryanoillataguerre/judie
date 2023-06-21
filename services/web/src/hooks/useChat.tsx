@@ -154,6 +154,38 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       setBeingStreamedMessage((prev) => prev + message);
     }
   }, [streaming, setBeingStreamedMessage]);
+
+  useEffect(() => {
+    return () => {
+      setBeingStreamedMessage(undefined);
+      setBeingStreamedChatId(undefined);
+      setTempUserMessage(undefined);
+      setTempUserMessageChatId(undefined);
+      setStreaming(false);
+    }
+  }, [])
+  
+  const completionOnError = useCallback((err: HTTPResponseError) => {
+    console.log('errored!')
+    setBeingStreamedChatId(() => undefined);
+    setBeingStreamedMessage(() => undefined);
+    setTempUserMessageChatId(() => undefined);
+    setTempUserMessage(() => undefined);
+    setStreaming(() => false);
+    
+    if (err.response.code === 429) {
+      setPaywallOpen(true);
+    } else {
+      toast({
+        title: "Oops!",
+        description: err.message || "Something went wrong changing pages, please try again.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  }, [setBeingStreamedChatId, setBeingStreamedMessage, setTempUserMessageChatId, setTempUserMessage, setStreaming, toast, setPaywallOpen]);
+
   const completionMutation = useMutation({
     mutationFn: ({ query }: { query: string }): Promise<string> => {
       if (chatId) {
@@ -173,20 +205,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             setBeingStreamedMessage(undefined);
             setStreaming(false);
           },
-          onError: (err: HTTPResponseError) => {
-            console.log('errored!')
-            if (err.response.code === 429) {
-              setPaywallOpen(true);
-              setTempUserMessage(undefined);
-            }
-            toast({
-              title: "Oops!",
-              description: err.message || "Something went wrong changing pages, please try again.",
-              status: "error",
-              duration: 2000,
-              isClosable: true,
-            });
-          }
+          onError: completionOnError
         });
       } else {
         toast({
@@ -199,23 +218,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         });
         return Promise.reject();
       }
-    },
-    onError: (err: HTTPResponseError) => {
-      setStreaming(false);
-      console.error('Completion error: ', err.response)
-      if (err.response?.status === 429) {
-        // Rate limited - user is out of questions for the day
-        setPaywallOpen(true);
-      } else {
-        toast({
-          title: "Oops!",
-          description: err.message || "Something went wrong, please try again.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
-      }
-
     },
     retry: false,
   });

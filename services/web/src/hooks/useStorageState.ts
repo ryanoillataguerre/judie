@@ -26,6 +26,8 @@ const useStorageState = <T>(
     }
     if (value) {
       window?.localStorage.setItem(key, JSON.stringify(value));
+    } else {
+      window?.localStorage.removeItem(key);
     }
   }, [key, value]);
 

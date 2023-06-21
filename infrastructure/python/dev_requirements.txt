@@ -5,6 +5,7 @@ sqlalchemy
 uvicorn
 grpcio
 grpcio-tools
+grpcio-health-checking
 jupyter
 protoletariat
 openai
@@ -19,3 +20,4 @@ altair
 pandas
 altair_saver
 vl-convert-python
+lxml

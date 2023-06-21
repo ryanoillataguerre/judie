@@ -1,5 +1,7 @@
 grpcio
 grpcio-tools
+grpcio-health-checking
 openai
 pinecone-client
 prisma
+lxml

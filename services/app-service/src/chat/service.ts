@@ -380,12 +380,12 @@ export const getChatGPTCompletion = async (
           val: ChatCompletionRequestMessage
         ) => {
           if (
-            currentMessagesContentLength + val.content.split(" ").length >
+            currentMessagesContentLength + (val?.content?.split(" ")?.length || 0) >
             OPENAI_PROMPT_TOKEN_LIMIT
           ) {
             return acc;
           } else {
-            currentMessagesContentLength += val.content.split(" ").length;
+            currentMessagesContentLength += (val?.content?.split(" ")?.length || 0);
             return [...acc, val];
           }
         },

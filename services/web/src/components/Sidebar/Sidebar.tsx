@@ -640,7 +640,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       style={{
         width: "1rem",
         height: "100vh",
-        backgroundColor: "#2a3448",
+        backgroundColor: bgColor,
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "space-between",
