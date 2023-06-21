@@ -34,9 +34,6 @@ export default function useAuth({
       SubscriptionStatus.ACTIVE
     );
   }, [userData]);
-
-  
-
   useEffect(() => {
     if (isProduction()) {
       window?.analytics?.identify(userData?.id ?? undefined);
@@ -74,6 +71,7 @@ export default function useAuth({
           logout();
         }
       },
+      refetchOnWindowFocus: true,
     }
   );
 

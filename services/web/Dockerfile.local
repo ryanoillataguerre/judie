@@ -5,6 +5,7 @@ WORKDIR /app
 COPY . .
 
 RUN yarn
+RUN yarn add -D @swc/cli @swc/core
 RUN yarn global add agentkeepalive
 RUN yarn global add
 
