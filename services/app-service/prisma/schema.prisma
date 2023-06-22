@@ -7,7 +7,7 @@ generator client {
 }
 
 generator client-py {
-  provider      = "prisma-client-py"
+  provider  = "prisma-client-py"
   interface = "sync"
 }
 
@@ -77,9 +77,10 @@ model User {
   questionsAsked    Int           @default(0) @map("questions_asked")
   organizationId    String?       @map("organization_id")
   organization      Organization? @relation(fields: [organizationId], references: [id])
-  schools          School[]      
+  schools           School[]
   subscription      Subscription?
   chats             Chat[]
+  classes           Class[]
 
   @@index([id, email])
   @@map("users")
@@ -132,26 +133,39 @@ model WaitlistEntry {
 
 // Multi Tenant
 model Organization {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  primaryContactEmail String @map("primary_contact_email")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  users     User[]
-  schools   School[]
+  id                  String    @id @default(uuid())
+  name                String    @unique
+  primaryContactEmail String    @map("primary_contact_email")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+  users               User[]
+  schools             School[]
 
   @@map("organizations")
 }
 
 model School {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  organizationId String @map("organization_id")
-  organization      Organization @relation(fields: [organizationId], references: [id])
-  users    User[]
-  
+  id             String       @id @default(uuid())
+  name           String       @unique
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  users          User[]
+  classes        Class[]
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime?    @updatedAt @map("updated_at")
+
+  @@map("schools")
+}
+
+model Class {
+  id       String @id @default(uuid())
+  name     String @unique
+  schoolId String @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+  students User[]
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
-  @@map("schools")
+  @@map("classes")
 }
