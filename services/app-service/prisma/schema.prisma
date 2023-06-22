@@ -63,25 +63,24 @@ model Subscription {
 }
 
 model User {
-  id                String        @id @default(uuid())
-  email             String        @unique
-  firstName         String?       @map("first_name")
-  lastName          String?       @map("last_name")
-  password          String
-  receivePromotions Boolean       @map("receive_promotions")
-  gradeYear         GradeYear?    @map("grade_year")
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime?     @updatedAt @map("updated_at")
-  stripeCustomerId  String?       @map("stripe_customer_id")
-  questionsAsked    Int           @default(0) @map("questions_asked")
-  organizationId    String?       @map("organization_id")
-  organization      Organization? @relation(fields: [organizationId], references: [id])
-  schools           School[]
-  subscription      Subscription?
-  chats             Chat[]
-  classes           Class[]
-  permissions UserPermission[]
-  createdOrganizations Organization[] @relation("creator")
+  id                   String           @id @default(uuid())
+  email                String           @unique
+  firstName            String?          @map("first_name")
+  lastName             String?          @map("last_name")
+  password             String
+  receivePromotions    Boolean          @map("receive_promotions")
+  gradeYear            GradeYear?       @map("grade_year")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime?        @updatedAt @map("updated_at")
+  stripeCustomerId     String?          @map("stripe_customer_id")
+  questionsAsked       Int              @default(0) @map("questions_asked")
+  organizations        Organization[]
+  schools              School[]
+  subscription         Subscription?
+  chats                Chat[]
+  classes              Class[]
+  permissions          UserPermission[]
+  createdOrganizations Organization[]   @relation("creator")
 
   @@index([id, email])
   @@map("users")
@@ -116,6 +115,7 @@ model Message {
   chatId          String      @map("chat_id")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime?   @updatedAt @map("updated_at")
+  deletedAt       DateTime?   @map("deleted_at")
   chat            Chat        @relation(fields: [chatId], references: [id])
 
   @@index([id, chatId])
@@ -134,44 +134,47 @@ model WaitlistEntry {
 
 // Multi Tenant
 model Organization {
-  id                  String    @id @default(uuid())
-  name                String    @unique
-  primaryContactEmail String    @map("primary_contact_email")
-  creatorId           String    @map("creator_id")
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime? @updatedAt @map("updated_at")
+  id                  String           @id @default(uuid())
+  name                String           @unique
+  primaryContactEmail String           @map("primary_contact_email")
+  creatorId           String           @map("creator_id")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime?        @updatedAt @map("updated_at")
   users               User[]
   schools             School[]
-  permissions UserPermission[]
-  creator            User?     @relation("creator", fields: [creatorId], references: [id])
-  deletedAt           DateTime? @map("deleted_at")
+  permissions         UserPermission[]
+  invites             Invite[]
+  creator             User?            @relation("creator", fields: [creatorId], references: [id])
+  deletedAt           DateTime?        @map("deleted_at")
 
   @@map("organizations")
 }
 
 model School {
-  id             String       @id @default(uuid())
-  name           String       @unique
-  address String?
-  organizationId String       @map("organization_id")
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  id             String           @id @default(uuid())
+  name           String           @unique
+  address        String?
+  organizationId String           @map("organization_id")
+  organization   Organization     @relation(fields: [organizationId], references: [id])
   users          User[]
   classes        Class[]
-  permissions UserPermission[]
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime?    @updatedAt @map("updated_at")
-  deletedAt      DateTime?    @map("deleted_at")
+  permissions    UserPermission[]
+  invites        Invite[]
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime?        @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
 
   @@map("schools")
 }
 
 model Class {
-  id       String @id @default(uuid())
-  name     String @unique
-  schoolId String @map("school_id")
-  school   School @relation(fields: [schoolId], references: [id])
-  students User[]
+  id          String           @id @default(uuid())
+  name        String           @unique
+  schoolId    String           @map("school_id")
+  school      School           @relation(fields: [schoolId], references: [id])
+  students    User[]
   permissions UserPermission[]
+  invites     Invite[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -181,21 +184,38 @@ model Class {
 }
 
 model UserPermission {
-  id        String    @id @default(uuid())
-  userId    String    @map("user_id")
-  schoolId  String?    @map("school_id")
-  organizationId String? @map("organization_id")
-  classId  String?   @map("class_id")
-  role     UserRole  @default(STUDENT)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-  user      User      @relation(fields: [userId], references: [id])
-  school    School?    @relation(fields: [schoolId], references: [id])
-  organization Organization? @relation(fields: [organizationId], references: [id])
-  class     Class?     @relation(fields: [classId], references: [id])
-
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  schoolId       String?       @map("school_id")
+  organizationId String?       @map("organization_id")
+  classId        String?       @map("class_id")
+  role           UserRole      @default(STUDENT)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime?     @updatedAt @map("updated_at")
+  deletedAt      DateTime?     @map("deleted_at")
+  user           User          @relation(fields: [userId], references: [id])
+  school         School?       @relation(fields: [schoolId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  class          Class?        @relation(fields: [classId], references: [id])
 
   @@index([id, userId, schoolId])
   @@map("user_permissions")
+}
+
+model Invite {
+  id             String        @id @default(uuid())
+  email          String        @unique
+  schoolId       String?       @map("school_id")
+  organizationId String?       @map("organization_id")
+  classId        String?       @map("class_id")
+  role           UserRole      @default(STUDENT)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime?     @updatedAt @map("updated_at")
+  deletedAt      DateTime?     @map("deleted_at")
+  school         School?       @relation(fields: [schoolId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  class          Class?        @relation(fields: [classId], references: [id])
+
+  @@index([id, email])
+  @@map("invites")
 }
