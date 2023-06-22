@@ -77,6 +77,7 @@ model User {
   questionsAsked    Int           @default(0) @map("questions_asked")
   organizationId    String?       @map("organization_id")
   organization      Organization? @relation(fields: [organizationId], references: [id])
+  schools          School[]      
   subscription      Subscription?
   chats             Chat[]
 
@@ -137,6 +138,20 @@ model Organization {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   users     User[]
+  schools   School[]
 
   @@map("organizations")
+}
+
+model School {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  organizationId String @map("organization_id")
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  users    User[]
+  
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("schools")
 }
