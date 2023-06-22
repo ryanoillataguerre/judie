@@ -29,10 +29,10 @@ enum GradeYear {
 }
 
 enum UserRole {
+  JUDIE
   ADMINISTRATOR
   TEACHER
   STUDENT
-  JUDIE
 }
 
 enum SubscriptionStatus {
@@ -72,7 +72,6 @@ model User {
   gradeYear         GradeYear?    @map("grade_year")
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime?     @updatedAt @map("updated_at")
-  role              UserRole      @default(STUDENT)
   stripeCustomerId  String?       @map("stripe_customer_id")
   questionsAsked    Int           @default(0) @map("questions_asked")
   organizationId    String?       @map("organization_id")
@@ -81,6 +80,8 @@ model User {
   subscription      Subscription?
   chats             Chat[]
   classes           Class[]
+  permissions UserPermission[]
+  createdOrganizations Organization[] @relation("creator")
 
   @@index([id, email])
   @@map("users")
@@ -136,10 +137,14 @@ model Organization {
   id                  String    @id @default(uuid())
   name                String    @unique
   primaryContactEmail String    @map("primary_contact_email")
+  creatorId           String    @map("creator_id")
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime? @updatedAt @map("updated_at")
   users               User[]
   schools             School[]
+  permissions UserPermission[]
+  creator            User?     @relation("creator", fields: [creatorId], references: [id])
+  deletedAt           DateTime? @map("deleted_at")
 
   @@map("organizations")
 }
@@ -147,12 +152,15 @@ model Organization {
 model School {
   id             String       @id @default(uuid())
   name           String       @unique
+  address String?
   organizationId String       @map("organization_id")
   organization   Organization @relation(fields: [organizationId], references: [id])
   users          User[]
   classes        Class[]
+  permissions UserPermission[]
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime?    @updatedAt @map("updated_at")
+  deletedAt      DateTime?    @map("deleted_at")
 
   @@map("schools")
 }
@@ -163,9 +171,31 @@ model Class {
   schoolId String @map("school_id")
   school   School @relation(fields: [schoolId], references: [id])
   students User[]
+  permissions UserPermission[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("classes")
+}
+
+model UserPermission {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  schoolId  String?    @map("school_id")
+  organizationId String? @map("organization_id")
+  classId  String?   @map("class_id")
+  role     UserRole  @default(STUDENT)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  user      User      @relation(fields: [userId], references: [id])
+  school    School?    @relation(fields: [schoolId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  class     Class?     @relation(fields: [classId], references: [id])
+
+
+  @@index([id, userId, schoolId])
+  @@map("user_permissions")
 }
