@@ -75,6 +75,8 @@ model User {
   role              UserRole      @default(STUDENT)
   stripeCustomerId  String?       @map("stripe_customer_id")
   questionsAsked    Int           @default(0) @map("questions_asked")
+  organizationId    String?       @map("organization_id")
+  organization      Organization? @relation(fields: [organizationId], references: [id])
   subscription      Subscription?
   chats             Chat[]
 
@@ -125,4 +127,16 @@ model WaitlistEntry {
   updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("waitlist_entries")
+}
+
+// Multi Tenant
+model Organization {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  primaryContactEmail String @map("primary_contact_email")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  users     User[]
+
+  @@map("organizations")
 }
