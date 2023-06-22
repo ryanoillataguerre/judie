@@ -1,6 +1,6 @@
 import { Box, Flex } from "@chakra-ui/react";
 import Sidebar from "../Sidebar/Sidebar";
-import { BsChevronBarLeft, BsChevronBarRight } from "react-icons/bs";
+import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import useStorageState from "@judie/hooks/useStorageState";
 
 interface SidebarPageContainerProps {
@@ -18,21 +18,21 @@ const OpenCloseButton = ({
     <Box
       style={{
         position: "fixed",
-        top: "1rem",
+        top: "3.5rem",
         left: isOpen ? "18.5rem" : "1.5rem",
       }}
     >
       {isOpen ? (
-        <BsChevronBarLeft
+        <LuChevronLeftSquare
           cursor={"pointer"}
           onClick={() => setIsOpen(false)}
-          size={18}
+          size={20}
         />
       ) : (
-        <BsChevronBarRight
+        <LuChevronRightSquare
           cursor={"pointer"}
           onClick={() => setIsOpen(true)}
-          size={18}
+          size={20}
         />
       )}
     </Box>

@@ -1,4 +1,4 @@
-import { Flex, useColorModeValue, Text } from "@chakra-ui/react";
+import { Flex, useColorModeValue, Badge } from "@chakra-ui/react";
 import {ChatContext} from "@judie/hooks/useChat";
 import { useContext } from "react";
 
@@ -18,14 +18,14 @@ const ChatNavbar = () => {
       }}
     >
       {subject && (
-        <Text
+        <Badge
           style={{
-            fontSize: "0.8rem",
-            fontWeight: 400,
+            justifySelf: "center",
           }}
+          colorScheme="blue"
         >
-          Subject: {subject}
-        </Text>
+          {subject}
+        </Badge>
       )}
     </Flex>
   );
