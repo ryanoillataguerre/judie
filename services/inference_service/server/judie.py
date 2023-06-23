@@ -2,19 +2,27 @@ import prisma
 from inference_service.prompts import prompt_generator
 from inference_service.openai_manager import openai_manager
 from inference_service.prisma_app_client import prisma_manager
-from typing import Optional, Iterator
+from typing import Optional, Iterator, Dict
 import logging
+from dataclasses import dataclass
 
 logger = logging.getLogger("inference_logger")
 
 
+@dataclass
+class SessionConfig:
+    subject: Optional[str] = None
+
+
 def yield_judie_response(
-    chat_id: Optional[str], subject: str, app_db: Optional[prisma.Prisma] = None
+    chat_id: Optional[str],
+    config: SessionConfig,
+    app_db: Optional[prisma.Prisma] = None,
 ) -> Optional[Iterator[str]]:
     """
     Wrapper around main logic for streaming based Judie Chat.
     :param chat_id: uuid string for chat objects in app DB
-    :param subject: string value for subject identifier
+    :param config: config object for relevant session data like subject or user type
     :param app_db: Prisma manager for app DB connection
     :return: Generator of response chunk strings
     """
@@ -22,7 +30,7 @@ def yield_judie_response(
 
     if history[-1]["role"] == "user":
         sys_prompt = prompt_generator.generate_question_answer_prompt(
-            question=history[-1]["content"], subject_modifier=subject
+            question=history[-1]["content"], subject_modifier=config.subject
         )
         logger.info(f"Full prompt: {sys_prompt}")
 
@@ -39,3 +47,7 @@ def yield_judie_response(
         logger.info("No response because last message type was not user's.")
         yield None
         return None
+
+
+def grab_chat_config(chat_id: Optional[str]) -> SessionConfig:
+    return SessionConfig(subject=prisma_manager.get_subject(chat_id=chat_id))
