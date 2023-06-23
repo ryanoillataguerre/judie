@@ -15,7 +15,9 @@ class SessionConfig:
 
 
 def yield_judie_response(
-    chat_id: Optional[str], config: SessionConfig, app_db: Optional[prisma.Prisma] = None
+    chat_id: Optional[str],
+    config: SessionConfig,
+    app_db: Optional[prisma.Prisma] = None,
 ) -> Optional[Iterator[str]]:
     """
     Wrapper around main logic for streaming based Judie Chat.
