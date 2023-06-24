@@ -166,7 +166,7 @@ export const forgotPassword = async ({email, origin}: {email: string; origin: st
   }
   // Create token and store in Redis
   const token = await createForgotPasswordToken({ userId: user.id });
-  const url = `${origin || "https://app.judie.io"}/reset-password?token=${token}`;
+  const url = `${`app.${origin}` || "https://app.judie.io"}/reset-password?token=${token}`;
   // Send email with link to reset password
   return await sendUserForgotPasswordEmail({
     user,

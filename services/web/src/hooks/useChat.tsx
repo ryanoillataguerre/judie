@@ -163,7 +163,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       setTempUserMessageChatId(undefined);
       setStreaming(false);
     }
-  }, [])
+  }, [auth.userData])
   
   const completionOnError = useCallback((err: HTTPResponseError) => {
     console.log('errored!')
@@ -321,7 +321,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     );
     setTempUserMessageChatId(chatId);
     // Call mutation
-    setStreaming(true);
     await completionMutation.mutateAsync({ query: prompt });
     
   }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage, beingStreamedChatId]);
