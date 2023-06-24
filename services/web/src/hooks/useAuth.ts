@@ -58,7 +58,7 @@ export default function useAuth({
   }, [router, setUserData, setSessionCookie, reset]);
 
   // GET /users/me
-  const { isError, refetch, error, isLoading, isFetched } = useQuery(
+  const { isError, refetch, isLoading, isFetched } = useQuery(
     [GET_ME, sessionCookie],
     () => getMeQuery(),
     {
@@ -66,12 +66,16 @@ export default function useAuth({
       onSuccess: (data) => {
         setUserData(data);
       },
+      onError: (err: HTTPResponseError) => {
+        if (err?.response?.code === 401) {
+          logout();
+        }
+      },
       refetchOnWindowFocus: true,
     }
   );
 
   useEffect(() => {
-    console.log("isError",isError);
     if (isError && !allowUnauth) {
       router.push("/signin", {
         query: router.query,

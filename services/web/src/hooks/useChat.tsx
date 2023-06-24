@@ -303,7 +303,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",
-        description: "If the problem persists, please log out and back in again.",
+        description: "If this message persists, please log out and back in again.",
         status: "warning",
         duration: 2000,
         isClosable: true,
