@@ -24,12 +24,18 @@ const OpenCloseButton = ({
     >
       {isOpen ? (
         <LuChevronLeftSquare
+          style={{
+            zIndex: 1000,
+          }}
           cursor={"pointer"}
           onClick={() => setIsOpen(false)}
           size={20}
         />
       ) : (
         <LuChevronRightSquare
+          style={{
+            zIndex: 1000,
+          }}
           cursor={"pointer"}
           onClick={() => setIsOpen(true)}
           size={20}

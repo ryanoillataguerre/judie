@@ -14,7 +14,7 @@ import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
 import { getUser, updateUser } from "../user/service.js";
 import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
-import { SubscriptionStatus } from "@prisma/client";
+import { SubscriptionStatus, UserRole } from "@prisma/client";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -97,6 +97,21 @@ export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   }
 };
 
+export const requireAdminAuth = async (req: Request, _: Response, next: NextFunction) => {
+  try {
+    if (!req.session?.userId) {
+      throw new UnauthorizedError("Not authorized");
+    }
+    const user = await getUser({ id: req.session?.userId });
+    if (!user?.email.includes("judie.io")) {
+      throw new UnauthorizedError("Not authorized");
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
 // Error wrapping Higher order function
 // This is used to pass our custom errors into the error handler middleware below
 export const errorPassthrough =
@@ -144,10 +159,11 @@ const redisClient = new Redis({
   port: parseInt(process.env.REDIS_PORT || "6379"),
   host: process.env.REDIS_HOST || "localhost",
 });
+export const sessionStore = new RedisStore({ client: redisClient });
 export const sessionLayer = () =>
   session({
     name: "judie_sid",
-    store: new RedisStore({ client: redisClient }),
+    store: sessionStore,
     secret: process.env.SESSION_SECRET || "secret",
     resave: false,
     saveUninitialized: false,

@@ -1,8 +1,7 @@
 import { HTTPResponseError } from "@judie/data/baseFetch";
-import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { forgotPasswordMutation, resetPasswordMutation } from "@judie/data/mutations";
+import { resetPasswordMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "@judie/components/Button/Button";
@@ -20,7 +19,6 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 
 interface SubmitData {
   password: string;
@@ -303,14 +301,6 @@ const ResetPassword = () => {
       </main>
     </>
   );
-};
-
-// Redirect users to chat if authed
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  if (ctx.req.cookies.judie_sid) {
-    return serverRedirect(ctx, "/chat");
-  }
-  return { props: {} };
 };
 
 ResetPassword.displayName = "Reset Password";

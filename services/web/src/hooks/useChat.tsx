@@ -38,6 +38,7 @@ interface UseChatData {
   setPaywallOpen: (open: boolean) => void;
   beingStreamedChatId?: string;
   tempUserMessageChatId?: string;
+  reset: () => void;
 }
 
 export const ChatContext = createContext<UseChatData>({
@@ -55,9 +56,8 @@ export const ChatContext = createContext<UseChatData>({
   setPaywallOpen: () => {},
   beingStreamedChatId: undefined,
   tempUserMessageChatId: undefined,
+  reset: () => {},
 });
-
-
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth();
@@ -91,29 +91,33 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setStreaming(false);
   }, [chatId]);
 
+  const reset = useCallback(() => {
+    setBeingStreamedMessage(undefined);
+    setBeingStreamedChatId(undefined);
+    setTempUserMessage(undefined);
+    setTempUserMessageChatId(undefined);
+    setStreaming(false);
+    window?.sessionStorage.clear();
+
+  }, [setBeingStreamedMessage, setBeingStreamedChatId, setTempUserMessage, setTempUserMessageChatId]);
+
   useEffect(() => {
     if (beingStreamedMessage) {
-      setBeingStreamedMessage(undefined);
-      setBeingStreamedChatId(undefined);
-      setTempUserMessage(undefined);
-      setTempUserMessageChatId(undefined);
+      reset();
     }
-  }, [auth?.userData?.id, setBeingStreamedMessage, setBeingStreamedChatId, setTempUserMessage, setTempUserMessageChatId]);
+  }, [auth?.userData?.id, reset]);
 
   // If beingStreamedMessage hasn't been updated in 5 seconds, reset it
   useEffect(() => {
     if (beingStreamedMessage) {
       const timeout = setTimeout(() => {
-        setBeingStreamedMessage(undefined);
-        setBeingStreamedChatId(undefined);
-        setTempUserMessage(undefined);
-      setTempUserMessageChatId(undefined);
+        reset()
       }, 5000);
       return () => {
         clearTimeout(timeout);
       };
     }
-  }, [beingStreamedMessage, setBeingStreamedMessage, setBeingStreamedChatId, setTempUserMessage, setTempUserMessageChatId]);
+  }, [beingStreamedMessage, reset]);
 
   const [prevChatId, setPrevChatId] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -157,13 +161,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     return () => {
-      setBeingStreamedMessage(undefined);
-      setBeingStreamedChatId(undefined);
-      setTempUserMessage(undefined);
-      setTempUserMessageChatId(undefined);
+      reset();
       setStreaming(false);
     }
-  }, [auth.userData])
+  }, [])
   
   const completionOnError = useCallback((err: HTTPResponseError) => {
     console.log('errored!')
@@ -302,7 +303,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",
-        description: "If the problem persists, please log out and back in again.",
+        description: "If this message persists, please log out and back in again.",
         status: "warning",
         duration: 2000,
         isClosable: true,
@@ -356,6 +357,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         setPaywallOpen,
         beingStreamedChatId,
         tempUserMessageChatId,
+        reset
       };
     }, [
       existingChatQuery.data,
@@ -372,6 +374,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       setPaywallOpen,
       beingStreamedChatId,
       tempUserMessageChatId,
+      reset
     ]);
   return (
     <ChatContext.Provider value={providerValue}>
