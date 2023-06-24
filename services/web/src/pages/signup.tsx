@@ -232,7 +232,7 @@ const SignupForm = () => {
             isInvalid={hasSubmitted && !termsAndConditions}
             marginY={1}
           >
-            <Text fontSize={"0.8rem"}>I agree to the Terms & Conditions</Text>
+            <Text fontSize={"0.8rem"}>I agree to the <Link textDecor={"underline"} target="_blank" href="https://judie.io/terms">Terms & Conditions</Link ></Text>
           </Checkbox>
         </Flex>
         <Flex
