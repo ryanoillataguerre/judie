@@ -3,7 +3,7 @@ import styles from "@judie/styles/Home.module.scss";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext } from "next";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
+import { removeCookie, serverRedirect, verifyAuth } from "@judie/utils/middleware/server";
 import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
 const Home = () => {
   // const { userData } = useAuth({ allowUnauth: true });
@@ -52,9 +52,14 @@ Home.displayName = "Home";
 // Redirect users to signin if unauthed, otherwise redirect to chat
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   if (ctx.req.cookies.judie_sid) {
-    return serverRedirect(ctx, "/chat");
+    const isAuthed = await verifyAuth(ctx.req.cookies.judie_sid);
+    if (isAuthed) {
+      return serverRedirect(ctx, "/chat");
+    } else {
+      removeCookie(ctx);
+      return serverRedirect(ctx, "/signin");
+    }
   }
-  return serverRedirect(ctx, "/signin");
 };
 
 export default Home;

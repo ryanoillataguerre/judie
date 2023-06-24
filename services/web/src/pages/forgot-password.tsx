@@ -20,7 +20,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
+import { removeCookie, serverRedirect, verifyAuth } from "@judie/utils/middleware/server";
 
 interface SubmitData {
   email: string;
@@ -223,7 +223,12 @@ const ForgotPassword = () => {
 // Redirect users to chat if authed
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   if (ctx.req.cookies.judie_sid) {
-    return serverRedirect(ctx, "/chat");
+    const isAuthed = await verifyAuth(ctx.req.cookies.judie_sid);
+    if (isAuthed) {
+      return serverRedirect(ctx, "/chat");
+    } else {
+      removeCookie(ctx);
+    }
   }
   return { props: {} };
 };
