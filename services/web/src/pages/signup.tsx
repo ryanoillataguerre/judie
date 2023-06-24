@@ -25,6 +25,7 @@ import {
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 
 interface SubmitData {
   email: string;
@@ -280,6 +281,7 @@ const SignupForm = () => {
 
 const SignupPage = () => {
   useAuth({ allowUnauth: true });
+  useUnauthRedirect();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
     <>

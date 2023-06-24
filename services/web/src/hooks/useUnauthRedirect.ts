@@ -18,5 +18,10 @@ export default () => {
                 router.push("/chat")
             }
         }
+        if (["/signin", "/signup"].includes(router.pathname)) {
+            if (auth.userData) {
+                router.push("/chat")
+            }
+        }
     }, [auth, router]);
 }
