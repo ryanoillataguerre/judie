@@ -299,12 +299,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         isClosable: true,
       });
     }
-    // console.log('inside callback - streaming', streaming)
-    // console.log('inside callback - beingStreamedMessage', beingStreamedMessage)
-    // console.log('inside callback - beingStreamedChatId', beingStreamedChatId)
     if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
       toast({
         title: "Please wait for the previous message to respond",
+        description: "If the problem persists, please log out and back in again.",
         status: "warning",
         duration: 2000,
         isClosable: true,
