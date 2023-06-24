@@ -113,7 +113,6 @@ export default function useAuth({
         isError &&
         !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
       ) {
-        console.log('redirecting')
         router.push("/signin");
       }
     } else {

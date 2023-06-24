@@ -2,6 +2,7 @@ import Head from "next/head";
 import styles from "@judie/styles/Home.module.scss";
 import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
 import useAuth from "@judie/hooks/useAuth";
+import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 const Home = () => {
   // const { userData } = useAuth({ allowUnauth: true });
   // const [query, setQuery] = useState<string>("");
@@ -20,6 +21,8 @@ const Home = () => {
   //   }
   // };
   useAuth({ allowUnauth: true })
+
+  useUnauthRedirect();
 
   return (
     <>

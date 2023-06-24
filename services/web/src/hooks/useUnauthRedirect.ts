@@ -10,5 +10,13 @@ export default () => {
         if (auth.userData && REDIRECT_FROM_PATHS.includes(router.pathname)) {
             router.push("/chat")
         }
-    }, [auth.userData, router]);
+        if (router.pathname === "/") {
+            if (!auth.userData && !auth.isLoading) {
+                router.push("/signin")
+            }
+            if (auth.userData) {
+                router.push("/chat")
+            }
+        }
+    }, [auth, router]);
 }
