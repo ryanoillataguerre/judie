@@ -66,18 +66,12 @@ export default function useAuth({
       onSuccess: (data) => {
         setUserData(data);
       },
-      onError: (err: HTTPResponseError) => {
-        console.error("/me error", err);
-        setUserData(undefined);
-        if (err.response?.status === 401) {
-          logout();
-        }
-      },
       refetchOnWindowFocus: true,
     }
   );
 
   useEffect(() => {
+    console.log("isError",isError);
     if (isError && !allowUnauth) {
       router.push("/signin", {
         query: router.query,
