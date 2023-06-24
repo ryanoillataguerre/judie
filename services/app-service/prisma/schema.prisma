@@ -78,7 +78,7 @@ model User {
   schools              School[]
   subscription         Subscription?
   chats                Chat[]
-  classes              Class[]
+  rooms                Room[]
   permissions          UserPermission[]
   createdOrganizations Organization[]   @relation("creator")
 
@@ -122,6 +122,18 @@ model Message {
   @@map("messages")
 }
 
+model MessageMetadata {
+  id        String @id @default(uuid())
+  messageId String @map("message_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([id, messageId])
+  @@map("message_metadata")
+}
+
 model WaitlistEntry {
   id        String    @id @default(uuid())
   email     String    @unique
@@ -143,6 +155,7 @@ model Organization {
   users               User[]
   schools             School[]
   permissions         UserPermission[]
+  rooms               Room[]
   invites             Invite[]
   creator             User?            @relation("creator", fields: [creatorId], references: [id])
   deletedAt           DateTime?        @map("deleted_at")
@@ -157,7 +170,7 @@ model School {
   organizationId String           @map("organization_id")
   organization   Organization     @relation(fields: [organizationId], references: [id])
   users          User[]
-  classes        Class[]
+  rooms          Room[]
   permissions    UserPermission[]
   invites        Invite[]
   createdAt      DateTime         @default(now()) @map("created_at")
@@ -167,20 +180,22 @@ model School {
   @@map("schools")
 }
 
-model Class {
-  id          String           @id @default(uuid())
-  name        String           @unique
-  schoolId    String           @map("school_id")
-  school      School           @relation(fields: [schoolId], references: [id])
-  students    User[]
-  permissions UserPermission[]
-  invites     Invite[]
+model Room {
+  id             String           @id @default(uuid())
+  name           String           @unique
+  schoolId       String           @map("school_id")
+  school         School           @relation(fields: [schoolId], references: [id])
+  organizationId String?          @map("organization_id")
+  organization   Organization?    @relation(fields: [organizationId], references: [id])
+  students       User[]
+  permissions    UserPermission[]
+  invites        Invite[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("classes")
+  @@map("rooms")
 }
 
 model UserPermission {
@@ -188,7 +203,7 @@ model UserPermission {
   userId         String        @map("user_id")
   schoolId       String?       @map("school_id")
   organizationId String?       @map("organization_id")
-  classId        String?       @map("class_id")
+  roomId         String?       @map("room_id")
   role           UserRole      @default(STUDENT)
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime?     @updatedAt @map("updated_at")
@@ -196,7 +211,7 @@ model UserPermission {
   user           User          @relation(fields: [userId], references: [id])
   school         School?       @relation(fields: [schoolId], references: [id])
   organization   Organization? @relation(fields: [organizationId], references: [id])
-  class          Class?        @relation(fields: [classId], references: [id])
+  room           Room?         @relation(fields: [roomId], references: [id])
 
   @@index([id, userId, schoolId])
   @@map("user_permissions")
@@ -207,14 +222,14 @@ model Invite {
   email          String        @unique
   schoolId       String?       @map("school_id")
   organizationId String?       @map("organization_id")
-  classId        String?       @map("class_id")
+  roomId         String?       @map("room_id")
   role           UserRole      @default(STUDENT)
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime?     @updatedAt @map("updated_at")
   deletedAt      DateTime?     @map("deleted_at")
   school         School?       @relation(fields: [schoolId], references: [id])
   organization   Organization? @relation(fields: [organizationId], references: [id])
-  class          Class?        @relation(fields: [classId], references: [id])
+  room           Room?         @relation(fields: [roomId], references: [id])
 
   @@index([id, email])
   @@map("invites")
