@@ -1,5 +1,4 @@
 import { HTTPResponseError } from "@judie/data/baseFetch";
-import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useMutation } from "react-query";
 import { signinMutation } from "@judie/data/mutations";
@@ -24,7 +23,6 @@ import {
   Spinner
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 
 interface SubmitData {
@@ -58,6 +56,7 @@ const SigninForm = () => {
         status: "error",
         duration: 5000,
         isClosable: true,
+        position: "top",
       });
     },
   });
@@ -290,13 +289,6 @@ const SigninPage = () => {
   );
 };
 
-// Redirect users to chat if authed
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  if (ctx.req.cookies.judie_sid) {
-    return serverRedirect(ctx, "/chat");
-  }
-  return { props: {} };
-};
 
 SigninPage.displayName = "Sign In";
 

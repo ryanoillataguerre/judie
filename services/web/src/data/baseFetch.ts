@@ -64,12 +64,12 @@ const checkStatus = async (response: Response) => {
     if (responseBody && response?.status) {
       // Not includes auth because we don't want to redirect on bad signin/signup
       if (response.status === 401 && !response.url.includes("/auth")) {
-        deleteCookie(SESSION_COOKIE, {
-          path: "/",
-        });
-        if (isClient()) {
-          window.location.href = "/signin";
-        }
+        // deleteCookie(SESSION_COOKIE, {
+        //   path: "/",
+        // });
+        // if (isClient()) {
+        //   window.location.href = "/signin";
+        // }
       }
       throw new HTTPResponseError(responseBody, response.status || 500);
     } else {
