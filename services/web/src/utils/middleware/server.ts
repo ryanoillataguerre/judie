@@ -31,7 +31,3 @@ export const verifyAuth = async (cookie?: string) => {
     return false;
   }
 }
-
-export const removeCookie = (ctx: GetServerSidePropsContext) => {
-  ctx.res.setHeader('Set-Cookie', 'judie_sid=bad; Max-Age=0');
-}

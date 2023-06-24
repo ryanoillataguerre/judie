@@ -227,7 +227,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     if (isAuthed) {
       return serverRedirect(ctx, "/chat");
     } else {
-      removeCookie(ctx);
+      ctx.res.setHeader('Set-Cookie', 'judie_sid=bad; Max-Age=0');
     }
   }
   return { props: {} };
