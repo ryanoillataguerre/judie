@@ -5,16 +5,16 @@ import { SubscriptionStatus, User } from "@judie/data/types/api";
 import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useContext } from "react";
 import {
   QueryObserverResult,
   RefetchOptions,
   RefetchQueryFilters,
   useQuery,
 } from "react-query";
+import { ChatContext } from "./useChat";
 
-const redirToChatFrom = ["/signin", "/signup"];
-const DO_NOT_REDIRECT_PATHS = [...redirToChatFrom, "/"];
+const DO_NOT_REDIRECT_PATHS = ["/signin", "/signup"];
 export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
 
 export default function useAuth({
@@ -40,7 +40,10 @@ export default function useAuth({
     }
   }, [userData]);
 
+  const { reset } = useContext(ChatContext);
+
   const logout = useCallback(() => {
+    reset();
     deleteCookie(SESSION_COOKIE, {
       path: "/",
       domain: !isLocal()
@@ -52,28 +55,33 @@ export default function useAuth({
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
-  }, [router, setUserData, setSessionCookie]);
+  }, [router, setUserData, setSessionCookie, reset]);
 
   // GET /users/me
-  const { isError, refetch, error, isLoading, isFetched } = useQuery(
+  const { isError, refetch, isLoading, isFetched } = useQuery(
     [GET_ME, sessionCookie],
     () => getMeQuery(),
     {
-      enabled: !!sessionCookie,
       staleTime: 1000 * 60,
       onSuccess: (data) => {
         setUserData(data);
       },
       onError: (err: HTTPResponseError) => {
-        console.error("/me error", err);
-        setUserData(undefined);
-        if (err.response?.status === 401) {
+        if (err?.response?.code === 401) {
           logout();
         }
       },
       refetchOnWindowFocus: true,
     }
   );
+
+  useEffect(() => {
+    if (isError && !allowUnauth) {
+      router.push("/signin", {
+        query: router.query,
+      });
+    }
+  }, [router, isError, allowUnauth]);
 
   // Stripe callback url has paid=true query param
   useEffect(() => {

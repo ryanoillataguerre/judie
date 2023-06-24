@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 
-export const serverRedirect = (
+export const serverRedirect = async (
   ctx: GetServerSidePropsContext,
   path: string
 ) => {

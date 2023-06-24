@@ -5,7 +5,7 @@ function getStorageValue<T>(key: string, defaultValue: T) {
   if (typeof window === "undefined") {
     return defaultValue;
   }
-  const saved = window?.localStorage.getItem(key);
+  const saved = window?.sessionStorage.getItem(key);
   if (!saved || saved === "undefined") {
     return defaultValue;
   }
@@ -25,9 +25,9 @@ const useStorageState = <T>(
       return;
     }
     if (value) {
-      window?.localStorage.setItem(key, JSON.stringify(value));
+      window?.sessionStorage.setItem(key, JSON.stringify(value));
     } else {
-      window?.localStorage.removeItem(key);
+      window?.sessionStorage.removeItem(key);
     }
   }, [key, value]);
 

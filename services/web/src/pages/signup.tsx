@@ -1,5 +1,4 @@
 import { HTTPResponseError } from "@judie/data/baseFetch";
-import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useMutation } from "react-query";
 import { signupMutation } from "@judie/data/mutations";
@@ -25,8 +24,8 @@ import {
   Spinner
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
-import { serverRedirect } from "@judie/utils/middleware/redirectToWaitlist";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 
 interface SubmitData {
   email: string;
@@ -282,6 +281,7 @@ const SignupForm = () => {
 
 const SignupPage = () => {
   useAuth({ allowUnauth: true });
+  useUnauthRedirect();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
     <>
@@ -332,14 +332,6 @@ const SignupPage = () => {
       </main>
     </>
   );
-};
-
-// Redirect users to chat if authed
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  if (ctx.req.cookies.judie_sid) {
-    return serverRedirect(ctx, "/chat");
-  }
-  return { props: {} };
 };
 
 SignupPage.displayName = "Sign Up";
