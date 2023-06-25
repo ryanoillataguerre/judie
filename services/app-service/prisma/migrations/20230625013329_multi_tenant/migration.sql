@@ -4,6 +4,26 @@
   - You are about to drop the column `role` on the `users` table. All the data in the column will be lost.
 
 */
+-- CreateEnum
+CREATE TYPE "PermissionType" AS ENUM ('ORG_ADMIN', 'SCHOOL_ADMIN', 'ROOM_ADMIN', 'STUDENT');
+
+-- AlterEnum
+-- This migration adds more than one value to an enum.
+-- With PostgreSQL versions 11 and earlier, this is not possible
+-- in a single migration. This can be worked around by creating
+-- multiple migrations, each migration adding only one value to
+-- the enum.
+
+
+ALTER TYPE "GradeYear" ADD VALUE 'FIRST';
+ALTER TYPE "GradeYear" ADD VALUE 'SECOND';
+ALTER TYPE "GradeYear" ADD VALUE 'THIRD';
+ALTER TYPE "GradeYear" ADD VALUE 'FOURTH';
+ALTER TYPE "GradeYear" ADD VALUE 'FIFTH';
+ALTER TYPE "GradeYear" ADD VALUE 'SIXTH';
+ALTER TYPE "GradeYear" ADD VALUE 'SEVENTH';
+ALTER TYPE "GradeYear" ADD VALUE 'EIGHTH';
+
 -- AlterTable
 ALTER TABLE "messages" ADD COLUMN     "deleted_at" TIMESTAMP(3);
 
@@ -63,7 +83,8 @@ CREATE TABLE "rooms" (
 -- CreateTable
 CREATE TABLE "user_permissions" (
     "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
+    "user_id" TEXT,
+    "invite_id" TEXT,
     "school_id" TEXT,
     "organization_id" TEXT,
     "room_id" TEXT,
@@ -71,6 +92,7 @@ CREATE TABLE "user_permissions" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
     "deleted_at" TIMESTAMP(3),
+    "type" "PermissionType" NOT NULL,
 
     CONSTRAINT "user_permissions_pkey" PRIMARY KEY ("id")
 );
@@ -82,6 +104,7 @@ CREATE TABLE "invites" (
     "school_id" TEXT,
     "organization_id" TEXT,
     "room_id" TEXT,
+    "grade_year" "GradeYear",
     "role" "UserRole" NOT NULL DEFAULT 'STUDENT',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
@@ -160,7 +183,10 @@ ALTER TABLE "rooms" ADD CONSTRAINT "rooms_school_id_fkey" FOREIGN KEY ("school_i
 ALTER TABLE "rooms" ADD CONSTRAINT "rooms_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_permissions" ADD CONSTRAINT "user_permissions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_permissions" ADD CONSTRAINT "user_permissions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_permissions" ADD CONSTRAINT "user_permissions_invite_id_fkey" FOREIGN KEY ("invite_id") REFERENCES "invites"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_permissions" ADD CONSTRAINT "user_permissions_school_id_fkey" FOREIGN KEY ("school_id") REFERENCES "schools"("id") ON DELETE SET NULL ON UPDATE CASCADE;
