@@ -5,24 +5,23 @@ import {
 } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { User } from "@prisma/client";
+import { User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
 import {cioClient} from "../utils/customerio.js";
-import { IdentifierType } from 'customerio-node';
 import { createForgotPasswordToken, getForgotPasswordToken, deleteForgotPasswordToken } from "../utils/redis.js";
 import { sendUserForgotPasswordEmail } from "../cio/service.js";
 
-const transformUserForSegment = (user: User) => ({
+const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firstName: user.firstName,
   lastName: user.lastName,
   email: user.email,
   role: user.role,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
-  questionsAsked: user.questionsAsked,
   receivePromotions: user.receivePromotions,
   stripeCustomerId: user.stripeCustomerId,
+  districtOrSchool,
 });
 
 export const signup = async ({
@@ -31,12 +30,16 @@ export const signup = async ({
   email,
   password,
   receivePromotions,
+  role,
+  districtOrSchool,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
+  role: UserRole;
+  districtOrSchool?: string;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -58,6 +61,8 @@ export const signup = async ({
   // Hash password
   const _password = await bcrypt.hash(password, 10);
 
+  // TODO: Calculate role
+
   const newUser = await dbClient.user.create({
     data: {
       firstName,
@@ -65,6 +70,7 @@ export const signup = async ({
       email,
       password: _password,
       receivePromotions,
+      role: role || UserRole.STUDENT,
     },
   });
 
@@ -74,19 +80,21 @@ export const signup = async ({
     first_name: newUser.firstName,
     last_name: newUser.lastName,
     receive_promotions: newUser.receivePromotions,
+    role: newUser.role,
+    district_or_school: districtOrSchool,
     last_logged_in: new Date().toISOString(),
   });
-  cioClient.mergeCustomers(IdentifierType.Id, newUser.id, IdentifierType.Id, newUser.email);
+  // TODO Ryan - this is failing - necessary?
+  // cioClient.mergeCustomers(IdentifierType.Id, newUser.id, IdentifierType.Id, newUser.email);
 
   // Create Stripe customer
   await createCustomer(newUser.id);
-  // TODO: Create Customer.io Customer
 
   // Identify in Segment
   analytics.identify({
     userId: newUser.id,
     traits: {
-      ...transformUserForSegment(newUser),
+      ...transformUserForSegment(newUser, districtOrSchool),
     },
   });
 
