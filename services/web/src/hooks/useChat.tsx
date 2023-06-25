@@ -167,7 +167,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
   
   const completionOnError = useCallback((err: HTTPResponseError) => {
-    console.log('errored!')
     setBeingStreamedChatId(() => undefined);
     setBeingStreamedMessage(() => undefined);
     setTempUserMessageChatId(() => undefined);
@@ -278,11 +277,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       });
     },
   });
-
-
-  // console.log('outside callback - streaming', streaming)
-  // console.log('outside callback - beingStreamedMessage', beingStreamedMessage)
-  // console.log('outside callback - beingStreamedChatId', beingStreamedChatId)
 
   const addMessage = useCallback(async (prompt: string) => {
     // Guard clauses
