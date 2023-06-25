@@ -21,18 +21,22 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useToast,
-  Spinner
+  Spinner,
+  Select,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
+import { UserRole } from "@judie/data/types/api";
 
 interface SubmitData {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
+  role: UserRole;
   receivePromotions: boolean;
+  districtOrSchool?: string;
 }
 
 const SignupForm = () => {
@@ -44,6 +48,8 @@ const SignupForm = () => {
       password: "",
       firstName: "",
       lastName: "",
+      role: UserRole.STUDENT,
+      districtOrSchool: "",
       receivePromotions: true,
     },
     reValidateMode: "onBlur",
@@ -72,6 +78,7 @@ const SignupForm = () => {
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState<UserRole>(UserRole.STUDENT);
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
     email,
@@ -79,6 +86,8 @@ const SignupForm = () => {
     firstName,
     lastName,
     receivePromotions,
+    role,
+    districtOrSchool
   }: SubmitData) => {
     try {
       setHasSubmitted(true);
@@ -99,6 +108,8 @@ const SignupForm = () => {
         receivePromotions,
         firstName,
         lastName,
+        role,
+        districtOrSchool
       });
     } catch (err) {}
   };
@@ -111,7 +122,9 @@ const SignupForm = () => {
   });
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
+  return typeof window === "undefined" ? (
+    <Spinner colorScheme="blue" />
+  ) : (
     <Flex
       style={{
         width: formWidth,
@@ -148,6 +161,7 @@ const SignupForm = () => {
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
+            isRequired
           >
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
@@ -164,6 +178,7 @@ const SignupForm = () => {
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
+            isRequired
           >
             <FormLabel htmlFor="password">Password</FormLabel>
             <InputGroup size="md">
@@ -192,6 +207,7 @@ const SignupForm = () => {
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
+            isRequired
           >
             <FormLabel htmlFor="firstName">First Name</FormLabel>
             <Input
@@ -207,6 +223,7 @@ const SignupForm = () => {
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
+            isRequired
           >
             <FormLabel htmlFor="lastName">Last Name</FormLabel>
             <Input
@@ -214,8 +231,32 @@ const SignupForm = () => {
               autoComplete="family-name"
               required
               placeholder="Thebot"
-              {...register("lastName", {})}
+              {...register("lastName")}
             />
+          </FormControl>
+          <FormControl paddingTop={2}>
+            <FormLabel htmlFor="districtOrSchool">Role</FormLabel>
+            <Select
+              {...register("role")}
+              onChange={(e) => setRole(e.target.value as UserRole)}
+              marginBottom={6}
+            >
+              <option value={UserRole.STUDENT}>Student</option>
+              <option value={UserRole.TEACHER}>Teacher</option>
+              <option value={UserRole.ADMINISTRATOR}>Administrator</option>
+            </Select>
+            {(role === UserRole.ADMINISTRATOR || role === UserRole.TEACHER) && (
+              <FormControl marginBottom={6} isRequired>
+                <FormLabel htmlFor="districtOrSchool">
+                  {role === UserRole.ADMINISTRATOR ? "District" : "School"}
+                </FormLabel>
+                <Input
+                  id="districtOrSchool"
+                  required
+                  {...register("districtOrSchool", {})}
+                />
+              </FormControl>
+            )}
           </FormControl>
           <Checkbox
             onChange={(e) => setReceivePromotions(e.target.checked)}
@@ -231,7 +272,16 @@ const SignupForm = () => {
             isInvalid={hasSubmitted && !termsAndConditions}
             marginY={1}
           >
-            <Text fontSize={"0.8rem"}>I agree to the <Link textDecor={"underline"} target="_blank" href="https://judie.io/terms">Terms & Conditions</Link ></Text>
+            <Text fontSize={"0.8rem"}>
+              I agree to the{" "}
+              <Link
+                textDecor={"underline"}
+                target="_blank"
+                href="https://judie.io/terms"
+              >
+                Terms & Conditions
+              </Link>
+            </Text>
           </Checkbox>
         </Flex>
         <Flex

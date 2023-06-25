@@ -13,11 +13,13 @@ router.post(
     body("firstName").isString().optional(),
     body("lastName").isString().optional(),
     body("receivePromotions").isBoolean().toBoolean().exists(),
+    body("role").isString().optional(),
+    body("districtOrSchool").isString().optional(),
   ],
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const { email, password, firstName, lastName, receivePromotions } =
+    const { email, password, firstName, lastName, receivePromotions, role, districtOrSchool } =
       req.body;
     // Create user
     const userId = await signup({
@@ -26,6 +28,8 @@ router.post(
       firstName,
       lastName,
       receivePromotions,
+      role,
+      districtOrSchool,
     });
     // Create session for user
     session.userId = userId;
