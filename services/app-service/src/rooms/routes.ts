@@ -11,7 +11,7 @@ router.post(
   [
     body("name").isString().exists(),
     body("address").isString().optional(),
-    body("organizationId").isString().exists(),
+    body("organizationId").isString().optional(),
     body("schoolId").isString().exists(),
   ],
   handleValidationErrors,
