@@ -9,16 +9,61 @@ export const validateOrganizationAdmin = async ({
   userId: string;
   organizationId: string;
 }) => {
-  const permission = await dbClient.userPermission.findFirst({
+  const user = await dbClient.user.findUnique({
     where: {
-      userId,
-      organizationId,
+      id: userId,
     },
+    include: {
+      permissions: true,
+    },
+  });
+  // God mode
+  if (user?.role === UserRole.JUDIE) {
+    return;
+  }
+  const permission = user?.permissions.find((permission) => {
+    return (
+      permission.organizationId === organizationId &&
+      permission.type === PermissionType.ORG_ADMIN
+    );
   });
   if (!permission) {
     throw new UnauthorizedError(
       "You do not have permission to perform this action"
     );
   }
-  return permission.type === PermissionType.ORG_ADMIN;
+  return;
+};
+
+export const validateSchoolAdmin = async ({
+  userId,
+  schoolId,
+}: {
+  userId: string;
+  schoolId: string;
+}) => {
+  const user = await dbClient.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      permissions: true,
+    },
+  });
+  // God mode
+  if (user?.role === UserRole.JUDIE) {
+    return;
+  }
+  const permission = user?.permissions.find((permission) => {
+    return (
+      permission.schoolId === schoolId &&
+      permission.type === PermissionType.SCHOOL_ADMIN
+    );
+  });
+  if (!permission) {
+    throw new UnauthorizedError(
+      "You do not have permission to perform this action"
+    );
+  }
+  return;
 };
