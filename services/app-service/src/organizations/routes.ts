@@ -1,7 +1,12 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
-import { handleValidationErrors, requireJudieAuth } from "../utils/express.js";
-import { createOrganization } from "./service.js";
+import {
+  handleValidationErrors,
+  requireAuth,
+  requireJudieAuth,
+} from "../utils/express.js";
+import { createOrganization, getUsersForOrganization } from "./service.js";
+import { validateOrganizationAdmin } from "../admin/service.js";
 
 const router = Router();
 
@@ -29,6 +34,26 @@ router.post(
 
     res.status(201).json({
       organization,
+    });
+  }
+);
+
+router.get(
+  "/:organizationId/users",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const organizationId = req.params.organizationId;
+    await validateOrganizationAdmin({
+      userId: userId as string,
+      organizationId,
+    });
+    const users = await getUsersForOrganization({
+      id: organizationId,
+    });
+    res.status(200).send({
+      users,
     });
   }
 );

@@ -6,3 +6,15 @@ export const createSchool = async (params: Prisma.SchoolCreateInput) => {
     data: params,
   });
 };
+
+export const getUsersForSchool = async ({ id }: { id: string }) => {
+  return await dbClient.user.findMany({
+    where: {
+      permissions: {
+        some: {
+          schoolId: id,
+        },
+      },
+    },
+  });
+};

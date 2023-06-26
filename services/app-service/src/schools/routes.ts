@@ -1,8 +1,15 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
-import { handleValidationErrors, requireJudieAuth } from "../utils/express.js";
-import { createSchool } from "./service.js";
-import { validateOrganizationAdmin } from "../admin/service.js";
+import {
+  handleValidationErrors,
+  requireAuth,
+  requireJudieAuth,
+} from "../utils/express.js";
+import { createSchool, getUsersForSchool } from "./service.js";
+import {
+  validateOrganizationAdmin,
+  validateSchoolAdmin,
+} from "../admin/service.js";
 
 const router = Router();
 
@@ -32,6 +39,26 @@ router.post(
 
     res.status(201).json({
       organization,
+    });
+  }
+);
+
+router.get(
+  "/:schoolId/users",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const schoolId = req.params.schoolId;
+    await validateSchoolAdmin({
+      userId: userId as string,
+      schoolId,
+    });
+    const users = await getUsersForSchool({
+      id: schoolId,
+    });
+    res.status(200).send({
+      users,
     });
   }
 );
