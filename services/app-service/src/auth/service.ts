@@ -99,7 +99,7 @@ export const signup = async ({
     },
   });
 
-  return newUser.id;
+  return newUser;
 };
 
 export const signin = async ({
@@ -138,7 +138,7 @@ export const signin = async ({
     last_logged_in: new Date().toISOString(),
   });
 
-  return user.id;
+  return user;
 };
 
 export const addToWaitlist = async ({ email }: { email: string }) => {
