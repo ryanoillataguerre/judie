@@ -54,7 +54,6 @@ export default function useAuth({
     });
     setSessionCookie(undefined);
     setUserData(undefined);
-    router.push("/signin");
   }, [router, setUserData, setSessionCookie, reset]);
 
   // GET /users/me
@@ -76,7 +75,8 @@ export default function useAuth({
   );
 
   useEffect(() => {
-    if (isError && !allowUnauth) {
+    if (isError && !allowUnauth && !DO_NOT_REDIRECT_PATHS.includes(router.asPath)) {
+      console.log('1')
       router.push("/signin", {
         query: router.query,
       });
@@ -113,6 +113,7 @@ export default function useAuth({
         isError &&
         !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
       ) {
+        console.log('2')
         router.push("/signin");
       }
     } else {

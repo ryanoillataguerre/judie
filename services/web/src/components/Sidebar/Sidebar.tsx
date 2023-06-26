@@ -6,6 +6,9 @@ import {
   BsPlusSquareDotted,
 } from "react-icons/bs";
 import {
+  BiHelpCircle
+} from "react-icons/bi";
+import {
   Box,
   Button,
   Divider,
@@ -325,6 +328,14 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         label: "Settings",
         onClick: () => {
           router.push("/settings", undefined, { shallow: true });
+        },
+      },
+      {
+        icon: <BiHelpCircle />,
+        key: "help",
+        label: "Help",
+        onClick: () => {
+          window.open("https://help.judie.io", "_blank");
         },
       },
       {
