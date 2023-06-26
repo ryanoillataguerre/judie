@@ -198,9 +198,9 @@ model School {
 
 model Room {
   id             String           @id @default(uuid())
-  name           String           @unique
-  schoolId       String           @map("school_id")
-  school         School           @relation(fields: [schoolId], references: [id])
+  name           String
+  schoolId       String?          @map("school_id")
+  school         School?          @relation(fields: [schoolId], references: [id])
   organizationId String?          @map("organization_id")
   organization   Organization?    @relation(fields: [organizationId], references: [id])
   students       User[]

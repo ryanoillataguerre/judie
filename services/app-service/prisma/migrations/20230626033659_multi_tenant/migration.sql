@@ -62,7 +62,7 @@ CREATE TABLE "schools" (
 CREATE TABLE "rooms" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "school_id" TEXT NOT NULL,
+    "school_id" TEXT,
     "organization_id" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
@@ -134,9 +134,6 @@ CREATE UNIQUE INDEX "organizations_name_key" ON "organizations"("name");
 CREATE UNIQUE INDEX "schools_name_key" ON "schools"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "rooms_name_key" ON "rooms"("name");
-
--- CreateIndex
 CREATE INDEX "user_permissions_id_user_id_school_id_idx" ON "user_permissions"("id", "user_id", "school_id");
 
 -- CreateIndex
@@ -170,7 +167,7 @@ ALTER TABLE "organizations" ADD CONSTRAINT "organizations_creator_id_fkey" FOREI
 ALTER TABLE "schools" ADD CONSTRAINT "schools_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "rooms" ADD CONSTRAINT "rooms_school_id_fkey" FOREIGN KEY ("school_id") REFERENCES "schools"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "rooms" ADD CONSTRAINT "rooms_school_id_fkey" FOREIGN KEY ("school_id") REFERENCES "schools"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "rooms" ADD CONSTRAINT "rooms_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
