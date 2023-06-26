@@ -9,26 +9,12 @@ export const setSeatCount = async ({
   organizationId?: string;
   schoolId?: string;
 }) => {
-  if (organizationId) {
-    const organization = await dbClient.organization.update({
-      where: {
-        ...(organizationId ? { id: organizationId } : {}),
-      },
-      data: {
-        count,
-      },
-    });
-    return organization;
-  }
-  if (schoolId) {
-    const school = await dbClient.school.update({
-      where: {
-        ...(schoolId ? { id: schoolId } : {}),
-      },
-      data: {
-        count,
-      },
-    });
-    return school;
-  }
+  const organization = await dbClient.seats.create({
+    data: {
+      count,
+      ...(organizationId ? { id: organizationId } : {}),
+      ...(schoolId ? { id: schoolId } : {}),
+    },
+  });
+  return organization;
 };
