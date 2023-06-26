@@ -73,6 +73,9 @@ export const signup = async ({
       receivePromotions,
       role: role || UserRole.STUDENT,
     },
+    include: {
+      subscription: true,
+    },
   });
 
   cioClient.identify(newUser.id, {
@@ -114,6 +117,9 @@ export const signin = async ({
   const user = await dbClient.user.findUnique({
     where: {
       email,
+    },
+    include: {
+      subscription: true,
     },
   });
   if (!user) {
