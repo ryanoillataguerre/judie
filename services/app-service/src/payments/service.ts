@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { getUser, updateUser } from "../user/service.js";
+import { getUser, updateUser } from "../users/service.js";
 import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
 import {
   Prisma,
@@ -61,10 +61,9 @@ export const checkout = async (
     customer: user.stripeCustomerId || newCustomerId || undefined,
     discounts: [
       {
-        coupon:
-          user.role === UserRole.JUDIE
-            ? process.env.STRIPE_EMPLOYEE_COUPON_ID
-            : process.env.STRIPE_COUPON_ID,
+        coupon: user.email.includes("@judie.io")
+          ? process.env.STRIPE_EMPLOYEE_COUPON_ID
+          : process.env.STRIPE_COUPON_ID,
       },
     ],
   };

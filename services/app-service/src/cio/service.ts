@@ -1,25 +1,41 @@
-import { User } from "@prisma/client";
+import { User, Invite } from "@prisma/client";
 import { apiClient } from "../utils/customerio.js";
-import { SendEmailRequest } from 'customerio-node';
+import { SendEmailRequest } from "customerio-node";
 
 export const sendUserForgotPasswordEmail = async ({
-    user,
-    url,
+  user,
+  url,
 }: {
-    user: User;
-    url: string;
+  user: User;
+  url: string;
 }) => {
-    // Send email
-    const newEmail = new SendEmailRequest({
-        to: user.email,
-        transactional_message_id: "2",
-        message_data: {
-            first_name: user.firstName,
-            url,
-        },
-        identifiers: {
-            id: user.id,
-        },
-    })
-    return await apiClient.sendEmail(newEmail);
-}
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: user.email,
+    transactional_message_id: "2",
+    message_data: {
+      first_name: user.firstName,
+      url,
+    },
+    identifiers: {
+      id: user.id,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};
+
+export const sendInviteEmail = async ({ invite }: { invite: Invite }) => {
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: invite.email,
+    transactional_message_id: "3",
+    message_data: {
+      first_name: invite.firstName,
+      url: `https://app.judie.io/invite/${invite.id}`,
+    },
+    identifiers: {
+      id: invite.id,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};

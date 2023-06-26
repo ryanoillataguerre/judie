@@ -101,6 +101,8 @@ CREATE TABLE "user_permissions" (
 CREATE TABLE "invites" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "first_name" TEXT,
+    "last_name" TEXT,
     "school_id" TEXT,
     "organization_id" TEXT,
     "room_id" TEXT,
