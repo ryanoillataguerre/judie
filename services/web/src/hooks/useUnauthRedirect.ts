@@ -12,13 +12,9 @@ export default () => {
         }
         if (router.pathname === "/") {
             if (!auth.userData && !auth.isLoading) {
+                console.log('3')
                 router.push("/signin")
             }
-            if (auth.userData) {
-                router.push("/chat")
-            }
-        }
-        if (["/signin", "/signup"].includes(router.pathname)) {
             if (auth.userData) {
                 router.push("/chat")
             }
