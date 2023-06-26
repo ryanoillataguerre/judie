@@ -1,15 +1,16 @@
 import bcrypt from "bcryptjs";
-import {
-  BadRequestError,
-  UnauthorizedError,
-} from "../utils/errors/index.js";
+import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
 import { User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
-import {cioClient} from "../utils/customerio.js";
-import { createForgotPasswordToken, getForgotPasswordToken, deleteForgotPasswordToken } from "../utils/redis.js";
+import { cioClient } from "../utils/customerio.js";
+import {
+  createForgotPasswordToken,
+  getForgotPasswordToken,
+  deleteForgotPasswordToken,
+} from "../utils/redis.js";
 import { sendUserForgotPasswordEmail } from "../cio/service.js";
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
@@ -155,7 +156,7 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
     });
     cioClient.identify(email, {
       email,
-      waitlist: true
+      waitlist: true,
     });
   } catch (err) {
     console.error(err);
@@ -163,7 +164,13 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
   }
 };
 
-export const forgotPassword = async ({email, origin}: {email: string; origin: string}) => {
+export const forgotPassword = async ({
+  email,
+  origin,
+}: {
+  email: string;
+  origin: string;
+}) => {
   const user = await dbClient.user.findUnique({
     where: {
       email,
@@ -174,15 +181,24 @@ export const forgotPassword = async ({email, origin}: {email: string; origin: st
   }
   // Create token and store in Redis
   const token = await createForgotPasswordToken({ userId: user.id });
-  const url = `${`${origin.slice(0, 8)}app.${origin.slice(8, origin.length)}` || "https://app.judie.io"}/reset-password?token=${token}`;
+  const url = `${
+    `${origin.slice(0, 8)}app.${origin.slice(8, origin.length)}` ||
+    "https://app.judie.io"
+  }/reset-password?token=${token}`;
   // Send email with link to reset password
   return await sendUserForgotPasswordEmail({
     user,
     url,
   });
-}
+};
 
-export const resetPassword = async ({token, password}: {token: string; password: string}) => {
+export const resetPassword = async ({
+  token,
+  password,
+}: {
+  token: string;
+  password: string;
+}) => {
   // Check Redis for token
   const userId = await getForgotPasswordToken({ token });
   if (!userId) {
@@ -200,4 +216,4 @@ export const resetPassword = async ({token, password}: {token: string; password:
   });
   // Delete token from Redis
   await deleteForgotPasswordToken({ token });
-}
+};

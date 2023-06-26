@@ -52,23 +52,18 @@ export const createForgotPasswordToken = async ({
   // Expire in 24hr
   await redis.set(`forgotPassword:${token}`, userId, "EX", 60 * 60 * 24);
   return token;
-}
-export const getForgotPasswordToken = async ({
-  token,
-}: {
-  token: string;
-}) => {
+};
+export const getForgotPasswordToken = async ({ token }: { token: string }) => {
   const id = await redis.get(`forgotPassword:${token}`);
   return id;
-}
+};
 export const deleteForgotPasswordToken = async ({
   token,
 }: {
   token: string;
 }) => {
   await redis.del(`forgotPassword:${token}`);
-  return token; 
-}
-
+  return token;
+};
 
 export { redis };

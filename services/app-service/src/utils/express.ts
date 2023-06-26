@@ -12,7 +12,7 @@ import {
 import { Redis } from "ioredis";
 import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
-import { getUser, updateUser } from "../user/service.js";
+import { getUser, updateUser } from "../users/service.js";
 import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
 import { SubscriptionStatus, UserRole } from "@prisma/client";
 
@@ -97,7 +97,11 @@ export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   }
 };
 
-export const requireAdminAuth = async (req: Request, _: Response, next: NextFunction) => {
+export const requireAdminAuth = async (
+  req: Request,
+  _: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.session?.userId) {
       throw new UnauthorizedError("Not authorized");

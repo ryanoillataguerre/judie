@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
-export const getUser = async (params: Prisma.UserWhereInput) => {
+export const getUser = async (params: Prisma.UserWhereInput, includeParams?: Prisma.UserInclude) => {
   return await dbClient.user.findFirst({
     where: params,
-    include: {
+    include: includeParams || {
       subscription: true,
       chats: {
         include: {
