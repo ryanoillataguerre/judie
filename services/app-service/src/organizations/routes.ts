@@ -8,8 +8,8 @@ const router = Router();
 router.post(
   "/",
   [
-    body("name").isString().isLength({ min: 1 }),
-    body("primaryContactEmail").isEmail(),
+    body("name").isString().exists(),
+    body("primaryContactEmail").isEmail().exists(),
   ],
   // Only Judie employees can create organizations
   requireJudieAuth,

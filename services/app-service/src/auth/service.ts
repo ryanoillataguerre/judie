@@ -97,9 +97,7 @@ export const signup = async ({
   // Identify in Segment
   analytics.identify({
     userId: newUser.id,
-    traits: {
-      ...transformUserForSegment(newUser, districtOrSchool),
-    },
+    traits: transformUserForSegment(newUser, districtOrSchool),
   });
 
   return newUser;
@@ -134,9 +132,7 @@ export const signin = async ({
 
   analytics.identify({
     userId: user.id,
-    traits: {
-      ...transformUserForSegment(user),
-    },
+    traits: transformUserForSegment(user),
   });
 
   cioClient.identify(user.id, {
