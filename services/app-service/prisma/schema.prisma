@@ -89,6 +89,7 @@ model User {
   updatedAt            DateTime?        @updatedAt @map("updated_at")
   stripeCustomerId     String?          @map("stripe_customer_id")
   questionsAsked       Int              @default(0) @map("questions_asked")
+  role                 UserRole         @default(STUDENT)
   organizations        Organization[]
   schools              School[]
   subscription         Subscription?
@@ -214,22 +215,22 @@ model Room {
 }
 
 model UserPermission {
-  id             String        @id @default(uuid())
-  userId         String?       @map("user_id")
-  inviteId       String?       @map("invite_id")
-  schoolId       String?       @map("school_id")
-  organizationId String?       @map("organization_id")
-  roomId         String?       @map("room_id")
-  role           UserRole      @default(STUDENT)
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime?     @updatedAt @map("updated_at")
-  deletedAt      DateTime?     @map("deleted_at")
-  type          PermissionType
-  user           User?         @relation(fields: [userId], references: [id])
-  invite         Invite?       @relation(fields: [inviteId], references: [id])
-  school         School?       @relation(fields: [schoolId], references: [id])
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  room           Room?         @relation(fields: [roomId], references: [id])
+  id             String         @id @default(uuid())
+  userId         String?        @map("user_id")
+  inviteId       String?        @map("invite_id")
+  schoolId       String?        @map("school_id")
+  organizationId String?        @map("organization_id")
+  roomId         String?        @map("room_id")
+  role           UserRole       @default(STUDENT)
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime?      @updatedAt @map("updated_at")
+  deletedAt      DateTime?      @map("deleted_at")
+  type           PermissionType
+  user           User?          @relation(fields: [userId], references: [id])
+  invite         Invite?        @relation(fields: [inviteId], references: [id])
+  school         School?        @relation(fields: [schoolId], references: [id])
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+  room           Room?          @relation(fields: [roomId], references: [id])
 
   @@index([id, userId, schoolId])
   @@map("user_permissions")

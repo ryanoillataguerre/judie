@@ -1,9 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `role` on the `users` table. All the data in the column will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "PermissionType" AS ENUM ('ORG_ADMIN', 'SCHOOL_ADMIN', 'ROOM_ADMIN', 'STUDENT');
 
@@ -26,9 +20,6 @@ ALTER TYPE "GradeYear" ADD VALUE 'EIGHTH';
 
 -- AlterTable
 ALTER TABLE "messages" ADD COLUMN     "deleted_at" TIMESTAMP(3);
-
--- AlterTable
-ALTER TABLE "users" DROP COLUMN "role";
 
 -- CreateTable
 CREATE TABLE "message_metadata" (

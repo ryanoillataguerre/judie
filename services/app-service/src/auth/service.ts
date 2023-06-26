@@ -17,6 +17,7 @@ const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firstName: user.firstName,
   lastName: user.lastName,
   email: user.email,
+  role: user.role,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
   receivePromotions: user.receivePromotions,
@@ -30,6 +31,7 @@ export const signup = async ({
   email,
   password,
   receivePromotions,
+  role,
   districtOrSchool,
 }: {
   firstName: string;
@@ -69,6 +71,7 @@ export const signup = async ({
       email,
       password: _password,
       receivePromotions,
+      role: role || UserRole.STUDENT,
     },
   });
 
@@ -78,6 +81,7 @@ export const signup = async ({
     first_name: newUser.firstName,
     last_name: newUser.lastName,
     receive_promotions: newUser.receivePromotions,
+    role: newUser.role,
     district_or_school: districtOrSchool,
     last_logged_in: new Date().toISOString(),
   });
