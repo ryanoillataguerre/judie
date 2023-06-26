@@ -2,7 +2,7 @@ import prisma
 from inference_service.prompts import prompt_generator
 from inference_service.openai_manager import openai_manager
 from inference_service.prisma_app_client import prisma_manager
-from typing import Optional, Iterator, Dict
+from typing import Optional, Iterator
 import logging
 from dataclasses import dataclass
 
@@ -26,7 +26,7 @@ def yield_judie_response(
     :param app_db: Prisma manager for app DB connection
     :return: Generator of response chunk strings
     """
-    history = prisma_manager.get_chat_openai_fmt(chat_id=chat_id)
+    history = prisma_manager.get_chat_openai_fmt(chat_id=chat_id, app_db=app_db)
 
     if history[-1]["role"] == "user":
         sys_prompt = prompt_generator.generate_question_answer_prompt(
@@ -38,7 +38,10 @@ def yield_judie_response(
             sys_prompt=sys_prompt, messages=history
         )
         logger.info(f"Full messages: \n{full_messages}")
-        openai_response = openai_manager.get_gpt_response(full_messages)
+        openai_config = openai_manager.OpenAiConfig(stream=True)
+        openai_response = openai_manager.get_gpt_response(
+            full_messages, openai_config=openai_config
+        )
 
         for response_chunk in openai_response:
             yield response_chunk
