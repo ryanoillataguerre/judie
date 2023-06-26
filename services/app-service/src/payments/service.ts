@@ -61,9 +61,10 @@ export const checkout = async (
     customer: user.stripeCustomerId || newCustomerId || undefined,
     discounts: [
       {
-        coupon: user.email.includes("@judie.io")
-          ? process.env.STRIPE_EMPLOYEE_COUPON_ID
-          : process.env.STRIPE_COUPON_ID,
+        coupon:
+          user.role === UserRole.JUDIE
+            ? process.env.STRIPE_EMPLOYEE_COUPON_ID
+            : process.env.STRIPE_COUPON_ID,
       },
     ],
   };
