@@ -67,3 +67,36 @@ export const validateSchoolAdmin = async ({
   }
   return;
 };
+
+export const validateRoomAdmin = async ({
+  userId,
+  roomId,
+}: {
+  userId: string;
+  roomId: string;
+}) => {
+  const user = await dbClient.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      permissions: true,
+    },
+  });
+  // God mode
+  if (user?.role === UserRole.JUDIE) {
+    return;
+  }
+  const permission = user?.permissions.find((permission) => {
+    return (
+      permission.roomId === roomId &&
+      permission.type === PermissionType.ROOM_ADMIN
+    );
+  });
+  if (!permission) {
+    throw new UnauthorizedError(
+      "You do not have permission to perform this action"
+    );
+  }
+  return;
+};

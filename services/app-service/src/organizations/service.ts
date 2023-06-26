@@ -8,3 +8,15 @@ export const createOrganization = async (
     data: params,
   });
 };
+
+export const getUsersForOrganization = async ({ id }: { id: string }) => {
+  return await dbClient.user.findMany({
+    where: {
+      permissions: {
+        some: {
+          organizationId: id,
+        },
+      },
+    },
+  });
+};
