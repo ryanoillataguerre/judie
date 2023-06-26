@@ -35,7 +35,7 @@ router.post(
       districtOrSchool,
     } = req.body;
     // Create user
-    const userId = await signup({
+    const user = await signup({
       email,
       password,
       firstName,
@@ -45,8 +45,8 @@ router.post(
       districtOrSchool,
     });
     // Create session for user
-    session.userId = userId;
-    res.status(201).send({ success: true });
+    session.userId = user.id;
+    res.status(201).send({ user });
   })
 );
 
@@ -58,10 +58,10 @@ router.post(
     const session = req.session;
     const { email, password } = req.body;
     // Create user
-    const userId = await signin({ email, password });
+    const user = await signin({ email, password });
     // Create session for user
-    session.userId = userId;
-    res.status(200).send({ success: true });
+    session.userId = user.id;
+    res.status(200).send({ user });
   })
 );
 

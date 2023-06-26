@@ -73,6 +73,9 @@ export const signup = async ({
       receivePromotions,
       role: role || UserRole.STUDENT,
     },
+    include: {
+      subscription: true,
+    },
   });
 
   cioClient.identify(newUser.id, {
@@ -99,7 +102,7 @@ export const signup = async ({
     },
   });
 
-  return newUser.id;
+  return newUser;
 };
 
 export const signin = async ({
@@ -114,6 +117,9 @@ export const signin = async ({
   const user = await dbClient.user.findUnique({
     where: {
       email,
+    },
+    include: {
+      subscription: true,
     },
   });
   if (!user) {
@@ -138,7 +144,7 @@ export const signin = async ({
     last_logged_in: new Date().toISOString(),
   });
 
-  return user.id;
+  return user;
 };
 
 export const addToWaitlist = async ({ email }: { email: string }) => {
