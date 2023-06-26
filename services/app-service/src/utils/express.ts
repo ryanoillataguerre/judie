@@ -97,7 +97,7 @@ export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   }
 };
 
-export const requireAdminAuth = async (
+export const requireJudieAuth = async (
   req: Request,
   _: Response,
   next: NextFunction
@@ -107,7 +107,7 @@ export const requireAdminAuth = async (
       throw new UnauthorizedError("Not authorized");
     }
     const user = await getUser({ id: req.session?.userId });
-    if (!user?.email.includes("judie.io")) {
+    if (!(user?.role === UserRole.JUDIE)) {
       throw new UnauthorizedError("Not authorized");
     }
     next();
