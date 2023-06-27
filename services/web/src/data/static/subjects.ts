@@ -53,8 +53,9 @@ export const subjects = [
   "US Govt & Politics",
   "US History",
   "World History",
-  "Psychology",
+  "Alaska History",
   "Ancient History",
+  "Psychology",
   "Philosophy",
   "Ethics",
   "Computer Science",
@@ -75,7 +76,7 @@ export const subjects = [
   "GED Preparation",
   "College Admissions",
   "Lesson Plans",
-  "Assignment Generation"
+  "Assignment Generation",
 ];
 
 export const adminSubjects = [
@@ -84,5 +85,5 @@ export const adminSubjects = [
   "Test Taking - LSAT",
   "Test Taking - APWH",
   "Test Taking - APEngLit",
-  "Testing"
+  "Testing",
 ];
