@@ -1,4 +1,4 @@
-import { PermissionType, UserRole } from "@prisma/client";
+import { PermissionType, Prisma, User, UserRole } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
 
@@ -99,4 +99,67 @@ export const validateRoomAdmin = async ({
     );
   }
   return;
+};
+
+// Necessary? If so, going to be a pain to implement efficiently
+// const validateUserViewability = async ({
+//   userId,
+//   targetUserId,
+// }: {
+//   userId: string;
+//   targetUserId: string;
+// }) => {
+//   const user = await dbClient.user.findUnique({
+//     where: {
+//       id: userId,
+//     },
+//     include: {
+//       permissions: true,
+//     },
+//   });
+//   const targetUser = await dbClient.user.findUnique({
+//     where: {
+//       id: targetUserId,
+//     },
+//     include: {
+//       permissions: true,
+//     },
+//   });
+//   if (!targetUser) {
+//     return;
+//   }
+//   // God mode
+//   if (user?.role === UserRole.JUDIE) {
+//     return;
+//   }
+//   // The gods are invisible
+//   if (targetUser.role === UserRole.JUDIE) {
+//     throw new UnauthorizedError(
+//       "You do not have permission to perform this action"
+//     );
+//   }
+
+//   // Return if:
+//   // Any of the user's permissions match the target user's permissions
+//   // If permission has only an organizationId, match on that
+//   // If permission has a schoolId, match on that
+//   // If permission has a roomId, match on that
+
+//   return;
+// };
+
+export const getUserAdmin = async (
+  params: Prisma.UserWhereUniqueInput
+): Promise<User | null> => {
+  const user = await dbClient.user.findUnique({
+    where: params,
+    include: {
+      permissions: true,
+      chats: true,
+      rooms: true,
+      schools: true,
+      organizations: true,
+    },
+  });
+  return user;
 };

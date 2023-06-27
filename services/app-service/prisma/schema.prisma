@@ -253,7 +253,6 @@ model Invite {
   organizationId String?    @map("organization_id")
   roomId         String?    @map("room_id")
   gradeYear      GradeYear? @map("grade_year")
-  role           UserRole   @default(STUDENT)
   createdAt      DateTime   @default(now()) @map("created_at")
   updatedAt      DateTime?  @updatedAt @map("updated_at")
   deletedAt      DateTime?  @map("deleted_at")

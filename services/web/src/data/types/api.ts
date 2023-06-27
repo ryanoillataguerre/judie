@@ -62,3 +62,10 @@ export enum UserRole {
   STUDENT = "STUDENT",
   JUDIE = "JUDIE",
 }
+
+export enum PermissionType {
+  ORG_ADMIN = "ORG_ADMIN",
+  SCHOOL_ADMIN = "SCHOOL_ADMIN",
+  ROOM_ADMIN = "ROOM_ADMIN",
+  STUDENT = "STUDENT",
+}

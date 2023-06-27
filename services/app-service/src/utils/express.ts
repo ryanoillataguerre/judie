@@ -169,7 +169,7 @@ export const sessionLayer = () =>
     name: "judie_sid",
     store: sessionStore,
     secret: process.env.SESSION_SECRET || "secret",
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     proxy: isProduction() || isSandbox(),
     cookie: {

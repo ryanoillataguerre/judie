@@ -9,19 +9,21 @@ import {
   resetPassword,
 } from "./service.js";
 
+export const signupValidation = [
+  body("email").exists().isEmail(),
+  body("password").isString().exists(),
+  body("firstName").isString().optional(),
+  body("lastName").isString().optional(),
+  body("receivePromotions").isBoolean().toBoolean().exists(),
+  body("role").isString().optional(),
+  body("districtOrSchool").isString().optional(),
+];
+
 const router = Router();
 
 router.post(
   "/signup",
-  [
-    body("email").exists().isEmail(),
-    body("password").isString().exists(),
-    body("firstName").isString().optional(),
-    body("lastName").isString().optional(),
-    body("receivePromotions").isBoolean().toBoolean().exists(),
-    body("role").isString().optional(),
-    body("districtOrSchool").isString().optional(),
-  ],
+  signupValidation,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -46,6 +48,7 @@ router.post(
     });
     // Create session for user
     session.userId = user.id;
+    session.save();
     res.status(201).send({ user });
   })
 );
@@ -61,6 +64,7 @@ router.post(
     const user = await signin({ email, password });
     // Create session for user
     session.userId = user.id;
+    session.save();
     res.status(200).send({ user });
   })
 );
