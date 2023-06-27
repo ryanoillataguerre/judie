@@ -11,6 +11,8 @@ import {
   validateRoomAdmin,
   validateSchoolAdmin,
 } from "../admin/service.js";
+import { createPermission } from "../permissions/service.js";
+import { PermissionType } from "@prisma/client";
 
 const router = Router();
 
@@ -18,8 +20,8 @@ router.post(
   "/",
   [
     body("name").isString().exists(),
-    body("organizationId").isString().optional(),
-    body("schoolId").isString().exists(),
+    body("organizationId").isString().exists(),
+    body("schoolId").isString().optional(),
   ],
   handleValidationErrors,
   async (req: Request, res: Response) => {
@@ -31,7 +33,7 @@ router.post(
         schoolId,
       });
     }
-    const organization = await createRoom({
+    const room = await createRoom({
       data: {
         name,
         ...(organizationId
@@ -55,8 +57,32 @@ router.post(
       },
     });
 
+    await createPermission({
+      type: PermissionType.ROOM_ADMIN,
+      organization: {
+        connect: {
+          id: organizationId,
+        },
+      },
+      school: {
+        connect: {
+          id: schoolId,
+        },
+      },
+      room: {
+        connect: {
+          id: room.id,
+        },
+      },
+      user: {
+        connect: {
+          id: req.session.userId,
+        },
+      },
+    });
+
     res.status(201).json({
-      organization,
+      room,
     });
   }
 );

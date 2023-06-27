@@ -7,6 +7,9 @@ import {
 } from "../utils/express.js";
 import { createOrganization, getUsersForOrganization } from "./service.js";
 import { validateOrganizationAdmin } from "../admin/service.js";
+import dbClient from "../utils/prisma.js";
+import { PermissionType } from "@prisma/client";
+import { createPermission } from "../permissions/service.js";
 
 const router = Router();
 
@@ -26,6 +29,20 @@ router.post(
       name,
       primaryContactEmail,
       creator: {
+        connect: {
+          id: userId,
+        },
+      },
+    });
+
+    await createPermission({
+      type: PermissionType.ORG_ADMIN,
+      organization: {
+        connect: {
+          id: organization.id,
+        },
+      },
+      user: {
         connect: {
           id: userId,
         },

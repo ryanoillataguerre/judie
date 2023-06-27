@@ -10,6 +10,8 @@ import {
   validateOrganizationAdmin,
   validateSchoolAdmin,
 } from "../admin/service.js";
+import { createPermission } from "../permissions/service.js";
+import { PermissionType } from "@prisma/client";
 
 const router = Router();
 
@@ -28,7 +30,7 @@ router.post(
       userId: req.session.userId as string,
       organizationId,
     });
-    const organization = await createSchool({
+    const school = await createSchool({
       name,
       organization: {
         connect: {
@@ -37,8 +39,28 @@ router.post(
       },
     });
 
+    // Create admin permission for creator
+    await createPermission({
+      type: PermissionType.SCHOOL_ADMIN,
+      organization: {
+        connect: {
+          id: organizationId,
+        },
+      },
+      school: {
+        connect: {
+          id: school.id,
+        },
+      },
+      user: {
+        connect: {
+          id: req.session.userId,
+        },
+      },
+    });
+
     res.status(201).json({
-      organization,
+      school,
     });
   }
 );

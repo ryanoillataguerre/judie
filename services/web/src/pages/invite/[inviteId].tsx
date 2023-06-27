@@ -20,7 +20,7 @@ import { redeemInviteMutation, waitlistMutation } from "@judie/data/mutations";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import { AiFillCheckCircle } from "react-icons/ai";
 import { useRouter } from "next/router";
-import { SignupForm } from "../signup";
+import { SignupForm, SignupSubmitData } from "../signup";
 import { GET_INVITE_BY_ID, getInviteByIdQuery } from "@judie/data/queries";
 
 const RedeemInvite = () => {
@@ -69,28 +69,28 @@ const RedeemInvite = () => {
     },
   });
 
-  //   const onSubmit: SubmitHandler<{ email: string }> = async ({
-  //     email,
-  //   }: {
-  //     email: string;
-  //   }) => {
-  //     try {
-  //       await mutateAsync({
-  //         email,
-  //       });
-  //       toast({
-  //         title: "Success!",
-  //         description: "You've been added to the waitlist.",
-  //         status: "success",
-  //         duration: 5000,
-  //         isClosable: true,
-  //         position: "top",
-  //       });
-  //     } catch (err) {}
-  //   };
+  const onSubmit: SubmitHandler<SignupSubmitData> = async (
+    params: SignupSubmitData
+  ) => {
+    try {
+      if (!inviteId) {
+        toast({
+          title: "Error redeeming invite",
+          description: "No invite id",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+      await mutateAsync({
+        ...params,
+        inviteId,
+      });
+    } catch (err) {
+      console.error("Error redeeming invite", err);
+    }
+  };
 
-  const containerWidth = useBreakpointValue({ base: "100%", md: "50%" });
-  const backgroundSrc = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   return (
     <>
@@ -139,14 +139,32 @@ const RedeemInvite = () => {
           <Text
             style={{
               alignSelf: "center",
-              fontSize: "2rem",
-              fontWeight: "semibold",
+              fontSize: "1rem",
               marginBottom: "1rem",
               marginTop: "1rem",
             }}
           >
-            We're so excited
+            We're so excited to have you here!
           </Text>
+          {inviteData && (
+            <Text
+              style={{
+                alignSelf: "center",
+                fontSize: "0.8rem",
+                fontWeight: 400,
+                marginBottom: "1rem",
+                marginTop: "1rem",
+              }}
+            >
+              Someone from{" "}
+              {inviteData?.school?.name ||
+                inviteData?.organization?.name ||
+                "your school"}{" "}
+              invited you to join Judie. Please sign up below to redeem your
+              invite.
+            </Text>
+          )}
+
           <SignupForm />
         </Flex>
       </main>
