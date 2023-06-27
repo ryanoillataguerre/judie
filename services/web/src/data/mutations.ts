@@ -195,18 +195,20 @@ export const redeemInviteMutation = async ({
   password,
   receivePromotions,
   inviteId,
+  role,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
+  role: UserRole;
   inviteId: string;
 }) => {
   const response = await baseFetch({
     url: `/invites/${inviteId}/redeem`,
     method: "POST",
-    body: { email, password, firstName, lastName, receivePromotions },
+    body: { email, password, firstName, lastName, role, receivePromotions },
   });
   return response.data;
 };
