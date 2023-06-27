@@ -9,6 +9,11 @@ import { getUserAdmin } from "./service.js";
 // Admin Router
 const router = Router();
 
+router.use("/invite", invitesRouter);
+router.use("/organization", organizationsRouter);
+router.use("/school", schoolsRouter);
+router.use("/rooms", roomsRouter);
+
 // Admin/users router
 const adminUserRouter = Router();
 adminUserRouter.get(
@@ -25,10 +30,6 @@ adminUserRouter.get(
   })
 );
 
-router.use("/invite", invitesRouter);
-router.use("/organization", organizationsRouter);
-router.use("/school", schoolsRouter);
-router.use("/rooms", roomsRouter);
 router.use("/users", adminUserRouter);
 
 export default router;

@@ -1,7 +1,10 @@
 import { Prisma } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
-export const getUser = async (params: Prisma.UserWhereInput, includeParams?: Prisma.UserInclude) => {
+export const getUser = async (
+  params: Prisma.UserWhereInput,
+  includeParams?: Prisma.UserInclude
+) => {
   return await dbClient.user.findFirst({
     where: params,
     include: includeParams || {
@@ -46,4 +49,16 @@ export const incrementUserQuestionsAsked = async (userId: string) => {
       },
     },
   });
+};
+
+export const getUserPermissions = async (
+  params: Prisma.UserWhereUniqueInput
+) => {
+  const user = await dbClient.user.findUnique({
+    where: params,
+    include: {
+      permissions: true,
+    },
+  });
+  return user?.permissions;
 };
