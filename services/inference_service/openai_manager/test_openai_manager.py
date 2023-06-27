@@ -42,7 +42,7 @@ def test_math_expressions(env_setup):
     print(response)
     assert response == "none"
 
-    expression = "The sky is purple today"
+    expression = "I don't know how to solve for 5 plus 5"
     response = openai_manager.identify_math_exp(expression)
     print(response)
-    assert response == "none"
+    assert "5" in response
