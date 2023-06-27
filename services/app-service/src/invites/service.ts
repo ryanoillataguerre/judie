@@ -1,8 +1,9 @@
-import { PermissionType, Prisma } from "@prisma/client";
+import { GradeYear, PermissionType, Prisma, UserRole } from "@prisma/client";
 import { getUser } from "../users/service.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
+import { signup } from "../auth/service.js";
 
 export const validateInviteRights = async ({
   userId,
@@ -61,4 +62,60 @@ export const createInvite = async (params: Prisma.InviteCreateInput) => {
   return await dbClient.invite.create({
     data: params,
   });
+};
+
+export const getInvite = async (params: Prisma.InviteFindUniqueArgs) => {
+  return await dbClient.invite.findUnique(params);
+};
+
+interface RedeemInviteParams {
+  inviteId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  receivePromotions: boolean;
+  role?: string;
+}
+export const redeemInvite = async (params: RedeemInviteParams) => {
+  const invite = await dbClient.invite.findUnique({
+    where: {
+      id: params.inviteId,
+    },
+    include: {
+      permissions: true,
+    },
+  });
+  if (!invite) {
+    throw new UnauthorizedError("Invite not found - it may have expired.");
+  }
+
+  // Create user
+  const newUser = await signup({
+    firstName: params.firstName,
+    lastName: params.lastName,
+    email: params.email,
+    password: params.password,
+    gradeYear: invite.gradeYear as GradeYear | undefined,
+    receivePromotions: params.receivePromotions,
+    role: (params.role as UserRole) || UserRole.STUDENT,
+  });
+
+  // Set userId on all permissions from invite
+  const updatePermissionsPromises = [];
+  for (const permission of invite.permissions) {
+    updatePermissionsPromises.push(
+      dbClient.userPermission.update({
+        where: {
+          id: permission.id,
+        },
+        data: {
+          userId: newUser.id,
+        },
+      })
+    );
+  }
+  await Promise.all(updatePermissionsPromises);
+
+  return newUser;
 };

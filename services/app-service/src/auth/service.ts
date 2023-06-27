@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { User, UserRole } from "@prisma/client";
+import { GradeYear, User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
 import { cioClient } from "../utils/customerio.js";
@@ -33,6 +33,7 @@ export const signup = async ({
   receivePromotions,
   role,
   districtOrSchool,
+  gradeYear,
 }: {
   firstName: string;
   lastName: string;
@@ -41,6 +42,7 @@ export const signup = async ({
   receivePromotions: boolean;
   role: UserRole;
   districtOrSchool?: string;
+  gradeYear?: GradeYear;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -62,8 +64,6 @@ export const signup = async ({
   // Hash password
   const _password = await bcrypt.hash(password, 10);
 
-  // TODO: Calculate role
-
   const newUser = await dbClient.user.create({
     data: {
       firstName,
@@ -72,6 +72,7 @@ export const signup = async ({
       password: _password,
       receivePromotions,
       role: role || UserRole.STUDENT,
+      gradeYear,
     },
     include: {
       subscription: true,

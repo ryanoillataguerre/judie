@@ -39,7 +39,7 @@ interface SubmitData {
   districtOrSchool?: string;
 }
 
-const SignupForm = () => {
+export const SignupForm = () => {
   const router = useRouter();
   const toast = useToast();
   const { handleSubmit, register } = useForm<SubmitData>({
@@ -87,7 +87,7 @@ const SignupForm = () => {
     lastName,
     receivePromotions,
     role,
-    districtOrSchool
+    districtOrSchool,
   }: SubmitData) => {
     try {
       setHasSubmitted(true);
@@ -109,7 +109,7 @@ const SignupForm = () => {
         firstName,
         lastName,
         role,
-        districtOrSchool
+        districtOrSchool,
       });
     } catch (err) {}
   };

@@ -16,7 +16,7 @@ export const completionFromQueryMutation = async ({
   setChatValue,
   onStreamEnd,
   onError,
-  abortController
+  abortController,
 }: {
   query: string;
   chatId: string;
@@ -53,11 +53,7 @@ export const signinMutation = async ({
   return response.data;
 };
 
-export const forgotPasswordMutation = async ({
-  email,
-}: {
-  email: string;
-}) => {
+export const forgotPasswordMutation = async ({ email }: { email: string }) => {
   const response = await baseFetch({
     url: "/auth/forgot-password",
     method: "POST",
@@ -67,9 +63,11 @@ export const forgotPasswordMutation = async ({
 };
 
 export const resetPasswordMutation = async ({
-  password, token,
+  password,
+  token,
 }: {
-  password: string, token: string;
+  password: string;
+  token: string;
 }) => {
   const response = await baseFetch({
     url: "/auth/reset-password",
@@ -185,6 +183,30 @@ export const waitlistMutation = async ({ email }: { email: string }) => {
     url: "/auth/waitlist",
     method: "POST",
     body: { email },
+  });
+  return response.data;
+};
+
+// Invite
+export const redeemInviteMutation = async ({
+  firstName,
+  lastName,
+  email,
+  password,
+  receivePromotions,
+  inviteId,
+}: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  receivePromotions: boolean;
+  inviteId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/invites/${inviteId}/redeem`,
+    method: "POST",
+    body: { email, password, firstName, lastName, receivePromotions },
   });
   return response.data;
 };
