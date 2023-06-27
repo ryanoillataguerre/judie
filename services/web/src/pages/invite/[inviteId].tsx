@@ -24,7 +24,6 @@ import { SignupForm } from "../signup";
 import { GET_INVITE_BY_ID, getInviteByIdQuery } from "@judie/data/queries";
 
 const RedeemInvite = () => {
-  const [submitted, setSubmitted] = useState(false);
   const toast = useToast();
   const router = useRouter();
   const inviteId = router.query.inviteId as string;
@@ -45,13 +44,23 @@ const RedeemInvite = () => {
 
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: redeemInviteMutation,
-    onSuccess: () => {
-      setSubmitted(true);
+    onSuccess: (data) => {
+      toast({
+        title: "Success!",
+        description: "Welcome to Judie",
+        status: "success",
+        duration: 1000,
+        isClosable: true,
+        position: "top",
+      });
+      setTimeout(() => {
+        router.push("/chat");
+      }, 1000);
     },
     onError: (err: HTTPResponseError) => {
-      console.error("Error waitlisting", err);
+      console.error("Error redeeming", err);
       toast({
-        title: "Error waitlisting",
+        title: "Error redeeming invite",
         description: err.message,
         status: "error",
         duration: 5000,
@@ -79,16 +88,6 @@ const RedeemInvite = () => {
   //       });
   //     } catch (err) {}
   //   };
-
-  const buttonVal = useMemo(() => {
-    if (isLoading) {
-      return <Spinner />;
-    }
-    if (submitted) {
-      return <AiFillCheckCircle size={24} fill={"#FFFFFF"} />;
-    }
-    return "Submit";
-  }, [isLoading, submitted]);
 
   const containerWidth = useBreakpointValue({ base: "100%", md: "50%" });
   const backgroundSrc = useColorModeValue("/logo.svg", "/logo_dark.svg");
