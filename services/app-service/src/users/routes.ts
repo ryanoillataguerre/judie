@@ -103,7 +103,6 @@ router.get(
   "/permissions",
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
-    // TODO Ryan: Validate current user can view this user
     const session = req.session;
     const user = await getUserPermissions({
       id: session.userId as string,
