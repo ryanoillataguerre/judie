@@ -15,7 +15,6 @@ import { GradeYear, PermissionType } from "@prisma/client";
 const router = Router();
 
 // Invites routes are nested under /admin/
-// TODO Ryan: Add nested permissions to contract
 export interface CreateInviteBody {
   firstName: string;
   lastName: string;

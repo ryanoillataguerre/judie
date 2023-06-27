@@ -48,10 +48,14 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const user = await getUser({ id: session.userId });
-    res.status(200).send({
-      data: transformUser(user),
-    });
+    try {
+      const user = await getUser({ id: session.userId });
+      res.status(200).send({
+        data: transformUser(user),
+      });
+    } catch (err) {
+      throw new UnauthorizedError("No user id found in session");
+    }
   })
 );
 
