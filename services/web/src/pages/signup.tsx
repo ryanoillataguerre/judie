@@ -29,7 +29,7 @@ import { HiEye, HiEyeOff } from "react-icons/hi";
 import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 import { UserRole } from "@judie/data/types/api";
 
-interface SubmitData {
+export interface SignupSubmitData {
   email: string;
   password: string;
   firstName: string;
@@ -42,7 +42,7 @@ interface SubmitData {
 export const SignupForm = () => {
   const router = useRouter();
   const toast = useToast();
-  const { handleSubmit, register } = useForm<SubmitData>({
+  const { handleSubmit, register } = useForm<SignupSubmitData>({
     defaultValues: {
       email: "",
       password: "",
@@ -80,7 +80,7 @@ export const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>(UserRole.STUDENT);
 
-  const onSubmit: SubmitHandler<SubmitData> = async ({
+  const onSubmit: SubmitHandler<SignupSubmitData> = async ({
     email,
     password,
     firstName,
@@ -88,7 +88,7 @@ export const SignupForm = () => {
     receivePromotions,
     role,
     districtOrSchool,
-  }: SubmitData) => {
+  }: SignupSubmitData) => {
     try {
       setHasSubmitted(true);
       if (!termsAndConditions) {

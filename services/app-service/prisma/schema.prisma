@@ -52,6 +52,7 @@ enum SubscriptionStatus {
 enum SubscriptionType {
   MONTHLY
   YEARLY
+  SEAT
 }
 
 enum PermissionType {
@@ -62,17 +63,19 @@ enum PermissionType {
 }
 
 model Subscription {
-  id         String             @id @default(uuid())
-  userId     String             @unique @map("user_id")
-  status     SubscriptionStatus
-  type       SubscriptionType
-  stripeId   String             @map("stripe_id")
-  canceledAt DateTime?          @map("canceled_at")
-  expiresAt  DateTime?          @map("expires_at")
-  createdAt  DateTime           @default(now()) @map("created_at")
-  updatedAt  DateTime?          @updatedAt @map("updated_at")
+  id             String             @id @default(uuid())
+  userId         String             @unique @map("user_id")
+  status         SubscriptionStatus
+  type           SubscriptionType
+  stripeId       String?            @map("stripe_id")
+  canceledAt     DateTime?          @map("canceled_at")
+  expiresAt      DateTime?          @map("expires_at")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime?          @updatedAt @map("updated_at")
+  organizationId String?            @map("organization_id")
 
-  user User @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
 
   @@index([id, userId])
   @@map("subscriptions")
@@ -173,13 +176,14 @@ model Organization {
   updatedAt           DateTime? @updatedAt @map("updated_at")
   deletedAt           DateTime? @map("deleted_at")
 
-  users       User[]
-  schools     School[]
-  permissions UserPermission[]
-  rooms       Room[]
-  invites     Invite[]
-  creator     User?            @relation("creator", fields: [creatorId], references: [id])
-  Seats       Seats[]
+  users         User[]
+  schools       School[]
+  permissions   UserPermission[]
+  rooms         Room[]
+  invites       Invite[]
+  creator       User?            @relation("creator", fields: [creatorId], references: [id])
+  seats         Seats[]
+  subscriptions Subscription[]
 
   @@map("organizations")
 }
@@ -193,7 +197,7 @@ model School {
   updatedAt      DateTime? @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
 
-  Seats        Seats[]
+  seats        Seats[]
   organization Organization     @relation(fields: [organizationId], references: [id])
   users        User[]
   rooms        Room[]

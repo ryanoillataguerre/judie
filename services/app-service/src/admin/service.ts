@@ -1,4 +1,11 @@
-import { PermissionType, Prisma, User, UserRole } from "@prisma/client";
+import {
+  PermissionType,
+  Prisma,
+  SubscriptionStatus,
+  SubscriptionType,
+  User,
+  UserRole,
+} from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
 
@@ -162,4 +169,27 @@ export const getUserAdmin = async (
     },
   });
   return user;
+};
+
+export const subscribeUser = async ({
+  userId,
+  organizationId,
+}: {
+  userId: string;
+  organizationId: string;
+}) => {
+  return await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      subscription: {
+        create: {
+          type: SubscriptionType.SEAT,
+          organizationId,
+          status: SubscriptionStatus.ACTIVE,
+        },
+      },
+    },
+  });
 };

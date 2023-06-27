@@ -4,6 +4,7 @@ import NotFoundError from "../utils/errors/NotFoundError.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
 import { signup } from "../auth/service.js";
+import { subscribeUser } from "../admin/service.js";
 
 export const validateInviteRights = async ({
   userId,
@@ -116,6 +117,12 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
     );
   }
   await Promise.all(updatePermissionsPromises);
+
+  // Add subscription for user
+  await subscribeUser({
+    userId: newUser.id,
+    organizationId: invite.organizationId as string,
+  });
 
   return newUser;
 };
