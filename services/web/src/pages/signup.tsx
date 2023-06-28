@@ -260,7 +260,7 @@ export const SignupForm = ({
               autoComplete="given-name"
               required
               placeholder="Judie"
-              value={inviteFirstName ?? ""}
+              defaultValue={inviteFirstName ?? ""}
               {...register("firstName", {})}
             />
           </FormControl>
@@ -277,7 +277,7 @@ export const SignupForm = ({
               autoComplete="family-name"
               required
               placeholder="Thebot"
-              value={inviteLastName ?? ""}
+              defaultValue={inviteLastName ?? ""}
               {...register("lastName")}
             />
           </FormControl>
