@@ -28,12 +28,6 @@ const RedeemInvite = () => {
   const router = useRouter();
   const inviteId = router.query.inviteId as string;
 
-  const { handleSubmit, register } = useForm<{ email: string }>({
-    defaultValues: {
-      email: "",
-    },
-  });
-
   const { data: inviteData } = useQuery(
     [GET_INVITE_BY_ID, inviteId],
     () => getInviteByIdQuery(inviteId),
@@ -41,7 +35,6 @@ const RedeemInvite = () => {
       enabled: !!inviteId,
     }
   );
-  console.log(inviteData);
 
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: redeemInviteMutation,
