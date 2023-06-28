@@ -41,7 +41,7 @@ export const getBillingPortalLinkQuery = async (): Promise<string> => {
 export const GET_INVITE_BY_ID = "GET_INVITE_BY_ID";
 export const getInviteByIdQuery = async (id: string) => {
   const response = await baseFetch({
-    url: `/invite/${id}`,
+    url: `/invites/${id}`,
     method: "GET",
   });
   return response.data;

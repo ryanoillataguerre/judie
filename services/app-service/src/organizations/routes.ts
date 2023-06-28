@@ -10,6 +10,8 @@ import { validateOrganizationAdmin } from "../admin/service.js";
 import dbClient from "../utils/prisma.js";
 import { PermissionType } from "@prisma/client";
 import { createPermission } from "../permissions/service.js";
+import { sendInviteEmail } from "../cio/service.js";
+import { createInvite } from "../invites/service.js";
 
 const router = Router();
 
@@ -18,12 +20,19 @@ router.post(
   [
     body("name").isString().exists(),
     body("primaryContactEmail").isEmail().exists(),
+    body("primaryContactFirstName").isString().exists(),
+    body("primaryContactLastName").isString().exists(),
   ],
   // Only Judie employees can create organizations
   requireJudieAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
-    const { name, primaryContactEmail } = req.body;
+    const {
+      name,
+      primaryContactEmail,
+      primaryContactFirstName,
+      primaryContactLastName,
+    } = req.body;
     const { userId } = req.session;
     const organization = await createOrganization({
       name,
@@ -48,6 +57,19 @@ router.post(
         },
       },
     });
+
+    // Create invite for primary contact
+    const newInvite = await createInvite({
+      email: primaryContactEmail,
+      firstName: primaryContactFirstName,
+      lastName: primaryContactLastName,
+      organization: {
+        connect: {
+          id: organization.id,
+        },
+      },
+    });
+    await sendInviteEmail({ invite: newInvite });
 
     res.status(201).json({
       organization,

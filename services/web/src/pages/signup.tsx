@@ -1,7 +1,7 @@
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { signupMutation } from "@judie/data/mutations";
+import { redeemInviteMutation, signupMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "@judie/components/Button/Button";
@@ -39,7 +39,17 @@ export interface SignupSubmitData {
   districtOrSchool?: string;
 }
 
-export const SignupForm = () => {
+export const SignupForm = ({
+  inviteEmail,
+  inviteFirstName,
+  inviteLastName,
+  inviteId,
+}: {
+  inviteEmail?: string;
+  inviteFirstName?: string;
+  inviteLastName?: string;
+  inviteId?: string;
+}) => {
   const router = useRouter();
   const toast = useToast();
   const { handleSubmit, register } = useForm<SignupSubmitData>({
@@ -74,6 +84,27 @@ export const SignupForm = () => {
     },
   });
 
+  const { mutateAsync: mutateAsyncInvite, isLoading: inviteSignupLoading } =
+    useMutation({
+      mutationFn: redeemInviteMutation,
+      onSuccess: () => {
+        router.push({
+          pathname: "/chat",
+          query: router.query,
+        });
+      },
+      onError: (err: HTTPResponseError) => {
+        console.error("Error signing up", err);
+        toast({
+          title: "Error signing up",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+    });
+
   const [receivePromotions, setReceivePromotions] = useState(true);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -102,15 +133,26 @@ export const SignupForm = () => {
         return;
       }
 
-      await mutateAsync({
-        email,
-        password,
-        receivePromotions,
-        firstName,
-        lastName,
-        role,
-        districtOrSchool,
-      });
+      if (inviteEmail) {
+        await mutateAsyncInvite({
+          password,
+          receivePromotions,
+          firstName: inviteFirstName || firstName,
+          lastName: inviteLastName || lastName,
+          inviteId: inviteId as string,
+        });
+        return;
+      } else {
+        await mutateAsync({
+          email,
+          password,
+          receivePromotions,
+          firstName,
+          lastName,
+          role,
+          districtOrSchool,
+        });
+      }
     } catch (err) {}
   };
 
@@ -171,6 +213,9 @@ export const SignupForm = () => {
               required
               placeholder="judie@judie.io"
               {...register("email", {})}
+              isReadOnly={inviteEmail !== undefined}
+              value={inviteEmail ?? ""}
+              disabled={inviteEmail !== undefined}
             />
           </FormControl>
           <FormControl
@@ -215,6 +260,7 @@ export const SignupForm = () => {
               autoComplete="given-name"
               required
               placeholder="Judie"
+              value={inviteFirstName ?? ""}
               {...register("firstName", {})}
             />
           </FormControl>
@@ -231,33 +277,37 @@ export const SignupForm = () => {
               autoComplete="family-name"
               required
               placeholder="Thebot"
+              value={inviteLastName ?? ""}
               {...register("lastName")}
             />
           </FormControl>
-          <FormControl paddingTop={2}>
-            <FormLabel htmlFor="districtOrSchool">Role</FormLabel>
-            <Select
-              {...register("role")}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              marginBottom={6}
-            >
-              <option value={UserRole.STUDENT}>Student</option>
-              <option value={UserRole.TEACHER}>Teacher</option>
-              <option value={UserRole.ADMINISTRATOR}>Administrator</option>
-            </Select>
-            {(role === UserRole.ADMINISTRATOR || role === UserRole.TEACHER) && (
-              <FormControl marginBottom={6} isRequired>
-                <FormLabel htmlFor="districtOrSchool">
-                  {role === UserRole.ADMINISTRATOR ? "District" : "School"}
-                </FormLabel>
-                <Input
-                  id="districtOrSchool"
-                  required
-                  {...register("districtOrSchool", {})}
-                />
-              </FormControl>
-            )}
-          </FormControl>
+          {!inviteEmail && (
+            <FormControl paddingTop={2}>
+              <FormLabel htmlFor="districtOrSchool">Role</FormLabel>
+              <Select
+                {...register("role")}
+                onChange={(e) => setRole(e.target.value as UserRole)}
+                marginBottom={6}
+              >
+                <option value={UserRole.STUDENT}>Student</option>
+                <option value={UserRole.TEACHER}>Teacher</option>
+                <option value={UserRole.ADMINISTRATOR}>Administrator</option>
+              </Select>
+              {(role === UserRole.ADMINISTRATOR ||
+                role === UserRole.TEACHER) && (
+                <FormControl marginBottom={6} isRequired>
+                  <FormLabel htmlFor="districtOrSchool">
+                    {role === UserRole.ADMINISTRATOR ? "District" : "School"}
+                  </FormLabel>
+                  <Input
+                    id="districtOrSchool"
+                    required
+                    {...register("districtOrSchool", {})}
+                  />
+                </FormControl>
+              )}
+            </FormControl>
+          )}
           <Checkbox
             onChange={(e) => setReceivePromotions(e.target.checked)}
             defaultChecked

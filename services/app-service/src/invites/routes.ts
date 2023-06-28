@@ -123,7 +123,7 @@ router.get("/:inviteId", async (req: Request, res: Response) => {
     return;
   }
   res.status(200).send({
-    invite,
+    data: invite,
   });
 });
 
@@ -136,7 +136,6 @@ router.post(
       inviteId: req.params.inviteId,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      email: req.body.email,
       password: req.body.password,
       role: req.body.role,
       receivePromotions: req.body.receivePromotions,
@@ -144,11 +143,11 @@ router.post(
 
     // Create session
     const session = req.session;
-    session.userId = newUser.id;
+    session.userId = newUser?.id;
     session.save();
     // Send user
     res.status(201).send({
-      user: newUser,
+      data: newUser,
     });
   }
 );

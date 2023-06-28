@@ -73,7 +73,6 @@ interface RedeemInviteParams {
   inviteId: string;
   firstName: string;
   lastName: string;
-  email: string;
   password: string;
   receivePromotions: boolean;
   role?: string;
@@ -95,7 +94,7 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
   const newUser = await signup({
     firstName: params.firstName,
     lastName: params.lastName,
-    email: params.email,
+    email: invite.email,
     password: params.password,
     gradeYear: invite.gradeYear as GradeYear | undefined,
     receivePromotions: params.receivePromotions,
@@ -118,10 +117,61 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
   }
   await Promise.all(updatePermissionsPromises);
 
+  // Relate organization, school, and room to user if they're present
+  if (invite.organizationId) {
+    await dbClient.organization.update({
+      where: {
+        id: invite.organizationId,
+      },
+      data: {
+        users: {
+          connect: {
+            id: newUser.id,
+          },
+        },
+      },
+    });
+  }
+  if (invite.schoolId) {
+    await dbClient.school.update({
+      where: {
+        id: invite.schoolId,
+      },
+      data: {
+        users: {
+          connect: {
+            id: newUser.id,
+          },
+        },
+      },
+    });
+  }
+  if (invite.roomId) {
+    await dbClient.room.update({
+      where: {
+        id: invite.roomId,
+      },
+      data: {
+        users: {
+          connect: {
+            id: newUser.id,
+          },
+        },
+      },
+    });
+  }
+
   // Add subscription for user
   await subscribeUser({
     userId: newUser.id,
     organizationId: invite.organizationId as string,
+  });
+
+  // Delete invite
+  await dbClient.invite.delete({
+    where: {
+      id: invite.id,
+    },
   });
 
   return newUser;

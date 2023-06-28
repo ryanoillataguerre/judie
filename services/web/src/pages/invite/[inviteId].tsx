@@ -41,6 +41,7 @@ const RedeemInvite = () => {
       enabled: !!inviteId,
     }
   );
+  console.log(inviteData);
 
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: redeemInviteMutation,
@@ -139,9 +140,9 @@ const RedeemInvite = () => {
           <Text
             style={{
               alignSelf: "center",
-              fontSize: "1rem",
-              marginBottom: "1rem",
-              marginTop: "1rem",
+              fontSize: "1.2rem",
+              marginBottom: "0.5rem",
+              marginTop: "0.5rem",
             }}
           >
             We're so excited to have you here!
@@ -150,10 +151,10 @@ const RedeemInvite = () => {
             <Text
               style={{
                 alignSelf: "center",
-                fontSize: "0.8rem",
+                fontSize: "1rem",
                 fontWeight: 400,
-                marginBottom: "1rem",
-                marginTop: "1rem",
+                marginBottom: "1.5rem",
+                marginTop: "0.5rem",
               }}
             >
               Someone from{" "}
@@ -165,7 +166,12 @@ const RedeemInvite = () => {
             </Text>
           )}
 
-          <SignupForm />
+          <SignupForm
+            inviteEmail={inviteData?.email}
+            inviteFirstName={inviteData?.firstName}
+            inviteLastName={inviteData?.lastName}
+            inviteId={inviteId}
+          />
         </Flex>
       </main>
     </>

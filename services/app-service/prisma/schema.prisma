@@ -218,7 +218,7 @@ model Room {
   deletedAt      DateTime? @map("deleted_at")
 
   organization Organization?    @relation(fields: [organizationId], references: [id])
-  students     User[]
+  users        User[]
   permissions  UserPermission[]
   invites      Invite[]
 
