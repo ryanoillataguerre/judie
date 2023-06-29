@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-const AdminRoot = () => {
-  return <></>;
-=======
 import {
   Tab,
   TabIndicator,
@@ -146,7 +142,6 @@ const AdminRoot = () => {
       </Tabs>
     </VStack>
   );
->>>>>>> Stashed changes
 };
 
 export default AdminRoot;
