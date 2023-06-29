@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-const AdminRoot = () => {
-  return <></>;
-=======
 import {
   Tab,
   TabIndicator,
@@ -16,10 +12,8 @@ import { PermissionType } from "@judie/data/types/api";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
 import { useMemo } from "react";
 import OrgRow from "../EntityRows/OrgRow";
-import SchoolRow from "../EntityRows/SchoolRow";
-import RoomRow from "../EntityRows/RoomRow";
 
-const AdminRoot = () => {
+const AdminOrganization = () => {
   const { userData } = useAuth();
   const adminPermissions = useMemo(
     () =>
@@ -40,6 +34,7 @@ const AdminRoot = () => {
       }
     }
   }, [userData, adminPermissions]);
+  console.log("organizations", organizations);
 
   const schools = useMemo(() => {
     if (!userData) return [];
@@ -83,8 +78,11 @@ const AdminRoot = () => {
       <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {organizations?.length ? <Tab>Your Organizations</Tab> : null}
+          {/* <Tab>Organizations</Tab> */}
           {schools?.length ? <Tab>Your Schools</Tab> : null}
+          {/* <Tab>Schools</Tab> */}
           {rooms?.length ? <Tab>Your Rooms</Tab> : null}
+          {/* <Tab>Rooms</Tab> */}
         </TabList>
         <TabPanels>
           {organizations?.length ? (
@@ -105,48 +103,13 @@ const AdminRoot = () => {
               </VStack>
             </TabPanel>
           ) : null}
-          {schools?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {schools.map((school) => (
-                  <SchoolRow key={school.id} school={school} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
-          {rooms?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {rooms.map((room) => (
-                  <RoomRow key={room.id} room={room} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
+          {schools?.length ? <TabPanel>schools</TabPanel> : null}
+          {rooms?.length ? <TabPanel>rooms</TabPanel> : null}
         </TabPanels>
         <TabIndicator />
       </Tabs>
     </VStack>
   );
->>>>>>> Stashed changes
 };
 
-export default AdminRoot;
+export default AdminOrganization;
