@@ -1,7 +1,11 @@
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import { GET_ME, getMeQuery } from "@judie/data/queries";
-import { SubscriptionStatus, User } from "@judie/data/types/api";
+import {
+  PermissionType,
+  SubscriptionStatus,
+  User,
+} from "@judie/data/types/api";
 import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
@@ -16,6 +20,14 @@ import { ChatContext } from "./useChat";
 
 const DO_NOT_REDIRECT_PATHS = ["/signin", "/signup"];
 export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
+
+export const isPermissionTypeAdmin = (type: PermissionType) => {
+  return (
+    type === PermissionType.ORG_ADMIN ||
+    type === PermissionType.SCHOOL_ADMIN ||
+    type === PermissionType.ROOM_ADMIN
+  );
+};
 
 export default function useAuth({
   allowUnauth = false,
@@ -74,6 +86,12 @@ export default function useAuth({
     }
   );
 
+  const isAdmin = useMemo(() => {
+    return userData?.permissions?.find((permission) =>
+      isPermissionTypeAdmin(permission.type)
+    );
+  }, [userData]);
+
   useEffect(() => {
     if (
       isError &&
@@ -129,7 +147,7 @@ export default function useAuth({
     }
   }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
-  return { userData, isPaid, isLoading, refresh: refetch, logout };
+  return { userData, isPaid, isLoading, refresh: refetch, logout, isAdmin };
 }
 
 export interface AuthData {
@@ -137,6 +155,7 @@ export interface AuthData {
   isLoading: boolean;
   isPaid: boolean;
   logout: () => void;
+  isAdmin: boolean;
   refresh: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<User, HTTPResponseError>>;

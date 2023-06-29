@@ -49,7 +49,13 @@ router.get(
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     try {
-      const user = await getUser({ id: session.userId });
+      const user = await getUser(
+        { id: session.userId },
+        {
+          permissions: true,
+          subscription: true,
+        }
+      );
       res.status(200).send({
         data: transformUser(user),
       });
