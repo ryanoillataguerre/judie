@@ -17,6 +17,51 @@ export interface Subscription {
   stripeId: string;
   user: User;
 }
+
+export interface School {
+  id: string;
+  name: string;
+  address: string;
+  organizationId: string;
+  createdAt: string;
+  updatedAt?: string;
+  deletedAt: string;
+}
+export interface Organization {
+  id: string;
+  name: string;
+  primaryContactEmail: string;
+  creatorId: string;
+  createdAt: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+export interface Room {
+  id: string;
+  name: string;
+  schoolId: string;
+  school: string;
+  organizationId: string;
+  createdAt: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+export interface Permission {
+  id: string;
+  userId: string;
+  inviteId: string;
+  schoolId: string;
+  organizationId: string;
+  roomId: string;
+  type: PermissionType;
+  role: UserRole;
+  createdAt: string;
+  updatedAt?: string;
+  deletedAt: string;
+  school?: School;
+  organization?: Organization;
+  room?: Room;
+}
 export interface User {
   id: string;
   email: string;
@@ -30,6 +75,8 @@ export interface User {
   stripeCustomerId?: string;
   questionsAsked: number;
   subscription?: Subscription;
+  chats?: Chat[];
+  permissions?: Permission[];
 }
 
 export enum MessageType {

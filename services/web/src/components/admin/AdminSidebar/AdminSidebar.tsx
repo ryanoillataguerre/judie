@@ -63,8 +63,8 @@ import { MessageType } from "@judie/data/types/api";
 import { TbPencil } from "react-icons/tb";
 import { AiOutlineCheck } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
-import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
-import UpgradeButton from "../UpgradeButton/UpgradeButton";
+import ColorModeSwitcher from "../../ColorModeSwitcher/ColorModeSwitcher";
+import UpgradeButton from "../../UpgradeButton/UpgradeButton";
 
 interface SidebarButtonProps {
   icon?: JSX.Element;
@@ -268,7 +268,7 @@ const SidebarChat = ({
   );
 };
 
-const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
+const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const chatContext = useContext(ChatContext);
@@ -323,11 +323,11 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   });
 
   const onAdminClick = useCallback(() => {
-    const filteredAdminPermissions = auth.userData?.permissions?.filter(
+    const filteredPermissions = auth.userData?.permissions?.filter(
       (permission) => isPermissionTypeAdmin(permission.type)
     );
-    if (filteredAdminPermissions?.length === 1) {
-      const permission = filteredAdminPermissions[0];
+    if (filteredPermissions?.length === 1) {
+      const permission = filteredPermissions[0];
       switch (permission.type) {
         case PermissionType.ORG_ADMIN:
           router.push(`/admin/organization/${permission.organizationId}`);
@@ -343,7 +343,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           break;
       }
       return;
-    } else if ((filteredAdminPermissions?.length || 0) > 1) {
+    } else if ((filteredPermissions?.length || 0) > 1) {
       router.push("/admin");
       return;
     }
@@ -718,4 +718,4 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;
