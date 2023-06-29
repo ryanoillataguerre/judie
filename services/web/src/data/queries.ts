@@ -1,6 +1,6 @@
 import { baseFetch } from "./baseFetch";
 import { ChatResponse } from "./mutations";
-import { User } from "./types/api";
+import { Invite, Organization, User } from "./types/api";
 
 export const GET_ME = "GET_ME";
 export const getMeQuery = async (): Promise<User> => {
@@ -39,9 +39,18 @@ export const getBillingPortalLinkQuery = async (): Promise<string> => {
 };
 
 export const GET_INVITE_BY_ID = "GET_INVITE_BY_ID";
-export const getInviteByIdQuery = async (id: string) => {
+export const getInviteByIdQuery = async (id: string): Promise<Invite> => {
   const response = await baseFetch({
     url: `/invites/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_ORG_BY_ID = "GET_ORG_BY_ID";
+export const getOrgByIdQuery = async (id: string): Promise<Organization> => {
+  const response = await baseFetch({
+    url: `/organizations/${id}`,
     method: "GET",
   });
   return response.data;

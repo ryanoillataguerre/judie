@@ -4,6 +4,7 @@ import { ChatProvider } from "@judie/hooks/useChat";
 import AdminSidebarPageContainer from "@judie/components/admin/AdminSidebarPageContainer/AdminSidebarPageContainer";
 import AdminRoot from "@judie/components/admin/AdminRoot/AdminRoot";
 import { useRouter } from "next/router";
+import AdminOrganization from "@judie/components/admin/AdminOrganization/AdminOrganization";
 
 function AdminPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ function AdminPage() {
       <main>
         <ChatProvider>
           <AdminSidebarPageContainer>
-            <AdminRoot />
+            <AdminOrganization id={router.query.organizationId as string} />
           </AdminSidebarPageContainer>
         </ChatProvider>
       </main>

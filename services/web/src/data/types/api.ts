@@ -9,6 +9,26 @@ export enum SubscriptionType {
   YEARLY = "YEARLY",
 }
 
+export enum GradeYear {
+  FIRST = "FIRST",
+  SECOND = "SECOND",
+  THIRD = "THIRD",
+  FOURTH = "FOURTH",
+  FIFTH = "FIFTH",
+  SIXTH = "SIXTH",
+  SEVENTH = "SEVENTH",
+  EIGHTH = "EIGHTH",
+  FRESHMAN = "FRESHMAN",
+  SOPHOMORE = "SOPHOMORE",
+  JUNIOR = "JUNIOR",
+  SENIOR = "SENIOR",
+  UNI_FRESHMAN = "UNI_FRESHMAN",
+  UNI_SOPHOMORE = "UNI_SOPHOMORE",
+  UNI_JUNIOR = "UNI_JUNIOR",
+  UNI_SENIOR = "UNI_SENIOR",
+  GRADUATE = "GRADUATE",
+}
+
 export interface Subscription {
   id: string;
   userId: string;
@@ -16,6 +36,24 @@ export interface Subscription {
   type: SubscriptionType;
   stripeId: string;
   user: User;
+}
+
+export interface Invite {
+  id?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  schoolId?: string;
+  organizationId?: string;
+  roomId?: string;
+  gradeYear?: GradeYear;
+  createdAt: string;
+  updatedAt?: string;
+  deletedAt?: string;
+  school?: School;
+  organization?: Organization;
+  room?: Room;
+  permissions?: Permission[];
 }
 
 export interface School {
@@ -26,6 +64,7 @@ export interface School {
   createdAt: string;
   updatedAt?: string;
   deletedAt: string;
+  rooms?: Room[];
 }
 export interface Organization {
   id: string;
@@ -35,6 +74,8 @@ export interface Organization {
   createdAt: string;
   updatedAt?: string;
   deletedAt?: string;
+  schools?: School[];
+  rooms?: Room[];
 }
 export interface Room {
   id: string;

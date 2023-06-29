@@ -8,12 +8,13 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { GET_ORG_BY_ID, getOrgByIdQuery } from "@judie/data/queries";
 import { PermissionType } from "@judie/data/types/api";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
 import { useMemo } from "react";
-import OrgRow from "../EntityRows/OrgRow";
+import { useQuery } from "react-query";
 
-const AdminOrganization = () => {
+const AdminOrganization = ({ id }: { id: string }) => {
   const { userData } = useAuth();
   const adminPermissions = useMemo(
     () =>
@@ -22,39 +23,12 @@ const AdminOrganization = () => {
       ),
     [userData?.permissions]
   );
-  const organizations = useMemo(() => {
-    if (!userData) return [];
-    if (!adminPermissions?.length) return [];
-    for (const permission of adminPermissions) {
-      if (permission.type === PermissionType.ORG_ADMIN) {
-        return [
-          ...(userData?.organizations || []),
-          ...(userData?.createdOrganizations || []),
-        ];
-      }
-    }
-  }, [userData, adminPermissions]);
-  console.log("organizations", organizations);
 
-  const schools = useMemo(() => {
-    if (!userData) return [];
-    if (!adminPermissions?.length) return [];
-    for (const permission of adminPermissions) {
-      if (permission.type === PermissionType.SCHOOL_ADMIN) {
-        return userData?.schools;
-      }
-    }
-  }, [userData, adminPermissions]);
-
-  const rooms = useMemo(() => {
-    if (!userData) return [];
-    if (!adminPermissions?.length) return [];
-    for (const permission of adminPermissions) {
-      if (permission.type === PermissionType.ROOM_ADMIN) {
-        return userData?.rooms;
-      }
-    }
-  }, [userData, adminPermissions]);
+  const { data: organizationData } = useQuery({
+    queryKey: [GET_ORG_BY_ID, id],
+    queryFn: () => getOrgByIdQuery(id),
+    enabled: !!id,
+  });
 
   return (
     <VStack
@@ -77,12 +51,8 @@ const AdminOrganization = () => {
       </Text>
       <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
-          {organizations?.length ? <Tab>Your Organizations</Tab> : null}
-          {/* <Tab>Organizations</Tab> */}
-          {schools?.length ? <Tab>Your Schools</Tab> : null}
-          {/* <Tab>Schools</Tab> */}
-          {rooms?.length ? <Tab>Your Rooms</Tab> : null}
-          {/* <Tab>Rooms</Tab> */}
+          {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
+          {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
         </TabList>
         <TabPanels>
           {organizations?.length ? (
