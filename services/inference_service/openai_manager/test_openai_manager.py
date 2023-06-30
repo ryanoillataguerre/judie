@@ -37,12 +37,17 @@ def test_math_expressions(env_setup):
     print(response)
     assert "12" in expression
 
+    expression = "I don't know how to solve for 5 plus 5"
+    response = openai_manager.identify_math_exp(expression)
+    print(response)
+    assert "5" in response
+
     expression = "The sky is purple today"
     response = openai_manager.identify_math_exp(expression)
     print(response)
     assert response == "none"
 
-    expression = "I don't know how to solve for 5 plus 5"
+    expression = "I want to learn about long division"
     response = openai_manager.identify_math_exp(expression)
     print(response)
-    assert "5" in response
+    assert response == "none"

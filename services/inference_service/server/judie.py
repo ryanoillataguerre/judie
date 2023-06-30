@@ -30,7 +30,7 @@ def yield_judie_response(
 
     if history[-1]["role"] == "user":
         sys_prompt = prompt_generator.generate_question_answer_prompt(
-            question=history[-1]["content"], subject_modifier=config.subject
+            question=history[-1]["content"], subject=config.subject
         )
         logger.info(f"Full prompt: {sys_prompt}")
 

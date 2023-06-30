@@ -8,7 +8,7 @@ logger = logging.getLogger("inference_logger")
 
 @dataclass
 class OpenAiConfig:
-    model: str = "gpt-4-0314"
+    model: str = "gpt-4-0613"
     temperature: float = 0.7
     max_tokens: int = 600
     top_p: int = 1
@@ -51,7 +51,7 @@ def identify_math_exp(message: str) -> str:
     prompt = [
         {
             "role": "system",
-            "content": 'Identify the complete math problem in the following text and respond only with the complete question. If there is not one present, simply respond with "none".',
+            "content": 'Identify the complete math problem in the following text and respond only with the complete question. If there is not one present, simply respond exactly with "none".',
         },
         {"role": "user", "content": message},
     ]

@@ -22,16 +22,25 @@ def env_setup():
 
 def test_prompt_generator_e2e(env_setup):
     full_prompt = generate_question_answer_prompt(
-        question="Teach me science", subject_modifier=None
+        question="Teach me science", subject=None
     )
     assert len(full_prompt) > 0
 
 
 def test_subject_prompt(env_setup):
     full_prompt = generate_question_answer_prompt(
-        question="What is photosynthesis?", subject_modifier="AP Biology"
+        question="What is photosynthesis?", subject="AP Biology"
     )
     assert "bio" in full_prompt
+
+
+def test_special_contect(env_setup):
+    full_prompt = generate_question_answer_prompt(
+        question="What is photosynthesis?",
+        subject="AP Biology",
+        special_context="Is the Pope Catholic?",
+    )
+    assert "the Pope" in full_prompt
 
 
 def test_context_limit(env_setup):

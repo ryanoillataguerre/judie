@@ -6,21 +6,18 @@ TOTAL_PROMPT_LIMIT = 7000
 
 
 def generate_question_answer_prompt(
-    question: str,
-    subject_modifier: str = None,
+    question: str, subject: str = None, special_context: str = None
 ) -> str:
     try:
-        if subject_modifier:
-            subject_prompt = prompt_chunks.PROMPT_MAP[subject_modifier]
+        if subject:
+            subject_prompt = prompt_chunks.PROMPT_MAP[subject]
         else:
             subject_prompt = prompt_chunks.DEFAULT_PROMPT
     except KeyError:
         subject_prompt = prompt_chunks.DEFAULT_PROMPT
     # print(subject_prompt)
 
-    context_block = context_retriever.pull_context_block(
-        question, subject=subject_modifier
-    )
+    context_block = context_retriever.pull_context_block(question, subject=subject)
 
     subject_plus_context = "\n".join(
         [
