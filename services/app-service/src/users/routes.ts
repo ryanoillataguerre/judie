@@ -48,16 +48,21 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
+    const admin = req.query.admin;
     try {
       const user = await getUser(
         { id: session.userId },
         {
-          permissions: true,
+          permissions: admin
+            ? {
+                include: {
+                  organization: true,
+                  school: true,
+                  room: true,
+                },
+              }
+            : true,
           subscription: true,
-          organizations: true,
-          createdOrganizations: true,
-          schools: true,
-          rooms: true,
         }
       );
       res.status(200).send({
