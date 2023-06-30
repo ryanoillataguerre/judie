@@ -2,7 +2,6 @@ import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import { ChatProvider } from "@judie/hooks/useChat";
 import AdminSidebarPageContainer from "@judie/components/admin/AdminSidebarPageContainer/AdminSidebarPageContainer";
-import AdminRoot from "@judie/components/admin/AdminRoot/AdminRoot";
 import { useRouter } from "next/router";
 import AdminOrganization from "@judie/components/admin/AdminOrganization/AdminOrganization";
 

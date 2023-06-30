@@ -54,6 +54,10 @@ router.get(
         {
           permissions: true,
           subscription: true,
+          organizations: true,
+          createdOrganizations: true,
+          schools: true,
+          rooms: true,
         }
       );
       res.status(200).send({

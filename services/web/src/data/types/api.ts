@@ -118,6 +118,10 @@ export interface User {
   subscription?: Subscription;
   chats?: Chat[];
   permissions?: Permission[];
+  organizations?: Organization[];
+  schools?: School[];
+  createdOrganizations?: Organization[];
+  rooms?: Room[];
 }
 
 export enum MessageType {

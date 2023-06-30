@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-const AdminRoot = () => {
-  return <></>;
-=======
 import {
   Tab,
   TabIndicator,
@@ -15,9 +11,9 @@ import {
 import { PermissionType } from "@judie/data/types/api";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
 import { useMemo } from "react";
-import OrgRow from "../EntityRows/OrgRow";
-import SchoolRow from "../EntityRows/SchoolRow";
-import RoomRow from "../EntityRows/RoomRow";
+import OrgRow from "../EntityRow/OrgRow";
+import SchoolRow from "../EntityRow/SchoolRow";
+import RoomRow from "../EntityRow/RoomRow";
 
 const AdminRoot = () => {
   const { userData } = useAuth();
@@ -28,6 +24,7 @@ const AdminRoot = () => {
       ),
     [userData?.permissions]
   );
+  console.log("adminPermissions", adminPermissions);
   const organizations = useMemo(() => {
     if (!userData) return [];
     if (!adminPermissions?.length) return [];
@@ -40,6 +37,8 @@ const AdminRoot = () => {
       }
     }
   }, [userData, adminPermissions]);
+
+  console.log(organizations);
 
   const schools = useMemo(() => {
     if (!userData) return [];
@@ -146,7 +145,6 @@ const AdminRoot = () => {
       </Tabs>
     </VStack>
   );
->>>>>>> Stashed changes
 };
 
 export default AdminRoot;

@@ -68,6 +68,8 @@ const AdminSidebarPageContainer = ({
           maxHeight: "100vh",
           position: "relative",
           overflow: "hidden",
+          maxWidth: "100%",
+          padding: "2rem 2rem",
         }}
       >
         <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />

@@ -87,8 +87,10 @@ export default function useAuth({
   );
 
   const isAdmin = useMemo(() => {
-    return userData?.permissions?.find((permission) =>
-      isPermissionTypeAdmin(permission.type)
+    return (
+      !!userData?.permissions?.find((permission) =>
+        isPermissionTypeAdmin(permission.type)
+      ) || false
     );
   }, [userData]);
 
