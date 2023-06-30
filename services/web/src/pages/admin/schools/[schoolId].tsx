@@ -2,11 +2,11 @@ import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import { ChatProvider } from "@judie/hooks/useChat";
 import AdminSidebarPageContainer from "@judie/components/admin/AdminSidebarPageContainer/AdminSidebarPageContainer";
-import AdminRoot from "@judie/components/admin/AdminRoot/AdminRoot";
-
-// TODO Ryan
+import AdminSchool from "@judie/components/admin/AdminSchool/AdminSchool";
+import { useRouter } from "next/router";
 function AdminPage() {
   useAuth();
+  const router = useRouter();
   return (
     <>
       <Head>
@@ -21,7 +21,7 @@ function AdminPage() {
       <main>
         <ChatProvider>
           <AdminSidebarPageContainer>
-            <AdminRoot />
+            <AdminSchool id={router.query.schoolId as string} />
           </AdminSidebarPageContainer>
         </ChatProvider>
       </main>

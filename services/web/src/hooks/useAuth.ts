@@ -71,7 +71,10 @@ export default function useAuth({
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(
     [GET_ME, sessionCookie],
-    () => getMeQuery(),
+    () =>
+      getMeQuery({
+        isAdmin,
+      }),
     {
       staleTime: 1000 * 60,
       onSuccess: (data) => {

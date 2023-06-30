@@ -1,11 +1,15 @@
 import { baseFetch } from "./baseFetch";
 import { ChatResponse } from "./mutations";
-import { Invite, Organization, User } from "./types/api";
+import { Invite, Organization, Room, School, User } from "./types/api";
 
 export const GET_ME = "GET_ME";
-export const getMeQuery = async (): Promise<User> => {
+export const getMeQuery = async ({
+  isAdmin = false,
+}: {
+  isAdmin: boolean;
+}): Promise<User> => {
   const response = await baseFetch({
-    url: "/user/me",
+    url: `/user/me?admin=${isAdmin}`,
     method: "GET",
   });
   return response.data;
@@ -51,6 +55,24 @@ export const GET_ORG_BY_ID = "GET_ORG_BY_ID";
 export const getOrgByIdQuery = async (id: string): Promise<Organization> => {
   const response = await baseFetch({
     url: `/admin/organizations/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_SCHOOL_BY_ID = "GET_SCHOOL_BY_ID";
+export const getSchoolByIdQuery = async (id: string): Promise<School> => {
+  const response = await baseFetch({
+    url: `/admin/schools/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_ROOM_BY_ID = "GET_ROOM_BY_ID";
+export const getRoomByIdQuery = async (id: string): Promise<Room> => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${id}`,
     method: "GET",
   });
   return response.data;

@@ -86,6 +86,7 @@ export interface Room {
   createdAt: string;
   updatedAt?: string;
   deletedAt?: string;
+  users?: User[];
 }
 export interface Permission {
   id: string;

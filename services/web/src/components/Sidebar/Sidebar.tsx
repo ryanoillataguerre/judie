@@ -6,18 +6,7 @@ import {
   useContext,
   useCallback,
 } from "react";
-import {
-  PermissionType,
-  SubscriptionStatus,
-  User,
-} from "@judie/data/types/api";
-import {
-  BsChevronRight,
-  BsClockHistory,
-  BsPlusSquareDotted,
-} from "react-icons/bs";
-import { MdAdminPanelSettings } from "react-icons/md";
-import { BiHelpCircle } from "react-icons/bi";
+import { PermissionType, SubscriptionStatus } from "@judie/data/types/api";
 import {
   Box,
   Button,
@@ -29,25 +18,23 @@ import {
   IconButton,
   Image,
   Input,
-  Slide,
   Spinner,
   Stack,
   Text,
-  Tooltip,
   Modal,
   ModalBody,
   ModalOverlay,
   ModalContent,
   useColorModeValue,
-  useDisclosure,
   useEditableControls,
   useToast,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { TfiTrash } from "react-icons/tfi";
-import { FiServer, FiSettings } from "react-icons/fi";
+import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
+import { MdAdminPanelSettings } from "react-icons/md";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useMutation, useQuery } from "react-query";
@@ -65,6 +52,7 @@ import { AiOutlineCheck } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 import UpgradeButton from "../UpgradeButton/UpgradeButton";
+import { BiHelpCircle } from "react-icons/bi";
 
 interface SidebarButtonProps {
   icon?: JSX.Element;
@@ -398,7 +386,8 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       !(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) &&
       !auth.isLoading &&
       router.isReady &&
-      auth.userData
+      auth.userData &&
+      !auth.isAdmin
     ) {
       options.push({
         key: "upgrade",
