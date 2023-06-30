@@ -9,9 +9,9 @@ import { getUserAdmin } from "./service.js";
 // Admin Router
 const router = Router();
 
-router.use("/invite", invitesRouter);
-router.use("/organization", organizationsRouter);
-router.use("/school", schoolsRouter);
+router.use("/invites", invitesRouter);
+router.use("/organizations", organizationsRouter);
+router.use("/schools", schoolsRouter);
 router.use("/rooms", roomsRouter);
 
 // Admin/users router

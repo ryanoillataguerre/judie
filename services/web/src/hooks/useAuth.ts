@@ -71,7 +71,10 @@ export default function useAuth({
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(
     [GET_ME, sessionCookie],
-    () => getMeQuery(),
+    () =>
+      getMeQuery({
+        isAdmin,
+      }),
     {
       staleTime: 1000 * 60,
       onSuccess: (data) => {
@@ -87,8 +90,10 @@ export default function useAuth({
   );
 
   const isAdmin = useMemo(() => {
-    return userData?.permissions?.find((permission) =>
-      isPermissionTypeAdmin(permission.type)
+    return (
+      !!userData?.permissions?.find((permission) =>
+        isPermissionTypeAdmin(permission.type)
+      ) || false
     );
   }, [userData]);
 

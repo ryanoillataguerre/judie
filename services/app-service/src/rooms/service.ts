@@ -16,3 +16,14 @@ export const getUsersForRoom = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const getRoomById = async ({ id }: { id: string }) => {
+  return await dbClient.room.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      users: true,
+    },
+  });
+};

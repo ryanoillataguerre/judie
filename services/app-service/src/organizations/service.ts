@@ -20,3 +20,16 @@ export const getUsersForOrganization = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const getOrganizationById = async ({ id }: { id: string }) => {
+  return await dbClient.organization.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      schools: true,
+      rooms: true,
+      users: true,
+    },
+  });
+};

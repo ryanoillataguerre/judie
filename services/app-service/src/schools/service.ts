@@ -18,3 +18,15 @@ export const getUsersForSchool = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const getSchoolById = async ({ id }: { id: string }) => {
+  return await dbClient.school.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      rooms: true,
+      users: true,
+    },
+  });
+};

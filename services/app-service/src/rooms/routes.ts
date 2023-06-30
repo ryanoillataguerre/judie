@@ -5,7 +5,7 @@ import {
   requireAuth,
   requireJudieAuth,
 } from "../utils/express.js";
-import { createRoom, getUsersForRoom } from "./service.js";
+import { createRoom, getRoomById, getUsersForRoom } from "./service.js";
 import {
   validateOrganizationAdmin,
   validateRoomAdmin,
@@ -82,13 +82,13 @@ router.post(
     });
 
     res.status(201).json({
-      room,
+      data: room,
     });
   }
 );
 
 router.get(
-  "/:schoolId/users",
+  "/:roomId/users",
   requireAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
@@ -102,7 +102,27 @@ router.get(
       id: roomId,
     });
     res.status(200).send({
-      users,
+      data: users,
+    });
+  }
+);
+
+router.get(
+  "/:roomId",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const roomId = req.params.roomId;
+    await validateRoomAdmin({
+      userId: userId as string,
+      roomId,
+    });
+    const users = await getRoomById({
+      id: roomId,
+    });
+    res.status(200).send({
+      data: users,
     });
   }
 );
