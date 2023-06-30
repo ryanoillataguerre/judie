@@ -50,7 +50,7 @@ export const getInviteByIdQuery = async (id: string): Promise<Invite> => {
 export const GET_ORG_BY_ID = "GET_ORG_BY_ID";
 export const getOrgByIdQuery = async (id: string): Promise<Organization> => {
   const response = await baseFetch({
-    url: `/organizations/${id}`,
+    url: `/admin/organizations/${id}`,
     method: "GET",
   });
   return response.data;

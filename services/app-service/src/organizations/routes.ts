@@ -5,7 +5,11 @@ import {
   requireAuth,
   requireJudieAuth,
 } from "../utils/express.js";
-import { createOrganization, getUsersForOrganization } from "./service.js";
+import {
+  createOrganization,
+  getOrganizationById,
+  getUsersForOrganization,
+} from "./service.js";
 import { validateOrganizationAdmin } from "../admin/service.js";
 import dbClient from "../utils/prisma.js";
 import { PermissionType } from "@prisma/client";
@@ -72,7 +76,7 @@ router.post(
     await sendInviteEmail({ invite: newInvite });
 
     res.status(201).json({
-      organization,
+      data: organization,
     });
   }
 );
@@ -92,7 +96,27 @@ router.get(
       id: organizationId,
     });
     res.status(200).send({
-      users,
+      data: users,
+    });
+  }
+);
+
+router.get(
+  "/:organizationId",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const organizationId = req.params.organizationId;
+    await validateOrganizationAdmin({
+      userId: userId as string,
+      organizationId,
+    });
+    const org = await getOrganizationById({
+      id: organizationId,
+    });
+    res.status(200).send({
+      data: org,
     });
   }
 );

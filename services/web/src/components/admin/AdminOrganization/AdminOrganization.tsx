@@ -49,7 +49,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           fontSize: "2rem",
         }}
       >
-        Admin
+        {organizationData?.name}
       </Text>
       <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

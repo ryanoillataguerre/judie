@@ -24,7 +24,6 @@ const AdminRoot = () => {
       ),
     [userData?.permissions]
   );
-  console.log("adminPermissions", adminPermissions);
   const organizations = useMemo(() => {
     if (!userData) return [];
     if (!adminPermissions?.length) return [];
@@ -37,8 +36,6 @@ const AdminRoot = () => {
       }
     }
   }, [userData, adminPermissions]);
-
-  console.log(organizations);
 
   const schools = useMemo(() => {
     if (!userData) return [];
@@ -81,65 +78,59 @@ const AdminRoot = () => {
       </Text>
       <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
-          {organizations?.length ? <Tab>Your Organizations</Tab> : null}
-          {schools?.length ? <Tab>Your Schools</Tab> : null}
-          {rooms?.length ? <Tab>Your Rooms</Tab> : null}
+          <Tab>Your Organizations</Tab>
+          <Tab>Your Schools</Tab>
+          <Tab>Your Rooms</Tab>
         </TabList>
         <TabPanels>
-          {organizations?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {organizations.map((org) => (
-                  <OrgRow key={org.id} org={org} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
-          {schools?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {schools.map((school) => (
-                  <SchoolRow key={school.id} school={school} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
-          {rooms?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {rooms.map((room) => (
-                  <RoomRow key={room.id} room={room} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
+          <TabPanel>
+            <VStack
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+                width: "100%",
+              }}
+              spacing={"1rem"}
+            >
+              {organizations?.map((org) => (
+                <OrgRow key={org.id} org={org} />
+              ))}
+            </VStack>
+          </TabPanel>
+          <TabPanel>
+            <VStack
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+                width: "100%",
+              }}
+              spacing={"1rem"}
+            >
+              {schools?.map((school) => (
+                <SchoolRow key={school.id} school={school} />
+              ))}
+            </VStack>
+          </TabPanel>
+          <TabPanel>
+            <VStack
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+                width: "100%",
+              }}
+              spacing={"1rem"}
+            >
+              {rooms?.map((room) => (
+                <RoomRow key={room.id} room={room} />
+              ))}
+            </VStack>
+          </TabPanel>
         </TabPanels>
         <TabIndicator />
       </Tabs>
