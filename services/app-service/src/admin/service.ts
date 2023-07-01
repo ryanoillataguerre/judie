@@ -264,10 +264,29 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
     return acc;
   }, [] as (Room | undefined)[]);
 
+  // Filter schools - if they exist in any organizations already, delete from array
+  const organizationSchoolIds = organizationsFormatted.reduce((acc, org) => {
+    if (org?.schools?.length) {
+      return [...acc, ...org.schools.map((school) => school.id)];
+    }
+    return acc;
+  }, [] as (string | undefined)[]);
+  // Filter rooms - if they exist in any schools already, delete from array
+  const schoolRoomIds = schoolsFormatted.reduce((acc, school) => {
+    if (school?.rooms?.length) {
+      return [...acc, ...school.rooms.map((room) => room.id)];
+    }
+    return acc;
+  }, [] as (string | undefined)[]);
+
   const formattedResults = {
     organizations: organizationsFormatted,
-    schools: schoolsFormatted,
-    rooms: roomsFormatted,
+    schools: schoolsFormatted.filter(
+      (school) => school?.id && !organizationSchoolIds.includes(school.id)
+    ),
+    rooms: roomsFormatted.filter(
+      (room) => room?.id && !schoolRoomIds.includes(room.id)
+    ),
   };
 
   return formattedResults;

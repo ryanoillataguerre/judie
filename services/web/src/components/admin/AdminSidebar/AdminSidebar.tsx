@@ -11,6 +11,9 @@ import {
   useColorModeValue,
   useToast,
   useBreakpointValue,
+  Collapse,
+  SlideFade,
+  VStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FiSettings } from "react-icons/fi";
@@ -21,17 +24,167 @@ import ColorModeSwitcher from "../../ColorModeSwitcher/ColorModeSwitcher";
 import { useQuery } from "react-query";
 import { GET_USER_ENTITIES, getUserEntitiesQuery } from "@judie/data/queries";
 import { Organization, Room, School } from "@judie/data/types/api";
+import useStorageState from "@judie/hooks/useStorageState";
+import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
+
+const NestedButton = ({
+  title,
+  expanded,
+  onClick,
+  hasChildren,
+  active,
+}: {
+  title: string;
+  expanded: boolean;
+  onClick: () => void;
+  hasChildren?: boolean;
+  active?: boolean;
+}) => {
+  return (
+    <Button
+      variant={"outline"}
+      colorScheme={active ? "blue" : "gray"}
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+      }}
+      onClick={onClick}
+    >
+      {/* Icon */}
+      {expanded ? (
+        <MdKeyboardArrowDown size={20} />
+      ) : hasChildren ? (
+        <MdKeyboardArrowRight size={20} />
+      ) : null}
+      {title}
+    </Button>
+  );
+};
 
 const SidebarRoom = ({ room }: { room: Room }) => {
-  return <></>;
+  const router = useRouter();
+  const isActive = useMemo(() => {
+    if (router.asPath.includes(`/rooms/${room.id}`)) {
+      return true;
+    }
+    return false;
+  }, [router]);
+  return (
+    <Flex
+      style={{
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <NestedButton
+        title={room.name}
+        expanded={false}
+        onClick={() => {}}
+        hasChildren={false}
+        active={isActive}
+      />
+    </Flex>
+  );
 };
 
 const SidebarSchool = ({ school }: { school: School }) => {
-  return <></>;
+  const [expanded, setExpanded] = useStorageState(
+    false,
+    `sidebar-expanded-org-${school.id}`
+  );
+  const router = useRouter();
+  const isActive = useMemo(() => {
+    if (router.asPath.includes(`/schools/${school.id}`)) {
+      return true;
+    }
+    return false;
+  }, [router]);
+  return (
+    <Flex
+      style={{
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <NestedButton
+        title={school.name}
+        expanded={expanded}
+        onClick={() => setExpanded((expanded) => !expanded)}
+        hasChildren={!!school.rooms?.length}
+        active={isActive}
+      />
+      <Collapse
+        in={expanded}
+        style={{
+          width: "100%",
+        }}
+      >
+        <VStack
+          style={{
+            padding: "1rem 0 1rem 1rem",
+            width: "100%",
+          }}
+        >
+          {school.rooms?.map((room) => (
+            <SidebarRoom room={room} />
+          ))}
+        </VStack>
+      </Collapse>
+    </Flex>
+  );
 };
 
 const SidebarOrganization = ({ org }: { org: Organization }) => {
-  return <></>;
+  const [expanded, setExpanded] = useStorageState(
+    false,
+    `sidebar-expanded-org-${org.id}`
+  );
+  const router = useRouter();
+  const isActive = useMemo(() => {
+    if (router.asPath.includes(`/organizations/${org.id}`)) {
+      return true;
+    }
+    return false;
+  }, [router]);
+  return (
+    <Flex
+      style={{
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <NestedButton
+        title={org.name}
+        expanded={expanded}
+        onClick={() => setExpanded((expanded) => !expanded)}
+        hasChildren={!!org.schools?.length}
+        active={isActive}
+      />
+      <Collapse
+        in={expanded}
+        style={{
+          width: "100%",
+        }}
+      >
+        <VStack
+          style={{
+            padding: "1rem 0 1rem 1rem",
+            width: "100%",
+          }}
+        >
+          {org.schools?.map((school) => (
+            <SidebarSchool school={school} />
+          ))}
+        </VStack>
+      </Collapse>
+    </Flex>
+  );
 };
 
 interface SidebarButtonProps {
