@@ -14,6 +14,7 @@ import {
   Collapse,
   SlideFade,
   VStack,
+  Badge,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FiSettings } from "react-icons/fi";
@@ -324,6 +325,14 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             >
               Judie AI
             </Text>
+            <Badge
+              colorScheme="purple"
+              style={{
+                marginLeft: "1rem",
+              }}
+            >
+              Admin
+            </Badge>
           </Flex>
         </Flex>
 
