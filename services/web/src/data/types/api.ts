@@ -162,3 +162,9 @@ export enum PermissionType {
   ROOM_ADMIN = "ROOM_ADMIN",
   STUDENT = "STUDENT",
 }
+
+export interface EntitiesResponse {
+  organizations?: Organization[];
+  schools?: School[];
+  rooms?: Room[];
+}

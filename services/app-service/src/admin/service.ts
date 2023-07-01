@@ -1,6 +1,9 @@
 import {
+  Organization,
   PermissionType,
   Prisma,
+  Room,
+  School,
   SubscriptionStatus,
   SubscriptionType,
   User,
@@ -8,6 +11,14 @@ import {
 } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
+
+export const isPermissionTypeAdmin = (type: PermissionType) => {
+  return (
+    type === PermissionType.ORG_ADMIN ||
+    type === PermissionType.SCHOOL_ADMIN ||
+    type === PermissionType.ROOM_ADMIN
+  );
+};
 
 export const validateOrganizationAdmin = async ({
   userId,
@@ -192,4 +203,91 @@ export const subscribeUser = async ({
       },
     },
   });
+};
+
+export const getEntitiesForUser = async ({ id }: { id: string }) => {
+  const queryResults = await dbClient.userPermission.findMany({
+    where: {
+      userId: id,
+    },
+    include: {
+      organization: {
+        include: {
+          schools: {
+            include: {
+              rooms: true,
+            },
+          },
+        },
+      },
+      school: {
+        include: {
+          rooms: true,
+        },
+      },
+      room: true,
+    },
+  });
+
+  const adminQueryResults = queryResults.filter((perm) =>
+    isPermissionTypeAdmin(perm.type)
+  );
+
+  if (!adminQueryResults.length) {
+    return [];
+  }
+
+  const organizationsFormatted = queryResults?.reduce((acc, permission) => {
+    if (
+      permission.type === PermissionType.ORG_ADMIN &&
+      permission.organization?.id
+    ) {
+      acc.push(permission.organization);
+    }
+    return acc;
+  }, [] as ((Organization & { schools: (School & { rooms: Room[] })[] }) | undefined)[]);
+
+  const schoolsFormatted = queryResults?.reduce((acc, permission) => {
+    if (
+      permission.type === PermissionType.SCHOOL_ADMIN &&
+      permission.school?.id
+    ) {
+      acc.push(permission.school);
+    }
+    return acc;
+  }, [] as ((School & { rooms: Room[] }) | undefined)[]);
+
+  const roomsFormatted = queryResults?.reduce((acc, permission) => {
+    if (permission.type === PermissionType.ROOM_ADMIN && permission.room?.id) {
+      acc.push(permission.room);
+    }
+    return acc;
+  }, [] as (Room | undefined)[]);
+
+  // Filter schools - if they exist in any organizations already, delete from array
+  const organizationSchoolIds = organizationsFormatted.reduce((acc, org) => {
+    if (org?.schools?.length) {
+      return [...acc, ...org.schools.map((school) => school.id)];
+    }
+    return acc;
+  }, [] as (string | undefined)[]);
+  // Filter rooms - if they exist in any schools already, delete from array
+  const schoolRoomIds = schoolsFormatted.reduce((acc, school) => {
+    if (school?.rooms?.length) {
+      return [...acc, ...school.rooms.map((room) => room.id)];
+    }
+    return acc;
+  }, [] as (string | undefined)[]);
+
+  const formattedResults = {
+    organizations: organizationsFormatted,
+    schools: schoolsFormatted.filter(
+      (school) => school?.id && !organizationSchoolIds.includes(school.id)
+    ),
+    rooms: roomsFormatted.filter(
+      (room) => room?.id && !schoolRoomIds.includes(room.id)
+    ),
+  };
+
+  return formattedResults;
 };

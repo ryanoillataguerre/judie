@@ -22,6 +22,7 @@ router.post(
     body("address").isString().optional(),
     body("organizationId").isString().exists(),
   ],
+  requireAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
     const { name, organizationId } = req.body;
