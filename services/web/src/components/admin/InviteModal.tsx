@@ -14,11 +14,12 @@ import {
   CreatePermissionType,
   createInviteMutation,
 } from "@judie/data/mutations";
-import { GradeYear, PermissionType, UserRole } from "@judie/data/types/api";
+import { GradeYear } from "@judie/data/types/api";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Button from "../Button/Button";
+import PermissionsWidget from "./PermissionsWidget";
 
 interface SubmitData {
   firstName: string;
@@ -60,7 +61,7 @@ const InviteModal = ({
         lastName,
         gradeYear,
         email,
-        // ... permissions
+        permissions,
       });
       onClose();
     } catch (err) {}
