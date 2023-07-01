@@ -208,3 +208,20 @@ export const redeemInviteMutation = async ({
   });
   return response.data;
 };
+
+export const createSchoolMutation = async ({
+  organizationId,
+  name,
+  address,
+}: {
+  organizationId: string;
+  name: string;
+  address?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/`,
+    method: "POST",
+    body: { organizationId, name, address },
+  });
+  return response.data;
+};
