@@ -1,6 +1,13 @@
 import { baseFetch } from "./baseFetch";
 import { ChatResponse } from "./mutations";
-import { Invite, Organization, Room, School, User } from "./types/api";
+import {
+  EntitiesResponse,
+  Invite,
+  Organization,
+  Room,
+  School,
+  User,
+} from "./types/api";
 
 export const GET_ME = "GET_ME";
 export const getMeQuery = async ({
@@ -73,6 +80,15 @@ export const GET_ROOM_BY_ID = "GET_ROOM_BY_ID";
 export const getRoomByIdQuery = async (id: string): Promise<Room> => {
   const response = await baseFetch({
     url: `/admin/rooms/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_USER_ENTITIES = "GET_USER_ENTITIES";
+export const getUserEntitiesQuery = async (): Promise<EntitiesResponse> => {
+  const response = await baseFetch({
+    url: `/admin/entities`,
     method: "GET",
   });
   return response.data;

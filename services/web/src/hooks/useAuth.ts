@@ -1,7 +1,13 @@
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
-import { GET_ME, getMeQuery } from "@judie/data/queries";
 import {
+  GET_ME,
+  GET_USER_ENTITIES,
+  getMeQuery,
+  getUserEntitiesQuery,
+} from "@judie/data/queries";
+import {
+  EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
   User,
@@ -97,6 +103,18 @@ export default function useAuth({
     );
   }, [userData]);
 
+  const { data: entitiesData, isLoading: entitiesLoading } = useQuery({
+    queryKey: [GET_USER_ENTITIES, sessionCookie],
+    queryFn: getUserEntitiesQuery,
+    enabled: !!isAdmin,
+    retry(failureCount, error) {
+      if (failureCount > 2) {
+        return false;
+      }
+      return true;
+    },
+  });
+
   useEffect(() => {
     if (
       isError &&
@@ -152,7 +170,15 @@ export default function useAuth({
     }
   }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
-  return { userData, isPaid, isLoading, refresh: refetch, logout, isAdmin };
+  return {
+    userData,
+    isPaid,
+    isLoading: isLoading || entitiesLoading,
+    refresh: refetch,
+    logout,
+    isAdmin,
+    entities: entitiesData,
+  };
 }
 
 export interface AuthData {
@@ -161,6 +187,7 @@ export interface AuthData {
   isPaid: boolean;
   logout: () => void;
   isAdmin: boolean;
+  entities?: EntitiesResponse;
   refresh: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<User, HTTPResponseError>>;

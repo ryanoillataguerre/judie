@@ -87,6 +87,7 @@ export const messageRateLimit = async (
 };
 
 export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
+  console.log("session", req.session);
   try {
     if (!req.session?.userId) {
       throw new UnauthorizedError("Not authorized");

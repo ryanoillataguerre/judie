@@ -18,6 +18,21 @@ import { RiLogoutBoxLine } from "react-icons/ri";
 import useAuth from "@judie/hooks/useAuth";
 import { ChatContext } from "@judie/hooks/useChat";
 import ColorModeSwitcher from "../../ColorModeSwitcher/ColorModeSwitcher";
+import { useQuery } from "react-query";
+import { GET_USER_ENTITIES, getUserEntitiesQuery } from "@judie/data/queries";
+import { Organization, Room, School } from "@judie/data/types/api";
+
+const SidebarRoom = ({ room }: { room: Room }) => {
+  return <></>;
+};
+
+const SidebarSchool = ({ school }: { school: School }) => {
+  return <></>;
+};
+
+const SidebarOrganization = ({ org }: { org: Organization }) => {
+  return <></>;
+};
 
 interface SidebarButtonProps {
   icon?: JSX.Element;
@@ -45,6 +60,13 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+
+  const entities = auth.entities;
+
+  const hasEntities =
+    entities?.organizations?.length ||
+    entities?.schools?.length ||
+    entities?.rooms?.length;
 
   const onChatClick = useCallback(() => {
     router.push("/chat");
@@ -154,7 +176,7 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
 
         <Divider backgroundColor="#565555" />
         {/* Chats container - scrollable */}
-        {true ? (
+        {auth.isLoading ? (
           <Flex
             style={{
               width: "100%",
@@ -167,7 +189,7 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
           >
             <Spinner />
           </Flex>
-        ) : (
+        ) : hasEntities ? (
           <Flex
             style={{
               width: "100%",
@@ -179,7 +201,30 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
               overflowY: "scroll",
               marginTop: "1rem",
             }}
-          ></Flex>
+          >
+            {entities?.organizations?.map((org) => (
+              <SidebarOrganization org={org} />
+            ))}
+            {entities?.schools?.map((school) => (
+              <SidebarSchool school={school} />
+            ))}
+            {entities?.rooms?.map((room) => (
+              <SidebarRoom room={room} />
+            ))}
+          </Flex>
+        ) : (
+          <Flex
+            style={{
+              width: "100%",
+              height: "100%",
+              flexDirection: "column",
+              flexGrow: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            No admin privileges
+          </Flex>
         )}
         {/* Bottom container - fixed to bottom */}
         <Flex
