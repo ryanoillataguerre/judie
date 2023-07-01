@@ -15,6 +15,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import Button from "../Button/Button";
 import { GET_ORG_BY_ID, getOrgByIdQuery } from "@judie/data/queries";
+import useAuth from "@judie/hooks/useAuth";
 
 interface SubmitData {
   name: string;
@@ -30,6 +31,7 @@ const CreateSchoolModal = ({
   onClose: () => void;
   organizationId: string;
 }) => {
+  const { refreshEntities } = useAuth();
   const [success, setSuccess] = useState(false);
   const createSchool = useMutation({
     mutationFn: createSchoolMutation,
@@ -38,7 +40,7 @@ const CreateSchoolModal = ({
     },
   });
 
-  const { refetch } = useQuery({
+  const { refetch: refetchOrg } = useQuery({
     queryKey: [GET_ORG_BY_ID, organizationId],
     queryFn: () => getOrgByIdQuery(organizationId),
     enabled: !!organizationId,
@@ -60,7 +62,8 @@ const CreateSchoolModal = ({
         address,
         organizationId,
       });
-      refetch();
+      refetchOrg();
+      refreshEntities();
       onClose();
     } catch (err) {}
   };

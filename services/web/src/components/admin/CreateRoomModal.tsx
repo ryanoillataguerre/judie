@@ -20,6 +20,7 @@ import {
   getOrgByIdQuery,
   getSchoolByIdQuery,
 } from "@judie/data/queries";
+import useAuth from "@judie/hooks/useAuth";
 
 interface SubmitData {
   name: string;
@@ -36,6 +37,7 @@ const CreateRoomModal = ({
   organizationId: string;
   schoolId: string;
 }) => {
+  const { refreshEntities } = useAuth();
   const [success, setSuccess] = useState(false);
   const createRoom = useMutation({
     mutationFn: createRoomMutation,
@@ -63,6 +65,7 @@ const CreateRoomModal = ({
         organizationId,
       });
       refetch();
+      refreshEntities();
       onClose();
     } catch (err) {}
   };

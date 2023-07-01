@@ -103,7 +103,11 @@ export default function useAuth({
     );
   }, [userData]);
 
-  const { data: entitiesData, isLoading: entitiesLoading } = useQuery({
+  const {
+    data: entitiesData,
+    isLoading: entitiesLoading,
+    refetch: refreshEntities,
+  } = useQuery({
     queryKey: [GET_USER_ENTITIES, sessionCookie],
     queryFn: getUserEntitiesQuery,
     enabled: !!isAdmin,
@@ -179,6 +183,7 @@ export default function useAuth({
     logout,
     isAdmin,
     entities: entitiesData,
+    refreshEntities,
   };
 }
 
@@ -189,7 +194,6 @@ export interface AuthData {
   logout: () => void;
   isAdmin: boolean;
   entities?: EntitiesResponse;
-  refresh: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<User, HTTPResponseError>>;
+  refreshEntities: () => void;
+  refresh: () => void;
 }
