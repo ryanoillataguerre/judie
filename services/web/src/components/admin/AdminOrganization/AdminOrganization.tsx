@@ -40,9 +40,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
     >
       <CreateSchoolModal
         isOpen={createSchoolOpen}
-        onClose={() => {
-          if (organizationData?.id) setCreateSchoolOpen(false);
-        }}
+        onClose={() => setCreateSchoolOpen(false)}
         organizationId={organizationData?.id as string}
       />
       <HStack
