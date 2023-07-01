@@ -1,4 +1,10 @@
-import { useMemo, CSSProperties, useContext, useCallback } from "react";
+import {
+  useMemo,
+  CSSProperties,
+  useContext,
+  useCallback,
+  useState,
+} from "react";
 import { BsFillChatTextFill } from "react-icons/bs";
 import { BiHelpCircle } from "react-icons/bi";
 import {
@@ -27,6 +33,8 @@ import { GET_USER_ENTITIES, getUserEntitiesQuery } from "@judie/data/queries";
 import { Organization, Room, School } from "@judie/data/types/api";
 import useStorageState from "@judie/hooks/useStorageState";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
+import { PlusSquareIcon } from "@chakra-ui/icons";
+import InviteModal from "../InviteModal";
 
 const NestedButton = ({
   title,
@@ -45,12 +53,14 @@ const NestedButton = ({
 }) => {
   return (
     <Button
+      size="sm"
       variant={"outline"}
       colorScheme={active ? "blue" : "gray"}
       style={{
         width: "100%",
         display: "flex",
         flexDirection: "row",
+        padding: "1rem",
         alignItems: "center",
         justifyContent: "flex-start",
       }}
@@ -73,7 +83,9 @@ const NestedButton = ({
           }}
         />
       ) : null}
-      <Text onClick={onClickButton}>{title}</Text>
+      <Text onClick={onClickButton} overflowX={"scroll"}>
+        {title}
+      </Text>
     </Button>
   );
 };
@@ -237,6 +249,8 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const auth = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+
   const entities = auth.entities;
 
   const hasEntities =
@@ -315,6 +329,10 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
         }}
         boxShadow={"lg"}
       >
+        <InviteModal
+          isOpen={inviteModalOpen}
+          onClose={() => setInviteModalOpen(false)}
+        />
         <Flex
           style={{
             width: "100%",
@@ -358,6 +376,17 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
           </Flex>
         </Flex>
 
+        <Button
+          style={{
+            width: "100%",
+            marginBottom: "1rem",
+            padding: "1rem",
+          }}
+          variant={"solid"}
+          onClick={() => setInviteModalOpen(true)}
+        >
+          <PlusSquareIcon marginRight={"0.3rem"} /> Invite
+        </Button>
         <Divider backgroundColor="#565555" />
         {/* Chats container - scrollable */}
         {auth.isLoading ? (

@@ -1,5 +1,11 @@
 import { HTTPResponseError, baseFetch } from "./baseFetch";
-import { Chat, Message, UserRole } from "./types/api";
+import {
+  Chat,
+  GradeYear,
+  Message,
+  PermissionType,
+  UserRole,
+} from "./types/api";
 
 export interface ChatResponse {
   id: string;
@@ -239,6 +245,33 @@ export const createRoomMutation = async ({
     url: `/admin/rooms/`,
     method: "POST",
     body: { organizationId, name, schoolId },
+  });
+  return response.data;
+};
+
+export interface CreatePermissionType {
+  type: PermissionType;
+  organizationId: string;
+  schoolId?: string;
+  roomId?: string;
+}
+export const createInviteMutation = async ({
+  firstName,
+  lastName,
+  gradeYear,
+  email,
+  permissions,
+}: {
+  firstName: string;
+  lastName: string;
+  gradeYear?: GradeYear;
+  email: string;
+  permissions: CreatePermissionType[];
+}) => {
+  const response = await baseFetch({
+    url: `/admin/invites`,
+    method: "POST",
+    body: { firstName, lastName, gradeYear, email, permissions },
   });
   return response.data;
 };

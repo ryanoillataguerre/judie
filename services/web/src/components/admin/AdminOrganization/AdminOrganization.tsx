@@ -66,7 +66,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           <PlusSquareIcon marginRight={"0.3rem"} /> Create School
         </Button>
       </HStack>
-      <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
+      <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
           {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}

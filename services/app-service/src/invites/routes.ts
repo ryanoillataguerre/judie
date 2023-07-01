@@ -36,7 +36,6 @@ router.post(
     body("lastName").isString(),
     body("gradeYear").isString().optional(),
     body("email").isString(),
-    body("role").isString().optional(),
     check("permissions.*.type").isString(),
     check("permissions.*.organizationId").isString().optional(),
     check("permissions.*.schoolId").isString().optional(),
