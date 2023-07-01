@@ -86,6 +86,7 @@ const AdminRoot = () => {
         style={{
           marginTop: "2rem",
           fontSize: "2rem",
+          paddingLeft: "1rem",
         }}
       >
         Admin

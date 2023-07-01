@@ -1,4 +1,6 @@
 import {
+  Button,
+  HStack,
   Tab,
   TabIndicator,
   TabList,
@@ -11,6 +13,9 @@ import {
 import { GET_SCHOOL_BY_ID, getSchoolByIdQuery } from "@judie/data/queries";
 import { useQuery } from "react-query";
 import RoomRow from "../EntityRow/RoomRow";
+import { useState } from "react";
+import CreateRoomModal from "../CreateRoomModal";
+import { PlusSquareIcon } from "@chakra-ui/icons";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData } = useQuery({
@@ -18,6 +23,8 @@ const AdminSchool = ({ id }: { id: string }) => {
     queryFn: () => getSchoolByIdQuery(id),
     enabled: !!id,
   });
+
+  const [createRoomOpen, setCreateRoomOpen] = useState(false);
 
   return (
     <VStack
@@ -30,14 +37,35 @@ const AdminSchool = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
-      <Text
-        style={{
-          marginTop: "2rem",
-          fontSize: "2rem",
-        }}
+      <CreateRoomModal
+        isOpen={createRoomOpen}
+        onClose={() => setCreateRoomOpen(false)}
+        schoolId={schoolData?.id as string}
+        organizationId={schoolData?.organizationId as string}
+      />
+      <HStack
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        width={"100%"}
+        paddingLeft={"1rem"}
+        paddingTop={"2rem"}
       >
-        {schoolData?.name}
-      </Text>
+        <Text
+          style={{
+            fontSize: "2rem",
+          }}
+        >
+          {schoolData?.name}
+        </Text>
+        <Button
+          size={"sm"}
+          variant={"solid"}
+          colorScheme="green"
+          onClick={() => setCreateRoomOpen(true)}
+        >
+          <PlusSquareIcon marginRight={"0.3rem"} /> Create Room
+        </Button>
+      </HStack>
       <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {schoolData?.rooms?.length ? <Tab>Rooms</Tab> : null}

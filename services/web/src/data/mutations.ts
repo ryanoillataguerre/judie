@@ -225,3 +225,20 @@ export const createSchoolMutation = async ({
   });
   return response.data;
 };
+
+export const createRoomMutation = async ({
+  organizationId,
+  name,
+  schoolId,
+}: {
+  organizationId: string;
+  name: string;
+  schoolId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/`,
+    method: "POST",
+    body: { organizationId, name, schoolId },
+  });
+  return response.data;
+};
