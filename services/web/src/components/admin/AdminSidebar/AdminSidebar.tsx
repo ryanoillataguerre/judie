@@ -31,13 +31,15 @@ import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
 const NestedButton = ({
   title,
   expanded,
-  onClick,
+  onClickIcon,
+  onClickButton,
   hasChildren,
   active,
 }: {
   title: string;
   expanded: boolean;
-  onClick: () => void;
+  onClickIcon: () => void;
+  onClickButton: () => void;
   hasChildren?: boolean;
   active?: boolean;
 }) => {
@@ -52,15 +54,26 @@ const NestedButton = ({
         alignItems: "center",
         justifyContent: "flex-start",
       }}
-      onClick={onClick}
     >
       {/* Icon */}
       {expanded ? (
-        <MdKeyboardArrowDown size={20} />
+        <MdKeyboardArrowDown
+          onClick={onClickIcon}
+          size={20}
+          style={{
+            marginRight: "0.8rem",
+          }}
+        />
       ) : hasChildren ? (
-        <MdKeyboardArrowRight size={20} />
+        <MdKeyboardArrowRight
+          onClick={onClickIcon}
+          size={20}
+          style={{
+            marginRight: "0.8rem",
+          }}
+        />
       ) : null}
-      {title}
+      <Text onClick={onClickButton}>{title}</Text>
     </Button>
   );
 };
@@ -84,7 +97,10 @@ const SidebarRoom = ({ room }: { room: Room }) => {
       <NestedButton
         title={room.name}
         expanded={false}
-        onClick={() => {}}
+        onClickIcon={() => {}}
+        onClickButton={() => {
+          router.push(`/admin/rooms/${room.id}`);
+        }}
         hasChildren={false}
         active={isActive}
       />
@@ -115,7 +131,10 @@ const SidebarSchool = ({ school }: { school: School }) => {
       <NestedButton
         title={school.name}
         expanded={expanded}
-        onClick={() => setExpanded((expanded) => !expanded)}
+        onClickIcon={() => setExpanded((expanded) => !expanded)}
+        onClickButton={() => {
+          router.push(`/admin/schools/${school.id}`);
+        }}
         hasChildren={!!school.rooms?.length}
         active={isActive}
       />
@@ -163,7 +182,10 @@ const SidebarOrganization = ({ org }: { org: Organization }) => {
       <NestedButton
         title={org.name}
         expanded={expanded}
-        onClick={() => setExpanded((expanded) => !expanded)}
+        onClickIcon={() => setExpanded((expanded) => !expanded)}
+        onClickButton={() => {
+          router.push(`/admin/organizations/${org.id}`);
+        }}
         hasChildren={!!org.schools?.length}
         active={isActive}
       />

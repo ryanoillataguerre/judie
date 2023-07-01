@@ -113,6 +113,7 @@ export default function useAuth({
       }
       return true;
     },
+    staleTime: 1000 * 60,
   });
 
   useEffect(() => {
