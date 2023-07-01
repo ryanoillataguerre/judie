@@ -53,7 +53,6 @@ const ResetPasswordForm = () => {
     },
   });
 
-
   const onSubmit: SubmitHandler<SubmitData> = async ({
     password,
     confirmPassword,
@@ -75,7 +74,8 @@ const ResetPasswordForm = () => {
       if (!token) {
         toast({
           title: "Missing token in link",
-          description: "Please check your email for the link to reset your password, or request a new one.",
+          description:
+            "Please check your email for the link to reset your password, or request a new one.",
           status: "error",
           duration: 5000,
           isClosable: true,
@@ -108,7 +108,8 @@ const ResetPasswordForm = () => {
         borderRadius: "0.8rem",
       }}
       boxShadow={"lg"}
-    >{success ? (
+    >
+      {success ? (
         <Flex
           style={{
             flexDirection: "column",
@@ -131,7 +132,8 @@ const ResetPasswordForm = () => {
               marginBottom: "1rem",
             }}
           >
-            Your password has been reset. You can now sign in with your new password.
+            Your password has been reset. You can now sign in with your new
+            password.
           </Text>
           <Button
             style={{
@@ -148,103 +150,102 @@ const ResetPasswordForm = () => {
             }}
           />
         </Flex>
-    ): (
-<form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{
-          width: "100%",
-        }}
-      >
-        <Flex
-          style={{
-            flexDirection: "column",
-            alignItems: "flex-start",
-            paddingBottom: "1rem",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: "1rem",
-            }}
-          >
-            Enter your new password below.
-          </Text>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <Input
-              id="password"
-              type={"password"}
-              autoComplete="password"
-              required
-              placeholder="Password"
-              {...register("password", {})}
-            />
-          </FormControl>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-            <Input
-              id="confirmPassword"
-              type={"confirmPassword"}
-              autoComplete="confirmPassword"
-              required
-              placeholder="Confirm Password"
-              {...register("confirmPassword", {})}
-            />
-          </FormControl>
-        </Flex>
-        <Flex
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "1rem",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: "0.8rem",
-            }}
-          >
-            Remembered it?
-          </Text>
-          <Link
-            color="teal"
-            style={{
-              fontSize: "1rem",
-            }}
-            onClick={() => {
-              router.push({
-                pathname: "/signin",
-                query: router.query,
-              });
-            }}
-          >
-            Sign In
-          </Link>
-        </Flex>
-        <Button
+      ) : (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
-          variant={"solid"}
-          loading={isLoading}
-          label="Reset Password"
-          type="submit"
-        />
-      </form>
-    )}
-      
+        >
+          <Flex
+            style={{
+              flexDirection: "column",
+              alignItems: "flex-start",
+              paddingBottom: "1rem",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: "1rem",
+              }}
+            >
+              Enter your new password below.
+            </Text>
+            <FormControl
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+              }}
+            >
+              <FormLabel htmlFor="password">Password</FormLabel>
+              <Input
+                id="password"
+                type={"password"}
+                autoComplete="password"
+                required
+                placeholder="Password"
+                {...register("password", {})}
+              />
+            </FormControl>
+            <FormControl
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+              }}
+            >
+              <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+              <Input
+                id="confirmPassword"
+                type={"confirmPassword"}
+                autoComplete="confirmPassword"
+                required
+                placeholder="Confirm Password"
+                {...register("confirmPassword", {})}
+              />
+            </FormControl>
+          </Flex>
+          <Flex
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "1rem",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: "0.8rem",
+              }}
+            >
+              Remembered it?
+            </Text>
+            <Link
+              color="teal"
+              style={{
+                fontSize: "1rem",
+              }}
+              onClick={() => {
+                router.push({
+                  pathname: "/signin",
+                  query: router.query,
+                });
+              }}
+            >
+              Sign In
+            </Link>
+          </Flex>
+          <Button
+            style={{
+              width: "100%",
+            }}
+            colorScheme="blue"
+            variant={"solid"}
+            loading={isLoading}
+            label="Reset Password"
+            type="submit"
+          />
+        </form>
+      )}
     </Flex>
   );
 };

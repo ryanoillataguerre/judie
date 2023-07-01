@@ -1,4 +1,6 @@
 import {
+  Button,
+  HStack,
   Tab,
   TabIndicator,
   TabList,
@@ -12,6 +14,9 @@ import { GET_ORG_BY_ID, getOrgByIdQuery } from "@judie/data/queries";
 import { useQuery } from "react-query";
 import SchoolRow from "../EntityRow/SchoolRow";
 import RoomRow from "../EntityRow/RoomRow";
+import { PlusSquareIcon } from "@chakra-ui/icons";
+import { useState } from "react";
+import CreateSchoolModal from "../CreateSchoolModal";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData } = useQuery({
@@ -19,6 +24,8 @@ const AdminOrganization = ({ id }: { id: string }) => {
     queryFn: () => getOrgByIdQuery(id),
     enabled: !!id,
   });
+
+  const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
 
   return (
     <VStack
@@ -31,14 +38,36 @@ const AdminOrganization = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
-      <Text
-        style={{
-          marginTop: "2rem",
-          fontSize: "2rem",
+      <CreateSchoolModal
+        isOpen={createSchoolOpen}
+        onClose={() => {
+          if (organizationData?.id) setCreateSchoolOpen(false);
         }}
+        organizationId={organizationData?.id as string}
+      />
+      <HStack
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        width={"100%"}
+        paddingLeft={"1rem"}
+        paddingTop={"2rem"}
       >
-        {organizationData?.name}
-      </Text>
+        <Text
+          style={{
+            fontSize: "2rem",
+          }}
+        >
+          {organizationData?.name}
+        </Text>
+        <Button
+          size={"sm"}
+          variant={"solid"}
+          colorScheme="green"
+          onClick={() => setCreateSchoolOpen(true)}
+        >
+          <PlusSquareIcon marginRight={"0.3rem"} /> Create School
+        </Button>
+      </HStack>
       <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
