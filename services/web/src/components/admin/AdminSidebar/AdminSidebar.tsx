@@ -83,7 +83,14 @@ const NestedButton = ({
           }}
         />
       ) : null}
-      <Text onClick={onClickButton} overflowX={"scroll"}>
+      <Text
+        onClick={onClickButton}
+        overflowX={"scroll"}
+        style={{
+          width: "100%",
+          textAlign: "start",
+        }}
+      >
         {title}
       </Text>
     </Button>
@@ -421,9 +428,9 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             {entities?.schools?.map((school) => (
               <SidebarSchool school={school} />
             ))}
-            {entities?.rooms?.map((room) => (
+            {/* {entities?.rooms?.map((room) => (
               <SidebarRoom room={room} />
-            ))}
+            ))} */}
           </Flex>
         ) : (
           <Flex

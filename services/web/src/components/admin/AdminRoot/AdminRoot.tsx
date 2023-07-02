@@ -19,57 +19,11 @@ import { useMemo } from "react";
 import OrgRow from "../EntityRow/OrgRow";
 import SchoolRow from "../EntityRow/SchoolRow";
 import RoomRow from "../EntityRow/RoomRow";
+import useFlatAllEntities from "@judie/hooks/useFlatAllEntities";
 
 const AdminRoot = () => {
   const { userData } = useAuth();
-  const adminPermissions = useMemo(
-    () =>
-      userData?.permissions?.filter((permission) =>
-        isPermissionTypeAdmin(permission.type)
-      ),
-    [userData?.permissions]
-  );
-  const organizations: Organization[] = useMemo(() => {
-    if (!userData) return [];
-    if (!adminPermissions?.length) return [];
-    return adminPermissions.reduce((acc: Organization[], permission) => {
-      if (
-        permission.type === PermissionType.ORG_ADMIN &&
-        permission.organization
-      ) {
-        return [...acc, permission.organization];
-      } else {
-        return acc;
-      }
-    }, []);
-  }, [userData, adminPermissions]);
-
-  const schools: School[] = useMemo(() => {
-    if (!userData) return [];
-    if (!adminPermissions?.length) return [];
-    return adminPermissions.reduce((acc: School[], permission) => {
-      if (
-        permission.type === PermissionType.SCHOOL_ADMIN &&
-        permission.school
-      ) {
-        return [...acc, permission.school];
-      } else {
-        return acc;
-      }
-    }, []);
-  }, [userData, adminPermissions]);
-
-  const rooms: Room[] = useMemo(() => {
-    if (!userData) return [];
-    if (!adminPermissions?.length) return [];
-    return adminPermissions.reduce((acc: Room[], permission) => {
-      if (permission.type === PermissionType.ROOM_ADMIN && permission.room) {
-        return [...acc, permission.room];
-      } else {
-        return acc;
-      }
-    }, []);
-  }, [userData, adminPermissions]);
+  const { organizations, schools, rooms } = useFlatAllEntities();
 
   return (
     <VStack

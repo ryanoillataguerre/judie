@@ -1,4 +1,5 @@
 import {
+  Box,
   Flex,
   FormControl,
   FormLabel,
@@ -9,6 +10,7 @@ import {
   ModalOverlay,
   Select,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import {
   CreatePermissionType,
@@ -36,6 +38,7 @@ const InviteModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const toast = useToast();
   const createInvite = useMutation({
     mutationFn: createInviteMutation,
   });
@@ -56,6 +59,13 @@ const InviteModal = ({
     email,
   }: SubmitData) => {
     try {
+      if (!permissions.length) {
+        toast({
+          status: "error",
+          title: "Must attach permissions",
+          description: "We need to know where to put the user inside your org",
+        });
+      }
       await createInvite.mutateAsync({
         firstName,
         lastName,
@@ -146,17 +156,27 @@ const InviteModal = ({
               >
                 <FormLabel htmlFor="gradeYear">Grade Year</FormLabel>
                 <Select id="gradeYear" {...register("gradeYear", {})}>
+                  <option value={"none"}>{"None"}</option>
+                  {/* TODO Ryan: Make user-facing versions of these */}
                   {Object.keys(GradeYear).map((key) => (
                     <option value={key}>{key}</option>
                   ))}
                 </Select>
               </FormControl>
-
-              <PermissionsWidget
-                onChangePermissions={(permissions: CreatePermissionType[]) =>
-                  setPermissions(permissions)
-                }
-              />
+              <Box
+                style={{
+                  marginTop: "0.5rem",
+                  marginBottom: "0.5rem",
+                  width: "100%",
+                }}
+              >
+                <FormLabel htmlFor="permissions">Permissions</FormLabel>
+                <PermissionsWidget
+                  onChangePermissions={(permissions: CreatePermissionType[]) =>
+                    setPermissions(permissions)
+                  }
+                />
+              </Box>
 
               <Button
                 style={{
