@@ -20,7 +20,7 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useToast,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
@@ -32,6 +32,7 @@ interface SubmitData {
 }
 
 const SigninForm = () => {
+  const { logout } = useAuth({ allowUnauth: true });
   const router = useRouter();
   const toast = useToast();
   const { handleSubmit, register } = useForm<SubmitData>({
@@ -70,8 +71,8 @@ const SigninForm = () => {
     password,
   }: SubmitData) => {
     try {
+      logout();
       setHasSubmitted(true);
-
       await mutateAsync({
         email,
         password,
@@ -80,14 +81,19 @@ const SigninForm = () => {
   };
 
   // Styles
-  const formWidth = useBreakpointValue({
-    base: "100%",
-    md: "60%",
-    lg: "40%",
-  }, { fallback: "60%" });
+  const formWidth = useBreakpointValue(
+    {
+      base: "100%",
+      md: "60%",
+      lg: "40%",
+    },
+    { fallback: "60%" }
+  );
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return (typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
+  return typeof window === "undefined" ? (
+    <Spinner colorScheme="blue" />
+  ) : (
     <Flex
       style={{
         width: formWidth,
@@ -229,7 +235,6 @@ const SigninForm = () => {
         />
       </form>
     </Flex>
-  )
   );
 };
 
@@ -282,15 +287,12 @@ const SigninPage = () => {
           >
             Welcome back!
           </Text>
-          {router.isReady && (
-            <SigninForm />
-          )}
+          {router.isReady && <SigninForm />}
         </Flex>
       </main>
     </>
   );
 };
-
 
 SigninPage.displayName = "Sign In";
 

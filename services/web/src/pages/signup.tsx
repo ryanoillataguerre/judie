@@ -42,6 +42,7 @@ interface SubmitData {
 const SignupForm = () => {
   const router = useRouter();
   const toast = useToast();
+  const { logout } = useAuth({ allowUnauth: true });
   const { handleSubmit, register } = useForm<SubmitData>({
     defaultValues: {
       email: "",
@@ -87,9 +88,10 @@ const SignupForm = () => {
     lastName,
     receivePromotions,
     role,
-    districtOrSchool
+    districtOrSchool,
   }: SubmitData) => {
     try {
+      logout();
       setHasSubmitted(true);
       if (!termsAndConditions) {
         toast({
@@ -109,7 +111,7 @@ const SignupForm = () => {
         firstName,
         lastName,
         role,
-        districtOrSchool
+        districtOrSchool,
       });
     } catch (err) {}
   };
