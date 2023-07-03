@@ -419,7 +419,6 @@ export const getChatGPTCompletion = async (
           // Messages in the event stream are separated by a pair of newline characters.
           const payloads = chunk.toString().split("\n\n");
           for (const payload of payloads) {
-            console.log("payload", payload);
             if (payload.includes("[DONE]")) {
               return;
             }
