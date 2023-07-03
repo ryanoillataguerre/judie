@@ -34,13 +34,22 @@ def test_subject_prompt(env_setup):
     assert "bio" in full_prompt
 
 
-def test_special_contect(env_setup):
+def test_special_context_prompt(env_setup):
     full_prompt = generate_question_answer_prompt(
-        question="What is photosynthesis?",
+        question="What is the derivative of 3x^5?",
+        subject="AP Calculus AB",
+    )
+    print(full_prompt)
+    assert "x^4" in full_prompt
+
+
+def test_special_context_block(env_setup):
+    context = pull_context_block(
+        query="What is photosynthesis?",
         subject="AP Biology",
         special_context="Is the Pope Catholic?",
     )
-    assert "the Pope" in full_prompt
+    assert "the Pope" in context
 
 
 def test_context_limit(env_setup):

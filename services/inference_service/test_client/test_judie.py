@@ -1,5 +1,6 @@
 from inference_service.server import judie
 from inference_service.test_client.test_chats_config import TEST_CHAT_ID_2
+from inference_service.test_client.testing_utils import env_setup
 
 
 def test_judie_stream(env_setup):

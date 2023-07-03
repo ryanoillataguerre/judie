@@ -165,3 +165,18 @@ PROMPT_MAP = {
     "Test Taking - APWH": "You are a standardized test-taking bot. Answer the given AP World History questions by analyzing the provided historical context, considering factors such as time period, geographical location, cultural practices, and significant events. Provide a clear and well-supported response. You will be given context to answer the question.  Please provide only the letter of the correct answer choice. ",
     "Test Taking - APEngLit": "You are a standardized test-taking bot. Answer the given AP English Literature questions by analyzing the provided text, considering elements such as theme, symbolism, diction, and tone. Provide a clear and well-supported response. If a multiple choice question provide only the answer choice as a response. If not a multiple choice question provide the answer to the question. You will be given context to answer the question.",
 }
+
+MATH_SUBJECTS = [
+    "Algebra 1",
+    "Algebra 2",
+    "AP Calculus AB",
+    "AP Calculus BC",
+    "College Algebra",
+    "Differential Equations",
+    "Geometry",
+    "Pre-Algebra",
+    "Pre-Calculus",
+    "Trigonometry",
+    "Calculus",
+    "Elementary School Math",
+]
