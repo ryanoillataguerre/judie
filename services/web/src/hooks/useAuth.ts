@@ -62,6 +62,9 @@ export default function useAuth({
     () => getMeQuery(),
     {
       staleTime: 1000 * 60,
+      // retryDelay(failureCount, error) {
+      //   if (failureCount )
+      // },
       onSuccess: (data) => {
         setUserData(data);
       },
@@ -75,8 +78,11 @@ export default function useAuth({
   );
 
   useEffect(() => {
-    if (isError && !allowUnauth && !DO_NOT_REDIRECT_PATHS.includes(router.asPath)) {
-      console.log('1')
+    if (
+      isError &&
+      !allowUnauth &&
+      !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
+    ) {
       router.push("/signin", {
         query: router.query,
       });
@@ -93,16 +99,16 @@ export default function useAuth({
         status: "success",
         duration: 7000,
         isClosable: true,
-        position: "top"
-      })
+        position: "top",
+      });
       const newQuery = router.query;
       delete newQuery.paid;
       router.push({
         pathname: router.pathname,
         query: newQuery,
-      })
+      });
     }
-  }, [router.query, refetch, toast, router])
+  }, [router.query, refetch, toast, router]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
@@ -113,7 +119,6 @@ export default function useAuth({
         isError &&
         !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
       ) {
-        console.log('2')
         router.push("/signin");
       }
     } else {
