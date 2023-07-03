@@ -83,7 +83,6 @@ const NewPermissionRow = ({
         schoolId,
         roomId,
       });
-      // TODO: Validate permission has according ids attached for type
       // Add permission to array
     } catch (err) {}
   };

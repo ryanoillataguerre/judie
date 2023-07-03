@@ -251,7 +251,7 @@ export const createRoomMutation = async ({
 
 export interface CreatePermissionType {
   type: PermissionType;
-  organizationId: string;
+  organizationId?: string;
   schoolId?: string;
   roomId?: string;
 }
