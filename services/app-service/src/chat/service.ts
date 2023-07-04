@@ -498,7 +498,6 @@ export const getChatGPTCompletion = async (
     } else {
       throw new InternalError("Could not get completion from OpenAI");
     }
-    return;
   } catch (err) {
     console.error("OpenAI error", err);
     throw err;
