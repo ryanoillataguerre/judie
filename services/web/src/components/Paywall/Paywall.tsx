@@ -73,7 +73,7 @@ const SubscribeCard = ({
                 marginRight: ".2rem",
               }}
             >
-              $29
+              $45
             </Text>
             <Text
               style={{

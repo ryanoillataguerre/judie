@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from inference_service.prompts.prompt_chunks import SUBJECT_NAMESPACE_MAP
 
@@ -6,15 +6,20 @@ import pinecone
 import openai
 
 CONTEXT_LIMIT = 4000
+
 EMBEDDING_MODEL = "text-embedding-ada-002"
 
 
-def pull_context_block(query, subject=None) -> str:
+def pull_context_block(
+    query, subject=None, special_context: Optional[str] = None
+) -> str:
     contexts = pull_context(query, subject)
 
+    running_len_contexts = len(special_context) if special_context else 0
+    context_block = special_context + "\n" if special_context else ""
+    over_limit = False
+
     if contexts:
-        running_len_contexts = 0
-        over_limit = False
         for i, c in enumerate(contexts):
             running_len_contexts += len(c)
             if running_len_contexts > CONTEXT_LIMIT:
@@ -25,9 +30,7 @@ def pull_context_block(query, subject=None) -> str:
             last_index = i
         else:
             last_index = i + 1
-        context_block = "\n".join(contexts[:last_index])
-    else:
-        context_block = ""
+        context_block += "\n".join(contexts[:last_index])
 
     return context_block
 
