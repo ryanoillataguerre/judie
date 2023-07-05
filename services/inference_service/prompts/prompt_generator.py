@@ -13,6 +13,7 @@ def generate_question_answer_prompt(question: str, subject: str = None) -> str:
         if subject:
             subject_prompt = prompt_chunks.PROMPT_MAP[subject]
 
+            # special triggers
             if subject in prompt_chunks.MATH_SUBJECTS:
                 math_expr = openai_manager.identify_math_exp(question)
                 if "none" != str.lower(math_expr):
