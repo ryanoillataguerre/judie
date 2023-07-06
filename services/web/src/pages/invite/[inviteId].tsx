@@ -6,12 +6,15 @@ import {
   Box,
   Button,
   Flex,
+  HStack,
   Image,
   Input,
   Spinner,
   Text,
+  VStack,
   useBreakpointValue,
   useColorModeValue,
+  useTimeout,
   useToast,
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -28,7 +31,7 @@ const RedeemInvite = () => {
   const router = useRouter();
   const inviteId = router.query.inviteId as string;
 
-  const { data: inviteData } = useQuery(
+  const { data: inviteData, isLoading: inviteLoading } = useQuery(
     [GET_INVITE_BY_ID, inviteId],
     () => getInviteByIdQuery(inviteId),
     {
@@ -36,56 +39,15 @@ const RedeemInvite = () => {
     }
   );
 
-  const { mutateAsync, isLoading } = useMutation({
-    mutationFn: redeemInviteMutation,
-    onSuccess: (data) => {
-      toast({
-        title: "Success!",
-        description: "Welcome to Judie",
-        status: "success",
-        duration: 1000,
-        isClosable: true,
-        position: "top",
-      });
-      setTimeout(() => {
-        router.push("/chat");
-      }, 1000);
-    },
-    onError: (err: HTTPResponseError) => {
-      console.error("Error redeeming", err);
-      toast({
-        title: "Error redeeming invite",
-        description: err.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    },
-  });
-
-  const onSubmit: SubmitHandler<SignupSubmitData> = async (
-    params: SignupSubmitData
-  ) => {
-    try {
-      if (!inviteId) {
-        toast({
-          title: "Error redeeming invite",
-          description: "No invite id",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-      await mutateAsync({
-        ...params,
-        inviteId,
-      });
-    } catch (err) {
-      console.error("Error redeeming invite", err);
-    }
-  };
+  const showForm = inviteData?.id === inviteId && !inviteData?.deletedAt;
 
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+  const formWidth = useBreakpointValue({
+    base: "100%",
+    md: "60%",
+    lg: "40%",
+  });
+  const formBgColor = useColorModeValue("white", "#2a3448");
   return (
     <>
       <Head>
@@ -134,11 +96,11 @@ const RedeemInvite = () => {
             style={{
               alignSelf: "center",
               fontSize: "1.2rem",
-              marginBottom: "0.5rem",
+              marginBottom: "2rem",
               marginTop: "0.5rem",
             }}
           >
-            We're so excited to have you here!
+            We're so excited you're here!
           </Text>
           {inviteData && (
             <Text
@@ -159,12 +121,56 @@ const RedeemInvite = () => {
             </Text>
           )}
 
-          <SignupForm
-            inviteEmail={inviteData?.email}
-            inviteFirstName={inviteData?.firstName}
-            inviteLastName={inviteData?.lastName}
-            inviteId={inviteId}
-          />
+          {!inviteLoading && showForm ? (
+            <SignupForm
+              inviteEmail={inviteData?.email}
+              inviteFirstName={inviteData?.firstName}
+              inviteLastName={inviteData?.lastName}
+              inviteId={inviteId}
+            />
+          ) : !showForm ? (
+            <Flex
+              style={{
+                width: formWidth,
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: formBgColor,
+                padding: "2rem",
+                borderRadius: "0.8rem",
+              }}
+              boxShadow={"lg"}
+            >
+              {inviteLoading ? (
+                <Spinner />
+              ) : (
+                <VStack
+                  style={{
+                    width: "100%",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: "1.2rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    We're sorry, your invite has expired.
+                  </Text>
+                  <Text
+                    style={{
+                      marginTop: "0.5rem",
+                      fontSize: "1rem",
+                      fontWeight: 400,
+                    }}
+                  >
+                    Please have an administrator send you another one.
+                  </Text>
+                </VStack>
+              )}
+            </Flex>
+          ) : null}
         </Flex>
       </main>
     </>
