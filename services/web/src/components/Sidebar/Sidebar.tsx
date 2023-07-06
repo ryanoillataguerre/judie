@@ -587,6 +587,14 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             alignItems: "center",
             justifyContent: "space-between",
           }}
+          cursor={"pointer"}
+          onClick={() => {
+            if (router.pathname.includes("/admin")) {
+              router.push("/admin");
+            } else {
+              router.push("/chat");
+            }
+          }}
         >
           <Flex
             style={{

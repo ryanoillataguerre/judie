@@ -45,7 +45,7 @@ router.post(
       type: PermissionType.SCHOOL_ADMIN,
       organization: {
         connect: {
-          id: organizationId,
+          id: school.organizationId,
         },
       },
       school: {

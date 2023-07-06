@@ -215,6 +215,30 @@ export const redeemInviteMutation = async ({
   return response.data;
 };
 
+export const createOrgMutation = async ({
+  name,
+  primaryContactEmail,
+  primaryContactFirstName,
+  primaryContactLastName,
+}: {
+  name: string;
+  primaryContactEmail: string;
+  primaryContactFirstName: string;
+  primaryContactLastName: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/organizations/`,
+    method: "POST",
+    body: {
+      name,
+      primaryContactEmail,
+      primaryContactFirstName,
+      primaryContactLastName,
+    },
+  });
+  return response.data;
+};
+
 export const createSchoolMutation = async ({
   organizationId,
   name,

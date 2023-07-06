@@ -16,6 +16,7 @@ import { PermissionType } from "@prisma/client";
 import { createPermission } from "../permissions/service.js";
 import { sendInviteEmail } from "../cio/service.js";
 import { createInvite } from "../invites/service.js";
+import { getUser, updateUser } from "../users/service.js";
 
 const router = Router();
 
@@ -62,18 +63,42 @@ router.post(
       },
     });
 
-    // Create invite for primary contact
-    const newInvite = await createInvite({
+    const user = await getUser({
       email: primaryContactEmail,
-      firstName: primaryContactFirstName,
-      lastName: primaryContactLastName,
-      organization: {
-        connect: {
-          id: organization.id,
-        },
-      },
     });
-    await sendInviteEmail({ invite: newInvite });
+
+    // If user exists, just associate them
+    if (user) {
+      await createPermission({
+        type: PermissionType.ORG_ADMIN,
+        organization: {
+          connect: {
+            id: organization.id,
+          },
+        },
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+      });
+    }
+
+    // If user doesn't exist already
+    if (!user) {
+      // Create invite for primary contact
+      const newInvite = await createInvite({
+        email: primaryContactEmail,
+        firstName: primaryContactFirstName,
+        lastName: primaryContactLastName,
+        organization: {
+          connect: {
+            id: organization.id,
+          },
+        },
+      });
+      await sendInviteEmail({ invite: newInvite });
+    }
 
     res.status(201).json({
       data: organization,

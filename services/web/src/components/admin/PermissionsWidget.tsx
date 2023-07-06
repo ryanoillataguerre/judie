@@ -51,6 +51,41 @@ interface SubmitData {
   roomId?: string;
 }
 
+// This is required to correctly fill permission IDs
+// TODO Ryan - figure out a stricter solution for this on the backend
+const fillPermissionIds = ({
+  permission,
+  organization,
+  school,
+  room,
+}: {
+  permission: CreatePermissionType;
+  organization: Organization | undefined;
+  school: School | undefined;
+  room: Room | undefined;
+}): CreatePermissionType => {
+  let newPermission = permission;
+  let organizationId =
+    organization?.id ||
+    school?.organizationId ||
+    room?.organizationId ||
+    undefined;
+  let schoolId = school?.id || room?.schoolId || undefined;
+  let roomId = room?.id || undefined;
+  if (!organizationId) {
+    throw new Error("Incorrectly formatted permission. Please try again.");
+  }
+  if (permission.type === PermissionType.STUDENT) {
+    newPermission = {
+      ...permission,
+      organizationId: organizationId || permission.organizationId,
+      schoolId: schoolId || permission.schoolId,
+      roomId: roomId || permission.roomId,
+    };
+  }
+  return newPermission;
+};
+
 const NewPermissionRow = ({
   setNewPermission,
 }: {
@@ -77,12 +112,20 @@ const NewPermissionRow = ({
   ) => {
     e?.preventDefault();
     try {
-      setNewPermission({
-        type,
-        organizationId: organizationId === "None" ? undefined : organizationId,
-        schoolId: schoolId === "None" ? undefined : schoolId,
-        roomId: roomId === "None" ? undefined : roomId,
-      });
+      setNewPermission(
+        fillPermissionIds({
+          permission: {
+            type,
+            organizationId:
+              organizationId === "None" ? undefined : organizationId,
+            schoolId: schoolId === "None" ? undefined : schoolId,
+            roomId: roomId === "None" ? undefined : roomId,
+          },
+          organization,
+          school,
+          room,
+        })
+      );
       // Add permission to array
     } catch (err) {}
   };

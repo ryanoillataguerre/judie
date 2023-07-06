@@ -197,6 +197,7 @@ const SidebarOrganization = ({ org }: { org: Organization }) => {
         flexDirection: "column",
         alignItems: "center",
       }}
+      marginY={"0.5rem"}
     >
       <NestedButton
         title={org.name}
@@ -346,6 +347,14 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+          }}
+          cursor={"pointer"}
+          onClick={() => {
+            if (router.pathname.includes("/admin")) {
+              router.push("/admin");
+            } else {
+              router.push("/chat");
+            }
           }}
         >
           <Flex
