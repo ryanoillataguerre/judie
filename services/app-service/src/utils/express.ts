@@ -70,7 +70,7 @@ export const messageRateLimit = async (
   }
 
   const existingQuestionCountEntry = await getQuestionCountEntry({ userId });
-  if (existingQuestionCountEntry >= 3) {
+  if (existingQuestionCountEntry >= 7) {
     throw new BadRequestError("Rate limit exceeded", 429);
   }
   if (!existingQuestionCountEntry) {
@@ -97,7 +97,11 @@ export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   }
 };
 
-export const requireAdminAuth = async (req: Request, _: Response, next: NextFunction) => {
+export const requireAdminAuth = async (
+  req: Request,
+  _: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.session?.userId) {
       throw new UnauthorizedError("Not authorized");

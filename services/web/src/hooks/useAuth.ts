@@ -54,7 +54,7 @@ export default function useAuth({
     });
     setSessionCookie(undefined);
     setUserData(undefined);
-  }, [router, setUserData, setSessionCookie, reset]);
+  }, [setUserData, setSessionCookie, reset]);
 
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(

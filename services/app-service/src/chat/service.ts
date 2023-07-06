@@ -434,8 +434,9 @@ export const getChatGPTCompletion = async (
                   onChunkReceived(filteredContent);
                 }
               } catch (error) {
+                console.error("Error parsing OpenAI stream");
                 console.error(error);
-                reject("Error parsing OpenAI stream");
+                // reject("Error parsing OpenAI stream");
               }
             }
           }
@@ -498,7 +499,6 @@ export const getChatGPTCompletion = async (
     } else {
       throw new InternalError("Could not get completion from OpenAI");
     }
-    return;
   } catch (err) {
     console.error("OpenAI error", err);
     throw err;
