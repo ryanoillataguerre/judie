@@ -38,10 +38,7 @@ variable "env_stripe_monthly_price_id" {
   type = string
   description = "Stripe monthly planprice ID"
 }
-variable "env_stripe_coupon_id" {
-  type = string
-  description = "Stripe intro coupon ID"
-}
+
 variable "env_stripe_sk" {
   type = string
   description = "Stripe secret key"
