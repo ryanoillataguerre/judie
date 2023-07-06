@@ -54,21 +54,17 @@ const InviteModal = ({
   const [permissions, setPermissions] = useState<CreatePermissionType[]>([]);
 
   useEffect(() => {
-    console.log("permissions", permissions);
-  }, [permissions]);
+    return () => {
+      setPermissions([]);
+    };
+  }, []);
+
   const onSubmit: SubmitHandler<SubmitData> = async ({
     firstName,
     lastName,
     gradeYear,
     email,
   }: SubmitData) => {
-    console.log({
-      firstName,
-      lastName,
-      gradeYear,
-      email,
-      permissions,
-    });
     try {
       if (!permissions.length) {
         toast({
@@ -90,6 +86,7 @@ const InviteModal = ({
         description: "The user will receive an email with the invite link",
         status: "success",
       });
+      setPermissions([]);
       onClose();
     } catch (err) {}
   };

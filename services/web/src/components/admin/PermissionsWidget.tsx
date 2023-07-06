@@ -5,6 +5,7 @@ import {
   FormLabel,
   Input,
   Select,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import { CreatePermissionType } from "@judie/data/mutations";
@@ -33,9 +34,12 @@ const PermissionRow = ({
       style={{
         width: "100%",
         padding: "0.5rem",
+        borderWidth: "0.5px",
+        borderRadius: "0.5rem",
       }}
     >
-      Hello
+      {/* TODO: Style this, add org, school, room name */}
+      {permission.type}
     </Flex>
   );
 };
@@ -113,7 +117,7 @@ const NewPermissionRow = ({
       setRoom(undefined);
       reset();
     };
-  }, []);
+  }, [reset, setRoom, setSchool, setOrganization]);
 
   return (
     <Flex
@@ -199,7 +203,10 @@ const NewPermissionRow = ({
                     None
                   </option>
                 )}
-                {organization?.schools?.map((school) => (
+                {(type === PermissionType.SCHOOL_ADMIN
+                  ? schools
+                  : organization?.schools
+                )?.map((school) => (
                   <option key={school.id} value={school.id}>
                     {school.name}
                   </option>
@@ -309,14 +316,26 @@ const PermissionsWidget = ({
     [permissions, onChangePermissions]
   );
   return (
-    <Flex
+    <VStack
       style={{
         width: "100%",
         padding: "1rem",
         borderWidth: "0.5px",
         borderRadius: "0.5rem",
+        flexDirection: "column",
       }}
+      gap={"1rem"}
     >
+      {permissions?.length && (
+        <Text
+          style={{
+            alignSelf: "flex-start",
+            fontWeight: 500,
+          }}
+        >
+          Existing Permissions
+        </Text>
+      )}
       {permissions.map((permission) => (
         <PermissionRow
           permission={permission}
@@ -327,7 +346,7 @@ const PermissionsWidget = ({
         />
       ))}
       <CreatePermissionWidget setPermission={setPermission} />
-    </Flex>
+    </VStack>
   );
 };
 
