@@ -334,6 +334,11 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     } else if ((filteredAdminPermissions?.length || 0) > 1) {
       router.push("/admin");
       return;
+    } else {
+      toast({
+        status: "warning",
+        title: "No admin orgs",
+      });
     }
   }, [auth.userData?.permissions]);
 
@@ -371,16 +376,8 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           auth.logout();
         },
       },
-      {
-        icon: <MdAdminPanelSettings />,
-        key: "admin",
-        label: "Admin",
-        onClick: onAdminClick,
-      },
-      {
-        icon: <ColorModeSwitcher />,
-        key: "color-mode-switcher",
-      },
+
+      ,
     ];
     if (
       !(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) &&
@@ -405,6 +402,18 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         ),
       });
     }
+    if (auth.isAdmin) {
+      options.push({
+        icon: <MdAdminPanelSettings />,
+        key: "admin",
+        label: "Admin",
+        onClick: onAdminClick,
+      });
+    }
+    options.push({
+      icon: <ColorModeSwitcher />,
+      key: "color-mode-switcher",
+    });
     return options;
   }, [auth, router, setIsClearConversationsModalOpen]);
   const toast = useToast();

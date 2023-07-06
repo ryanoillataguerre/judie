@@ -29,7 +29,7 @@ export interface CreateInviteBody {
   }[];
 }
 router.post(
-  "/invite",
+  "/",
   requireAuth,
   [
     body("firstName").isString(),

@@ -286,7 +286,8 @@ export const createGPTRequestFromPrompt = async ({
         includeMetadata: true,
       };
       if (chat.subject && subjectToNamespaceMap[chat.subject]) {
-        queryRequest.namespace = subjectToNamespaceMap[chat.subject] || "default";
+        queryRequest.namespace =
+          subjectToNamespaceMap[chat.subject] || "default";
       }
       const pineconeResponse = await pcIndex.query({
         queryRequest,
@@ -380,12 +381,14 @@ export const getChatGPTCompletion = async (
           val: ChatCompletionRequestMessage
         ) => {
           if (
-            currentMessagesContentLength + (val?.content?.split(" ")?.length || 0) >
+            currentMessagesContentLength +
+              (val?.content?.split(" ")?.length || 0) >
             OPENAI_PROMPT_TOKEN_LIMIT
           ) {
             return acc;
           } else {
-            currentMessagesContentLength += (val?.content?.split(" ")?.length || 0);
+            currentMessagesContentLength +=
+              val?.content?.split(" ")?.length || 0;
             return [...acc, val];
           }
         },
@@ -421,17 +424,17 @@ export const getChatGPTCompletion = async (
             }
             if (payload.startsWith("data:")) {
               const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
-              try {
-                const delta = JSON.parse(data.trim());
-                const content = delta.choices[0].delta?.content;
-                const filteredContent = content?.replace("undefined", "");
-                if (filteredContent) {
-                  fullContent += filteredContent;
-                  onChunkReceived(filteredContent);
-                }
-              } catch (error) {
-                throw new InternalError("Error parsing OpenAI stream");
+              // try {
+              const delta = JSON.parse(data.trim());
+              const content = delta.choices[0].delta?.content;
+              const filteredContent = content?.replace("undefined", "");
+              if (filteredContent) {
+                fullContent += filteredContent;
+                onChunkReceived(filteredContent);
               }
+              // } catch (error) {
+              //   throw new InternalError("Error parsing OpenAI stream");
+              // }
             }
           }
         });
@@ -448,7 +451,6 @@ export const getChatGPTCompletion = async (
       console.error("Error getting completion: ", err);
       throw err;
     }
-
 
     if (fullContent) {
       const newMessage = {

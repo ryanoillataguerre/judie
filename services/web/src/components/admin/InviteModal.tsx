@@ -17,7 +17,7 @@ import {
   createInviteMutation,
 } from "@judie/data/mutations";
 import { GradeYear } from "@judie/data/types/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Button from "../Button/Button";
@@ -52,26 +52,43 @@ const InviteModal = ({
     reValidateMode: "onBlur",
   });
   const [permissions, setPermissions] = useState<CreatePermissionType[]>([]);
+
+  useEffect(() => {
+    console.log("permissions", permissions);
+  }, [permissions]);
   const onSubmit: SubmitHandler<SubmitData> = async ({
     firstName,
     lastName,
     gradeYear,
     email,
   }: SubmitData) => {
+    console.log({
+      firstName,
+      lastName,
+      gradeYear,
+      email,
+      permissions,
+    });
     try {
       if (!permissions.length) {
         toast({
           status: "error",
           title: "Must attach permissions",
-          description: "We need to know where to put the user inside your org",
+          description: "We need to know what to do with this user",
         });
       }
       await createInvite.mutateAsync({
         firstName,
         lastName,
-        gradeYear,
+        gradeYear: (gradeYear as string) === "None" ? undefined : gradeYear,
         email,
         permissions,
+      });
+      // Toast
+      toast({
+        title: "Invite Sent!",
+        description: "The user will receive an email with the invite link",
+        status: "success",
       });
       onClose();
     } catch (err) {}
@@ -156,7 +173,7 @@ const InviteModal = ({
               >
                 <FormLabel htmlFor="gradeYear">Grade Year</FormLabel>
                 <Select id="gradeYear" {...register("gradeYear", {})}>
-                  <option value={"none"}>{"None"}</option>
+                  <option value={undefined}>{"None"}</option>
                   {/* TODO Ryan: Make user-facing versions of these */}
                   {Object.keys(GradeYear).map((key) => (
                     <option value={key}>{key}</option>
@@ -172,9 +189,8 @@ const InviteModal = ({
               >
                 <FormLabel htmlFor="permissions">Permissions</FormLabel>
                 <PermissionsWidget
-                  onChangePermissions={(permissions: CreatePermissionType[]) =>
-                    setPermissions(permissions)
-                  }
+                  onChangePermissions={setPermissions}
+                  permissions={permissions}
                 />
               </Box>
 

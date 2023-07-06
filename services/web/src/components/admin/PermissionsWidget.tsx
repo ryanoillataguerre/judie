@@ -15,7 +15,7 @@ import {
   Room,
   School,
 } from "@judie/data/types/api";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Button from "../Button/Button";
 import useAuth from "@judie/hooks/useAuth";
@@ -33,7 +33,6 @@ const PermissionRow = ({
       style={{
         width: "100%",
         padding: "0.5rem",
-        backgroundColor: "white",
       }}
     >
       Hello
@@ -50,10 +49,8 @@ interface SubmitData {
 
 const NewPermissionRow = ({
   setNewPermission,
-  newPermission,
 }: {
   setNewPermission: (perm: CreatePermissionType) => void;
-  newPermission?: CreatePermissionType;
 }) => {
   const auth = useAuth();
   const [type, setType] = useState<PermissionType>(PermissionType.STUDENT);
@@ -70,12 +67,11 @@ const NewPermissionRow = ({
     },
     reValidateMode: "onBlur",
   });
-  const onSubmit: SubmitHandler<SubmitData> = ({
-    type,
-    organizationId,
-    schoolId,
-    roomId,
-  }: SubmitData) => {
+  const onSubmit: SubmitHandler<SubmitData> = (
+    { type, organizationId, schoolId, roomId }: SubmitData,
+    e?: React.BaseSyntheticEvent
+  ) => {
+    e?.preventDefault();
     try {
       setNewPermission({
         type,
@@ -108,7 +104,16 @@ const NewPermissionRow = ({
     setSchool(undefined);
     setRoom(undefined);
     reset();
-  }, [watch("type")]);
+  }, [watch("type"), setOrganization, setSchool, setRoom, reset]);
+
+  useEffect(() => {
+    return () => {
+      setOrganization(undefined);
+      setSchool(undefined);
+      setRoom(undefined);
+      reset();
+    };
+  }, []);
 
   return (
     <Flex
@@ -120,7 +125,6 @@ const NewPermissionRow = ({
       }}
     >
       <form
-        onSubmit={handleSubmit(onSubmit)}
         style={{
           width: "100%",
         }}
@@ -241,7 +245,7 @@ const NewPermissionRow = ({
             variant={"solid"}
             loading={false}
             label="+ Add"
-            type="button"
+            onClick={handleSubmit(onSubmit)}
           />
         </Flex>
       </form>
@@ -249,9 +253,12 @@ const NewPermissionRow = ({
   );
 };
 
-const CreatePermissionWidget = () => {
-  const [newPermission, setNewPermission] = useState<CreatePermissionType>();
-
+const CreatePermissionWidget = ({
+  setPermission,
+}: {
+  setPermission: (permission: CreatePermissionType) => void;
+}) => {
+  const [displayNewPermission, setDisplayNewPermission] = useState(false);
   return (
     <VStack
       style={{
@@ -274,15 +281,12 @@ const CreatePermissionWidget = () => {
         backgroundColor="white"
         textColor={"black"}
         cursor={"pointer"}
-        onClick={() => setNewPermission({} as CreatePermissionType)}
+        onClick={() => setDisplayNewPermission(true)}
       >
         + Add a permission
       </Flex>
-      {newPermission ? (
-        <NewPermissionRow
-          setNewPermission={setNewPermission}
-          newPermission={newPermission}
-        />
+      {displayNewPermission ? (
+        <NewPermissionRow setNewPermission={setPermission} />
       ) : null}
     </VStack>
   );
@@ -290,10 +294,20 @@ const CreatePermissionWidget = () => {
 
 const PermissionsWidget = ({
   onChangePermissions,
+  permissions,
 }: {
   onChangePermissions: (permissions: CreatePermissionType[]) => void;
+  permissions: CreatePermissionType[];
 }) => {
-  const [permissions, setPermissions] = useState<CreatePermissionType[]>([]);
+  // TODO: Get permissions by user ID (if not of create user type)
+
+  const setPermission = useCallback(
+    (newPermission: CreatePermissionType) => {
+      const newPermissions = [...permissions, newPermission];
+      onChangePermissions(newPermissions);
+    },
+    [permissions, onChangePermissions]
+  );
   return (
     <Flex
       style={{
@@ -312,7 +326,7 @@ const PermissionsWidget = ({
           }}
         />
       ))}
-      <CreatePermissionWidget />
+      <CreatePermissionWidget setPermission={setPermission} />
     </Flex>
   );
 };
