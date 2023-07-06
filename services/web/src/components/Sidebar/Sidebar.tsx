@@ -318,13 +318,13 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       const permission = filteredAdminPermissions[0];
       switch (permission.type) {
         case PermissionType.ORG_ADMIN:
-          router.push(`/admin/organization/${permission.organizationId}`);
+          router.push(`/admin/organizations/${permission.organizationId}`);
           break;
         case PermissionType.SCHOOL_ADMIN:
-          router.push(`/admin/school/${permission.schoolId}`);
+          router.push(`/admin/schools/${permission.schoolId}`);
           break;
         case PermissionType.ROOM_ADMIN:
-          router.push(`/admin/room/${permission.roomId}`);
+          router.push(`/admin/rooms/${permission.roomId}`);
           break;
         default:
           router.push("/admin");

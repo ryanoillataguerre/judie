@@ -79,9 +79,9 @@ const NewPermissionRow = ({
     try {
       setNewPermission({
         type,
-        organizationId,
-        schoolId,
-        roomId,
+        organizationId: organizationId === "None" ? undefined : organizationId,
+        schoolId: schoolId === "None" ? undefined : schoolId,
+        roomId: roomId === "None" ? undefined : roomId,
       });
       // Add permission to array
     } catch (err) {}
