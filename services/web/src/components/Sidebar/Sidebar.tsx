@@ -55,10 +55,10 @@ import UpgradeButton from "../UpgradeButton/UpgradeButton";
 import { BiHelpCircle } from "react-icons/bi";
 
 interface SidebarButtonProps {
-  icon?: JSX.Element;
-  label?: string | JSX.Element;
-  key?: string;
-  onClick?: () => void;
+  icon?: JSX.Element | undefined;
+  label?: string | JSX.Element | undefined;
+  key?: string | undefined;
+  onClick?: () => void | undefined;
 }
 const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   return (
@@ -376,44 +376,46 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           auth.logout();
         },
       },
-
-      ,
-    ];
-    if (
-      !(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) &&
+      ...(auth.isAdmin
+        ? [
+            {
+              icon: <MdAdminPanelSettings />,
+              key: "admin",
+              label: "Admin",
+              onClick: onAdminClick,
+            },
+          ]
+        : []),
+      ...(!(
+        auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE
+      ) &&
       !auth.isLoading &&
       router.isReady &&
       auth.userData &&
       !auth.isAdmin
-    ) {
-      options.push({
-        key: "upgrade",
-        icon: (
-          <Box
-            style={{
-              display: "flex",
-              width: "100%",
-              alignItems: "center",
-              padding: "1rem 0",
-            }}
-          >
-            <UpgradeButton />
-          </Box>
-        ),
-      });
-    }
-    if (auth.isAdmin) {
-      options.push({
-        icon: <MdAdminPanelSettings />,
-        key: "admin",
-        label: "Admin",
-        onClick: onAdminClick,
-      });
-    }
-    options.push({
-      icon: <ColorModeSwitcher />,
-      key: "color-mode-switcher",
-    });
+        ? [
+            {
+              key: "upgrade",
+              icon: (
+                <Box
+                  style={{
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    padding: "1rem 0",
+                  }}
+                >
+                  <UpgradeButton />
+                </Box>
+              ),
+            },
+          ]
+        : []),
+      {
+        icon: <ColorModeSwitcher />,
+        key: "color-mode-switcher",
+      },
+    ];
     return options;
   }, [auth, router, setIsClearConversationsModalOpen]);
   const toast = useToast();
