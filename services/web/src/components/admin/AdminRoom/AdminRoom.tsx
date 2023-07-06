@@ -38,7 +38,7 @@ const AdminRoom = ({ id }: { id: string }) => {
       >
         {roomData?.name}
       </Text>
-      <Tabs size={"md"} variant="line" width={"100%"} defaultIndex={0}>
+      <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {roomData?.users?.length ? <Tab>Users</Tab> : null}
         </TabList>

@@ -10,10 +10,11 @@ const RoomRow = ({ room }: { room: Room }) => {
       colorScheme={"white"}
       style={{
         width: "100%",
-        padding: "1.5rem",
+        padding: "1rem",
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        fontSize: "0.9rem",
       }}
       onClick={() => {
         router.push(`/admin/rooms/${room.id}`);

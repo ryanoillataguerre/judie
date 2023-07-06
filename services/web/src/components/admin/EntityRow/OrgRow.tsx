@@ -10,10 +10,11 @@ const OrgRow = ({ org }: { org: Organization }) => {
       colorScheme={"white"}
       style={{
         width: "100%",
-        padding: "1.5rem",
+        padding: "1rem",
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        fontSize: "0.9rem",
       }}
       onClick={() => {
         router.push(`/admin/organizations/${org.id}`);

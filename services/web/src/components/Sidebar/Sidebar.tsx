@@ -55,10 +55,10 @@ import UpgradeButton from "../UpgradeButton/UpgradeButton";
 import { BiHelpCircle } from "react-icons/bi";
 
 interface SidebarButtonProps {
-  icon?: JSX.Element;
-  label?: string | JSX.Element;
-  key?: string;
-  onClick?: () => void;
+  icon?: JSX.Element | undefined;
+  label?: string | JSX.Element | undefined;
+  key?: string | undefined;
+  onClick?: () => void | undefined;
 }
 const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   return (
@@ -318,13 +318,13 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       const permission = filteredAdminPermissions[0];
       switch (permission.type) {
         case PermissionType.ORG_ADMIN:
-          router.push(`/admin/organization/${permission.organizationId}`);
+          router.push(`/admin/organizations/${permission.organizationId}`);
           break;
         case PermissionType.SCHOOL_ADMIN:
-          router.push(`/admin/school/${permission.schoolId}`);
+          router.push(`/admin/schools/${permission.schoolId}`);
           break;
         case PermissionType.ROOM_ADMIN:
-          router.push(`/admin/room/${permission.roomId}`);
+          router.push(`/admin/rooms/${permission.roomId}`);
           break;
         default:
           router.push("/admin");
@@ -334,6 +334,11 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     } else if ((filteredAdminPermissions?.length || 0) > 1) {
       router.push("/admin");
       return;
+    } else {
+      toast({
+        status: "warning",
+        title: "No admin orgs",
+      });
     }
   }, [auth.userData?.permissions]);
 
@@ -371,40 +376,46 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           auth.logout();
         },
       },
-      {
-        icon: <MdAdminPanelSettings />,
-        key: "admin",
-        label: "Admin",
-        onClick: onAdminClick,
-      },
+      ...(auth.isAdmin
+        ? [
+            {
+              icon: <MdAdminPanelSettings />,
+              key: "admin",
+              label: "Admin",
+              onClick: onAdminClick,
+            },
+          ]
+        : []),
+      ...(!(
+        auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE
+      ) &&
+      !auth.isLoading &&
+      router.isReady &&
+      auth.userData &&
+      !auth.isAdmin
+        ? [
+            {
+              key: "upgrade",
+              icon: (
+                <Box
+                  style={{
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    padding: "1rem 0",
+                  }}
+                >
+                  <UpgradeButton />
+                </Box>
+              ),
+            },
+          ]
+        : []),
       {
         icon: <ColorModeSwitcher />,
         key: "color-mode-switcher",
       },
     ];
-    if (
-      !(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) &&
-      !auth.isLoading &&
-      router.isReady &&
-      auth.userData &&
-      !auth.isAdmin
-    ) {
-      options.push({
-        key: "upgrade",
-        icon: (
-          <Box
-            style={{
-              display: "flex",
-              width: "100%",
-              alignItems: "center",
-              padding: "1rem 0",
-            }}
-          >
-            <UpgradeButton />
-          </Box>
-        ),
-      });
-    }
     return options;
   }, [auth, router, setIsClearConversationsModalOpen]);
   const toast = useToast();
