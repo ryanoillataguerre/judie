@@ -54,7 +54,7 @@ router.post(
       response: res,
     });
     res.status(200).end();
-    incrementQuestionCountEntry({ userId: session.userId });
+    await incrementQuestionCountEntry({ userId: session.userId });
   })
 );
 
