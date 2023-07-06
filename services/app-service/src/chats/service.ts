@@ -204,7 +204,7 @@ await pinecone.init({
 });
 
 export const OPENAI_PROMPT_TOKEN_LIMIT = 6000;
-export const OPENAI_COMPLETION_MODEL = "gpt-4-0314";
+export const OPENAI_COMPLETION_MODEL = "gpt-4-0613";
 
 export const transformMessageToChatCompletionMessage = (
   message: Message
@@ -424,17 +424,18 @@ export const getChatGPTCompletion = async (
             }
             if (payload.startsWith("data:")) {
               const data = payload.replaceAll(/(\n)?^data:\s*/g, ""); // in case there's multiline data event
-              // try {
-              const delta = JSON.parse(data.trim());
-              const content = delta.choices[0].delta?.content;
-              const filteredContent = content?.replace("undefined", "");
-              if (filteredContent) {
-                fullContent += filteredContent;
-                onChunkReceived(filteredContent);
+              try {
+                const delta = JSON.parse(data.trim());
+                const content = delta.choices[0].delta?.content;
+                const filteredContent = content?.replace("undefined", "");
+                if (filteredContent) {
+                  fullContent += filteredContent;
+                  onChunkReceived(filteredContent);
+                }
+              } catch (error) {
+                console.error(error);
+                reject("Error parsing OpenAI stream");
               }
-              // } catch (error) {
-              //   throw new InternalError("Error parsing OpenAI stream");
-              // }
             }
           }
         });
@@ -449,7 +450,7 @@ export const getChatGPTCompletion = async (
       });
     } catch (err) {
       console.error("Error getting completion: ", err);
-      throw err;
+      throw new InternalError("Error getting completion from OpenAI");
     }
 
     if (fullContent) {

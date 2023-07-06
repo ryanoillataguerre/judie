@@ -83,6 +83,9 @@ export default function useAuth({
       }),
     {
       staleTime: 1000 * 60,
+      // retryDelay(failureCount, error) {
+      //   if (failureCount )
+      // },
       onSuccess: (data) => {
         setUserData(data);
       },
