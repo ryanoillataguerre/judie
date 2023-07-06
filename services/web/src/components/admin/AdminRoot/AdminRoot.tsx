@@ -13,9 +13,10 @@ import {
   PermissionType,
   Room,
   School,
+  UserRole,
 } from "@judie/data/types/api";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import OrgRow from "../EntityRow/OrgRow";
 import SchoolRow from "../EntityRow/SchoolRow";
 import RoomRow from "../EntityRow/RoomRow";
@@ -25,6 +26,13 @@ const AdminRoot = () => {
   const { userData } = useAuth();
   const { organizations, schools, rooms } = useFlatAllEntities();
 
+  const [displayCreateOrg, setDisplayCreateOrg] = useState(false);
+
+  useEffect(() => {
+    if (userData?.role === UserRole.JUDIE) {
+      setDisplayCreateOrg(true);
+    }
+  }, [userData, setDisplayCreateOrg]);
   return (
     <VStack
       style={{
