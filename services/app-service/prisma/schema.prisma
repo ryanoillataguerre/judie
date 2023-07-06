@@ -212,12 +212,12 @@ model Room {
   name           String
   schoolId       String?   @map("school_id")
   school         School?   @relation(fields: [schoolId], references: [id])
-  organizationId String?   @map("organization_id")
+  organizationId String    @map("organization_id")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime? @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
 
-  organization Organization?    @relation(fields: [organizationId], references: [id])
+  organization Organization     @relation(fields: [organizationId], references: [id])
   users        User[]
   permissions  UserPermission[]
   invites      Invite[]

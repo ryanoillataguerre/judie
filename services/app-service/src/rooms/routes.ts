@@ -36,15 +36,11 @@ router.post(
     const room = await createRoom({
       data: {
         name,
-        ...(organizationId
-          ? {
-              organization: {
-                connect: {
-                  id: organizationId,
-                },
-              },
-            }
-          : {}),
+        organization: {
+          connect: {
+            id: organizationId,
+          },
+        },
         ...(schoolId
           ? {
               school: {
@@ -61,7 +57,7 @@ router.post(
       type: PermissionType.ROOM_ADMIN,
       organization: {
         connect: {
-          id: organizationId,
+          id: room.organizationId,
         },
       },
       school: {
