@@ -250,7 +250,7 @@ model UserPermission {
 
 model Invite {
   id             String     @id @default(uuid())
-  email          String     @unique
+  email          String
   firstName      String?    @map("first_name")
   lastName       String?    @map("last_name")
   schoolId       String?    @map("school_id")

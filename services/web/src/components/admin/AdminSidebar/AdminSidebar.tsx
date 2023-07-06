@@ -197,6 +197,7 @@ const SidebarOrganization = ({ org }: { org: Organization }) => {
         flexDirection: "column",
         alignItems: "center",
       }}
+      marginY={"0.5rem"}
     >
       <NestedButton
         title={org.name}
