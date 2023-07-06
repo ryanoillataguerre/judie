@@ -176,7 +176,7 @@ const CreateOrgModal = ({
                 }}
                 colorScheme="green"
                 variant={"solid"}
-                loading={createSchool.isLoading}
+                loading={createOrg.isLoading}
                 label="Create School"
                 type="submit"
               />

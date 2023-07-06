@@ -1,4 +1,6 @@
 import {
+  Button,
+  HStack,
   Tab,
   TabIndicator,
   TabList,
@@ -21,12 +23,15 @@ import OrgRow from "../EntityRow/OrgRow";
 import SchoolRow from "../EntityRow/SchoolRow";
 import RoomRow from "../EntityRow/RoomRow";
 import useFlatAllEntities from "@judie/hooks/useFlatAllEntities";
+import { PlusSquareIcon } from "@chakra-ui/icons";
+import CreateOrgModal from "../CreateOrgModal";
 
 const AdminRoot = () => {
   const { userData } = useAuth();
   const { organizations, schools, rooms } = useFlatAllEntities();
 
   const [displayCreateOrg, setDisplayCreateOrg] = useState(false);
+  const [createOrgModalOpen, setCreateOrgModalOpen] = useState(false);
 
   useEffect(() => {
     if (userData?.role === UserRole.JUDIE) {
@@ -44,15 +49,35 @@ const AdminRoot = () => {
         maxWidth: "100%",
       }}
     >
-      <Text
-        style={{
-          marginTop: "2rem",
-          fontSize: "2rem",
-          paddingLeft: "1rem",
-        }}
+      <HStack
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        width={"100%"}
+        paddingLeft={"1rem"}
+        paddingTop={"2rem"}
       >
-        Admin
-      </Text>
+        <CreateOrgModal
+          isOpen={createOrgModalOpen}
+          onClose={() => setCreateOrgModalOpen(false)}
+        />
+        <Text
+          style={{
+            fontSize: "2rem",
+          }}
+        >
+          Admin
+        </Text>
+        {displayCreateOrg ? (
+          <Button
+            size={"sm"}
+            variant={"solid"}
+            colorScheme="green"
+            onClick={() => setCreateOrgModalOpen(true)}
+          >
+            <PlusSquareIcon marginRight={"0.3rem"} /> Create Organization
+          </Button>
+        ) : null}
+      </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           <Tab>Your Organizations</Tab>
