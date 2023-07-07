@@ -66,12 +66,14 @@ const InviteModal = ({
     email,
   }: SubmitData) => {
     try {
+      console.log("permissions", permissions);
       if (!permissions.length) {
         toast({
           status: "error",
           title: "Must attach permissions",
           description: "We need to know what to do with this user",
         });
+        return;
       }
       await createInvite.mutateAsync({
         firstName,
@@ -200,6 +202,7 @@ const InviteModal = ({
                 variant={"solid"}
                 loading={createInvite.isLoading}
                 label="Invite User"
+                disabled={!permissions.length}
                 type="submit"
               />
             </Flex>

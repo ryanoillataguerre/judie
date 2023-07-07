@@ -5,12 +5,19 @@ import {
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
-import { createInvite, redeemInvite, validateInviteRights } from "./service.js";
+import {
+  createInvite,
+  getInvite,
+  redeemInvite,
+  validateInviteRights,
+} from "./service.js";
 
 import { sendInviteEmail } from "../cio/service.js";
 import dbClient from "../utils/prisma.js";
 import { signupValidation } from "../auth/routes.js";
 import { GradeYear, PermissionType } from "@prisma/client";
+import BadRequestError from "../utils/errors/BadRequestError.js";
+import moment from "moment";
 
 const router = Router();
 
@@ -60,6 +67,19 @@ router.post(
     }
     await Promise.all(validatePermissionsPromises);
 
+    const now = new Date();
+    const existingInvite = await dbClient.invite.findFirst({
+      where: {
+        email: body.email,
+        deletedAt: null,
+        createdAt: {
+          gt: moment(now).subtract(2, "hours").format(),
+        },
+      },
+    });
+    if (existingInvite) {
+      throw new BadRequestError("User already invited");
+    }
     // Create invite
     const newInvite = await createInvite({
       firstName: body.firstName,

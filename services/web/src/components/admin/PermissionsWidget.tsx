@@ -7,6 +7,7 @@ import {
   Select,
   Text,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 import { CreatePermissionType } from "@judie/data/mutations";
 import {
@@ -69,20 +70,20 @@ const fillPermissionIds = ({
     organization?.id ||
     school?.organizationId ||
     room?.organizationId ||
+    permission.organizationId ||
     undefined;
-  let schoolId = school?.id || room?.schoolId || undefined;
-  let roomId = room?.id || undefined;
+  let schoolId =
+    school?.id || room?.schoolId || permission.schoolId || undefined;
+  let roomId = room?.id || permission.roomId || undefined;
   if (!organizationId) {
     throw new Error("Incorrectly formatted permission. Please try again.");
   }
-  if (permission.type === PermissionType.STUDENT) {
-    newPermission = {
-      ...permission,
-      organizationId: organizationId || permission.organizationId,
-      schoolId: schoolId || permission.schoolId,
-      roomId: roomId || permission.roomId,
-    };
-  }
+  newPermission = {
+    ...permission,
+    organizationId: organizationId || permission.organizationId,
+    schoolId: schoolId || permission.schoolId,
+    roomId: roomId || permission.roomId,
+  };
   return newPermission;
 };
 
@@ -92,75 +93,188 @@ const NewPermissionRow = ({
   setNewPermission: (perm: CreatePermissionType) => void;
 }) => {
   const auth = useAuth();
+  const toast = useToast();
   const [type, setType] = useState<PermissionType>(PermissionType.STUDENT);
   const { organizations, schools, rooms } = useFlatAllEntities();
+  // State
   const [organization, setOrganization] = useState<Organization>();
   const [school, setSchool] = useState<School>();
   const [room, setRoom] = useState<Room>();
+  const [organizationId, setOrganizationId] = useState<string>();
+  const [schoolId, setSchoolId] = useState<string>();
+  const [roomId, setRoomId] = useState<string>();
+
+  useEffect(() => {
+    const reset = () => {
+      setOrganizationId(undefined);
+      setSchoolId(undefined);
+      setRoomId(undefined);
+      setOrganization(undefined);
+      setSchool(undefined);
+      setRoom(undefined);
+    };
+    reset();
+    switch (type) {
+      case PermissionType.ORG_ADMIN:
+        setOrganizationId(organizations?.[0]?.id);
+        break;
+      case PermissionType.SCHOOL_ADMIN:
+        setSchoolId(schools?.[0]?.id);
+        break;
+      case PermissionType.ROOM_ADMIN:
+        setRoomId(rooms?.[0]?.id);
+        break;
+    }
+  }, [
+    type,
+    setOrganizationId,
+    setSchoolId,
+    setRoomId,
+    setOrganization,
+    setSchool,
+    setRoom,
+  ]);
+
+  useEffect(() => {
+    if (organizationId) {
+      const newOrg = organizations?.find((org) => org.id === organizationId);
+      setOrganization(newOrg);
+    } else {
+      setOrganization(undefined);
+    }
+  }, [organizationId, setOrganization, organizations]);
+
+  useEffect(() => {
+    if (schoolId) {
+      const newSchool = schools?.find((sch) => sch.id === schoolId);
+      setSchool(newSchool);
+    } else {
+      setSchool(undefined);
+    }
+  }, [schoolId, setSchool, schools]);
+
+  useEffect(() => {
+    if (roomId) {
+      const newRoom = rooms?.find((rm) => rm.id === roomId);
+      setRoom(newRoom);
+    } else {
+      setRoom(undefined);
+    }
+  }, [roomId, setRoom, rooms]);
+
   const { handleSubmit, register, reset, watch } = useForm<SubmitData>({
     defaultValues: {
       type,
-      organizationId: undefined,
-      schoolId: undefined,
-      roomId: undefined,
+      organizationId: organizationId,
+      schoolId: schoolId,
+      roomId: roomId,
     },
     reValidateMode: "onBlur",
   });
+
   const onSubmit: SubmitHandler<SubmitData> = (
-    { type, organizationId, schoolId, roomId }: SubmitData,
+    {}: SubmitData,
     e?: React.BaseSyntheticEvent
   ) => {
     e?.preventDefault();
     try {
-      setNewPermission(
-        fillPermissionIds({
-          permission: {
-            type,
-            organizationId:
-              organizationId === "None" ? undefined : organizationId,
-            schoolId: schoolId === "None" ? undefined : schoolId,
-            roomId: roomId === "None" ? undefined : roomId,
-          },
-          organization,
-          school,
-          room,
-        })
-      );
+      console.log("permission", {
+        permission: {
+          type,
+          organizationId:
+            organizationId === "None" ? undefined : organizationId,
+          schoolId: schoolId === "None" ? undefined : schoolId,
+          roomId: roomId === "None" ? undefined : roomId,
+        },
+        organization,
+        school,
+        room,
+      });
+      // console.log("room", room);
+      // console.log("roomId", roomId);
+      const permission = fillPermissionIds({
+        permission: {
+          type,
+          organizationId:
+            organizationId === "None" ? undefined : organizationId,
+          schoolId: schoolId === "None" ? undefined : schoolId,
+          roomId: roomId === "None" ? undefined : roomId,
+        },
+        organization,
+        school,
+        room,
+      });
+      console.log("newPermission", permission);
+      setNewPermission(permission);
       // Add permission to array
-    } catch (err) {}
+    } catch (err) {
+      toast({
+        title: "Error formatting permission",
+      });
+    }
   };
 
-  useEffect(() => {
-    const org = organizations?.find(
-      (org) => org.id === watch("organizationId")
-    );
-    if (org) {
-      setOrganization(org);
-    }
-  }, [watch("organizationId")]);
+  // useEffect(() => {
+  //   const org = organizations?.find(
+  //     (org) => org.id === watch("organizationId")
+  //   );
+  //   if (org) {
+  //     setOrganization(org);
+  //   }
+  // }, [watch("organizationId")]);
 
-  useEffect(() => {
-    const school = schools?.find((school) => school.id === watch("schoolId"));
-    if (school) {
-      setSchool(school);
-    }
-  }, [watch("schoolId")]);
+  // useEffect(() => {
+  //   const school = schools?.find((school) => school.id === watch("schoolId"));
+  //   if (school) {
+  //     setSchool(school);
+  //   }
+  // }, [watch("schoolId")]);
 
-  useEffect(() => {
-    setOrganization(undefined);
-    setSchool(undefined);
-    setRoom(undefined);
-    reset();
-  }, [watch("type"), setOrganization, setSchool, setRoom, reset]);
+  // useEffect(() => {
+  //   const room = rooms?.find((room) => room.id === watch("roomId"));
+  //   if (room) {
+  //     setRoom(room);
+  //   }
+  // }, [watch("roomId")]);
 
-  useEffect(() => {
-    return () => {
-      setOrganization(undefined);
-      setSchool(undefined);
-      setRoom(undefined);
-      reset();
-    };
-  }, [reset, setRoom, setSchool, setOrganization]);
+  // useEffect(() => {
+  //   setOrganization(undefined);
+  //   setSchool(undefined);
+  //   setRoom(undefined);
+  //   setOrganizationId(undefined);
+  //   setSchoolId(undefined);
+  //   setRoomId(undefined);
+  //   // reset();
+  // }, [
+  //   watch("type"),
+  //   setOrganization,
+  //   setSchool,
+  //   setRoom,
+  //   reset,
+  //   setRoomId,
+  //   setSchoolId,
+  //   setOrganizationId,
+  // ]);
+
+  // useEffect(() => {
+  //   return () => {
+  //     setOrganization(undefined);
+  //     setSchool(undefined);
+  //     setRoom(undefined);
+  //     setOrganizationId(undefined);
+  //     setSchoolId(undefined);
+  //     setRoomId(undefined);
+  //     // reset();
+  //   };
+  // }, [
+  //   reset,
+  //   setRoom,
+  //   setSchool,
+  //   setOrganization,
+  //   setRoomId,
+  //   setSchoolId,
+  //   setOrganizationId,
+  // ]);
 
   return (
     <Flex
@@ -215,7 +329,15 @@ const NewPermissionRow = ({
               isRequired={type === PermissionType.ORG_ADMIN}
             >
               <FormLabel htmlFor="organization">Organization</FormLabel>
-              <Select id="organizationId" {...register("organizationId", {})}>
+              <Select
+                id="organizationId"
+                {...register("organizationId", {})}
+                value={organizationId}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  console.log("organizationId", e.target.value);
+                  setOrganizationId(e.target.value);
+                }}
+              >
                 {type !== PermissionType.ORG_ADMIN && (
                   <option key="none" value={undefined}>
                     None
@@ -240,7 +362,15 @@ const NewPermissionRow = ({
               isRequired={type === PermissionType.SCHOOL_ADMIN}
             >
               <FormLabel htmlFor="school">School</FormLabel>
-              <Select id="schoolId" {...register("schoolId", {})}>
+              <Select
+                id="schoolId"
+                {...register("schoolId", {})}
+                value={schoolId}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  console.log("schoolId", e.target.value);
+                  setSchoolId(e.target.value);
+                }}
+              >
                 {type !== PermissionType.SCHOOL_ADMIN && (
                   <option key="none" value={undefined}>
                     None
@@ -268,7 +398,15 @@ const NewPermissionRow = ({
               isRequired={type === PermissionType.ROOM_ADMIN}
             >
               <FormLabel htmlFor="room">Room</FormLabel>
-              <Select id="roomId" {...register("roomId", {})}>
+              <Select
+                id="roomId"
+                {...register("roomId", {})}
+                value={roomId}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  console.log("schoolId", e.target.value);
+                  setSchoolId(e.target.value);
+                }}
+              >
                 {type !== PermissionType.ROOM_ADMIN && (
                   <option key="none" value={undefined}>
                     None

@@ -53,6 +53,7 @@
     "grpc_tools_node_protoc_ts": "^5.3.3",
     "helmet": "^6.0.1",
     "ioredis": "^5.3.1",
+    "moment": "^2.29.4",
     "morgan": "^1.10.0",
     "openai": "^3.2.1",
     "stripe": "^12.2.0",
