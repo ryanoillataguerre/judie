@@ -104,15 +104,23 @@ const NewPermissionRow = ({
   const [schoolId, setSchoolId] = useState<string>();
   const [roomId, setRoomId] = useState<string>();
 
+  const reset = useCallback(() => {
+    setOrganizationId(undefined);
+    setSchoolId(undefined);
+    setRoomId(undefined);
+    setOrganization(undefined);
+    setSchool(undefined);
+    setRoom(undefined);
+  }, [
+    setOrganizationId,
+    setSchoolId,
+    setRoomId,
+    setOrganization,
+    setSchool,
+    setRoom,
+  ]);
+
   useEffect(() => {
-    const reset = () => {
-      setOrganizationId(undefined);
-      setSchoolId(undefined);
-      setRoomId(undefined);
-      setOrganization(undefined);
-      setSchool(undefined);
-      setRoom(undefined);
-    };
     reset();
     switch (type) {
       case PermissionType.ORG_ADMIN:
@@ -123,17 +131,13 @@ const NewPermissionRow = ({
         break;
       case PermissionType.ROOM_ADMIN:
         setRoomId(rooms?.[0]?.id);
+      case PermissionType.STUDENT:
+        reset();
+        break;
+      default:
         break;
     }
-  }, [
-    type,
-    setOrganizationId,
-    setSchoolId,
-    setRoomId,
-    setOrganization,
-    setSchool,
-    setRoom,
-  ]);
+  }, [type, reset, setOrganizationId, setSchoolId, setRoomId]);
 
   useEffect(() => {
     if (organizationId) {
@@ -162,12 +166,12 @@ const NewPermissionRow = ({
     }
   }, [roomId, setRoom, rooms]);
 
-  const { handleSubmit, register, reset, watch } = useForm<SubmitData>({
-    defaultValues: {
+  const { handleSubmit, register, watch } = useForm<SubmitData>({
+    values: {
       type,
-      organizationId: organizationId,
-      schoolId: schoolId,
-      roomId: roomId,
+      organizationId,
+      schoolId,
+      roomId,
     },
     reValidateMode: "onBlur",
   });
@@ -206,6 +210,7 @@ const NewPermissionRow = ({
       });
       console.log("newPermission", permission);
       setNewPermission(permission);
+      reset();
       // Add permission to array
     } catch (err) {
       toast({
@@ -318,41 +323,39 @@ const NewPermissionRow = ({
               ))}
             </Select>
           </FormControl>
-          {type === PermissionType.ORG_ADMIN ||
-          type === PermissionType.STUDENT ? (
-            <FormControl
-              style={{
-                marginTop: "0.5rem",
-                marginBottom: "0.5rem",
-                width: "100%",
+          <FormControl
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.5rem",
+              width: "100%",
+            }}
+            isRequired={type === PermissionType.ORG_ADMIN}
+          >
+            <FormLabel htmlFor="organization">Organization</FormLabel>
+            <Select
+              id="organizationId"
+              {...register("organizationId", {})}
+              value={organizationId}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                setOrganizationId(e.target.value);
               }}
-              isRequired={type === PermissionType.ORG_ADMIN}
             >
-              <FormLabel htmlFor="organization">Organization</FormLabel>
-              <Select
-                id="organizationId"
-                {...register("organizationId", {})}
-                value={organizationId}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  console.log("organizationId", e.target.value);
-                  setOrganizationId(e.target.value);
-                }}
-              >
-                {type !== PermissionType.ORG_ADMIN && (
-                  <option key="none" value={undefined}>
-                    None
-                  </option>
-                )}
-                {organizations?.map((org) => (
-                  <option key={org.id} value={org.id}>
-                    {org.name}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          ) : null}
-          {type === PermissionType.SCHOOL_ADMIN ||
-          (type === PermissionType.STUDENT && organization) ? (
+              {type !== PermissionType.ORG_ADMIN && (
+                <option key="none" value={undefined}>
+                  None
+                </option>
+              )}
+              {organizations?.map((org) => (
+                <option key={org.id} value={org.id}>
+                  {org.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          {(type === PermissionType.ROOM_ADMIN ||
+            type === PermissionType.SCHOOL_ADMIN ||
+            type === PermissionType.STUDENT) &&
+          organization ? (
             <FormControl
               style={{
                 marginTop: "0.5rem",
@@ -376,10 +379,7 @@ const NewPermissionRow = ({
                     None
                   </option>
                 )}
-                {(type === PermissionType.SCHOOL_ADMIN
-                  ? schools
-                  : organization?.schools
-                )?.map((school) => (
+                {organization?.schools?.map((school) => (
                   <option key={school.id} value={school.id}>
                     {school.name}
                   </option>
@@ -387,8 +387,10 @@ const NewPermissionRow = ({
               </Select>
             </FormControl>
           ) : null}
-          {type === PermissionType.ROOM_ADMIN ||
-          (type === PermissionType.STUDENT && organization && school) ? (
+          {(type === PermissionType.ROOM_ADMIN ||
+            type === PermissionType.STUDENT) &&
+          organization &&
+          school ? (
             <FormControl
               style={{
                 marginTop: "0.5rem",
@@ -403,8 +405,8 @@ const NewPermissionRow = ({
                 {...register("roomId", {})}
                 value={roomId}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  console.log("schoolId", e.target.value);
-                  setSchoolId(e.target.value);
+                  console.log("roomId", e.target.value);
+                  setRoomId(e.target.value);
                 }}
               >
                 {type !== PermissionType.ROOM_ADMIN && (
@@ -412,10 +414,7 @@ const NewPermissionRow = ({
                     None
                   </option>
                 )}
-                {(type === PermissionType.ROOM_ADMIN
-                  ? rooms
-                  : school?.rooms
-                )?.map((room) => (
+                {school?.rooms?.map((room) => (
                   <option key={room.id} value={room.id}>
                     {room.name}
                   </option>
@@ -514,7 +513,7 @@ const PermissionsWidget = ({
             fontWeight: 500,
           }}
         >
-          Existing Permissions
+          Permissions to Add
         </Text>
       )}
       {permissions.map((permission) => (
