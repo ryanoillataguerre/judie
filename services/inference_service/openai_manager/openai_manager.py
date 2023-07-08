@@ -62,3 +62,7 @@ def identify_math_exp(message: str) -> str:
     # only one element in the generator because we called without streaming
     response_return = next(openai_response)
     return response_return
+
+
+def comprehension_score(message: str) -> int:
+    pass
