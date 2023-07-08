@@ -11,6 +11,7 @@ import {
 } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
+import { getUser } from "../users/service.js";
 
 export const isPermissionTypeAdmin = (type: PermissionType) => {
   return (
@@ -279,7 +280,14 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
   //   return acc;
   // }, [] as (string | undefined)[]);
 
-  const formattedResults = {
+  const formattedResults: {
+    organizations: (
+      | (Organization & { schools: (School & { rooms: Room[] })[] })
+      | undefined
+    )[];
+    schools: ((School & { rooms: Room[] }) | undefined)[];
+    rooms: (Room | undefined)[];
+  } = {
     organizations: organizationsFormatted,
     schools: schoolsFormatted.filter(
       (school) => school?.id && !organizationSchoolIds.includes(school.id)
@@ -288,4 +296,69 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
   };
 
   return formattedResults;
+};
+
+export const getUsersForAdminUser = async ({ id }: { id: string }) => {
+  // TODO Ryan: Why is this possibly type never[] ? - Clean this up
+  const entities = (await getEntitiesForUser({ id })) as {
+    organizations: (
+      | (Organization & { schools: (School & { rooms: Room[] })[] })
+      | undefined
+    )[];
+    schools: ((School & { rooms: Room[] }) | undefined)[];
+    rooms: (Room | undefined)[];
+  };
+
+  const { organizations, schools, rooms } = entities;
+
+  // TODO Ryan: Switch to a reduce here
+  const roomIds: string[] = rooms.reduce((acc, room) => {
+    if (room?.id) {
+      return [...acc, room.id];
+    }
+    return acc;
+  }, [] as string[]);
+  const schoolIds: string[] = schools.reduce((acc, school) => {
+    if (school?.id) {
+      return [...acc, school.id];
+    }
+    return acc;
+  }, [] as string[]);
+  const organizationIds: string[] = organizations.reduce(
+    (acc, organization) => {
+      if (organization?.id) {
+        return [...acc, organization.id];
+      }
+      return acc;
+    },
+    [] as string[]
+  );
+
+  const userQueryResult = await dbClient.user.findMany({
+    where: {
+      permissions: {
+        some: {
+          OR: [
+            {
+              roomId: {
+                in: roomIds,
+              },
+            },
+            {
+              schoolId: {
+                in: schoolIds,
+              },
+            },
+            {
+              organizationId: {
+                in: organizationIds,
+              },
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  return userQueryResult;
 };
