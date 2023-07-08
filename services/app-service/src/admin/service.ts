@@ -311,7 +311,6 @@ export const getUsersForAdminUser = async ({ id }: { id: string }) => {
 
   const { organizations, schools, rooms } = entities;
 
-  // TODO Ryan: Switch to a reduce here
   const roomIds: string[] = rooms.reduce((acc, room) => {
     if (room?.id) {
       return [...acc, room.id];
