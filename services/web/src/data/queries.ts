@@ -93,3 +93,12 @@ export const getUserEntitiesQuery = async (): Promise<EntitiesResponse> => {
   });
   return response.data;
 };
+
+export const GET_USERS_FOR_ADMIN_USER = "GET_USERS_FOR_ADMIN_USER";
+export const getUsersForAdminUserQuery = async (): Promise<User[]> => {
+  const response = await baseFetch({
+    url: `/admin/users`,
+    method: "GET",
+  });
+  return response.data;
+};

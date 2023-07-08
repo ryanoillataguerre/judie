@@ -4,7 +4,11 @@ import organizationsRouter from "../organizations/routes.js";
 import schoolsRouter from "../schools/routes.js";
 import roomsRouter from "../rooms/routes.js";
 import { errorPassthrough, requireAuth } from "../utils/express.js";
-import { getEntitiesForUser, getUserAdmin } from "./service.js";
+import {
+  getEntitiesForUser,
+  getUserAdmin,
+  getUsersForAdminUser,
+} from "./service.js";
 
 // Admin Router
 const router = Router();
@@ -15,6 +19,7 @@ router.use("/schools", schoolsRouter);
 router.use("/rooms", roomsRouter);
 
 // Root /admin routes
+// Get all entities for admin user (orgs, schools, rooms)
 router.get(
   "/entities",
   requireAuth,
@@ -24,6 +29,20 @@ router.get(
     });
     res.status(200).send({
       data: entities,
+    });
+  })
+);
+
+// Get all users for admin user
+router.get(
+  "/users",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const users = await getUsersForAdminUser({
+      id: req.session.userId as string,
+    });
+    res.status(200).send({
+      data: users,
     });
   })
 );
