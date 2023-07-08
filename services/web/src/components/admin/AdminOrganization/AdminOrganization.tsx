@@ -37,8 +37,6 @@ const AdminOrganization = ({ id }: { id: string }) => {
     enabled: !!id,
   });
 
-  console.log(organizationUserData);
-
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
 
   return (

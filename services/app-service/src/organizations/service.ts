@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createOrganization = async (
@@ -10,22 +10,27 @@ export const createOrganization = async (
 };
 
 export const getUsersForOrganization = async ({ id }: { id: string }) => {
-  return await dbClient.user.findMany({
+  const permissionsWithUsers = await dbClient.userPermission.findMany({
     where: {
-      permissions: {
-        some: {
-          organizationId: id,
-        },
+      organizationId: id,
+      userId: {
+        not: null,
       },
     },
     include: {
-      permissions: {
-        where: {
-          organizationId: id,
+      user: {
+        include: {
+          permissions: true,
         },
       },
     },
   });
+  return permissionsWithUsers.reduce((acc, val) => {
+    if (val.user) {
+      return [...acc, val.user];
+    }
+    return acc;
+  }, [] as User[]);
 };
 
 export const getOrganizationById = async ({ id }: { id: string }) => {

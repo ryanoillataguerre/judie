@@ -111,3 +111,21 @@ export const getUsersForOrgQuery = async (id: string): Promise<User[]> => {
   });
   return response.data;
 };
+
+export const GET_USERS_FOR_SCHOOL = "GET_USERS_FOR_SCHOOL";
+export const getUsersForSchoolQuery = async (id: string): Promise<User[]> => {
+  const response = await baseFetch({
+    url: `/admin/schools/${id}/users`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_USERS_FOR_ROOM = "GET_USERS_FOR_ROOM";
+export const getUsersForRoomQuery = async (id: string): Promise<User[]> => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${id}/users`,
+    method: "GET",
+  });
+  return response.data;
+};
