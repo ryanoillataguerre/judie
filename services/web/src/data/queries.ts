@@ -102,3 +102,12 @@ export const getUsersForAdminUserQuery = async (): Promise<User[]> => {
   });
   return response.data;
 };
+
+export const GET_USERS_FOR_ORG = "GET_USERS_FOR_ORG";
+export const getUsersForOrgQuery = async (id: string): Promise<User[]> => {
+  const response = await baseFetch({
+    url: `/admin/organizations/${id}/users`,
+    method: "GET",
+  });
+  return response.data;
+};

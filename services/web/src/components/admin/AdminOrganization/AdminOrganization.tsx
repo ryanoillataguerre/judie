@@ -10,13 +10,19 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { GET_ORG_BY_ID, getOrgByIdQuery } from "@judie/data/queries";
+import {
+  GET_ORG_BY_ID,
+  GET_USERS_FOR_ORG,
+  getOrgByIdQuery,
+  getUsersForOrgQuery,
+} from "@judie/data/queries";
 import { useQuery } from "react-query";
 import SchoolRow from "../EntityRow/SchoolRow";
 import RoomRow from "../EntityRow/RoomRow";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import CreateSchoolModal from "../CreateSchoolModal";
+import UserRow from "../EntityRow/UserRow";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData } = useQuery({
@@ -24,6 +30,14 @@ const AdminOrganization = ({ id }: { id: string }) => {
     queryFn: () => getOrgByIdQuery(id),
     enabled: !!id,
   });
+
+  const { data: organizationUserData } = useQuery({
+    queryKey: [GET_USERS_FOR_ORG, id],
+    queryFn: () => getUsersForOrgQuery(id),
+    enabled: !!id,
+  });
+
+  console.log(organizationUserData);
 
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
 
@@ -70,6 +84,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
         <TabList width={"100%"}>
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
           {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {organizationUserData?.length ? <Tab>Users</Tab> : null}
         </TabList>
         <TabPanels>
           {organizationData?.schools?.length ? (
@@ -104,6 +119,24 @@ const AdminOrganization = ({ id }: { id: string }) => {
               >
                 {organizationData?.rooms.map((room) => (
                   <RoomRow key={room.id} room={room} />
+                ))}
+              </VStack>
+            </TabPanel>
+          ) : null}
+          {organizationUserData?.length ? (
+            <TabPanel>
+              <VStack
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                }}
+                spacing={"1rem"}
+              >
+                {organizationUserData.map((user) => (
+                  <UserRow key={user.id} user={user} />
                 ))}
               </VStack>
             </TabPanel>
