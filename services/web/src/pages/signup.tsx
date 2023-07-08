@@ -32,8 +32,8 @@ import { UserRole } from "@judie/data/types/api";
 export interface SignupSubmitData {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   role: UserRole;
   receivePromotions: boolean;
   districtOrSchool?: string;
@@ -41,13 +41,9 @@ export interface SignupSubmitData {
 
 export const SignupForm = ({
   inviteEmail,
-  inviteFirstName,
-  inviteLastName,
   inviteId,
 }: {
   inviteEmail?: string;
-  inviteFirstName?: string;
-  inviteLastName?: string;
   inviteId?: string;
 }) => {
   const router = useRouter();
@@ -137,8 +133,8 @@ export const SignupForm = ({
         await mutateAsyncInvite({
           password,
           receivePromotions,
-          firstName: inviteFirstName || firstName,
-          lastName: inviteLastName || lastName,
+          firstName: firstName as string,
+          lastName: lastName as string,
           inviteId: inviteId as string,
         });
         return;
@@ -163,6 +159,8 @@ export const SignupForm = ({
     lg: "40%",
   });
   const formBgColor = useColorModeValue("white", "#2a3448");
+
+  const isInvite = !!inviteEmail;
 
   return typeof window === "undefined" ? (
     <Spinner colorScheme="blue" />
@@ -252,15 +250,14 @@ export const SignupForm = ({
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
-            isRequired
+            isRequired={!isInvite}
           >
             <FormLabel htmlFor="firstName">First Name</FormLabel>
             <Input
               id="firstName"
               autoComplete="given-name"
-              required
+              required={!isInvite}
               placeholder="Judie"
-              defaultValue={inviteFirstName ?? ""}
               {...register("firstName", {})}
             />
           </FormControl>
@@ -269,15 +266,14 @@ export const SignupForm = ({
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
-            isRequired
+            isRequired={!isInvite}
           >
             <FormLabel htmlFor="lastName">Last Name</FormLabel>
             <Input
               id="lastName"
               autoComplete="family-name"
-              required
+              required={!isInvite}
               placeholder="Thebot"
-              defaultValue={inviteLastName ?? ""}
               {...register("lastName")}
             />
           </FormControl>

@@ -22,10 +22,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Button from "../Button/Button";
 import PermissionsWidget from "./PermissionsWidget";
+import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface SubmitData {
-  firstName: string;
-  lastName: string;
   gradeYear?: GradeYear;
   email: string;
   permissions: CreatePermissionType[];
@@ -44,8 +43,6 @@ const InviteModal = ({
   });
   const { handleSubmit, register, reset } = useForm<SubmitData>({
     defaultValues: {
-      firstName: "",
-      lastName: "",
       gradeYear: undefined,
       email: "",
     },
@@ -60,8 +57,6 @@ const InviteModal = ({
   }, []);
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
-    firstName,
-    lastName,
     gradeYear,
     email,
   }: SubmitData) => {
@@ -76,8 +71,6 @@ const InviteModal = ({
         return;
       }
       await createInvite.mutateAsync({
-        firstName,
-        lastName,
         gradeYear: (gradeYear as string) === "None" ? undefined : gradeYear,
         email,
         permissions,
@@ -90,7 +83,13 @@ const InviteModal = ({
       });
       setPermissions([]);
       onClose();
-    } catch (err) {}
+    } catch (err) {
+      toast({
+        title: "Oops!",
+        description: (err as unknown as HTTPResponseError).message,
+        status: "error",
+      });
+    }
   };
 
   return (
@@ -141,26 +140,6 @@ const InviteModal = ({
                 }}
                 isRequired
               >
-                <FormLabel htmlFor="firstName">First Name</FormLabel>
-                <Input id="firstName" required {...register("firstName", {})} />
-              </FormControl>
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                }}
-                isRequired
-              >
-                <FormLabel htmlFor="lastName">Last Name</FormLabel>
-                <Input id="lastName" {...register("lastName", {})} />
-              </FormControl>
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                }}
-                isRequired
-              >
                 <FormLabel htmlFor="email">Email</FormLabel>
                 <Input id="email" type="email" {...register("email", {})} />
               </FormControl>
@@ -179,19 +158,20 @@ const InviteModal = ({
                   ))}
                 </Select>
               </FormControl>
-              <Box
+              <FormControl
                 style={{
                   marginTop: "0.5rem",
                   marginBottom: "0.5rem",
                   width: "100%",
                 }}
+                isRequired
               >
                 <FormLabel htmlFor="permissions">Permissions</FormLabel>
                 <PermissionsWidget
                   onChangePermissions={setPermissions}
                   permissions={permissions}
                 />
-              </Box>
+              </FormControl>
 
               <Button
                 style={{

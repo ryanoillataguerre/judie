@@ -5,12 +5,7 @@ import {
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
-import {
-  createInvite,
-  getInvite,
-  redeemInvite,
-  validateInviteRights,
-} from "./service.js";
+import { createInvite, redeemInvite, validateInviteRights } from "./service.js";
 
 import { sendInviteEmail } from "../cio/service.js";
 import dbClient from "../utils/prisma.js";
@@ -39,8 +34,6 @@ router.post(
   "/",
   requireAuth,
   [
-    body("firstName").isString(),
-    body("lastName").isString(),
     body("gradeYear").isString().optional(),
     body("email").isString(),
     check("permissions.*.type").isString(),
@@ -73,17 +66,17 @@ router.post(
         email: body.email,
         deletedAt: null,
         createdAt: {
-          gt: moment(now).subtract(2, "hours").format(),
+          gt: moment(now).subtract(2, "days").format(),
         },
       },
     });
     if (existingInvite) {
-      throw new BadRequestError("User already invited");
+      throw new BadRequestError(
+        "User already invited. Please let them know to check their email."
+      );
     }
     // Create invite
     const newInvite = await createInvite({
-      firstName: body.firstName,
-      lastName: body.lastName,
       gradeYear: body.gradeYear as GradeYear | undefined,
       email: body.email,
       permissions: {

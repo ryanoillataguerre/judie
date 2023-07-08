@@ -3,7 +3,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Input,
   Select,
   Text,
   VStack,
@@ -12,12 +11,11 @@ import {
 import { CreatePermissionType } from "@judie/data/mutations";
 import {
   Organization,
-  Permission,
   PermissionType,
   Room,
   School,
 } from "@judie/data/types/api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Button from "../Button/Button";
 import useAuth from "@judie/hooks/useAuth";
@@ -139,6 +137,7 @@ const NewPermissionRow = ({
     }
   }, [type, reset, setOrganizationId, setSchoolId, setRoomId]);
 
+  // Set org, school, room when org, school, roomId changes
   useEffect(() => {
     if (organizationId) {
       const newOrg = organizations?.find((org) => org.id === organizationId);
@@ -147,7 +146,6 @@ const NewPermissionRow = ({
       setOrganization(undefined);
     }
   }, [organizationId, setOrganization, organizations]);
-
   useEffect(() => {
     if (schoolId) {
       const newSchool = schools?.find((sch) => sch.id === schoolId);
@@ -156,7 +154,6 @@ const NewPermissionRow = ({
       setSchool(undefined);
     }
   }, [schoolId, setSchool, schools]);
-
   useEffect(() => {
     if (roomId) {
       const newRoom = rooms?.find((rm) => rm.id === roomId);
@@ -166,7 +163,7 @@ const NewPermissionRow = ({
     }
   }, [roomId, setRoom, rooms]);
 
-  const { handleSubmit, register, watch } = useForm<SubmitData>({
+  const { handleSubmit, register } = useForm<SubmitData>({
     values: {
       type,
       organizationId,
@@ -182,20 +179,6 @@ const NewPermissionRow = ({
   ) => {
     e?.preventDefault();
     try {
-      console.log("permission", {
-        permission: {
-          type,
-          organizationId:
-            organizationId === "None" ? undefined : organizationId,
-          schoolId: schoolId === "None" ? undefined : schoolId,
-          roomId: roomId === "None" ? undefined : roomId,
-        },
-        organization,
-        school,
-        room,
-      });
-      // console.log("room", room);
-      // console.log("roomId", roomId);
       const permission = fillPermissionIds({
         permission: {
           type,
@@ -208,7 +191,6 @@ const NewPermissionRow = ({
         school,
         room,
       });
-      console.log("newPermission", permission);
       setNewPermission(permission);
       reset();
       // Add permission to array
@@ -218,68 +200,6 @@ const NewPermissionRow = ({
       });
     }
   };
-
-  // useEffect(() => {
-  //   const org = organizations?.find(
-  //     (org) => org.id === watch("organizationId")
-  //   );
-  //   if (org) {
-  //     setOrganization(org);
-  //   }
-  // }, [watch("organizationId")]);
-
-  // useEffect(() => {
-  //   const school = schools?.find((school) => school.id === watch("schoolId"));
-  //   if (school) {
-  //     setSchool(school);
-  //   }
-  // }, [watch("schoolId")]);
-
-  // useEffect(() => {
-  //   const room = rooms?.find((room) => room.id === watch("roomId"));
-  //   if (room) {
-  //     setRoom(room);
-  //   }
-  // }, [watch("roomId")]);
-
-  // useEffect(() => {
-  //   setOrganization(undefined);
-  //   setSchool(undefined);
-  //   setRoom(undefined);
-  //   setOrganizationId(undefined);
-  //   setSchoolId(undefined);
-  //   setRoomId(undefined);
-  //   // reset();
-  // }, [
-  //   watch("type"),
-  //   setOrganization,
-  //   setSchool,
-  //   setRoom,
-  //   reset,
-  //   setRoomId,
-  //   setSchoolId,
-  //   setOrganizationId,
-  // ]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     setOrganization(undefined);
-  //     setSchool(undefined);
-  //     setRoom(undefined);
-  //     setOrganizationId(undefined);
-  //     setSchoolId(undefined);
-  //     setRoomId(undefined);
-  //     // reset();
-  //   };
-  // }, [
-  //   reset,
-  //   setRoom,
-  //   setSchool,
-  //   setOrganization,
-  //   setRoomId,
-  //   setSchoolId,
-  //   setOrganizationId,
-  // ]);
 
   return (
     <Flex
@@ -513,7 +433,7 @@ const PermissionsWidget = ({
             fontWeight: 500,
           }}
         >
-          Permissions to Add
+          Permissions for Invite
         </Text>
       )}
       {permissions.map((permission) => (

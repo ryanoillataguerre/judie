@@ -11,12 +11,11 @@ import {
   getUsersForOrganization,
 } from "./service.js";
 import { validateOrganizationAdmin } from "../admin/service.js";
-import dbClient from "../utils/prisma.js";
 import { PermissionType } from "@prisma/client";
 import { createPermission } from "../permissions/service.js";
 import { sendInviteEmail } from "../cio/service.js";
 import { createInvite } from "../invites/service.js";
-import { getUser, updateUser } from "../users/service.js";
+import { getUser } from "../users/service.js";
 
 const router = Router();
 

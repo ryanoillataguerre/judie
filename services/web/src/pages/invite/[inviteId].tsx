@@ -1,29 +1,18 @@
 import Head from "next/head";
-import ReactPlayer from "react-player/youtube";
 
-import { useMemo, useState } from "react";
 import {
-  Box,
-  Button,
   Flex,
-  HStack,
   Image,
-  Input,
   Spinner,
   Text,
   VStack,
   useBreakpointValue,
   useColorModeValue,
-  useTimeout,
   useToast,
 } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useMutation, useQuery } from "react-query";
-import { redeemInviteMutation, waitlistMutation } from "@judie/data/mutations";
-import { HTTPResponseError } from "@judie/data/baseFetch";
-import { AiFillCheckCircle } from "react-icons/ai";
+import { useQuery } from "react-query";
 import { useRouter } from "next/router";
-import { SignupForm, SignupSubmitData } from "../signup";
+import { SignupForm } from "../signup";
 import { GET_INVITE_BY_ID, getInviteByIdQuery } from "@judie/data/queries";
 
 const RedeemInvite = () => {
@@ -122,12 +111,7 @@ const RedeemInvite = () => {
           )}
 
           {!inviteLoading && showForm ? (
-            <SignupForm
-              inviteEmail={inviteData?.email}
-              inviteFirstName={inviteData?.firstName}
-              inviteLastName={inviteData?.lastName}
-              inviteId={inviteId}
-            />
+            <SignupForm inviteEmail={inviteData?.email} inviteId={inviteId} />
           ) : !showForm ? (
             <Flex
               style={{

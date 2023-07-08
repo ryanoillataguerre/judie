@@ -18,6 +18,13 @@ export const getUsersForOrganization = async ({ id }: { id: string }) => {
         },
       },
     },
+    include: {
+      permissions: {
+        where: {
+          organizationId: id,
+        },
+      },
+    },
   });
 };
 

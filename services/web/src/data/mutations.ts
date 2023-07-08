@@ -92,8 +92,8 @@ export const signupMutation = async ({
   role,
   districtOrSchool,
 }: {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   password: string;
   receivePromotions: boolean;
@@ -280,14 +280,10 @@ export interface CreatePermissionType {
   roomId?: string;
 }
 export const createInviteMutation = async ({
-  firstName,
-  lastName,
   gradeYear,
   email,
   permissions,
 }: {
-  firstName: string;
-  lastName: string;
   gradeYear?: GradeYear;
   email: string;
   permissions: CreatePermissionType[];
@@ -295,7 +291,7 @@ export const createInviteMutation = async ({
   const response = await baseFetch({
     url: `/admin/invites`,
     method: "POST",
-    body: { firstName, lastName, gradeYear, email, permissions },
+    body: { gradeYear, email, permissions },
   });
   return response.data;
 };
