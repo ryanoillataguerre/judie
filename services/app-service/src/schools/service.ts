@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createSchool = async (params: Prisma.SchoolCreateInput) => {
@@ -8,15 +8,27 @@ export const createSchool = async (params: Prisma.SchoolCreateInput) => {
 };
 
 export const getUsersForSchool = async ({ id }: { id: string }) => {
-  return await dbClient.user.findMany({
+  const permissionsWithUsers = await dbClient.userPermission.findMany({
     where: {
-      permissions: {
-        some: {
-          schoolId: id,
+      schoolId: id,
+      userId: {
+        not: null,
+      },
+    },
+    include: {
+      user: {
+        include: {
+          permissions: true,
         },
       },
     },
   });
+  return permissionsWithUsers.reduce((acc, val) => {
+    if (val.user) {
+      return [...acc, val.user];
+    }
+    return acc;
+  }, [] as User[]);
 };
 
 export const getSchoolById = async ({ id }: { id: string }) => {

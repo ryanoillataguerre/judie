@@ -10,17 +10,28 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { GET_SCHOOL_BY_ID, getSchoolByIdQuery } from "@judie/data/queries";
+import {
+  GET_SCHOOL_BY_ID,
+  GET_USERS_FOR_SCHOOL,
+  getSchoolByIdQuery,
+  getUsersForSchoolQuery,
+} from "@judie/data/queries";
 import { useQuery } from "react-query";
 import RoomRow from "../EntityRow/RoomRow";
 import { useState } from "react";
 import CreateRoomModal from "../CreateRoomModal";
 import { PlusSquareIcon } from "@chakra-ui/icons";
+import UserRow from "../EntityRow/UserRow";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData } = useQuery({
     queryKey: [GET_SCHOOL_BY_ID, id],
     queryFn: () => getSchoolByIdQuery(id),
+    enabled: !!id,
+  });
+  const { data: schoolUserData } = useQuery({
+    queryKey: [GET_USERS_FOR_SCHOOL, id],
+    queryFn: () => getUsersForSchoolQuery(id),
     enabled: !!id,
   });
 
@@ -69,6 +80,7 @@ const AdminSchool = ({ id }: { id: string }) => {
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {schoolData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {schoolUserData?.length ? <Tab>Users</Tab> : null}
         </TabList>
         <TabPanels>
           {schoolData?.rooms?.length ? (
@@ -85,6 +97,24 @@ const AdminSchool = ({ id }: { id: string }) => {
               >
                 {schoolData?.rooms.map((room) => (
                   <RoomRow key={room.id} room={room} />
+                ))}
+              </VStack>
+            </TabPanel>
+          ) : null}
+          {schoolUserData?.length ? (
+            <TabPanel>
+              <VStack
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                }}
+                spacing={"1rem"}
+              >
+                {schoolUserData.map((user) => (
+                  <UserRow key={user.id} user={user} />
                 ))}
               </VStack>
             </TabPanel>

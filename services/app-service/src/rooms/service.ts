@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createRoom = async (params: Prisma.RoomCreateArgs) => {
@@ -6,15 +6,27 @@ export const createRoom = async (params: Prisma.RoomCreateArgs) => {
 };
 
 export const getUsersForRoom = async ({ id }: { id: string }) => {
-  return await dbClient.user.findMany({
+  const permissionsWithUsers = await dbClient.userPermission.findMany({
     where: {
-      permissions: {
-        some: {
-          roomId: id,
+      roomId: id,
+      userId: {
+        not: null,
+      },
+    },
+    include: {
+      user: {
+        include: {
+          permissions: true,
         },
       },
     },
   });
+  return permissionsWithUsers.reduce((acc, val) => {
+    if (val.user) {
+      return [...acc, val.user];
+    }
+    return acc;
+  }, [] as User[]);
 };
 
 export const getRoomById = async ({ id }: { id: string }) => {

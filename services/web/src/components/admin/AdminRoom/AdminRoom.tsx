@@ -8,7 +8,12 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { GET_ROOM_BY_ID, getRoomByIdQuery } from "@judie/data/queries";
+import {
+  GET_ROOM_BY_ID,
+  GET_USERS_FOR_ROOM,
+  getRoomByIdQuery,
+  getUsersForRoomQuery,
+} from "@judie/data/queries";
 import { useQuery } from "react-query";
 import UserRow from "../EntityRow/UserRow";
 
@@ -16,6 +21,11 @@ const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData } = useQuery({
     queryKey: [GET_ROOM_BY_ID, id],
     queryFn: () => getRoomByIdQuery(id),
+    enabled: !!id,
+  });
+  const { data: roomUserData } = useQuery({
+    queryKey: [GET_USERS_FOR_ROOM, id],
+    queryFn: () => getUsersForRoomQuery(id),
     enabled: !!id,
   });
 
@@ -40,10 +50,10 @@ const AdminRoom = ({ id }: { id: string }) => {
       </Text>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
-          {roomData?.users?.length ? <Tab>Users</Tab> : null}
+          {roomUserData?.length ? <Tab>Users</Tab> : null}
         </TabList>
         <TabPanels>
-          {roomData?.users?.length ? (
+          {roomUserData?.length ? (
             <TabPanel>
               <VStack
                 style={{
@@ -55,7 +65,7 @@ const AdminRoom = ({ id }: { id: string }) => {
                 }}
                 spacing={"1rem"}
               >
-                {roomData?.users?.map((user) => (
+                {roomUserData?.map((user) => (
                   <UserRow key={user.id} user={user} />
                 ))}
               </VStack>
