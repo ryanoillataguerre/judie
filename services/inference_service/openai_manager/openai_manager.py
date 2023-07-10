@@ -64,5 +64,12 @@ def identify_math_exp(message: str) -> str:
     return response_return
 
 
-def comprehension_score(message: str) -> int:
-    pass
+def comprehension_score(message_config:) -> int:
+    prompt = [
+        {
+            "role": "system",
+            "content": '',
+        },
+        {'role': 'assistant', "content": }
+        {"role": "user", "content": message},
+    ]

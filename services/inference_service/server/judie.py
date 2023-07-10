@@ -8,10 +8,14 @@ from dataclasses import dataclass
 
 logger = logging.getLogger("inference_logger")
 
+@dataclass
+class History:
+    chat_list: List[Dict]
 
 @dataclass
 class SessionConfig:
     subject: Optional[str] = None
+    history: History
 
 
 def yield_judie_response(
