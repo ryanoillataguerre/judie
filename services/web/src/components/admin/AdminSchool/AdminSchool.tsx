@@ -25,6 +25,9 @@ import CreateRoomModal from "../CreateRoomModal";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import UserRow from "../EntityRow/UserRow";
 import InviteRow from "../EntityRow/InviteRow";
+import InvitesTable from "../tables/InvitesTable";
+import { Invite, User } from "@judie/data/types/api";
+import UsersTable from "../tables/UsersTable";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData } = useQuery({
@@ -112,42 +115,15 @@ const AdminSchool = ({ id }: { id: string }) => {
               </VStack>
             </TabPanel>
           ) : null}
-          {schoolUserData?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {schoolUserData.map((user) => (
-                  <UserRow key={user.id} user={user} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
-          {schoolInvitesData?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {schoolInvitesData.map((invite) => (
-                  <InviteRow key={invite.id} invite={invite} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
+          <TabPanel>
+            <UsersTable users={schoolUserData as User[]} schoolId={id} />
+          </TabPanel>
+          <TabPanel>
+            <InvitesTable
+              invites={schoolInvitesData as Invite[]}
+              schoolId={id}
+            />
+          </TabPanel>
         </TabPanels>
         <TabIndicator />
       </Tabs>
