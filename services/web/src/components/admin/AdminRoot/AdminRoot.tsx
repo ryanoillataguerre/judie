@@ -10,7 +10,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { UserRole } from "@judie/data/types/api";
+import { Organization, School, User, UserRole } from "@judie/data/types/api";
 import useAuth from "@judie/hooks/useAuth";
 import { useEffect, useState } from "react";
 import OrgRow from "../EntityRow/OrgRow";
@@ -25,6 +25,10 @@ import {
   getUsersForAdminUserQuery,
 } from "@judie/data/queries";
 import UserRow from "../EntityRow/UserRow";
+import OrganizationsTable from "../tables/OrganizationsTable";
+import SchoolsTable from "../tables/SchoolsTable";
+import RoomsTable from "../tables/RoomsTable";
+import UsersTable from "../tables/UsersTable";
 
 const AdminRoot = () => {
   const { userData } = useAuth();
@@ -92,68 +96,18 @@ const AdminRoot = () => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <VStack
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-                width: "100%",
-              }}
-              spacing={"1rem"}
-            >
-              {organizations?.map((org) => (
-                <OrgRow key={org.id} org={org} />
-              ))}
-            </VStack>
+            <OrganizationsTable
+              organizations={organizations as Organization[]}
+            />
           </TabPanel>
           <TabPanel>
-            <VStack
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-                width: "100%",
-              }}
-              spacing={"1rem"}
-            >
-              {schools?.map((school) => (
-                <SchoolRow key={school.id} school={school} />
-              ))}
-            </VStack>
+            <SchoolsTable schools={schools} />
           </TabPanel>
           <TabPanel>
-            <VStack
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-                width: "100%",
-              }}
-              spacing={"1rem"}
-            >
-              {rooms?.map((room) => (
-                <RoomRow key={room.id} room={room} />
-              ))}
-            </VStack>
+            <RoomsTable rooms={rooms} />
           </TabPanel>
           <TabPanel>
-            <VStack
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-                width: "100%",
-              }}
-              spacing={"1rem"}
-            >
-              {users?.map((user) => (
-                <UserRow key={user.id} user={user} />
-              ))}
-            </VStack>
+            <UsersTable users={users as User[]} />
           </TabPanel>
         </TabPanels>
         <TabIndicator />

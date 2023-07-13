@@ -17,8 +17,9 @@ import {
   getUsersForRoomQuery,
 } from "@judie/data/queries";
 import { useQuery } from "react-query";
-import UserRow from "../EntityRow/UserRow";
-import InviteRow from "../EntityRow/InviteRow";
+import UsersTable from "../tables/UsersTable";
+import { Invite, User } from "@judie/data/types/api";
+import InvitesTable from "../tables/InvitesTable";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData } = useQuery({
@@ -62,42 +63,12 @@ const AdminRoom = ({ id }: { id: string }) => {
           {roomInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
         <TabPanels>
-          {roomUserData?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {roomUserData?.map((user) => (
-                  <UserRow key={user.id} user={user} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
-          {roomInvitesData?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {roomInvitesData.map((invite) => (
-                  <InviteRow key={invite.id} invite={invite} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
+          <TabPanel>
+            <UsersTable roomId={id} users={roomUserData as User[]} />
+          </TabPanel>
+          <TabPanel>
+            <InvitesTable roomId={id} invites={roomInvitesData as Invite[]} />
+          </TabPanel>
         </TabPanels>
         <TabIndicator />
       </Tabs>

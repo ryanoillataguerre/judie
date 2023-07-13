@@ -1,6 +1,12 @@
 import { Button } from "@chakra-ui/react";
 import { Invite } from "@judie/data/types/api";
 
+// Columns:
+
+// email
+// permissions
+// createdAt
+
 const InviteRow = ({ invite }: { invite: Invite }) => {
   return (
     <Button

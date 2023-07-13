@@ -19,6 +19,7 @@ import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
+import dbClient from "../utils/prisma.js";
 
 const router = Router();
 
@@ -55,6 +56,14 @@ router.post(
     });
     res.status(200).end();
     await incrementQuestionCountEntry({ userId: session.userId });
+    await dbClient.user.update({
+      where: {
+        id: session.userId,
+      },
+      data: {
+        lastMessageAt: new Date(),
+      },
+    });
   })
 );
 

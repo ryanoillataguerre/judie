@@ -19,13 +19,13 @@ import {
   getUsersForOrgQuery,
 } from "@judie/data/queries";
 import { useQuery } from "react-query";
-import SchoolRow from "../EntityRow/SchoolRow";
-import RoomRow from "../EntityRow/RoomRow";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import CreateSchoolModal from "../CreateSchoolModal";
-import UserRow from "../EntityRow/UserRow";
-import InviteRow from "../EntityRow/InviteRow";
+import SchoolsTable from "../tables/SchoolsTable";
+import RoomsTable from "../tables/RoomsTable";
+import UsersTable from "../tables/UsersTable";
+import InvitesTable from "../tables/InvitesTable";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData } = useQuery({
@@ -97,74 +97,22 @@ const AdminOrganization = ({ id }: { id: string }) => {
         <TabPanels>
           {organizationData?.schools?.length ? (
             <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {organizationData?.schools.map((school) => (
-                  <SchoolRow key={school.id} school={school} />
-                ))}
-              </VStack>
+              <SchoolsTable schools={organizationData?.schools} />
             </TabPanel>
           ) : null}
           {organizationData?.rooms?.length ? (
             <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {organizationData?.rooms.map((room) => (
-                  <RoomRow key={room.id} room={room} />
-                ))}
-              </VStack>
+              <RoomsTable rooms={organizationData?.rooms} />
             </TabPanel>
           ) : null}
           {organizationUserData?.length ? (
             <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {organizationUserData.map((user) => (
-                  <UserRow key={user.id} user={user} />
-                ))}
-              </VStack>
+              <UsersTable users={organizationUserData} />
             </TabPanel>
           ) : null}
           {organizationInvitesData?.length ? (
             <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {organizationInvitesData.map((invite) => (
-                  <InviteRow key={invite.id} invite={invite} />
-                ))}
-              </VStack>
+              <InvitesTable invites={organizationInvitesData} />
             </TabPanel>
           ) : null}
         </TabPanels>

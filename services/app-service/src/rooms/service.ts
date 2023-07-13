@@ -49,5 +49,8 @@ export const getInvitesForRoom = async ({ id }: { id: string }) => {
         },
       },
     },
+    include: {
+      permissions: true,
+    },
   });
 };

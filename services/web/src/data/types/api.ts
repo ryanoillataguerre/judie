@@ -47,9 +47,9 @@ export interface Invite {
   organizationId?: string;
   roomId?: string;
   gradeYear?: GradeYear;
-  createdAt: string;
-  updatedAt?: string;
-  deletedAt?: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  deletedAt?: Date;
   school?: School;
   organization?: Organization;
   room?: Room;
@@ -117,6 +117,7 @@ export interface User {
   stripeCustomerId?: string;
   questionsAsked: number;
   subscription?: Subscription;
+  lastMessageAt?: Date;
   chats?: Chat[];
   permissions?: Permission[];
   organizations?: Organization[];
