@@ -23,6 +23,7 @@ import { PlusSquareIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import CreateSchoolModal from "../CreateSchoolModal";
 import UserRow from "../EntityRow/UserRow";
+import InviteRow from "../EntityRow/InviteRow";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData } = useQuery({
@@ -83,6 +84,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
           {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
           {organizationUserData?.length ? <Tab>Users</Tab> : null}
+          {organizationData?.invites?.length ? <Tab>Invites</Tab> : null}
         </TabList>
         <TabPanels>
           {organizationData?.schools?.length ? (
@@ -135,6 +137,24 @@ const AdminOrganization = ({ id }: { id: string }) => {
               >
                 {organizationUserData.map((user) => (
                   <UserRow key={user.id} user={user} />
+                ))}
+              </VStack>
+            </TabPanel>
+          ) : null}
+          {organizationData?.invites?.length ? (
+            <TabPanel>
+              <VStack
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                }}
+                spacing={"1rem"}
+              >
+                {organizationData?.invites.map((invite) => (
+                  <InviteRow key={invite.id} invite={invite} />
                 ))}
               </VStack>
             </TabPanel>

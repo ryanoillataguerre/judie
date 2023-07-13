@@ -76,6 +76,7 @@ export interface Organization {
   deletedAt?: string;
   schools?: School[];
   rooms?: Room[];
+  invites?: Invite[];
 }
 export interface Room {
   id: string;
