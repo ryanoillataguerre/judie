@@ -11,6 +11,7 @@ import {
   PermissionType,
   SubscriptionStatus,
   User,
+  UserRole,
 } from "@judie/data/types/api";
 import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
@@ -102,7 +103,9 @@ export default function useAuth({
     return (
       !!userData?.permissions?.find((permission) =>
         isPermissionTypeAdmin(permission.type)
-      ) || false
+      ) ||
+      userData?.role === UserRole.JUDIE ||
+      false
     );
   }, [userData]);
 

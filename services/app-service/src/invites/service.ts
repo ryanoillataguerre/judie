@@ -179,7 +179,7 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
   const updatePermissionsPromises = [];
   for (const permission of invite.permissions) {
     updatePermissionsPromises.push(
-      dbClient.userPermission.update({
+      dbClient.permission.update({
         where: {
           id: permission.id,
         },

@@ -61,6 +61,15 @@ router.post(
     }
     await Promise.all(validatePermissionsPromises);
 
+    const existingUser = await dbClient.user.findUnique({
+      where: {
+        email: body.email,
+      },
+    });
+    if (existingUser) {
+      throw new BadRequestError("User already exists");
+    }
+
     const now = new Date();
     const existingInvite = await dbClient.invite.findFirst({
       where: {

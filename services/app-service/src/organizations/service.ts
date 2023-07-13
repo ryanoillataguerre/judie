@@ -10,7 +10,7 @@ export const createOrganization = async (
 };
 
 export const getUsersForOrganization = async ({ id }: { id: string }) => {
-  const permissionsWithUsers = await dbClient.userPermission.findMany({
+  const permissionsWithUsers = await dbClient.permission.findMany({
     where: {
       organizationId: id,
       userId: {
@@ -41,6 +41,18 @@ export const getOrganizationById = async ({ id }: { id: string }) => {
     include: {
       schools: true,
       rooms: true,
+    },
+  });
+};
+
+export const getInvitesForOrganization = async ({ id }: { id: string }) => {
+  return await dbClient.invite.findMany({
+    where: {
+      permissions: {
+        some: {
+          organizationId: id,
+        },
+      },
     },
   });
 };

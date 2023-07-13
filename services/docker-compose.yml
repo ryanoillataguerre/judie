@@ -38,7 +38,7 @@ services:
       dockerfile: ./app-service/Dockerfile.local
     ports:
       - 8080:8080
-    restart: always
+    restart: on-failure
     environment:
       NODE_ENV: local
       PORT: 8080

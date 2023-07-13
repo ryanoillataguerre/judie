@@ -5,7 +5,12 @@ import {
   requireAuth,
   requireJudieAuth,
 } from "../utils/express.js";
-import { createRoom, getRoomById, getUsersForRoom } from "./service.js";
+import {
+  createRoom,
+  getInvitesForRoom,
+  getRoomById,
+  getUsersForRoom,
+} from "./service.js";
 import {
   validateOrganizationAdmin,
   validateRoomAdmin,
@@ -115,6 +120,26 @@ router.get(
       roomId,
     });
     const users = await getRoomById({
+      id: roomId,
+    });
+    res.status(200).send({
+      data: users,
+    });
+  }
+);
+
+router.get(
+  "/:roomId/invites",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const roomId = req.params.roomId;
+    await validateRoomAdmin({
+      userId: userId as string,
+      roomId,
+    });
+    const users = await getInvitesForRoom({
       id: roomId,
     });
     res.status(200).send({

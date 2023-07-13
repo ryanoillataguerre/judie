@@ -129,3 +129,32 @@ export const getUsersForRoomQuery = async (id: string): Promise<User[]> => {
   });
   return response.data;
 };
+
+export const GET_INVITES_FOR_ORG = "GET_INVITES_FOR_ORG";
+export const getInvitesForOrgQuery = async (id: string): Promise<Invite[]> => {
+  const response = await baseFetch({
+    url: `/admin/organizations/${id}/invites`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_INVITES_FOR_SCHOOL = "GET_INVITES_FOR_SCHOOL";
+export const getInvitesForSchoolQuery = async (
+  id: string
+): Promise<Invite[]> => {
+  const response = await baseFetch({
+    url: `/admin/schools/${id}/invites`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_INVITES_FOR_ROOM = "GET_INVITES_FOR_ROOM";
+export const getInvitesForRoomQuery = async (id: string): Promise<Invite[]> => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${id}/invites`,
+    method: "GET",
+  });
+  return response.data;
+};

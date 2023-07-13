@@ -7,6 +7,7 @@ import {
 } from "../utils/express.js";
 import {
   createOrganization,
+  getInvitesForOrganization,
   getOrganizationById,
   getUsersForOrganization,
 } from "./service.js";
@@ -110,7 +111,6 @@ router.get(
   requireAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
-    console.log("receiving request");
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
@@ -142,6 +142,26 @@ router.get(
     });
     res.status(200).send({
       data: org,
+    });
+  }
+);
+
+router.get(
+  "/:organizationId/invites",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const organizationId = req.params.organizationId;
+    await validateOrganizationAdmin({
+      userId: userId as string,
+      organizationId,
+    });
+    const users = await getInvitesForOrganization({
+      id: organizationId,
+    });
+    res.status(200).send({
+      data: users,
     });
   }
 );

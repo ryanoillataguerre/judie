@@ -5,7 +5,12 @@ import {
   requireAuth,
   requireJudieAuth,
 } from "../utils/express.js";
-import { createSchool, getSchoolById, getUsersForSchool } from "./service.js";
+import {
+  createSchool,
+  getInvitesForSchool,
+  getSchoolById,
+  getUsersForSchool,
+} from "./service.js";
 import {
   validateOrganizationAdmin,
   validateSchoolAdmin,
@@ -102,6 +107,26 @@ router.get(
     });
     res.status(200).send({
       data: school,
+    });
+  }
+);
+
+router.get(
+  "/:schoolId/invites",
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const schoolId = req.params.schoolId;
+    await validateSchoolAdmin({
+      userId: userId as string,
+      schoolId,
+    });
+    const users = await getInvitesForSchool({
+      id: schoolId,
+    });
+    res.status(200).send({
+      data: users,
     });
   }
 );

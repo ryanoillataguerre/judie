@@ -207,7 +207,7 @@ export const subscribeUser = async ({
 };
 
 export const getEntitiesForUser = async ({ id }: { id: string }) => {
-  const queryResults = await dbClient.userPermission.findMany({
+  const queryResults = await dbClient.permission.findMany({
     where: {
       userId: id,
     },
@@ -311,19 +311,19 @@ export const getUsersForAdminUser = async ({ id }: { id: string }) => {
 
   const { organizations, schools, rooms } = entities;
 
-  const roomIds: string[] = rooms.reduce((acc, room) => {
+  const roomIds: string[] = rooms?.reduce((acc, room) => {
     if (room?.id) {
       return [...acc, room.id];
     }
     return acc;
   }, [] as string[]);
-  const schoolIds: string[] = schools.reduce((acc, school) => {
+  const schoolIds: string[] = schools?.reduce((acc, school) => {
     if (school?.id) {
       return [...acc, school.id];
     }
     return acc;
   }, [] as string[]);
-  const organizationIds: string[] = organizations.reduce(
+  const organizationIds: string[] = organizations?.reduce(
     (acc, organization) => {
       if (organization?.id) {
         return [...acc, organization.id];

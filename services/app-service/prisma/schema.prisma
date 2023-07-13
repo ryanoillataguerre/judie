@@ -101,8 +101,8 @@ model User {
   subscription         Subscription?
   chats                Chat[]
   rooms                Room[]
-  permissions          UserPermission[]
-  createdOrganizations Organization[]   @relation("creator")
+  permissions          Permission[]
+  createdOrganizations Organization[] @relation("creator")
 
   @@index([id, email])
   @@map("users")
@@ -179,10 +179,10 @@ model Organization {
 
   users         User[]
   schools       School[]
-  permissions   UserPermission[]
+  permissions   Permission[]
   rooms         Room[]
   invites       Invite[]
-  creator       User?            @relation("creator", fields: [creatorId], references: [id])
+  creator       User?          @relation("creator", fields: [creatorId], references: [id])
   seats         Seats[]
   subscriptions Subscription[]
 
@@ -199,10 +199,10 @@ model School {
   deletedAt      DateTime? @map("deleted_at")
 
   seats        Seats[]
-  organization Organization     @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   users        User[]
   rooms        Room[]
-  permissions  UserPermission[]
+  permissions  Permission[]
   invites      Invite[]
 
   @@map("schools")
@@ -218,15 +218,15 @@ model Room {
   updatedAt      DateTime? @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
 
-  organization Organization     @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
   users        User[]
-  permissions  UserPermission[]
+  permissions  Permission[]
   invites      Invite[]
 
   @@map("rooms")
 }
 
-model UserPermission {
+model Permission {
   id             String         @id @default(uuid())
   userId         String?        @map("user_id")
   inviteId       String?        @map("invite_id")
@@ -246,7 +246,7 @@ model UserPermission {
   room         Room?         @relation(fields: [roomId], references: [id])
 
   @@index([id, userId, schoolId])
-  @@map("user_permissions")
+  @@map("permissions")
 }
 
 model Invite {
@@ -254,18 +254,18 @@ model Invite {
   email          String
   firstName      String?    @map("first_name")
   lastName       String?    @map("last_name")
-  schoolId       String?    @map("school_id")
-  organizationId String?    @map("organization_id")
-  roomId         String?    @map("room_id")
+  schoolId       String?    @map("school_id") // @deprecated - remove in future migration
+  organizationId String?    @map("organization_id") // @deprecated - remove in future migration
+  roomId         String?    @map("room_id") // @deprecated - remove in future migration
   gradeYear      GradeYear? @map("grade_year")
   createdAt      DateTime   @default(now()) @map("created_at")
   updatedAt      DateTime?  @updatedAt @map("updated_at")
   deletedAt      DateTime?  @map("deleted_at")
 
-  school       School?          @relation(fields: [schoolId], references: [id])
-  organization Organization?    @relation(fields: [organizationId], references: [id])
-  room         Room?            @relation(fields: [roomId], references: [id])
-  permissions  UserPermission[]
+  school       School?       @relation(fields: [schoolId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  room         Room?         @relation(fields: [roomId], references: [id])
+  permissions  Permission[]
 
   @@index([id, email])
   @@map("invites")
