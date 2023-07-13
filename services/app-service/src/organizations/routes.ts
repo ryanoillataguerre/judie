@@ -111,7 +111,6 @@ router.get(
   requireAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
-    console.log("receiving request");
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
@@ -152,7 +151,6 @@ router.get(
   requireAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
-    console.log("receiving request");
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({

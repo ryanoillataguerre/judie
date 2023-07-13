@@ -290,7 +290,6 @@ const NewPermissionRow = ({
                 {...register("schoolId", {})}
                 value={schoolId}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  console.log("schoolId", e.target.value);
                   setSchoolId(e.target.value);
                 }}
               >
@@ -325,7 +324,6 @@ const NewPermissionRow = ({
                 {...register("roomId", {})}
                 value={roomId}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  console.log("roomId", e.target.value);
                   setRoomId(e.target.value);
                 }}
               >

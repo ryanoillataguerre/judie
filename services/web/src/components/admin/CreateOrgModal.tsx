@@ -67,7 +67,6 @@ const CreateOrgModal = ({
       refreshEntities();
       onClose();
     } catch (err) {
-      console.log("caught error");
       toast({
         title: "Error creating organization",
         description: (err as unknown as HTTPResponseError).message,

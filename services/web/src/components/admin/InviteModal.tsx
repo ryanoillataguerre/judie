@@ -61,7 +61,6 @@ const InviteModal = ({
     email,
   }: SubmitData) => {
     try {
-      console.log("permissions", permissions);
       if (!permissions.length) {
         toast({
           status: "error",
