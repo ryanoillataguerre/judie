@@ -12,6 +12,7 @@ import {
   deleteForgotPasswordToken,
 } from "../utils/redis.js";
 import { sendUserForgotPasswordEmail } from "../cio/service.js";
+import { sessionStore } from "../utils/express.js";
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firstName: user.firstName,
@@ -219,4 +220,41 @@ export const resetPassword = async ({
   });
   // Delete token from Redis
   await deleteForgotPasswordToken({ token });
+};
+
+export const setUserSessionId = async ({
+  userId,
+  sessionId,
+}: {
+  userId: string;
+  sessionId: string;
+}) => {
+  await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      lastSessionId: sessionId,
+    },
+  });
+};
+
+export const destroyUserSession = async ({ userId }: { userId: string }) => {
+  const user = await dbClient.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  const userSid = user?.lastSessionId;
+  if (!userSid) {
+    console.info(
+      `Attempted to destroy session for user ${userId} but no session found`
+    );
+    return;
+  }
+  sessionStore.destroy(userSid, (err) => {
+    if (err) {
+      console.error("Error destroying session", err);
+    }
+  });
 };

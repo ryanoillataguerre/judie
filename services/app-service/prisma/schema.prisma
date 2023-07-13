@@ -93,6 +93,7 @@ model User {
   updatedAt         DateTime?  @updatedAt @map("updated_at")
   stripeCustomerId  String?    @map("stripe_customer_id")
   questionsAsked    Int        @default(0) @map("questions_asked")
+  lastSessionId     String?    @map("last_session_id")
   role              UserRole   @default(STUDENT)
 
   organizations        Organization[]

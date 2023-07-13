@@ -7,6 +7,7 @@ import {
   addToWaitlist,
   forgotPassword,
   resetPassword,
+  setUserSessionId,
 } from "./service.js";
 
 export const signupValidation = [
@@ -49,6 +50,10 @@ router.post(
     // Create session for user
     session.userId = user.id;
     session.save();
+    await setUserSessionId({
+      userId: user.id,
+      sessionId: session.id,
+    });
     res.status(201).send({ user });
   })
 );
@@ -65,6 +70,10 @@ router.post(
     // Create session for user
     session.userId = user.id;
     session.save();
+    await setUserSessionId({
+      userId: user.id,
+      sessionId: session.id,
+    });
     res.status(200).send({ user });
   })
 );

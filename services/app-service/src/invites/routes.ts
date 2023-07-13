@@ -13,6 +13,7 @@ import { signupValidation } from "../auth/routes.js";
 import { GradeYear, PermissionType } from "@prisma/client";
 import BadRequestError from "../utils/errors/BadRequestError.js";
 import moment from "moment";
+import { setUserSessionId } from "../auth/service.js";
 
 const router = Router();
 
@@ -157,6 +158,10 @@ router.post(
     const session = req.session;
     session.userId = newUser?.id;
     session.save();
+    await setUserSessionId({
+      userId: newUser.id,
+      sessionId: session.id,
+    });
     // Send user
     res.status(201).send({
       data: newUser,

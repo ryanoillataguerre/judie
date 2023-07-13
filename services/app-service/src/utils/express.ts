@@ -166,10 +166,12 @@ const redisClient = new Redis({
 export const sessionStore = new RedisStore({ client: redisClient });
 export const sessionLayer = () =>
   session({
+    unset: "destroy",
+    rolling: true,
     name: "judie_sid",
     store: sessionStore,
     secret: process.env.SESSION_SECRET || "secret",
-    resave: true,
+    resave: false,
     saveUninitialized: false,
     proxy: isProduction() || isSandbox(),
     cookie: {
