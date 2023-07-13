@@ -162,8 +162,6 @@ export const SignupForm = ({
 
   const isInvite = !!inviteEmail;
 
-  console.log(isInvite);
-
   return typeof window === "undefined" ? (
     <Spinner colorScheme="blue" />
   ) : (
