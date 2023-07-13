@@ -59,6 +59,7 @@ const AdminRoom = ({ id }: { id: string }) => {
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {roomUserData?.length ? <Tab>Users</Tab> : null}
+          {roomInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
         <TabPanels>
           {roomUserData?.length ? (

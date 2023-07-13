@@ -43,6 +43,7 @@ const AdminSchool = ({ id }: { id: string }) => {
     queryFn: () => getInvitesForSchoolQuery(id),
     enabled: !!id,
   });
+  console.log(schoolInvitesData);
 
   const [createRoomOpen, setCreateRoomOpen] = useState(false);
 
@@ -90,6 +91,7 @@ const AdminSchool = ({ id }: { id: string }) => {
         <TabList width={"100%"}>
           {schoolData?.rooms?.length ? <Tab>Rooms</Tab> : null}
           {schoolUserData?.length ? <Tab>Users</Tab> : null}
+          {schoolInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
         <TabPanels>
           {schoolData?.rooms?.length ? (
