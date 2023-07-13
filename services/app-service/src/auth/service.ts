@@ -11,7 +11,10 @@ import {
   getForgotPasswordToken,
   deleteForgotPasswordToken,
 } from "../utils/redis.js";
-import { sendUserForgotPasswordEmail } from "../cio/service.js";
+import {
+  sendUserForgotPasswordEmail,
+  sendVerificationEmail,
+} from "../cio/service.js";
 import { sessionStore } from "../utils/express.js";
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
@@ -80,7 +83,7 @@ export const signup = async ({
     },
   });
 
-  cioClient.identify(newUser.id, {
+  await cioClient.identify(newUser.id, {
     email: newUser.email,
     created_at: newUser.createdAt,
     first_name: newUser.firstName,
@@ -101,6 +104,8 @@ export const signup = async ({
     userId: newUser.id,
     traits: transformUserForSegment(newUser, districtOrSchool),
   });
+
+  await sendVerificationEmail({ user: newUser });
 
   return newUser;
 };
@@ -137,7 +142,7 @@ export const signin = async ({
     traits: transformUserForSegment(user),
   });
 
-  cioClient.identify(user.id, {
+  await cioClient.identify(user.id, {
     email: user.email,
     last_logged_in: new Date().toISOString(),
   });

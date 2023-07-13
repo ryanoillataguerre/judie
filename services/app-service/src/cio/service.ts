@@ -39,3 +39,19 @@ export const sendInviteEmail = async ({ invite }: { invite: Invite }) => {
   });
   return await apiClient.sendEmail(newEmail);
 };
+
+export const sendVerificationEmail = async ({ user }: { user: User }) => {
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: user.email,
+    transactional_message_id: "4",
+    message_data: {
+      first_name: user.firstName,
+      url: `https://app.judie.io/verify/${user.id}`,
+    },
+    identifiers: {
+      email: user.email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};

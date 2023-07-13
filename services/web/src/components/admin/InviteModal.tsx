@@ -41,7 +41,7 @@ const InviteModal = ({
   const createInvite = useMutation({
     mutationFn: createInviteMutation,
   });
-  const { handleSubmit, register, reset } = useForm<SubmitData>({
+  const { handleSubmit, register } = useForm<SubmitData>({
     defaultValues: {
       gradeYear: undefined,
       email: "",
