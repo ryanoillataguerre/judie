@@ -94,6 +94,7 @@ model User {
   stripeCustomerId  String?    @map("stripe_customer_id")
   questionsAsked    Int        @default(0) @map("questions_asked")
   lastSessionId     String?    @map("last_session_id")
+  emailVerified     Boolean    @default(false) @map("email_verified")
   role              UserRole   @default(STUDENT)
 
   organizations        Organization[]

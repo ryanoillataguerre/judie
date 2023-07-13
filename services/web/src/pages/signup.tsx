@@ -162,6 +162,8 @@ export const SignupForm = ({
 
   const isInvite = !!inviteEmail;
 
+  console.log(isInvite);
+
   return typeof window === "undefined" ? (
     <Spinner colorScheme="blue" />
   ) : (
@@ -211,9 +213,13 @@ export const SignupForm = ({
               required
               placeholder="judie@judie.io"
               {...register("email", {})}
-              isReadOnly={inviteEmail !== undefined}
-              value={inviteEmail ?? ""}
-              disabled={inviteEmail !== undefined}
+              isReadOnly={isInvite}
+              {...(isInvite
+                ? {
+                    value: inviteEmail,
+                  }
+                : {})}
+              disabled={isInvite}
             />
           </FormControl>
           <FormControl

@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import { errorPassthrough, requireAuth } from "../utils/express.js";
-import { getUser, getUserPermissions, updateUser } from "./service.js";
+import {
+  getUser,
+  getUserPermissions,
+  updateUser,
+  verifyUserEmail,
+} from "./service.js";
 import { Chat, Message, Subscription, User } from "@prisma/client";
 import { body } from "express-validator";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -123,6 +128,16 @@ router.get(
       id: session.userId as string,
     });
 
+    res.status(200).send({
+      data: user,
+    });
+  })
+);
+
+router.post(
+  "/:userId/verify",
+  errorPassthrough(async (req: Request, res: Response) => {
+    const user = await verifyUserEmail(req.params.userId as string);
     res.status(200).send({
       data: user,
     });

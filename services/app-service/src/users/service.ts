@@ -62,3 +62,14 @@ export const getUserPermissions = async (
   });
   return user?.permissions;
 };
+
+export const verifyUserEmail = async (userId: string) => {
+  return await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      emailVerified: true,
+    },
+  });
+};
