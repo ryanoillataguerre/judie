@@ -11,8 +11,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
+  GET_INVITES_FOR_SCHOOL,
   GET_SCHOOL_BY_ID,
   GET_USERS_FOR_SCHOOL,
+  getInvitesForSchoolQuery,
   getSchoolByIdQuery,
   getUsersForSchoolQuery,
 } from "@judie/data/queries";
@@ -22,6 +24,7 @@ import { useState } from "react";
 import CreateRoomModal from "../CreateRoomModal";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import UserRow from "../EntityRow/UserRow";
+import InviteRow from "../EntityRow/InviteRow";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData } = useQuery({
@@ -32,6 +35,12 @@ const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolUserData } = useQuery({
     queryKey: [GET_USERS_FOR_SCHOOL, id],
     queryFn: () => getUsersForSchoolQuery(id),
+    enabled: !!id,
+  });
+
+  const { data: schoolInvitesData } = useQuery({
+    queryKey: [GET_INVITES_FOR_SCHOOL, id],
+    queryFn: () => getInvitesForSchoolQuery(id),
     enabled: !!id,
   });
 
@@ -115,6 +124,24 @@ const AdminSchool = ({ id }: { id: string }) => {
               >
                 {schoolUserData.map((user) => (
                   <UserRow key={user.id} user={user} />
+                ))}
+              </VStack>
+            </TabPanel>
+          ) : null}
+          {schoolInvitesData?.length ? (
+            <TabPanel>
+              <VStack
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                }}
+                spacing={"1rem"}
+              >
+                {schoolInvitesData.map((invite) => (
+                  <InviteRow key={invite.id} invite={invite} />
                 ))}
               </VStack>
             </TabPanel>

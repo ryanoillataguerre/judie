@@ -8,7 +8,7 @@ export const createSchool = async (params: Prisma.SchoolCreateInput) => {
 };
 
 export const getUsersForSchool = async ({ id }: { id: string }) => {
-  const permissionsWithUsers = await dbClient.userPermission.findMany({
+  const permissionsWithUsers = await dbClient.permission.findMany({
     where: {
       schoolId: id,
       userId: {
@@ -39,6 +39,18 @@ export const getSchoolById = async ({ id }: { id: string }) => {
     include: {
       rooms: true,
       users: true,
+    },
+  });
+};
+
+export const getInvitesForSchool = async ({ id }: { id: string }) => {
+  return await dbClient.invite.findMany({
+    where: {
+      permissions: {
+        some: {
+          schoolId: id,
+        },
+      },
     },
   });
 };

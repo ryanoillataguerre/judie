@@ -11,8 +11,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
+  GET_INVITES_FOR_ORG,
   GET_ORG_BY_ID,
   GET_USERS_FOR_ORG,
+  getInvitesForOrgQuery,
   getOrgByIdQuery,
   getUsersForOrgQuery,
 } from "@judie/data/queries";
@@ -35,6 +37,12 @@ const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationUserData } = useQuery({
     queryKey: [GET_USERS_FOR_ORG, id],
     queryFn: () => getUsersForOrgQuery(id),
+    enabled: !!id,
+  });
+
+  const { data: organizationInvitesData } = useQuery({
+    queryKey: [GET_INVITES_FOR_ORG, id],
+    queryFn: () => getInvitesForOrgQuery(id),
     enabled: !!id,
   });
 
@@ -84,7 +92,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
           {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
           {organizationUserData?.length ? <Tab>Users</Tab> : null}
-          {organizationData?.invites?.length ? <Tab>Invites</Tab> : null}
+          {organizationInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
         <TabPanels>
           {organizationData?.schools?.length ? (
@@ -141,7 +149,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
               </VStack>
             </TabPanel>
           ) : null}
-          {organizationData?.invites?.length ? (
+          {organizationInvitesData?.length ? (
             <TabPanel>
               <VStack
                 style={{
@@ -153,7 +161,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
                 }}
                 spacing={"1rem"}
               >
-                {organizationData?.invites.map((invite) => (
+                {organizationInvitesData.map((invite) => (
                   <InviteRow key={invite.id} invite={invite} />
                 ))}
               </VStack>

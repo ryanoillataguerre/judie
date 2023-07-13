@@ -6,7 +6,7 @@ export const createRoom = async (params: Prisma.RoomCreateArgs) => {
 };
 
 export const getUsersForRoom = async ({ id }: { id: string }) => {
-  const permissionsWithUsers = await dbClient.userPermission.findMany({
+  const permissionsWithUsers = await dbClient.permission.findMany({
     where: {
       roomId: id,
       userId: {
@@ -36,6 +36,18 @@ export const getRoomById = async ({ id }: { id: string }) => {
     },
     include: {
       users: true,
+    },
+  });
+};
+
+export const getInvitesForRoom = async ({ id }: { id: string }) => {
+  return await dbClient.invite.findMany({
+    where: {
+      permissions: {
+        some: {
+          roomId: id,
+        },
+      },
     },
   });
 };

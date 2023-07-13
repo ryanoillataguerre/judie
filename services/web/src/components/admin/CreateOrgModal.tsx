@@ -8,6 +8,7 @@ import {
   ModalContent,
   ModalOverlay,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { createOrgMutation, createSchoolMutation } from "@judie/data/mutations";
 import { useEffect, useState } from "react";
@@ -16,6 +17,7 @@ import { useMutation, useQuery } from "react-query";
 import Button from "../Button/Button";
 import { GET_ORG_BY_ID, getOrgByIdQuery } from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
+import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface SubmitData {
   name: string;
@@ -32,6 +34,7 @@ const CreateOrgModal = ({
   onClose: () => void;
 }) => {
   const { refreshEntities } = useAuth();
+  const toast = useToast();
   const [success, setSuccess] = useState(false);
   const createOrg = useMutation({
     mutationFn: createOrgMutation,
@@ -63,7 +66,13 @@ const CreateOrgModal = ({
       });
       refreshEntities();
       onClose();
-    } catch (err) {}
+    } catch (err) {
+      console.log("caught error");
+      toast({
+        title: "Error creating organization",
+        description: (err as unknown as HTTPResponseError).message,
+      });
+    }
   };
 
   useEffect(() => {
@@ -177,7 +186,7 @@ const CreateOrgModal = ({
                 colorScheme="green"
                 variant={"solid"}
                 loading={createOrg.isLoading}
-                label="Create School"
+                label="Create Organization"
                 type="submit"
               />
             </Flex>

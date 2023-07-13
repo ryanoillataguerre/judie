@@ -1,9 +1,7 @@
-import { Button, Text } from "@chakra-ui/react";
-import { Invite, Organization } from "@judie/data/types/api";
-import { useRouter } from "next/router";
+import { Button } from "@chakra-ui/react";
+import { Invite } from "@judie/data/types/api";
 
 const InviteRow = ({ invite }: { invite: Invite }) => {
-  const router = useRouter();
   return (
     <Button
       variant={"outline"}

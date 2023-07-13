@@ -331,7 +331,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           break;
       }
       return;
-    } else if ((filteredAdminPermissions?.length || 0) > 1) {
+    } else if ((filteredAdminPermissions?.length || 0) > 1 || auth.isAdmin) {
       router.push("/admin");
       return;
     } else {
@@ -340,7 +340,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         title: "No admin orgs",
       });
     }
-  }, [auth.userData?.permissions]);
+  }, [auth.userData?.permissions, auth.isAdmin]);
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
