@@ -2,6 +2,13 @@ import { Button, Text } from "@chakra-ui/react";
 import { Organization } from "@judie/data/types/api";
 import { useRouter } from "next/router";
 
+// Columns:
+
+// name
+// numStudents
+// numTeachers
+// numAdmins
+
 const OrgRow = ({ org }: { org: Organization }) => {
   const router = useRouter();
   return (

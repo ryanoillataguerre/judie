@@ -91,6 +91,7 @@ model User {
   gradeYear         GradeYear? @map("grade_year")
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedAt         DateTime?  @updatedAt @map("updated_at")
+  lastMessageAt     DateTime?  @map("last_message_at")
   stripeCustomerId  String?    @map("stripe_customer_id")
   questionsAsked    Int        @default(0) @map("questions_asked")
   lastSessionId     String?    @map("last_session_id")

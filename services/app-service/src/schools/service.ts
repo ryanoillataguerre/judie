@@ -52,5 +52,8 @@ export const getInvitesForSchool = async ({ id }: { id: string }) => {
         },
       },
     },
+    include: {
+      permissions: true,
+    },
   });
 };

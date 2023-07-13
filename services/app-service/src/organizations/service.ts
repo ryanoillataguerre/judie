@@ -54,5 +54,8 @@ export const getInvitesForOrganization = async ({ id }: { id: string }) => {
         },
       },
     },
+    include: {
+      permissions: true,
+    },
   });
 };
