@@ -295,3 +295,11 @@ export const createInviteMutation = async ({
   });
   return response.data;
 };
+
+export const verifyEmailMutation = async (id: string) => {
+  const response = await baseFetch({
+    url: `/user/${id}/verify`,
+    method: "POST",
+  });
+  return response.data;
+};

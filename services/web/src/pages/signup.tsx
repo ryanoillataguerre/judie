@@ -211,9 +211,13 @@ export const SignupForm = ({
               required
               placeholder="judie@judie.io"
               {...register("email", {})}
-              isReadOnly={inviteEmail !== undefined}
-              value={inviteEmail ?? ""}
-              disabled={inviteEmail !== undefined}
+              isReadOnly={isInvite}
+              {...(isInvite
+                ? {
+                    value: inviteEmail,
+                  }
+                : {})}
+              disabled={isInvite}
             />
           </FormControl>
           <FormControl
