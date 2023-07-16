@@ -23,8 +23,13 @@ export const getUsersForSchool = async ({ id }: { id: string }) => {
       },
     },
   });
+  const userIdMap: { [key: string]: boolean } = {};
   return permissionsWithUsers.reduce((acc, val) => {
-    if (val.user) {
+    if (val.user?.id && userIdMap[val.user?.id]) {
+      return acc;
+    }
+    if (val.user?.id) {
+      userIdMap[val.user.id] = true;
       return [...acc, val.user];
     }
     return acc;

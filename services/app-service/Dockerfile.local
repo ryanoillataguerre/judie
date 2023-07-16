@@ -4,7 +4,6 @@ WORKDIR /app
 
 COPY app-service/package.json ./
 COPY app-service/prisma ./prisma/
-COPY build_protos.sh /opt/build_protos.sh
 
 RUN yarn
 
