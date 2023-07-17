@@ -8,6 +8,12 @@ import {
   UserRole,
 } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
+import {
+  DecodedNotificationPayload,
+  JWSRenewalInfoDecodedPayload,
+  JWSTransactionDecodedPayload,
+  decodeTransaction,
+} from "app-store-server-api";
 
 export const createCustomer = async (userId: string): Promise<string> => {
   const user = await getUser({ id: userId });
@@ -72,6 +78,12 @@ export const checkout = async (
   return await createCheckoutSession(params);
 };
 
+export const getSubscription = async (
+  args: Prisma.SubscriptionFindFirstArgs
+) => {
+  return await dbClient.subscription.findFirst(args);
+};
+
 export const createSubscription = async (
   params: Prisma.SubscriptionCreateInput
 ) => {
@@ -79,6 +91,10 @@ export const createSubscription = async (
     data: params,
   });
 };
+
+export const upsertSubscription = async (
+  args: Prisma.SubscriptionUpsertArgs
+) => {};
 
 /**
  * 
@@ -258,4 +274,189 @@ export const handleSubscriptionCreated = async (
     },
   };
   await createSubscription(subscriptionData);
+};
+
+const monthlyAppleProductId = "judiemonthlysubscription";
+const annualAppleProductId = "judieannualsubscription";
+
+export const handleAppleSubscriptionCreated = async (
+  transactionInfo: JWSTransactionDecodedPayload
+) => {
+  const userId = transactionInfo.appAccountToken;
+  if (!userId) {
+    throw new Error("User not found");
+  }
+  const expiresDate = expirationDateFromTransactionInfo(transactionInfo);
+  const subscriptionType = subscriptionTypeFromAppleProductId(
+    transactionInfo.productId
+  );
+  const subscriptionData: Prisma.SubscriptionCreateInput = {
+    status: SubscriptionStatus.ACTIVE,
+    appleTransactionId: transactionInfo.transactionId,
+    originalAppleTransactionId: transactionInfo.originalTransactionId,
+    type: subscriptionType,
+    expiresAt: expiresDate,
+    user: {
+      connect: {
+        id: userId,
+      },
+    },
+  };
+  await createSubscription(subscriptionData);
+};
+
+export const handleAppleSubscriptionRenewalPrefsChanged = async (
+  transactionInfo: JWSTransactionDecodedPayload
+) => {
+  const userId = transactionInfo.appAccountToken;
+  if (!userId) {
+    throw new Error("User not found");
+  }
+  const subscriptionType = subscriptionTypeFromAppleProductId(
+    transactionInfo.productId
+  );
+  const subscriptionArgs: Prisma.SubscriptionFindFirstArgs = {
+    select: {
+      id: true,
+      userId: true,
+    },
+    where: {
+      originalAppleTransactionId: transactionInfo.originalTransactionId,
+      type: subscriptionType,
+    },
+  };
+
+  const existingSubscription = await getSubscription(subscriptionArgs);
+  const subscriptionId =
+    existingSubscription != null ? existingSubscription.id : null;
+  const expiresDate = expirationDateFromTransactionInfo(transactionInfo);
+  const createSubscriptionInput: Prisma.SubscriptionCreateInput = {
+    status: SubscriptionStatus.ACTIVE,
+    appleTransactionId: transactionInfo.transactionId,
+    originalAppleTransactionId: transactionInfo.originalTransactionId,
+    type: subscriptionType,
+    expiresAt: expiresDate,
+    user: {
+      connect: {
+        id: userId,
+      },
+    },
+  };
+  if (subscriptionId == null || existingSubscription == null) {
+    return await createSubscription(createSubscriptionInput);
+  }
+
+  if (existingSubscription.userId != userId) {
+    return await dbClient.$transaction([
+      dbClient.subscription.delete({
+        where: {
+          id: subscriptionId,
+        },
+      }),
+      dbClient.subscription.create({ data: createSubscriptionInput }),
+    ]);
+  }
+  const subscriptionUpdateArgs: Prisma.SubscriptionUpdateArgs = {
+    where: {
+      id: subscriptionId,
+    },
+    data: {
+      status: SubscriptionStatus.ACTIVE,
+      appleTransactionId: transactionInfo.transactionId,
+      originalAppleTransactionId: transactionInfo.originalTransactionId,
+      type: subscriptionType,
+      expiresAt: expiresDate,
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+    },
+  };
+  return dbClient.subscription.update(subscriptionUpdateArgs);
+};
+
+export const handleAppleSubscriptionExpired = async (
+  transactionInfo: JWSTransactionDecodedPayload
+) => {
+  const subscriptionId = await getSubscriptionIdFromAppleTransactionInfo(
+    transactionInfo
+  );
+  if (subscriptionId == null) return;
+
+  const expiresDate = expirationDateFromTransactionInfo(transactionInfo);
+  const subscriptionUpdateArgs: Prisma.SubscriptionUpdateArgs = {
+    where: {
+      id: subscriptionId,
+    },
+    data: {
+      status: SubscriptionStatus.CANCELED,
+      expiresAt: expiresDate,
+    },
+  };
+  return dbClient.subscription.update(subscriptionUpdateArgs);
+};
+
+export const handleAppleSubscriptionRenewal = async (
+  transactionInfo: JWSTransactionDecodedPayload
+) => {
+  const subscriptionId = await getSubscriptionIdFromAppleTransactionInfo(
+    transactionInfo,
+    undefined
+  );
+  if (subscriptionId == null) return;
+
+  const expiresDate = expirationDateFromTransactionInfo(transactionInfo);
+  const subscriptionUpdateArgs: Prisma.SubscriptionUpdateArgs = {
+    where: {
+      id: subscriptionId,
+    },
+    data: {
+      status: SubscriptionStatus.ACTIVE,
+      expiresAt: expiresDate,
+    },
+  };
+  return dbClient.subscription.update(subscriptionUpdateArgs);
+};
+
+const getSubscriptionIdFromAppleTransactionInfo = async (
+  transactionInfo: JWSTransactionDecodedPayload,
+  status: SubscriptionStatus | undefined = SubscriptionStatus.ACTIVE
+): Promise<string | null> => {
+  const subscriptionType = subscriptionTypeFromAppleProductId(
+    transactionInfo.productId
+  );
+  const subscriptionArgs: Prisma.SubscriptionFindFirstArgs = {
+    select: {
+      id: true,
+    },
+    where: {
+      originalAppleTransactionId: transactionInfo.originalTransactionId,
+      type: subscriptionType,
+      status: status,
+    },
+  };
+
+  const existingSubscription = await getSubscription(subscriptionArgs);
+  return existingSubscription == null ? null : existingSubscription.id;
+};
+
+const subscriptionTypeFromAppleProductId = (productId: string) => {
+  switch (productId) {
+    case monthlyAppleProductId:
+      return SubscriptionType.MONTHLY;
+    case annualAppleProductId:
+      return SubscriptionType.YEARLY;
+    default:
+      throw new Error("");
+  }
+};
+
+const expirationDateFromTransactionInfo = (
+  transactionInfo: JWSTransactionDecodedPayload
+) => {
+  if (transactionInfo.expiresDate) {
+    return new Date(transactionInfo.expiresDate);
+  }
+  return null;
 };

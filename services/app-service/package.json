@@ -40,6 +40,8 @@
     "@prisma/client": "4.10.1",
     "@segment/analytics-node": "^1.0.0-beta.26",
     "@types/bcryptjs": "^2.4.2",
+    "app-store-server-api": "^0.9.0",
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "connect-redis": "^6.1.3",

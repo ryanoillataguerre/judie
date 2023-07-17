@@ -2,6 +2,7 @@ import { errorPassthrough } from "../utils/express.js";
 
 import { Router, Request, Response, NextFunction } from "express";
 import { handleStripeWebhookEvents } from "./stripe.js";
+import { handleAppleWebhookEvents } from "./apple.js";
 
 const router = Router();
 router.post(
@@ -22,6 +23,21 @@ router.post(
         res.status(422).send("Invalid request");
       }
     } catch (error) {
+      next(error);
+    }
+  })
+);
+
+router.post(
+  "/apple",
+  errorPassthrough(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const reqBodyString = req.body.toString("utf-8");
+      const decodedReqBody = JSON.parse(reqBodyString);
+      await handleAppleWebhookEvents(decodedReqBody.signedPayload);
+      res.status(200).send();
+    } catch (error) {
+      res.status(422).send("Invalid request");
       next(error);
     }
   })
