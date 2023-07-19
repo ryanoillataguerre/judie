@@ -11,7 +11,7 @@ RUN yarn run generate
 
 COPY ./app-service .
 
-RUN /opt/build_protos.sh
+# RUN /opt/build_protos.sh
 
 EXPOSE 8080
 
