@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import {
+  errorPassthrough,
   handleValidationErrors,
   requireAuth,
   requireJudieAuth,
@@ -29,7 +30,7 @@ router.post(
   ],
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { name, organizationId } = req.body;
     // Validate user has organization-level privileges
     await validateOrganizationAdmin({
@@ -68,14 +69,14 @@ router.post(
     res.status(201).json({
       data: school,
     });
-  }
+  })
 );
 
 router.get(
   "/:schoolId/users",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
     await validateSchoolAdmin({
@@ -88,14 +89,14 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
 );
 
 router.get(
   "/:schoolId",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
     await validateSchoolAdmin({
@@ -108,14 +109,14 @@ router.get(
     res.status(200).send({
       data: school,
     });
-  }
+  })
 );
 
 router.get(
   "/:schoolId/invites",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
     await validateSchoolAdmin({
@@ -128,7 +129,7 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
 );
 
 export default router;

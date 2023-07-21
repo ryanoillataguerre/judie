@@ -26,8 +26,9 @@ import { PlusSquareIcon } from "@chakra-ui/icons";
 import UserRow from "../EntityRow/UserRow";
 import InviteRow from "../EntityRow/InviteRow";
 import InvitesTable from "../tables/InvitesTable";
-import { Invite, User } from "@judie/data/types/api";
+import { Invite, Room, User } from "@judie/data/types/api";
 import UsersTable from "../tables/UsersTable";
+import RoomsTable from "../tables/RoomsTable";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData } = useQuery({
@@ -97,24 +98,9 @@ const AdminSchool = ({ id }: { id: string }) => {
           {schoolInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
         <TabPanels>
-          {schoolData?.rooms?.length ? (
-            <TabPanel>
-              <VStack
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                  width: "100%",
-                }}
-                spacing={"1rem"}
-              >
-                {schoolData?.rooms.map((room) => (
-                  <RoomRow key={room.id} room={room} />
-                ))}
-              </VStack>
-            </TabPanel>
-          ) : null}
+          <TabPanel>
+            <RoomsTable rooms={schoolData?.rooms as Room[]} />
+          </TabPanel>
           <TabPanel>
             <UsersTable users={schoolUserData as User[]} schoolId={id} />
           </TabPanel>

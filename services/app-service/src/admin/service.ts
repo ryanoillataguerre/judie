@@ -61,6 +61,14 @@ export const validateSchoolAdmin = async ({
   userId: string;
   schoolId: string;
 }) => {
+  const school = await dbClient.school.findUnique({
+    where: {
+      id: schoolId,
+    },
+    include: {
+      organization: true,
+    },
+  });
   const user = await dbClient.user.findUnique({
     where: {
       id: userId,
@@ -75,8 +83,10 @@ export const validateSchoolAdmin = async ({
   }
   const permission = user?.permissions.find((permission) => {
     return (
-      permission.schoolId === schoolId &&
-      permission.type === PermissionType.SCHOOL_ADMIN
+      (permission.schoolId === schoolId &&
+        permission.type === PermissionType.SCHOOL_ADMIN) ||
+      (permission.organizationId === school?.organizationId &&
+        permission.type === PermissionType.ORG_ADMIN)
     );
   });
   if (!permission) {
@@ -94,6 +104,14 @@ export const validateRoomAdmin = async ({
   userId: string;
   roomId: string;
 }) => {
+  const room = await dbClient.room.findUnique({
+    where: {
+      id: roomId,
+    },
+    include: {
+      organization: true,
+    },
+  });
   const user = await dbClient.user.findUnique({
     where: {
       id: userId,
@@ -108,8 +126,12 @@ export const validateRoomAdmin = async ({
   }
   const permission = user?.permissions.find((permission) => {
     return (
-      permission.roomId === roomId &&
-      permission.type === PermissionType.ROOM_ADMIN
+      (permission.roomId === roomId &&
+        permission.type === PermissionType.ROOM_ADMIN) ||
+      (permission.organizationId === room?.organizationId &&
+        permission.type === PermissionType.ORG_ADMIN) ||
+      (permission.schoolId === room?.schoolId &&
+        permission.type === PermissionType.SCHOOL_ADMIN)
     );
   });
   if (!permission) {
