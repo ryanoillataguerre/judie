@@ -4,6 +4,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -30,13 +31,7 @@ interface SubmitData {
   permissions: CreatePermissionType[];
 }
 
-const InviteModal = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
+const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
   const toast = useToast();
   const createInvite = useMutation({
     mutationFn: createInviteMutation,
@@ -90,6 +85,119 @@ const InviteModal = ({
       });
     }
   };
+  return (
+    <>
+      <Text
+        style={{
+          fontSize: "1.5rem",
+          fontWeight: 500,
+        }}
+      >
+        Add a user
+      </Text>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          width: "100%",
+        }}
+      >
+        <Flex
+          style={{
+            flexDirection: "column",
+            alignItems: "flex-start",
+            paddingBottom: "1rem",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: "1rem",
+              margin: "1rem 0",
+            }}
+          >
+            Enter the user's info below and attach them to an organization,
+            school, or room for them to start out.
+          </Text>
+          <FormControl
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.5rem",
+            }}
+            isRequired
+          >
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <Input id="email" type="email" {...register("email", {})} />
+          </FormControl>
+          <FormControl
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.5rem",
+            }}
+          >
+            <FormLabel htmlFor="gradeYear">Grade Year</FormLabel>
+            <Select id="gradeYear" {...register("gradeYear", {})}>
+              <option value={undefined}>{"None"}</option>
+              {/* TODO Ryan: Make user-facing versions of these */}
+              {Object.keys(GradeYear).map((key) => (
+                <option value={key}>{key}</option>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.5rem",
+              width: "100%",
+            }}
+            isRequired
+          >
+            <FormLabel htmlFor="permissions">Permissions</FormLabel>
+            <PermissionsWidget
+              onChangePermissions={setPermissions}
+              permissions={permissions}
+            />
+          </FormControl>
+
+          <Button
+            style={{
+              width: "100%",
+              marginTop: "1rem",
+            }}
+            colorScheme="green"
+            variant={"solid"}
+            loading={createInvite.isLoading}
+            label="Invite User"
+            disabled={!permissions.length}
+            type="submit"
+          />
+        </Flex>
+      </form>
+    </>
+  );
+};
+
+const BulkUploadModalBody = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <>
+      <Text
+        style={{
+          fontSize: "1.5rem",
+          fontWeight: 500,
+        }}
+      >
+        Upload users
+      </Text>
+    </>
+  );
+};
+
+const InviteModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const [displayUpload, setDisplayUpload] = useState(false);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
@@ -102,90 +210,39 @@ const InviteModal = ({
             alignItems: "flex-start",
           }}
         >
-          <Text
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: 500,
-            }}
-          >
-            Add a user
-          </Text>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
+          {displayUpload ? (
+            <BulkUploadModalBody onClose={onClose} />
+          ) : (
+            <SingleInviteModalBody onClose={onClose} />
+          )}
+
+          <Flex
             style={{
               width: "100%",
+              padding: "1rem",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <Flex
-              style={{
-                flexDirection: "column",
-                alignItems: "flex-start",
-                paddingBottom: "1rem",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: "1rem",
-                  margin: "1rem 0",
-                }}
-              >
-                Enter the user's info below and attach them to an organization,
-                school, or room for them to start out.
+            {displayUpload ? (
+              <Text style={{}}>
+                Want to add a single student?{" "}
+                <Link
+                  color={"teal.500"}
+                  onClick={() => setDisplayUpload(false)}
+                >
+                  Invite instead
+                </Link>
               </Text>
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                }}
-                isRequired
-              >
-                <FormLabel htmlFor="email">Email</FormLabel>
-                <Input id="email" type="email" {...register("email", {})} />
-              </FormControl>
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <FormLabel htmlFor="gradeYear">Grade Year</FormLabel>
-                <Select id="gradeYear" {...register("gradeYear", {})}>
-                  <option value={undefined}>{"None"}</option>
-                  {/* TODO Ryan: Make user-facing versions of these */}
-                  {Object.keys(GradeYear).map((key) => (
-                    <option value={key}>{key}</option>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                  width: "100%",
-                }}
-                isRequired
-              >
-                <FormLabel htmlFor="permissions">Permissions</FormLabel>
-                <PermissionsWidget
-                  onChangePermissions={setPermissions}
-                  permissions={permissions}
-                />
-              </FormControl>
-
-              <Button
-                style={{
-                  width: "100%",
-                  marginTop: "1rem",
-                }}
-                colorScheme="green"
-                variant={"solid"}
-                loading={createInvite.isLoading}
-                label="Invite User"
-                disabled={!permissions.length}
-                type="submit"
-              />
-            </Flex>
-          </form>
+            ) : (
+              <Text style={{}}>
+                Want to invite many students at one time?{" "}
+                <Link color={"teal.500"} onClick={() => setDisplayUpload(true)}>
+                  Upload instead
+                </Link>
+              </Text>
+            )}
+          </Flex>
         </ModalBody>
       </ModalContent>
     </Modal>
