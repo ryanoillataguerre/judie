@@ -3,6 +3,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Image,
   Input,
   Link,
   Modal,
@@ -24,6 +25,7 @@ import { useMutation } from "react-query";
 import Button from "../Button/Button";
 import PermissionsWidget from "./PermissionsWidget";
 import { HTTPResponseError } from "@judie/data/baseFetch";
+import SheetReader from "./SheetReader";
 
 interface SubmitData {
   gradeYear?: GradeYear;
@@ -184,8 +186,40 @@ const BulkUploadModalBody = ({ onClose }: { onClose: () => void }) => {
           fontWeight: 500,
         }}
       >
-        Upload users
+        Add multiple users
       </Text>
+      <Text
+        style={{
+          fontSize: "1rem",
+          margin: "0.5rem 0",
+        }}
+      >
+        Upload a CSV file of the following format:
+      </Text>
+      <Image
+        src="/assets/demo-invite-spreadsheet.png"
+        style={{ width: "60%", height: "auto", margin: "1rem 0" }}
+      />
+      <Text
+        style={{
+          fontWeight: 600,
+        }}
+      >
+        Want a starter? Download a basic spreadsheet{" "}
+        <Link
+          color={"teal.500"}
+          href="/assets/demo-invite-spreadsheet.xlsx"
+          download
+        >
+          here
+        </Link>
+      </Text>
+      <SheetReader
+        onFileChange={(val) => {
+          console.log("file changed");
+          console.log(val);
+        }}
+      />
     </>
   );
 };
@@ -225,7 +259,11 @@ const InviteModal = ({
             }}
           >
             {displayUpload ? (
-              <Text style={{}}>
+              <Text
+                style={{
+                  fontSize: "0.8rem",
+                }}
+              >
                 Want to add a single student?{" "}
                 <Link
                   color={"teal.500"}
@@ -235,7 +273,11 @@ const InviteModal = ({
                 </Link>
               </Text>
             ) : (
-              <Text style={{}}>
+              <Text
+                style={{
+                  fontSize: "0.8rem",
+                }}
+              >
                 Want to invite many students at one time?{" "}
                 <Link color={"teal.500"} onClick={() => setDisplayUpload(true)}>
                   Upload instead
