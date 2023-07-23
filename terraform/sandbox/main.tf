@@ -251,10 +251,6 @@ resource "google_cloud_run_service" "app-service" {
           value = var.env_stripe_monthly_price_id
         }
         env {
-          name = "STRIPE_COUPON_ID"
-          value = var.env_stripe_coupon_id
-        }
-        env {
           name = "STRIPE_SK"
           value = var.env_stripe_sk
         }
