@@ -191,8 +191,8 @@ export interface InviteRow {
 }
 interface OnSubmitData {
   all: InviteRow[];
-  valid: InviteRow[];
-  invalid: InviteRow[];
+  validData: InviteRow[];
+  invalidData: InviteRow[];
 }
 const fields = [
   {
@@ -322,9 +322,8 @@ const InviteModal = ({
   // TODO: Make these type strict
   const onSubmit = async (defaultData: any) => {
     const data = defaultData as OnSubmitData;
-    console.log(data);
     // Check for errors in rows
-    if (data.invalid.length) {
+    if (data.invalidData?.length) {
       return;
     }
 
@@ -333,7 +332,7 @@ const InviteModal = ({
     if (organizationId) {
       await bulkMutation.mutateAsync({
         organizationId,
-        invites: data.valid.map((invite) => ({
+        invites: data.validData?.map((invite) => ({
           email: invite.Email,
           role: invite.Role,
           school: invite.School,
