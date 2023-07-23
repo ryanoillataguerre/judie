@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, Request, Response } from "express";
 import invitesRouter from "../invites/routes.js";
 import organizationsRouter from "../organizations/routes.js";
 import schoolsRouter from "../schools/routes.js";

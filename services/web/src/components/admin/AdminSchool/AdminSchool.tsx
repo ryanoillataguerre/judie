@@ -47,7 +47,6 @@ const AdminSchool = ({ id }: { id: string }) => {
     queryFn: () => getInvitesForSchoolQuery(id),
     enabled: !!id,
   });
-  console.log(schoolInvitesData);
 
   const [createRoomOpen, setCreateRoomOpen] = useState(false);
 
