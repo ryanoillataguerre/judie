@@ -1,9 +1,7 @@
 import {
-  Box,
   Flex,
   FormControl,
   FormLabel,
-  Image,
   Input,
   Link,
   Modal,
@@ -25,7 +23,7 @@ import { useMutation } from "react-query";
 import Button from "../Button/Button";
 import PermissionsWidget from "./PermissionsWidget";
 import { HTTPResponseError } from "@judie/data/baseFetch";
-import SheetReader from "./SheetReader";
+import { ReactSpreadsheetImport } from "react-spreadsheet-import";
 
 interface SubmitData {
   gradeYear?: GradeYear;
@@ -177,52 +175,111 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-const BulkUploadModalBody = ({ onClose }: { onClose: () => void }) => {
-  return (
-    <>
-      <Text
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 500,
-        }}
-      >
-        Add multiple users
-      </Text>
-      <Text
-        style={{
-          fontSize: "1rem",
-          margin: "0.5rem 0",
-        }}
-      >
-        Upload a CSV file of the following format:
-      </Text>
-      <Image
-        src="/assets/demo-invite-spreadsheet.png"
-        style={{ width: "60%", height: "auto", margin: "1rem 0" }}
-      />
-      <Text
-        style={{
-          fontWeight: 600,
-        }}
-      >
-        Want a starter? Download a basic spreadsheet{" "}
-        <Link
-          color={"teal.500"}
-          href="/assets/demo-invite-spreadsheet.xlsx"
-          download
-        >
-          here
-        </Link>
-      </Text>
-      <SheetReader
-        onFileChange={(val) => {
-          console.log("file changed");
-          console.log(val);
-        }}
-      />
-    </>
-  );
-};
+enum InviteSheetRole {
+  Student,
+  Teacher,
+  Principal,
+  Administrator,
+}
+export interface InviteRow {
+  Email: string;
+  Role: InviteSheetRole;
+  School?: string;
+  Classroom?: string;
+}
+interface OnSubmitData {
+  all: InviteRow[];
+  valid: InviteRow[];
+  invalid: InviteRow[];
+}
+const fields = [
+  {
+    // Visible in table header and when matching columns.
+    label: "Email",
+    // This is the key used for this field when we call onSubmit.
+    key: "Email",
+    fieldType: {
+      // There are 3 types - "input" / "checkbox" / "select".
+      type: "input",
+    },
+    // Used in the first step to provide an example of what data is expected in this field. Optional.
+    example: "student@school.edu",
+    // Can have multiple validations that are visible in Validation Step table.
+    validations: [
+      {
+        // Can be "required" / "unique" / "regex"
+        rule: "required",
+        errorMessage: "Email is required",
+        // There can be "info" / "warning" / "error" levels. Optional. Default "error".
+        level: "error",
+      },
+    ],
+  },
+  {
+    label: "Role",
+    key: "Role",
+    fieldType: {
+      type: "select",
+      options: [
+        {
+          label: "Student",
+          value: "Student",
+        },
+        {
+          label: "Teacher",
+          value: "Teacher",
+        },
+        {
+          label: "Principal",
+          value: "Principal",
+        },
+        {
+          label: "Administrator",
+          value: "Administrator",
+        },
+      ],
+    },
+    example: "Student",
+    validations: [
+      {
+        rule: "required",
+        errorMessage: "Role is required",
+        level: "error",
+      },
+    ],
+  },
+  {
+    label: "School",
+    key: "School",
+    fieldType: {
+      type: "input",
+    },
+    example: "Hart High School",
+  },
+  {
+    label: "Classroom",
+    key: "Classroom",
+    fieldType: {
+      type: "input",
+    },
+    example: "Mr. Smith's 3rd Period Physics",
+  },
+] as const;
+
+// const rowHookValidator: RowHook<InviteRow> = (
+//   data: InviteRow,
+//   addError: (
+//     fieldKey: InviteRow,
+//     error: { message: string; level: string }
+//   ) => void
+// ) => {
+//   // If no email, throw err
+//   // If role === student and no school, throw err
+//   // If role === teacher and (no school or no room), throw err
+//   // If role === principal and no school, throw err
+//   // If role === administrator and school or room, throw err
+//   return data;
+// };
 
 const InviteModal = ({
   isOpen,
@@ -231,7 +288,29 @@ const InviteModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const [displayUpload, setDisplayUpload] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const onCloseUpload = () => {
+    setIsUploadOpen(false);
+  };
+
+  // TODO: Make these type strict
+  const onSubmit = (defaultData: any) => {
+    const data = defaultData as OnSubmitData;
+    console.log(data);
+    // Check for errors in rows
+    if (data.invalid.length) {
+      return;
+    }
+
+    // If errors, show errors
+    // Else: Bulk upload route mutation
+  };
+
+  useEffect(() => {
+    return () => {
+      setIsUploadOpen(false);
+    };
+  }, []);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
@@ -244,12 +323,14 @@ const InviteModal = ({
             alignItems: "flex-start",
           }}
         >
-          {displayUpload ? (
-            <BulkUploadModalBody onClose={onClose} />
-          ) : (
-            <SingleInviteModalBody onClose={onClose} />
-          )}
-
+          <SingleInviteModalBody onClose={onClose} />
+          <ReactSpreadsheetImport
+            isOpen={isUploadOpen}
+            onClose={onCloseUpload}
+            onSubmit={onSubmit}
+            fields={fields}
+            // rowHook={rowHookValidator}
+          />
           <Flex
             style={{
               width: "100%",
@@ -258,32 +339,16 @@ const InviteModal = ({
               justifyContent: "center",
             }}
           >
-            {displayUpload ? (
-              <Text
-                style={{
-                  fontSize: "0.8rem",
-                }}
-              >
-                Want to add a single student?{" "}
-                <Link
-                  color={"teal.500"}
-                  onClick={() => setDisplayUpload(false)}
-                >
-                  Invite instead
-                </Link>
-              </Text>
-            ) : (
-              <Text
-                style={{
-                  fontSize: "0.8rem",
-                }}
-              >
-                Want to invite many students at one time?{" "}
-                <Link color={"teal.500"} onClick={() => setDisplayUpload(true)}>
-                  Upload instead
-                </Link>
-              </Text>
-            )}
+            <Text
+              style={{
+                fontSize: "0.8rem",
+              }}
+            >
+              Want to invite many students at one time?{" "}
+              <Link color={"teal.500"} onClick={() => setIsUploadOpen(true)}>
+                Upload instead
+              </Link>
+            </Text>
           </Flex>
         </ModalBody>
       </ModalContent>
