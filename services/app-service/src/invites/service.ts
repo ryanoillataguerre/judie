@@ -4,6 +4,10 @@ import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
 import { signup } from "../auth/service.js";
 import { subscribeUser } from "../admin/service.js";
+import { sendInviteEmail } from "../cio/service.js";
+import { CreateInviteBody } from "./routes.js";
+import BadRequestError from "../utils/errors/BadRequestError.js";
+import moment from "moment";
 
 export const validateInviteRights = async ({
   userId,
@@ -249,4 +253,170 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
   });
 
   return newUser;
+};
+
+export const invite = async (params: CreateInviteBody & { userId: string }) => {
+  // Validate the admin can invite for the given permissions
+  const validatePermissionsPromises = [];
+  for (const permission of params.permissions) {
+    validatePermissionsPromises.push(
+      validateInviteRights({
+        userId: params.userId as string,
+        organizationId: permission.organizationId,
+        schoolId: permission.schoolId,
+        roomId: permission.roomId,
+      })
+    );
+  }
+  await Promise.all(validatePermissionsPromises);
+
+  const existingUser = await dbClient.user.findUnique({
+    where: {
+      email: params.email,
+    },
+  });
+  if (existingUser) {
+    throw new BadRequestError("User already exists");
+  }
+
+  const now = new Date();
+  const existingInvite = await dbClient.invite.findFirst({
+    where: {
+      email: params.email,
+      deletedAt: null,
+      createdAt: {
+        gt: moment(now).subtract(2, "days").format(),
+      },
+    },
+  });
+  if (existingInvite) {
+    throw new BadRequestError(
+      "User already invited. Please let them know to check their email."
+    );
+  }
+  // Create invite
+  const newInvite = await createInvite({
+    gradeYear: params.gradeYear as GradeYear | undefined,
+    email: params.email,
+    permissions: {
+      create: params.permissions.map((permission) => ({
+        type: permission.type as PermissionType,
+        organizationId: permission.organizationId,
+        schoolId: permission.schoolId,
+        roomId: permission.roomId,
+      })),
+    },
+  });
+  // Send invite email
+  await sendInviteEmail({
+    invite: newInvite,
+  });
+};
+
+interface BulkInviteRow {
+  email: string;
+  role: string;
+  school?: string;
+  classroom?: string;
+}
+export interface BulkInviteBody {
+  organizationId: string;
+  invites: BulkInviteRow[];
+}
+
+const inviteStringToPermissionTypeMap: {
+  [key: string]: PermissionType;
+} = {
+  Teacher: PermissionType.ROOM_ADMIN,
+  Student: PermissionType.STUDENT,
+  Principal: PermissionType.SCHOOL_ADMIN,
+  Administrator: PermissionType.ORG_ADMIN,
+};
+
+export const bulkInvite = async (
+  params: BulkInviteBody & { userId: string }
+) => {
+  const schoolNameToIdMap = new Map<string, string>();
+  const roomNameToIdMap = new Map<string, string>();
+  // Validate the admin can invite for every row
+  const validatePermissionsPromises = [];
+  for (const invite of params.invites) {
+    validatePermissionsPromises.push(async () => {
+      let schoolId = undefined;
+      let roomId = undefined;
+      const school = await dbClient.school.findUnique({
+        where: {
+          name: invite.school,
+        },
+      });
+      if (school) {
+        schoolId = school.id;
+        schoolNameToIdMap.set(school.name, school.id);
+
+        if (invite.classroom) {
+          const room = await dbClient.room.findFirst({
+            where: {
+              name: invite.classroom,
+              schoolId: school.id,
+            },
+          });
+          if (room) {
+            roomId = room.id;
+            roomNameToIdMap.set(room.name, room.id);
+          }
+        }
+      }
+      await validateInviteRights({
+        userId: params.userId as string,
+        organizationId: params.organizationId,
+        schoolId,
+        roomId,
+      });
+    });
+  }
+  // Chunk promises into batches of 50
+  let chunks = [];
+  const chunkSize = 50;
+  for (let i = 0; i < validatePermissionsPromises.length; i += chunkSize) {
+    chunks.push(validatePermissionsPromises.slice(i, i + chunkSize));
+  }
+  // Run chunks in sequence
+  for (const chunk of chunks) {
+    await Promise.all(chunk);
+  }
+
+  // Permissions validated! Create invites and send them out
+
+  // Create invites
+  const invites = await dbClient.$transaction(
+    params.invites.map((invite) =>
+      dbClient.invite.create({
+        data: {
+          email: invite.email,
+          organizationId: params.organizationId,
+          permissions: {
+            create: {
+              type: inviteStringToPermissionTypeMap[invite.role],
+              organizationId: params.organizationId,
+              schoolId: invite.school
+                ? schoolNameToIdMap.get(invite.school) || undefined
+                : undefined,
+              roomId: invite.classroom
+                ? roomNameToIdMap.get(invite.classroom) || undefined
+                : undefined,
+            },
+          },
+        },
+      })
+    )
+  );
+
+  // Send invite emails
+  await Promise.all(
+    invites.map(async (invite) => {
+      await sendInviteEmail({
+        invite,
+      });
+    })
+  );
 };
