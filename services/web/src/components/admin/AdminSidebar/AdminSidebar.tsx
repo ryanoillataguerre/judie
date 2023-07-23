@@ -35,6 +35,7 @@ import useStorageState from "@judie/hooks/useStorageState";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import InviteModal from "../InviteModal";
+import useAdminActiveOrganization from "@judie/hooks/useAdminActiveOrganization";
 
 const NestedButton = ({
   title,
@@ -256,6 +257,7 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+  const activeOrganizationId = useAdminActiveOrganization();
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
@@ -392,17 +394,20 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
           </Flex>
         </Flex>
 
-        <Button
-          style={{
-            width: "100%",
-            marginBottom: "1rem",
-            padding: "1rem",
-          }}
-          variant={"solid"}
-          onClick={() => setInviteModalOpen(true)}
-        >
-          <PlusSquareIcon marginRight={"0.3rem"} /> Invite
-        </Button>
+        {activeOrganizationId && (
+          <Button
+            style={{
+              width: "100%",
+              marginBottom: "1rem",
+              padding: "1rem",
+            }}
+            variant={"solid"}
+            onClick={() => setInviteModalOpen(true)}
+          >
+            <PlusSquareIcon marginRight={"0.3rem"} /> Invite
+          </Button>
+        )}
+
         <Divider backgroundColor="#565555" />
         {/* Chats container - scrollable */}
         {auth.isLoading ? (

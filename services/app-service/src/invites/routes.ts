@@ -1,36 +1,22 @@
 import { Request, Response, Router } from "express";
-import { body, check, param } from "express-validator";
+import { body, param } from "express-validator";
 import {
   errorPassthrough,
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
-import {
-  BulkInviteBody,
-  bulkInvite,
-  createInvite,
-  invite,
-  redeemInvite,
-  validateInviteRights,
-} from "./service.js";
+import { BulkInviteBody, bulkInvite, invite, redeemInvite } from "./service.js";
 
-import { sendInviteEmail } from "../cio/service.js";
 import dbClient from "../utils/prisma.js";
 import { signupValidation } from "../auth/routes.js";
-import { GradeYear, PermissionType } from "@prisma/client";
-import BadRequestError from "../utils/errors/BadRequestError.js";
-import moment from "moment";
 import { setUserSessionId } from "../auth/service.js";
 
 const router = Router();
 
 // Invites routes are nested under /admin/
 export interface CreateInviteBody {
-  firstName: string;
-  lastName: string;
   gradeYear: string;
   email: string;
-  role?: string;
   permissions: {
     type: string;
     organizationId?: string;

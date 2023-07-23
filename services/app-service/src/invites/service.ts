@@ -324,7 +324,7 @@ export interface BulkInviteBody {
   invites: BulkInviteRow[];
 }
 
-const inviteStringToPermissionTypeMap: {
+const inviteRoleToPermissionTypeMap: {
   [key: string]: PermissionType;
 } = {
   Teacher: PermissionType.ROOM_ADMIN,
@@ -386,7 +386,6 @@ export const bulkInvite = async (
   }
 
   // Permissions validated! Create invites and send them out
-
   // Create invites
   const invites = await dbClient.$transaction(
     params.invites.map((invite) =>
@@ -396,7 +395,7 @@ export const bulkInvite = async (
           organizationId: params.organizationId,
           permissions: {
             create: {
-              type: inviteStringToPermissionTypeMap[invite.role],
+              type: inviteRoleToPermissionTypeMap[invite.role],
               organizationId: params.organizationId,
               schoolId: invite.school
                 ? schoolNameToIdMap.get(invite.school) || undefined
@@ -410,7 +409,6 @@ export const bulkInvite = async (
       })
     )
   );
-
   // Send invite emails
   await Promise.all(
     invites.map(async (invite) => {
@@ -419,4 +417,5 @@ export const bulkInvite = async (
       });
     })
   );
+  return invites;
 };

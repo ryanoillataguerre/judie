@@ -1,3 +1,7 @@
+import {
+  InviteRow,
+  InviteSheetRole,
+} from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
 import {
   Chat,
@@ -300,6 +304,27 @@ export const verifyEmailMutation = async (id: string) => {
   const response = await baseFetch({
     url: `/user/${id}/verify`,
     method: "POST",
+  });
+  return response.data;
+};
+
+interface BEInviteRow {
+  email: string;
+  role: InviteSheetRole;
+  school?: string;
+  classroom?: string;
+}
+export const bulkInviteMutation = async ({
+  organizationId,
+  invites,
+}: {
+  organizationId: string;
+  invites: BEInviteRow[];
+}) => {
+  const response = await baseFetch({
+    url: `/admin/invites/bulk`,
+    method: "POST",
+    body: { organizationId, invites },
   });
   return response.data;
 };

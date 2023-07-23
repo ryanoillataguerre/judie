@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import {
   CreatePermissionType,
+  bulkInviteMutation,
   createInviteMutation,
 } from "@judie/data/mutations";
 import { GradeYear } from "@judie/data/types/api";
@@ -24,6 +25,7 @@ import Button from "../Button/Button";
 import PermissionsWidget from "./PermissionsWidget";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import { ReactSpreadsheetImport } from "react-spreadsheet-import";
+import useAdminActiveOrganization from "@judie/hooks/useAdminActiveOrganization";
 
 interface SubmitData {
   gradeYear?: GradeYear;
@@ -175,7 +177,7 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-enum InviteSheetRole {
+export enum InviteSheetRole {
   Student,
   Teacher,
   Principal,
@@ -292,9 +294,33 @@ const InviteModal = ({
   const onCloseUpload = () => {
     setIsUploadOpen(false);
   };
+  const organizationId = useAdminActiveOrganization();
+
+  const toast = useToast();
+
+  const bulkMutation = useMutation({
+    mutationFn: bulkInviteMutation,
+    onSuccess: () => {
+      // Toast
+      toast({
+        title: "Invites Sent!",
+        description:
+          "The users will receive an email with their corresponding invite link",
+        status: "success",
+      });
+      onClose();
+    },
+    onError: (err) => {
+      toast({
+        title: "Oops!",
+        description: (err as unknown as HTTPResponseError).message,
+        status: "error",
+      });
+    },
+  });
 
   // TODO: Make these type strict
-  const onSubmit = (defaultData: any) => {
+  const onSubmit = async (defaultData: any) => {
     const data = defaultData as OnSubmitData;
     console.log(data);
     // Check for errors in rows
@@ -304,6 +330,23 @@ const InviteModal = ({
 
     // If errors, show errors
     // Else: Bulk upload route mutation
+    if (organizationId) {
+      await bulkMutation.mutateAsync({
+        organizationId,
+        invites: data.valid.map((invite) => ({
+          email: invite.Email,
+          role: invite.Role,
+          school: invite.School,
+          classroom: invite.Classroom,
+        })),
+      });
+    } else {
+      toast({
+        title: "Oops!",
+        description: "You must be active in an organization to upload invites",
+        status: "error",
+      });
+    }
   };
 
   useEffect(() => {
