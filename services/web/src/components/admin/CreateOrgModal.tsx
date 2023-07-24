@@ -78,7 +78,7 @@ const CreateOrgModal = ({
     return () => {
       reset();
     };
-  }, []);
+  }, [reset]);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
@@ -117,7 +117,7 @@ const CreateOrgModal = ({
                   margin: "1rem 0",
                 }}
               >
-                Enter the org's info below
+                Enter the org&apos;s info below
               </Text>
               <FormControl
                 style={{

@@ -35,6 +35,7 @@ const InvitesTable = ({
         <Tbody>
           {invites?.map((invite) => (
             <Tr
+              key={invite.id}
               _hover={{
                 backgroundColor: rowBackgroundColor,
                 transition: "ease-in-out 0.3s",

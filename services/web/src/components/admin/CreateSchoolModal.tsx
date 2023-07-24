@@ -72,7 +72,7 @@ const CreateSchoolModal = ({
     return () => {
       reset();
     };
-  }, []);
+  }, [reset]);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
@@ -111,7 +111,7 @@ const CreateSchoolModal = ({
                   margin: "1rem 0",
                 }}
               >
-                Enter the school's info below
+                Enter the school&apos;s info below
               </Text>
               <FormControl
                 style={{

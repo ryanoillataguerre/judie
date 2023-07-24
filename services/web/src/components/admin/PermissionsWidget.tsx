@@ -135,7 +135,16 @@ const NewPermissionRow = ({
       default:
         break;
     }
-  }, [type, reset, setOrganizationId, setSchoolId, setRoomId]);
+  }, [
+    type,
+    reset,
+    setOrganizationId,
+    setSchoolId,
+    setRoomId,
+    organizations,
+    rooms,
+    schools,
+  ]);
 
   // Set org, school, room when org, school, roomId changes
   useEffect(() => {
@@ -239,7 +248,9 @@ const NewPermissionRow = ({
             >
               {/* TODO Ryan: Make user-facing versions of these */}
               {Object.keys(PermissionType).map((key) => (
-                <option value={key}>{key}</option>
+                <option value={key} key={key}>
+                  {key}
+                </option>
               ))}
             </Select>
           </FormControl>
@@ -436,6 +447,7 @@ const PermissionsWidget = ({
       )}
       {permissions.map((permission) => (
         <PermissionRow
+          key={`${permission.type}-${permission.organizationId}-${permission.schoolId}-${permission.roomId}`}
           permission={permission}
           onChange={(permission) => {
             // TODO: Update permission in permissions array and do mutation

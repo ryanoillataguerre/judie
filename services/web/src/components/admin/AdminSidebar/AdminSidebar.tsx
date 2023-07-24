@@ -105,7 +105,7 @@ const SidebarRoom = ({ room }: { room: Room }) => {
       return true;
     }
     return false;
-  }, [router]);
+  }, [router, room?.id]);
   return (
     <Flex
       style={{
@@ -139,7 +139,7 @@ const SidebarSchool = ({ school }: { school: School }) => {
       return true;
     }
     return false;
-  }, [router]);
+  }, [router, school?.id]);
   return (
     <Flex
       style={{
@@ -171,7 +171,7 @@ const SidebarSchool = ({ school }: { school: School }) => {
           }}
         >
           {school.rooms?.map((room) => (
-            <SidebarRoom room={room} />
+            <SidebarRoom room={room} key={room.id} />
           ))}
         </VStack>
       </Collapse>
@@ -190,7 +190,7 @@ const SidebarOrganization = ({ org }: { org: Organization }) => {
       return true;
     }
     return false;
-  }, [router]);
+  }, [router, org?.id]);
   return (
     <Flex
       style={{
@@ -223,7 +223,7 @@ const SidebarOrganization = ({ org }: { org: Organization }) => {
           }}
         >
           {org.schools?.map((school) => (
-            <SidebarSchool school={school} />
+            <SidebarSchool school={school} key={school.id} />
           ))}
         </VStack>
       </Collapse>
@@ -310,7 +310,7 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
     ];
     return options;
-  }, [auth, router]);
+  }, [auth, router, onChatClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
@@ -437,10 +437,10 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             }}
           >
             {entities?.organizations?.map((org) => (
-              <SidebarOrganization org={org} />
+              <SidebarOrganization org={org} key={org.id} />
             ))}
             {entities?.schools?.map((school) => (
-              <SidebarSchool school={school} />
+              <SidebarSchool school={school} key={school.id} />
             ))}
             {/* {entities?.rooms?.map((room) => (
               <SidebarRoom room={room} />

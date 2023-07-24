@@ -11,10 +11,8 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
 import { useRouter } from "next/router";
-import { SignupForm } from "../signup";
-import { GET_INVITE_BY_ID, getInviteByIdQuery } from "@judie/data/queries";
 import { verifyEmailMutation } from "@judie/data/mutations";
 import { useEffect } from "react";
 
@@ -42,7 +40,7 @@ const VerifyEmail = () => {
         await mutateAsync();
       })();
     }
-  }, [userId]);
+  }, [userId, mutateAsync]);
 
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const formWidth = useBreakpointValue({
@@ -145,7 +143,7 @@ const VerifyEmail = () => {
                   <Link color="teal.500" href="/signin">
                     here
                   </Link>{" "}
-                  if you'd like to log in to Judie.
+                  if you&apos;d like to log in to Judie.
                 </Text>
 
                 <Link />

@@ -28,6 +28,7 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
         <Tbody>
           {rooms?.map((room) => (
             <Tr
+              key={room.id}
               onClick={() => {
                 router.push(`/admin/rooms/${room.id}`);
               }}

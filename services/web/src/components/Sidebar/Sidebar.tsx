@@ -259,6 +259,7 @@ const SidebarChat = ({
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
+  const toast = useToast();
   const chatContext = useContext(ChatContext);
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
@@ -340,7 +341,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         title: "No admin orgs",
       });
     }
-  }, [auth.userData?.permissions, auth.isAdmin]);
+  }, [auth.userData?.permissions, auth.isAdmin, router, toast]);
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
@@ -417,8 +418,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
     ];
     return options;
-  }, [auth, router, setIsClearConversationsModalOpen]);
-  const toast = useToast();
+  }, [auth, router, setIsClearConversationsModalOpen, onAdminClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({

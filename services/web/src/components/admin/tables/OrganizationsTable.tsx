@@ -32,6 +32,7 @@ const OrganizationsTable = ({
         <Tbody>
           {organizations?.map((organization) => (
             <Tr
+              key={organization.id}
               onClick={() => {
                 router.push(`/admin/organizations/${organization.id}`);
               }}

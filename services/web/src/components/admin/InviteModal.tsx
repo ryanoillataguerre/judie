@@ -116,7 +116,7 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
               margin: "1rem 0",
             }}
           >
-            Enter the user's info below and attach them to an organization,
+            Enter the user&apos;s info below and attach them to an organization,
             school, or room for them to start out.
           </Text>
           <FormControl
@@ -140,7 +140,9 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
               <option value={undefined}>{"None"}</option>
               {/* TODO Ryan: Make user-facing versions of these */}
               {Object.keys(GradeYear).map((key) => (
-                <option value={key}>{key}</option>
+                <option value={key} key={key}>
+                  {key}
+                </option>
               ))}
             </Select>
           </FormControl>

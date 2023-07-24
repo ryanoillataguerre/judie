@@ -39,6 +39,7 @@ const UsersTable = ({
         <Tbody>
           {users?.map((user) => (
             <Tr
+              key={user.id}
               onClick={() => {
                 router.push(`/admin/users/${user.id}`);
               }}

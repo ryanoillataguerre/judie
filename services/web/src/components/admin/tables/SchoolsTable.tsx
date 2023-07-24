@@ -28,6 +28,7 @@ const SchoolsTable = ({ schools }: { schools: School[] }) => {
         <Tbody>
           {schools?.map((school) => (
             <Tr
+              key={school.id}
               onClick={() => {
                 router.push(`/admin/schools/${school.id}`);
               }}

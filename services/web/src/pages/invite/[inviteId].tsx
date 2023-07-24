@@ -89,7 +89,7 @@ const RedeemInvite = () => {
               marginTop: "0.5rem",
             }}
           >
-            We're so excited you're here!
+            We&apos;re so excited you&apos;re here!
           </Text>
           {inviteData && (
             <Text
@@ -140,7 +140,7 @@ const RedeemInvite = () => {
                       fontWeight: 600,
                     }}
                   >
-                    We're sorry, your invite has expired.
+                    We&apos;re sorry, your invite has expired.
                   </Text>
                   <Text
                     style={{

@@ -74,7 +74,7 @@ const CreateRoomModal = ({
     return () => {
       reset();
     };
-  }, []);
+  }, [reset]);
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
@@ -113,7 +113,7 @@ const CreateRoomModal = ({
                   margin: "1rem 0",
                 }}
               >
-                Enter the room's name below
+                Enter the room&apos;s name below
               </Text>
               <FormControl
                 style={{
