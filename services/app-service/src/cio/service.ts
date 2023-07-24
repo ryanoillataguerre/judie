@@ -1,6 +1,7 @@
 import { User, Invite } from "@prisma/client";
 import { apiClient } from "../utils/customerio.js";
 import { SendEmailRequest } from "customerio-node";
+import { getOrigin } from "../utils/env.js";
 
 export const sendUserForgotPasswordEmail = async ({
   user,
@@ -31,7 +32,7 @@ export const sendInviteEmail = async ({ invite }: { invite: Invite }) => {
     transactional_message_id: "3",
     message_data: {
       first_name: invite.firstName,
-      url: `https://app.judie.io/invite/${invite.id}`,
+      url: `${getOrigin()}/invite/${invite.id}`,
     },
     identifiers: {
       id: invite.id,
@@ -47,7 +48,7 @@ export const sendVerificationEmail = async ({ user }: { user: User }) => {
     transactional_message_id: "4",
     message_data: {
       first_name: user.firstName,
-      url: `https://app.judie.io/verify/${user.id}`,
+      url: `${getOrigin()}/verify/${user.id}`,
     },
     identifiers: {
       email: user.email,

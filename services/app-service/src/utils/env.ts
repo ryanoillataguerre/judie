@@ -17,3 +17,13 @@ export const getEnv = () => {
   }
   return Environment.Local;
 };
+
+export const getOrigin = () => {
+  if (isProduction()) {
+    return "https://app.judie.io";
+  }
+  if (isSandbox()) {
+    return "https://app.sandbox.judie.io";
+  }
+  return "http://localhost:3000";
+};
