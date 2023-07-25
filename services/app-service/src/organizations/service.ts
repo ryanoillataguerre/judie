@@ -31,6 +31,7 @@ export const getUsersForOrganization = async ({ id }: { id: string }) => {
       return acc;
     }
     if (val.user) {
+      userIdMap[val.user.id] = true;
       return [...acc, val.user];
     }
     return acc;

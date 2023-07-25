@@ -119,18 +119,26 @@ const NewPermissionRow = ({
   ]);
 
   useEffect(() => {
-    reset();
+    // reset();
     switch (type) {
       case PermissionType.ORG_ADMIN:
-        setOrganizationId(organizations?.[0]?.id);
+        if (!organizationId) {
+          setOrganizationId(organizations?.[0]?.id);
+        }
         break;
       case PermissionType.SCHOOL_ADMIN:
-        setSchoolId(schools?.[0]?.id);
+        if (!schoolId) {
+          setSchoolId(schools?.[0]?.id);
+        }
         break;
       case PermissionType.ROOM_ADMIN:
-        setRoomId(rooms?.[0]?.id);
+        if (!roomId) {
+          setRoomId(rooms?.[0]?.id);
+        }
       case PermissionType.STUDENT:
-        reset();
+        if (!organizationId) {
+          setOrganizationId(organizations?.[0]?.id);
+        }
         break;
       default:
         break;

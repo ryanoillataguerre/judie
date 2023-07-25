@@ -32,14 +32,12 @@ const useAdminActiveOrganization = () => {
   if (organizationId) {
     return organizationId as string;
   }
-  switch (router.asPath) {
-    case "/admin":
-      return null;
-    case "/admin/organizations":
+  switch (true) {
+    case router.asPath.includes("/admin/organizations"):
       return organizationData?.id;
-    case "/admin/schools":
+    case router.asPath.includes("/admin/schools"):
       return schoolData?.organizationId;
-    case "/admin/rooms":
+    case router.asPath.includes("/admin/rooms"):
       return roomData?.organizationId;
     default:
       return null;

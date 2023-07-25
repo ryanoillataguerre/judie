@@ -260,29 +260,41 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
     return [];
   }
 
+  const organizationIdMap: { [key: string]: boolean } = {};
   const organizationsFormatted = queryResults?.reduce((acc, permission) => {
     if (
       permission.type === PermissionType.ORG_ADMIN &&
-      permission.organization?.id
+      permission.organization?.id &&
+      !organizationIdMap[permission.organization.id]
     ) {
       acc.push(permission.organization);
+      organizationIdMap[permission.organization.id] = true;
     }
     return acc;
   }, [] as ((Organization & { schools: (School & { rooms: Room[] })[] }) | undefined)[]);
 
+  const schoolIdMap: { [key: string]: boolean } = {};
   const schoolsFormatted = queryResults?.reduce((acc, permission) => {
     if (
       permission.type === PermissionType.SCHOOL_ADMIN &&
-      permission.school?.id
+      permission.school?.id &&
+      !schoolIdMap[permission.school.id]
     ) {
       acc.push(permission.school);
+      schoolIdMap[permission.school.id] = true;
     }
     return acc;
   }, [] as ((School & { rooms: Room[] }) | undefined)[]);
 
+  const roomIdMap: { [key: string]: boolean } = {};
   const roomsFormatted = queryResults?.reduce((acc, permission) => {
-    if (permission.type === PermissionType.ROOM_ADMIN && permission.room?.id) {
+    if (
+      permission.type === PermissionType.ROOM_ADMIN &&
+      permission.room?.id &&
+      !roomIdMap[permission.room.id]
+    ) {
       acc.push(permission.room);
+      roomIdMap[permission.room.id] = true;
     }
     return acc;
   }, [] as (Room | undefined)[]);

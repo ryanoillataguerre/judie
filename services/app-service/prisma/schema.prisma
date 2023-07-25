@@ -76,7 +76,7 @@ model Subscription {
   updatedAt                  DateTime?          @updatedAt @map("updated_at")
   organizationId             String?            @map("organization_id")
 
-  organization Organization? @relation(fields: [organizationId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user         User          @relation(fields: [userId], references: [id])
 
   @@index([id, userId])
@@ -203,7 +203,7 @@ model School {
   deletedAt      DateTime? @map("deleted_at")
 
   seats        Seats[]
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   users        User[]
   rooms        Room[]
   permissions  Permission[]
@@ -216,13 +216,13 @@ model Room {
   id             String    @id @default(uuid())
   name           String
   schoolId       String?   @map("school_id")
-  school         School?   @relation(fields: [schoolId], references: [id])
   organizationId String    @map("organization_id")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime? @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  school       School?      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   users        User[]
   permissions  Permission[]
   invites      Invite[]
