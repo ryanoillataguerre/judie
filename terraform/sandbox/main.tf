@@ -16,9 +16,9 @@ resource "google_project_service" "sqladmin-api" {
 }
 
 # Create default VPC network
-resource "google_compute_network" "vpc_network" {
-  name = "default-vpc"
-}
+# resource "google_compute_network" "vpc_network" {
+#   name = "default-vpc"
+# }
 
 # resource "google_compute_subnetwork" "public-subnetwork" {
 #   name = "default-subnet"
@@ -27,158 +27,158 @@ resource "google_compute_network" "vpc_network" {
 #   network = google_compute_network.vpc_network.name
 # }
 
-resource "random_id" "bucket_prefix" {
-  byte_length = 8
-}
-# Store backend state in Cloud Storage
-# https://cloud.google.com/docs/terraform/resource-management/store-state
-resource "google_storage_bucket" "default" {
-  name          = "${random_id.bucket_prefix.hex}-bucket-tfstate"
-  force_destroy = false
-  location      = "US"
-  storage_class = "STANDARD"
-  versioning {
-    enabled = true
-  }
-}
+# resource "random_id" "bucket_prefix" {
+#   byte_length = 8
+# }
+# # Store backend state in Cloud Storage
+# # https://cloud.google.com/docs/terraform/resource-management/store-state
+# resource "google_storage_bucket" "default" {
+#   name          = "${random_id.bucket_prefix.hex}-bucket-tfstate"
+#   force_destroy = false
+#   location      = "US"
+#   storage_class = "STANDARD"
+#   versioning {
+#     enabled = true
+#   }
+# }
 
 # Do these matter/make a difference?
-resource "google_dns_managed_zone" "web-public" {
-  dns_name      = "app.sandbox.judie.io."
-  force_destroy = false
-  name          = "web-public"
-  project       = var.gcp_project
-  visibility    = "public"
-}
+# resource "google_dns_managed_zone" "web-public" {
+#   dns_name      = "app.sandbox.judie.io."
+#   force_destroy = false
+#   name          = "web-public"
+#   project       = var.gcp_project
+#   visibility    = "public"
+# }
 
-resource "google_dns_managed_zone" "app-service-public" {
-  dns_name      = "app-service.sandbox.judie.io."
-  force_destroy = false
-  name          = "app-service-public"
-  project       = var.gcp_project
-  visibility    = "public"
-}
+# resource "google_dns_managed_zone" "app-service-public" {
+#   dns_name      = "app-service.sandbox.judie.io."
+#   force_destroy = false
+#   name          = "app-service-public"
+#   project       = var.gcp_project
+#   visibility    = "public"
+# }
 
-# Private network
-resource "google_compute_network" "private_network" {
-  provider = google-beta
-  name     = "private-network"
-}
+# # Private network
+# resource "google_compute_network" "private_network" {
+#   provider = google-beta
+#   name     = "private-network"
+# }
 
-# Private Subnet
-resource "google_compute_subnetwork" "private-subnetwork" {
-  name = "private-subnet"
-  ip_cidr_range = "10.10.0.0/28"
-  region = "us-west1"
-  network = google_compute_network.private_network.name
-}
+# # Private Subnet
+# resource "google_compute_subnetwork" "private-subnetwork" {
+#   name = "private-subnet"
+#   ip_cidr_range = "10.10.0.0/28"
+#   region = "us-west1"
+#   network = google_compute_network.private_network.name
+# }
 
-# Reserve global internal address range for the peering
-resource "google_compute_global_address" "private_ip_address" {
-  provider      = google-beta
-  name          = "private-ip"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.private_network.self_link
-}
+# # Reserve global internal address range for the peering
+# resource "google_compute_global_address" "private_ip_address" {
+#   provider      = google-beta
+#   name          = "private-ip"
+#   purpose       = "VPC_PEERING"
+#   address_type  = "INTERNAL"
+#   prefix_length = 16
+#   network       = google_compute_network.private_network.self_link
+# }
 
-# Establish VPC network peering connection using the reserved address range
-resource "google_service_networking_connection" "private_vpc_connection" {
-  provider                = google-beta
-  network                 = google_compute_network.private_network.self_link
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
-}
+# # Establish VPC network peering connection using the reserved address range
+# resource "google_service_networking_connection" "private_vpc_connection" {
+#   provider                = google-beta
+#   network                 = google_compute_network.private_network.self_link
+#   service                 = "servicenetworking.googleapis.com"
+#   reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+# }
 
-resource "google_vpc_access_connector" "connector" {
-  name          = "vpc-access-conn"
-  # network = google_compute_network.private_network.self_link
-  subnet {
-    name = google_compute_subnetwork.private-subnetwork.name
-  }
-  # ip_cidr_range = google_compute_global_address.private_ip_address.address
-  min_instances = 2
-  max_instances = 3
-  project = var.gcp_project
-  region  = var.gcp_region
-}
+# resource "google_vpc_access_connector" "connector" {
+#   name          = "vpc-access-conn"
+#   # network = google_compute_network.private_network.self_link
+#   subnet {
+#     name = google_compute_subnetwork.private-subnetwork.name
+#   }
+#   # ip_cidr_range = google_compute_global_address.private_ip_address.address
+#   min_instances = 2
+#   max_instances = 3
+#   project = var.gcp_project
+#   region  = var.gcp_region
+# }
 
 
 # Create a Cloud SQL DB
-resource "google_sql_database_instance" "core" {
-  database_version = "POSTGRES_14"
-  name             = "core"
-  project          = var.gcp_project
-  region           = var.gcp_region
+# resource "google_sql_database_instance" "core" {
+#   database_version = "POSTGRES_14"
+#   name             = "core"
+#   project          = var.gcp_project
+#   region           = var.gcp_region
 
-  settings {
-    activation_policy = "ALWAYS"
-    availability_type = "REGIONAL"
-    pricing_plan = "PER_USE"
-    tier         = "db-f1-micro"
+#   settings {
+#     activation_policy = "ALWAYS"
+#     availability_type = "REGIONAL"
+#     pricing_plan = "PER_USE"
+#     tier         = "db-f1-micro"
     
-    backup_configuration {
-      enabled                        = false
-    }
+#     backup_configuration {
+#       enabled                        = false
+#     }
 
-    disk_autoresize       = true
-    disk_autoresize_limit = 0
-    disk_size             = 50
-    disk_type             = "PD_SSD"
+#     disk_autoresize       = true
+#     disk_autoresize_limit = 0
+#     disk_size             = 50
+#     disk_type             = "PD_SSD"
 
-    insights_config {
-      query_insights_enabled = false
-    }
+#     insights_config {
+#       query_insights_enabled = false
+#     }
 
-    ip_configuration {
-      authorized_networks {
-        name  = "ryan-home"
-        value = "76.33.133.137"
-      }
+#     ip_configuration {
+#       authorized_networks {
+#         name  = "ryan-home"
+#         value = "76.33.133.137"
+#       }
 
-      ipv4_enabled    = true
-      private_network = google_compute_network.private_network.self_link
-    }
+#       ipv4_enabled    = true
+#       private_network = google_compute_network.private_network.self_link
+#     }
 
-    location_preference {
-      zone = "us-west1-a"
-    }
-  }
-  depends_on       = [google_service_networking_connection.private_vpc_connection]
-}
+#     location_preference {
+#       zone = "us-west1-a"
+#     }
+#   }
+#   depends_on       = [google_service_networking_connection.private_vpc_connection]
+# }
 
-resource "random_password" "password" {
-  length           = 32
-  special          = true
-  override_special = "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
-}
+# resource "random_password" "password" {
+#   length           = 32
+#   special          = true
+#   override_special = "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+# }
 
-resource "google_sql_user" "core_db_master_user" {
-  instance = google_sql_database_instance.core.name
-  name     = "postgres"
-  password = random_password.password.result
-}
+# resource "google_sql_user" "core_db_master_user" {
+#   instance = google_sql_database_instance.core.name
+#   name     = "postgres"
+#   password = random_password.password.result
+# }
 
 # Redis Instance
-resource "google_redis_instance" "redis-core" {
-  authorized_network      = google_compute_network.private_network.id
-  connect_mode            = "DIRECT_PEERING"
-  location_id             = "us-west1-a"
-  memory_size_gb          = 1
-  name                    = "redis-core"
-  project                 = var.gcp_project
-  read_replicas_mode      = "READ_REPLICAS_DISABLED"
-  redis_version           = "REDIS_6_X"
-  region                  = "us-west1"
-  tier                    = "BASIC"
-  transit_encryption_mode = "DISABLED"
-  # In Prod?
-  # persistence_config = {
-  #   persistence_mode    = "RDB"
-  #   rdb_snapshot_period = "ONE_HOUR"
-  # }
-}
+# resource "google_redis_instance" "redis-core" {
+#   authorized_network      = google_compute_network.private_network.id
+#   connect_mode            = "DIRECT_PEERING"
+#   location_id             = "us-west1-a"
+#   memory_size_gb          = 1
+#   name                    = "redis-core"
+#   project                 = var.gcp_project
+#   read_replicas_mode      = "READ_REPLICAS_DISABLED"
+#   redis_version           = "REDIS_6_X"
+#   region                  = "us-west1"
+#   tier                    = "BASIC"
+#   transit_encryption_mode = "DISABLED"
+#   # In Prod?
+#   # persistence_config = {
+#   #   persistence_mode    = "RDB"
+#   #   rdb_snapshot_period = "ONE_HOUR"
+#   # }
+# }
 
 # Artifact Registry
 resource "google_artifact_registry_repository" "web" {
