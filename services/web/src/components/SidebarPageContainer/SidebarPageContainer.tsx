@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, useBreakpointValue } from "@chakra-ui/react";
 import Sidebar from "../Sidebar/Sidebar";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import useStorageState from "@judie/hooks/useStorageState";
@@ -20,7 +20,9 @@ const OpenCloseButton = ({
         position: "fixed",
         top: "3.5rem",
         left: isOpen ? "18.5rem" : "1.5rem",
+        padding: "0.5rem",
       }}
+      onClick={() => setIsOpen(!isOpen)}
     >
       {isOpen ? (
         <LuChevronLeftSquare
@@ -28,7 +30,6 @@ const OpenCloseButton = ({
             zIndex: 1000,
           }}
           cursor={"pointer"}
-          onClick={() => setIsOpen(false)}
           size={20}
         />
       ) : (
@@ -37,7 +38,6 @@ const OpenCloseButton = ({
             zIndex: 1000,
           }}
           cursor={"pointer"}
-          onClick={() => setIsOpen(true)}
           size={20}
         />
       )}
@@ -46,7 +46,14 @@ const OpenCloseButton = ({
 };
 
 const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
-  const [isOpen, setIsOpen] = useStorageState<boolean>(true, "sidebarOpen");
+  const isMobile = useBreakpointValue({
+    base: true,
+    md: false,
+  });
+  const [isOpen, setIsOpen] = useStorageState<boolean>(
+    isMobile ?? false,
+    "sidebarOpen"
+  );
   return (
     <Flex
       style={{

@@ -16,6 +16,7 @@ import {
   sendVerificationEmail,
 } from "../cio/service.js";
 import { sessionStore } from "../utils/express.js";
+import { Environment, getEnv } from "../utils/env.js";
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firstName: user.firstName,
@@ -188,11 +189,13 @@ export const forgotPassword = async ({
   if (!user) {
     throw new BadRequestError("Invalid email");
   }
+  const env: Environment = getEnv();
   // Create token and store in Redis
   const token = await createForgotPasswordToken({ userId: user.id });
   const url = `${
-    `${origin.slice(0, 8)}app.${origin.slice(8, origin.length)}` ||
-    "https://app.judie.io"
+    `${
+      env === Environment.Local ? origin.slice(0, 7) : origin.slice(0, 8)
+    }app.${origin.slice(8, origin.length)}` || "https://app.judie.io"
   }/reset-password?token=${token}`;
   // Send email with link to reset password
   return await sendUserForgotPasswordEmail({

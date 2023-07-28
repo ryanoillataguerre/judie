@@ -196,7 +196,7 @@ const ResetPasswordForm = () => {
               <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
               <Input
                 id="confirmPassword"
-                type={"confirmPassword"}
+                type={"password"}
                 autoComplete="confirmPassword"
                 required
                 placeholder="Confirm Password"
