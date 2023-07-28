@@ -1,10 +1,9 @@
-# syntax=docker/dockerfile:1
 FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY --from=project ./inference_service ./inference_service
-COPY --from=project ./app-service/prisma/schema.prisma ./app-service/prisma/schema.prisma
+COPY ./inference_service ./inference_service
+COPY ./app-service/prisma/schema.prisma ./app-service/prisma/schema.prisma
 
 RUN pip install --no-cache-dir -r inference_service/inference_requirements.txt
 
