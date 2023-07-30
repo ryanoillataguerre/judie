@@ -178,16 +178,25 @@ export const getCompletion = async ({
     },
   });
 
+  // If message ends up being created, we can set createdAt to be the same as the message start
+  const createdAt = new Date();
   // Send request to inference service
-  await getChatCompletion({
+  const completionText = await getChatCompletion({
     chatId: chat.id,
     response,
   });
-
-  // Get chat and return
-  const latestChat = await getChatInternal({
-    id: chat.id,
+  // Save message to chat
+  const latestChat = await updateChat(chat.id, {
+    messages: {
+      create: {
+        content: completionText,
+        readableContent: completionText,
+        type: MessageType.BOT,
+        createdAt,
+      },
+    },
   });
+
   return latestChat;
 };
 

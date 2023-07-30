@@ -13,17 +13,17 @@ export const getChatCompletion = async ({
     chatId,
   };
   const result = inferenceServiceClient.getChatResponse(chatRequest);
+  const fullResponse = [];
   for await (const chunk of result) {
-    console.log("chunk", chunk);
     if (chunk.responsePart) {
+      fullResponse.push(chunk.responsePart);
       response.write(chunk.responsePart);
     }
     // Else do nothing (for now)
   }
+  const fullText = fullResponse.join("");
+
   // TODO: Create verbose response here for the web to consume
   // Add flags, notices, quizzes, etc.
-  // Save response to db when done
-  return {
-    success: true,
-  };
+  return fullText;
 };
