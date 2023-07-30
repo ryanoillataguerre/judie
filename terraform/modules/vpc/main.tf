@@ -7,7 +7,7 @@ module "vpc" {
 
   # Do these matter/make a difference?
   resource "google_dns_managed_zone" "web-public" {
-    dns_name      = "${var.web_public_dns_zone}.}"
+    dns_name      = "${var.web_public_dns_zone}."
     force_destroy = false
     name          = "web-public"
     project       = var.gcp_project
@@ -60,7 +60,7 @@ module "vpc" {
       name = google_compute_subnetwork.private-subnetwork.name
     }
     min_instances = 2
-    max_instances = "${var.vpc_access_connector_max_instances}"
+    max_instances = var.access_connector_max_instances
     project = var.gcp_project
     region  = var.gcp_region
   }

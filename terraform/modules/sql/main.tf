@@ -1,7 +1,7 @@
 module "sql_db" {
   resource "google_sql_database_instance" {
     database_version = "POSTGRES_14"
-    name             = "${var.db_name}"
+    name             = var.db_name
     project          = var.gcp_project
     region           = var.gcp_region
 
@@ -9,7 +9,7 @@ module "sql_db" {
       activation_policy = "ALWAYS"
       availability_type = "REGIONAL"
       pricing_plan = "PER_USE"
-      tier         = "${var.db_tier}"
+      tier         = var.db_tier
       
       backup_configuration {
         enabled                        = false

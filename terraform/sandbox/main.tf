@@ -181,24 +181,24 @@ resource "google_project_service" "sqladmin-api" {
 # }
 
 # Artifact Registry
-resource "google_artifact_registry_repository" "web" {
-  format        = "DOCKER"
-  location      = "us-west1"
-  project       = var.gcp_project
-  repository_id = "web"
-}
-resource "google_artifact_registry_repository" "app-service" {
-  format        = "DOCKER"
-  location      = "us-west1"
-  project       = var.gcp_project
-  repository_id = "app-service"
-}
-resource "google_artifact_registry_repository" "inference-service" {
-  format        = "DOCKER"
-  location      = "us-west1"
-  project       = var.gcp_project
-  repository_id = "inference-service"
-}
+# resource "google_artifact_registry_repository" "web" {
+#   format        = "DOCKER"
+#   location      = "us-west1"
+#   project       = var.gcp_project
+#   repository_id = "web"
+# }
+# resource "google_artifact_registry_repository" "app-service" {
+#   format        = "DOCKER"
+#   location      = "us-west1"
+#   project       = var.gcp_project
+#   repository_id = "app-service"
+# }
+# resource "google_artifact_registry_repository" "inference-service" {
+#   format        = "DOCKER"
+#   location      = "us-west1"
+#   project       = var.gcp_project
+#   repository_id = "inference-service"
+# }
 
 # Create the Cloud Run service
 resource "google_cloud_run_service" "app-service" {
