@@ -1,14 +1,7 @@
-import { createChannel, createClient } from "nice-grpc";
-import {
-  InferenceServiceClient,
-  InferenceServiceDefinition,
-} from "../../proto/inference_service.js";
+import grpc from "@grpc/grpc-js";
+import { InferenceServiceClient } from "../../proto/inference_service.js";
 
-const channel = createChannel(`dns:///inference-service:443`);
-
-const client: InferenceServiceClient = createClient(
-  InferenceServiceDefinition,
-  channel
+export default new InferenceServiceClient(
+  `dns:///inference-service:443`,
+  grpc.credentials.createInsecure()
 );
-
-export default client;

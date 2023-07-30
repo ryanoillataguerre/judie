@@ -1,6 +1,20 @@
 /* eslint-disable */
-import type { CallContext, CallOptions } from "nice-grpc-common";
-import * as _m0 from "protobufjs/minimal";
+import {
+  CallOptions,
+  ChannelCredentials,
+  Client,
+  ClientOptions,
+  ClientReadableStream,
+  ClientUnaryCall,
+  handleServerStreamingCall,
+  handleUnaryCall,
+  makeGenericClientConstructor,
+  Metadata,
+  ServiceError,
+  UntypedServiceImplementation,
+} from "@grpc/grpc-js";
+// Note: You have to add ".js" to this extension because we're using ESM...
+import _m0 from "protobufjs/minimal.js";
 
 export const protobufPackage = "inferenceServiceServer";
 
@@ -71,10 +85,12 @@ export const ChatDetails = {
     return obj;
   },
 
-  create(base?: DeepPartial<ChatDetails>): ChatDetails {
-    return ChatDetails.fromPartial(base ?? {});
+  create<I extends Exact<DeepPartial<ChatDetails>, I>>(base?: I): ChatDetails {
+    return ChatDetails.fromPartial(base ?? ({} as any));
   },
-  fromPartial(object: DeepPartial<ChatDetails>): ChatDetails {
+  fromPartial<I extends Exact<DeepPartial<ChatDetails>, I>>(
+    object: I
+  ): ChatDetails {
     const message = createBaseChatDetails();
     message.chatId = object.chatId ?? "";
     return message;
@@ -136,10 +152,14 @@ export const TutorResponse = {
     return obj;
   },
 
-  create(base?: DeepPartial<TutorResponse>): TutorResponse {
-    return TutorResponse.fromPartial(base ?? {});
+  create<I extends Exact<DeepPartial<TutorResponse>, I>>(
+    base?: I
+  ): TutorResponse {
+    return TutorResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial(object: DeepPartial<TutorResponse>): TutorResponse {
+  fromPartial<I extends Exact<DeepPartial<TutorResponse>, I>>(
+    object: I
+  ): TutorResponse {
     const message = createBaseTutorResponse();
     message.responsePart = object.responsePart ?? "";
     return message;
@@ -204,10 +224,14 @@ export const ReturnConnectedCheck = {
     return obj;
   },
 
-  create(base?: DeepPartial<ReturnConnectedCheck>): ReturnConnectedCheck {
-    return ReturnConnectedCheck.fromPartial(base ?? {});
+  create<I extends Exact<DeepPartial<ReturnConnectedCheck>, I>>(
+    base?: I
+  ): ReturnConnectedCheck {
+    return ReturnConnectedCheck.fromPartial(base ?? ({} as any));
   },
-  fromPartial(object: DeepPartial<ReturnConnectedCheck>): ReturnConnectedCheck {
+  fromPartial<I extends Exact<DeepPartial<ReturnConnectedCheck>, I>>(
+    object: I
+  ): ReturnConnectedCheck {
     const message = createBaseReturnConnectedCheck();
     message.returnCheck = object.returnCheck ?? false;
     return message;
@@ -270,11 +294,13 @@ export const ConnectedCheckResponse = {
     return obj;
   },
 
-  create(base?: DeepPartial<ConnectedCheckResponse>): ConnectedCheckResponse {
-    return ConnectedCheckResponse.fromPartial(base ?? {});
+  create<I extends Exact<DeepPartial<ConnectedCheckResponse>, I>>(
+    base?: I
+  ): ConnectedCheckResponse {
+    return ConnectedCheckResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial(
-    object: DeepPartial<ConnectedCheckResponse>
+  fromPartial<I extends Exact<DeepPartial<ConnectedCheckResponse>, I>>(
+    object: I
   ): ConnectedCheckResponse {
     const message = createBaseConnectedCheckResponse();
     message.connected = object.connected ?? false;
@@ -282,51 +308,88 @@ export const ConnectedCheckResponse = {
   },
 };
 
-export type InferenceServiceDefinition = typeof InferenceServiceDefinition;
-export const InferenceServiceDefinition = {
-  name: "InferenceService",
-  fullName: "inferenceServiceServer.InferenceService",
-  methods: {
-    getChatResponse: {
-      name: "GetChatResponse",
-      requestType: ChatDetails,
-      requestStream: false,
-      responseType: TutorResponse,
-      responseStream: true,
-      options: {},
-    },
-    serverConnectionCheck: {
-      name: "ServerConnectionCheck",
-      requestType: ReturnConnectedCheck,
-      requestStream: false,
-      responseType: ConnectedCheckResponse,
-      responseStream: false,
-      options: {},
-    },
+export type InferenceServiceService = typeof InferenceServiceService;
+export const InferenceServiceService = {
+  getChatResponse: {
+    path: "/inferenceServiceServer.InferenceService/GetChatResponse",
+    requestStream: false,
+    responseStream: true,
+    requestSerialize: (value: ChatDetails) =>
+      Buffer.from(ChatDetails.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ChatDetails.decode(value),
+    responseSerialize: (value: TutorResponse) =>
+      Buffer.from(TutorResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => TutorResponse.decode(value),
+  },
+  serverConnectionCheck: {
+    path: "/inferenceServiceServer.InferenceService/ServerConnectionCheck",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ReturnConnectedCheck) =>
+      Buffer.from(ReturnConnectedCheck.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ReturnConnectedCheck.decode(value),
+    responseSerialize: (value: ConnectedCheckResponse) =>
+      Buffer.from(ConnectedCheckResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) =>
+      ConnectedCheckResponse.decode(value),
   },
 } as const;
 
-export interface InferenceServiceImplementation<CallContextExt = {}> {
-  getChatResponse(
-    request: ChatDetails,
-    context: CallContext & CallContextExt
-  ): ServerStreamingMethodResult<DeepPartial<TutorResponse>>;
-  serverConnectionCheck(
-    request: ReturnConnectedCheck,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ConnectedCheckResponse>>;
+export interface InferenceServiceServer extends UntypedServiceImplementation {
+  getChatResponse: handleServerStreamingCall<ChatDetails, TutorResponse>;
+  serverConnectionCheck: handleUnaryCall<
+    ReturnConnectedCheck,
+    ConnectedCheckResponse
+  >;
 }
 
-export interface InferenceServiceClient<CallOptionsExt = {}> {
+export interface InferenceServiceClient extends Client {
   getChatResponse(
-    request: DeepPartial<ChatDetails>,
-    options?: CallOptions & CallOptionsExt
-  ): AsyncIterable<TutorResponse>;
+    request: ChatDetails,
+    options?: Partial<CallOptions>
+  ): ClientReadableStream<TutorResponse>;
+  getChatResponse(
+    request: ChatDetails,
+    metadata?: Metadata,
+    options?: Partial<CallOptions>
+  ): ClientReadableStream<TutorResponse>;
   serverConnectionCheck(
-    request: DeepPartial<ReturnConnectedCheck>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ConnectedCheckResponse>;
+    request: ReturnConnectedCheck,
+    callback: (
+      error: ServiceError | null,
+      response: ConnectedCheckResponse
+    ) => void
+  ): ClientUnaryCall;
+  serverConnectionCheck(
+    request: ReturnConnectedCheck,
+    metadata: Metadata,
+    callback: (
+      error: ServiceError | null,
+      response: ConnectedCheckResponse
+    ) => void
+  ): ClientUnaryCall;
+  serverConnectionCheck(
+    request: ReturnConnectedCheck,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (
+      error: ServiceError | null,
+      response: ConnectedCheckResponse
+    ) => void
+  ): ClientUnaryCall;
 }
+
+export const InferenceServiceClient = makeGenericClientConstructor(
+  InferenceServiceService,
+  "inferenceServiceServer.InferenceService"
+) as unknown as {
+  new (
+    address: string,
+    credentials: ChannelCredentials,
+    options?: Partial<ClientOptions>
+  ): InferenceServiceClient;
+  service: typeof InferenceServiceService;
+};
 
 type Builtin =
   | Date
@@ -347,10 +410,13 @@ export type DeepPartial<T> = T extends Builtin
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin
+  ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
+      [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
+    };
+
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
-
-export type ServerStreamingMethodResult<Response> = {
-  [Symbol.asyncIterator](): AsyncIterator<Response, void>;
-};
