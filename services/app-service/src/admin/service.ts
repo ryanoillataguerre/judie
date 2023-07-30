@@ -1,4 +1,5 @@
 import {
+  MessageType,
   Organization,
   PermissionType,
   Prisma,
@@ -196,7 +197,20 @@ export const getUserAdmin = async (
     where: params,
     include: {
       permissions: true,
-      chats: true,
+      chats: {
+        orderBy: {
+          updatedAt: "asc",
+        },
+        include: {
+          messages: {
+            where: {
+              type: {
+                not: MessageType.SYSTEM,
+              },
+            },
+          },
+        },
+      },
       rooms: true,
       schools: true,
       organizations: true,

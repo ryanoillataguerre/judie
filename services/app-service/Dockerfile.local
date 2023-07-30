@@ -1,19 +1,11 @@
 FROM node:18
 
 WORKDIR /app
-COPY ./build_protos.sh /opt/build_protos.sh
-COPY app-service/package.json ./
-COPY app-service/prisma ./prisma/
-COPY app-service/src ./src/
-# COPY protos/inference_service/server/inference_service.proto ./protos/inference_service.proto
+# COPY ./build_protos.sh /opt/build_protos.sh
+COPY . .
 
 RUN yarn
-
 RUN yarn run generate
-
-# COPY ./app-service .
-
-# RUN /opt/build_protos.sh
 
 EXPOSE 8080
 

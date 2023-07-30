@@ -16,6 +16,7 @@
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.10.6",
     "@hookform/error-message": "^2.0.1",
+    "@nivo/line": "^0.83.0",
     "@segment/analytics-next": "^1.51.7",
     "@segment/snippet": "^4.16.0",
     "@types/node": "18.15.0",
