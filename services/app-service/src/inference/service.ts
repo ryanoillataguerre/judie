@@ -22,6 +22,7 @@ export const getChatCompletion = async ({
   }
   // TODO: Create verbose response here for the web to consume
   // Add flags, notices, quizzes, etc.
+  // Save response to db when done
   return {
     success: true,
   };
