@@ -15,7 +15,10 @@ export const getChatCompletion = async ({
   const result = inferenceServiceClient.getChatResponse(chatRequest);
   for await (const chunk of result) {
     console.log("chunk", chunk);
-    response.write(chunk);
+    if (chunk.responsePart) {
+      response.write(chunk.responsePart);
+    }
+    // Else do nothing (for now)
   }
   // TODO: Create verbose response here for the web to consume
   // Add flags, notices, quizzes, etc.
