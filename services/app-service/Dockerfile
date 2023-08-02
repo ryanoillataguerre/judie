@@ -5,8 +5,8 @@ COPY app-service .
 # COPY protos/inference_service/server/inference_service.proto ./protos/inference_service.proto
 RUN yarn install
 RUN yarn run generate
-RUN yarn build
 RUN /opt/build_protos.sh
+RUN yarn build
 
 FROM node:20-alpine AS final
 WORKDIR /app

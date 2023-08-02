@@ -158,3 +158,12 @@ export const getInvitesForRoomQuery = async (id: string): Promise<Invite[]> => {
   });
   return response.data;
 };
+
+export const GET_USER_BY_ID = "GET_USER_BY_ID";
+export const getUserByIdQuery = async (id: string): Promise<User> => {
+  const response = await baseFetch({
+    url: `/admin/users/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};

@@ -31,11 +31,10 @@ services:
     privileged: true
     volumes:
       - ./app-service:/app
-      - ./protos:/app/protos # Copies protos into the container at dir /app/protos
     working_dir: /app
     build:
-      context: .
-      dockerfile: ./app-service/Dockerfile.local
+      context: ./app-service
+      dockerfile: ./Dockerfile.local
     ports:
       - 8080:8080
     restart: on-failure
