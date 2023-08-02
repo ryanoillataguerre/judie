@@ -153,7 +153,6 @@ interface RedeemInviteParams {
   lastName: string;
   password: string;
   receivePromotions: boolean;
-  role?: string;
 }
 export const redeemInvite = async (params: RedeemInviteParams) => {
   const invite = await dbClient.invite.findUnique({
@@ -176,7 +175,6 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
     password: params.password,
     gradeYear: invite.gradeYear as GradeYear | undefined,
     receivePromotions: params.receivePromotions,
-    role: (params.role as UserRole) || UserRole.STUDENT,
   });
 
   // Set userId on all permissions from invite
