@@ -37,7 +37,6 @@ const UserUsage = ({ id }: { id: string }) => {
     };
   }, [userData]);
 
-  console.log("lineData", lineData);
   const color = useToken("colors", "blue.400");
 
   return (
