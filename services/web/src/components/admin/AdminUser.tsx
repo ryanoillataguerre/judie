@@ -1,4 +1,5 @@
 import {
+  Tab,
   TabIndicator,
   TabList,
   TabPanel,
@@ -38,7 +39,9 @@ const AdminUser = ({ id }: { id: string }) => {
         {userData?.email}
       </Text>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
-        <TabList width={"100%"}>Usage</TabList>
+        <TabList width={"100%"}>
+          <Tab>Usage</Tab>
+        </TabList>
         <TabPanels>
           <TabPanel>
             <UserUsage id={id} />

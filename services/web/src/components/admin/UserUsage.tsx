@@ -1,7 +1,10 @@
+import AutoSizer from "react-virtualized-auto-sizer";
+import moment from "moment";
 import { GET_USER_BY_ID, getUserByIdQuery } from "@judie/data/queries";
 import { useQuery } from "react-query";
-import { ResponsiveLine } from "@nivo/line";
+import { Line, ResponsiveLine } from "@nivo/line";
 import { useMemo } from "react";
+import { Flex, Tag, useTheme, useToken } from "@chakra-ui/react";
 
 const UserUsage = ({ id }: { id: string }) => {
   const { data: userData } = useQuery({
@@ -29,91 +32,106 @@ const UserUsage = ({ id }: { id: string }) => {
     });
     return {
       id: "usage",
-      color: "hsl(351, 70%, 50%)",
+      color: "blue",
       data: newData,
     };
   }, [userData]);
 
+  console.log("lineData", lineData);
+  const color = useToken("colors", "blue.400");
+
   return (
-    <>
-      <ResponsiveLine
-        data={[lineData]}
-        margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-        xScale={{ type: "point" }}
-        yScale={{
-          type: "linear",
-          min: "auto",
-          max: "auto",
-          stacked: true,
-          reverse: false,
-        }}
-        axisBottom={{
-          format: "%b %d",
-          legend: "time scale",
-          legendOffset: -12,
-          tickValues: "every 2 days",
-        }}
-        axisLeft={{
-          legend: "linear scale",
-          legendOffset: 12,
-        }}
-        yFormat=" >-.2f"
-        curve="natural"
-        axisTop={null}
-        axisRight={null}
-        // axisBottom={{
-        //   tickSize: 5,
-        //   tickPadding: 5,
-        //   tickRotation: 0,
-        //   legend: "transportation",
-        //   legendOffset: 36,
-        //   legendPosition: "middle",
-        // }}
-        // axisLeft={{
-        //   tickSize: 5,
-        //   tickPadding: 5,
-        //   tickRotation: 0,
-        //   legend: "count",
-        //   legendOffset: -40,
-        //   legendPosition: "middle",
-        // }}
-        enableGridX={false}
-        enablePoints={false}
-        pointSize={10}
-        pointColor={{ theme: "background" }}
-        pointBorderWidth={2}
-        pointBorderColor={{ from: "serieColor" }}
-        pointLabelYOffset={-12}
-        enableCrosshair={false}
-        useMesh={true}
-        legends={[
-          {
-            anchor: "bottom-right",
-            direction: "column",
-            justify: false,
-            translateX: 100,
-            translateY: 0,
-            itemsSpacing: 0,
-            itemDirection: "left-to-right",
-            itemWidth: 80,
-            itemHeight: 20,
-            itemOpacity: 0.75,
-            symbolSize: 12,
-            symbolShape: "circle",
-            symbolBorderColor: "rgba(0, 0, 0, .5)",
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemBackground: "rgba(0, 0, 0, .03)",
-                  itemOpacity: 1,
+    <Flex width={"100%"} height={"400px"}>
+      <AutoSizer style={{ width: "100%" }}>
+        {({ height, width }) => (
+          <Line
+            height={height}
+            width={width}
+            colors={[color]}
+            theme={{
+              // TODO: Color mode values
+              axis: {
+                domain: {
+                  line: {
+                    stroke: "#BABABA",
+                  },
+                },
+                legend: {
+                  text: {
+                    fill: "#BABABA",
+                  },
+                },
+                ticks: {
+                  line: {
+                    stroke: "#BABABA",
+                    strokeWidth: 1,
+                  },
+                  text: {
+                    fill: "#BABABA",
+                  },
                 },
               },
-            ],
-          },
-        ]}
-      />
-    </>
+            }}
+            useMesh={true}
+            data={[lineData]}
+            margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+            xScale={{ type: "point" }}
+            yScale={{
+              type: "linear",
+              min: 0,
+              // max: "auto",
+              stacked: true,
+              reverse: false,
+            }}
+            axisBottom={{
+              format: function (value) {
+                return moment(value).format("MM/DD");
+              },
+            }}
+            axisLeft={{
+              legend: "Messages",
+              legendOffset: -40,
+              tickValues: "every 2 days",
+            }}
+            // yFormat=" >-.2f"
+            curve="natural"
+            axisTop={null}
+            axisRight={null}
+            tooltip={({ point }) => (
+              <Tag colorScheme="cyan">
+                {Math.round(Number(point.data.yFormatted))} messages on{" "}
+                {moment(point.data.x).format("MM/DD")}
+              </Tag>
+            )}
+            // axisBottom={{
+            //   tickSize: 5,
+            //   tickPadding: 5,
+            //   tickRotation: 0,
+            //   legend: "transportation",
+            //   legendOffset: 36,
+            //   legendPosition: "middle",
+            // }}
+            // axisLeft={{
+            //   tickSize: 5,
+            //   tickPadding: 5,
+            //   tickRotation: 0,
+            //   legend: "count",
+            //   legendOffset: -40,
+            //   legendPosition: "middle",
+            // }}
+            enableGridX={false}
+            enableGridY={false}
+            // enablePoints={false}
+            // pointSize={10}
+            // pointColor={{ theme: "background" }}
+            // pointBorderWidth={2}
+            // pointBorderColor={{ from: "serieColor" }}
+            pointLabelYOffset={-12}
+            enableCrosshair={false}
+          />
+        )}
+      </AutoSizer>
+    </Flex>
   );
 };
 
