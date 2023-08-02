@@ -84,16 +84,12 @@ const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
     }
     return result;
   }
-  if (chat.messages?.[0]?.readableContent) {
-    if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
-      if (sliced) {
-        const result = chat.messages?.[0]?.readableContent.slice(0, 20);
-        if (result.length >= 20) {
-          return result + "...";
-        }
-      }
-      return chat.messages?.[0]?.readableContent;
+  if (chat.subject) {
+    const result = chat.subject.slice(0, 20);
+    if (result.length === 20) {
+      return result + "...";
     }
+    return result;
   }
   return "Untitled";
 };
