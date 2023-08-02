@@ -45,7 +45,7 @@ export const signup = async ({
   email: string;
   password: string;
   receivePromotions: boolean;
-  role: UserRole;
+  role?: UserRole;
   districtOrSchool?: string;
   gradeYear?: GradeYear;
 }) => {

@@ -99,7 +99,12 @@ router.get(
 
 router.post(
   "/:inviteId/redeem",
-  [...signupValidation, param("inviteId").isString()],
+  [
+    param("inviteId").isString(),
+    body("firstName").isString().optional(),
+    body("lastName").isString().optional(),
+    body("password").isString().exists(),
+  ],
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     // Get invite
@@ -108,7 +113,6 @@ router.post(
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       password: req.body.password,
-      role: req.body.role,
       receivePromotions: req.body.receivePromotions,
     });
 
