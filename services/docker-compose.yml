@@ -53,6 +53,7 @@ services:
       CUSTOMERIO_SITE_ID: ${CUSTOMERIO_SITE_ID}
       CUSTOMERIO_API_KEY: ${CUSTOMERIO_API_KEY}
       CUSTOMERIO_APP_API_KEY: ${CUSTOMERIO_APP_API_KEY}
+      INFERENCE_SERVICE_URL: dns:///inference-service:443
   web:
     networks:
       - dev
