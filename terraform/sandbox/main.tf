@@ -253,6 +253,11 @@ resource "google_cloud_run_service" "inference-service" {
             service = "grpc.health.v1.Health"
           }
         }
+
+        ports {
+          container_port = 443
+          name = "h2c"
+        }
       }
     }
 
@@ -266,6 +271,7 @@ resource "google_cloud_run_service" "inference-service" {
         "run.googleapis.com/client-name"        = "cloud-console"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
+        "run.googleapis.com/ingress" = "all"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
       }
     }
@@ -283,6 +289,7 @@ resource "google_cloud_run_service" "inference-service" {
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],
@@ -296,6 +303,14 @@ resource "google_cloud_run_service" "inference-service" {
   }
 
   depends_on = [google_project_service.run_api, google_sql_database_instance.core, google_artifact_registry_repository.inference-service, google_vpc_access_connector.connector]
+}
+
+resource google_cloud_run_service_iam_member public_access {
+  service = google_cloud_run_service.inference-service.name
+  location = google_cloud_run_service.inference-service.location
+  project = google_cloud_run_service.inference-service.project
+  role = "roles/run.invoker"
+  member = "allUsers"
 }
 
 # Create the Cloud Run service
@@ -370,7 +385,7 @@ resource "google_cloud_run_service" "app-service" {
         }
         env {
           name = "INFERENCE_SERVICE_URL"
-          value = "${trimprefix(google_cloud_run_service.inference-service.status[0].url, "https://")}:443"
+          value = "inference-service.sandbox.judie.io:443"
         }
         startup_probe {
           initial_delay_seconds = 10
@@ -420,6 +435,7 @@ resource "google_cloud_run_service" "app-service" {
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],
@@ -490,6 +506,7 @@ resource "google_cloud_run_service" "web" {
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],

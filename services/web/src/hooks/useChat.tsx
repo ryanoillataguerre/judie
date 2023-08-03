@@ -190,7 +190,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setBeingStreamedChatId(() => undefined);
     setBeingStreamedMessage(() => undefined);
     setTempUserMessageChatId(() => undefined);
-    setTempUserMessage(() => undefined);
+    // setTempUserMessage(() => undefined);
     setStreaming(() => false);
 
     if (err.response.code === 429) {
@@ -198,14 +198,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       toast({
         title: "Oops!",
-        description:
-          err.message ||
-          "Something went wrong with the chat, please try again.",
+        description: err.message || "Something went wrong, please try again.",
         status: "error",
         duration: 2000,
         isClosable: true,
       });
     }
+    existingChatQuery.refetch();
   };
 
   const completionMutation = useMutation({
