@@ -18,7 +18,7 @@ const OpenCloseButton = ({
     <Box
       style={{
         position: "fixed",
-        top: "3.5rem",
+        top: "0.4rem",
         left: isOpen ? "18.5rem" : "1.5rem",
         padding: "0.5rem",
       }}
@@ -51,7 +51,7 @@ const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
     md: false,
   });
   const [isOpen, setIsOpen] = useStorageState<boolean>(
-    isMobile ?? false,
+    isMobile ? false : true,
     "sidebarOpen"
   );
   return (
