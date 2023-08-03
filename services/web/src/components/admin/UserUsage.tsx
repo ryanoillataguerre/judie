@@ -42,7 +42,7 @@ const UserUsage = ({ id }: { id: string }) => {
   return (
     <Flex width={"100%"} height={"400px"}>
       <AutoSizer style={{ width: "100%" }}>
-        {({ height, width }) => (
+        {({ height, width }: { height: number; width: number }) => (
           <Line
             height={height}
             width={width}
