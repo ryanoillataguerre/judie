@@ -445,7 +445,9 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             {entities?.rooms &&
               !entities?.organizations?.length &&
               !entities?.schools?.length &&
-              entities?.rooms?.map((room) => <SidebarRoom room={room} />)}
+              entities?.rooms?.map((room) => (
+                <SidebarRoom key={room.id} room={room} />
+              ))}
           </Flex>
         ) : (
           <Flex

@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 WORKDIR /app
 COPY ./build_protos.sh /opt/build_protos.sh
 COPY app-service .
