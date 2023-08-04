@@ -540,7 +540,7 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
 }
 # Allow unauthenticated users to invoke the service
 # TEMP: Remove this
-resource "google_cloud_run_service_iam_member" "run_all_users_service" {
+resource "google_cloud_run_service_iam_member" "run_all_users_app_service" {
   service  = google_cloud_run_service.app-service.name
   location = google_cloud_run_service.app-service.location
   role     = "roles/run.invoker"
