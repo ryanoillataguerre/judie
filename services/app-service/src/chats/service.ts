@@ -218,3 +218,27 @@ export const createMessage = async (params: Prisma.MessageCreateInput) => {
   });
   return newMessage;
 };
+
+export const deleteMostRecentChatMessage = async ({
+  chatId,
+}: {
+  chatId: string;
+}) => {
+  const message = await dbClient.message.findFirst({
+    where: {
+      chatId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  if (!message) {
+    console.info("No message found to delete for chat id: ", chatId);
+    return;
+  }
+  await dbClient.message.delete({
+    where: {
+      id: message.id,
+    },
+  });
+};

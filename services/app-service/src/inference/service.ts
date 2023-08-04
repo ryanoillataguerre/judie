@@ -2,6 +2,7 @@ import { Response } from "express";
 import inferenceServiceClient from "../utils/grpc/inferenceClient.js";
 import { ChatDetails } from "../proto/inference_service.js";
 import InternalError from "../utils/errors/InternalError.js";
+import { deleteMostRecentChatMessage } from "../chats/service.js";
 
 export const getChatCompletion = async ({
   chatId,
@@ -30,6 +31,7 @@ export const getChatCompletion = async ({
     return fullText;
   } catch (err) {
     console.error(err);
+    await deleteMostRecentChatMessage({ chatId });
     throw new InternalError(
       "Could not get chat completion. Please try again later."
     );

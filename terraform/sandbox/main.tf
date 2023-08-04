@@ -271,7 +271,6 @@ resource "google_cloud_run_service" "inference-service" {
         "run.googleapis.com/client-name"        = "cloud-console"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
-        "run.googleapis.com/ingress" = "all"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
       }
     }
@@ -385,7 +384,7 @@ resource "google_cloud_run_service" "app-service" {
         }
         env {
           name = "INFERENCE_SERVICE_URL"
-          value = "inference-service.sandbox.judie.io:443"
+          value = "${trimprefix(google_cloud_run_service.inference-service.status[0].url, "https://")}:443"
         }
         startup_probe {
           initial_delay_seconds = 10
