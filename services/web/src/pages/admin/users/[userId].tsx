@@ -22,7 +22,7 @@ function AdminPage() {
       <main>
         <ChatProvider>
           <AdminSidebarPageContainer>
-            <AdminUser id={router.query.schoolId as string} />
+            <AdminUser id={router.query.userId as string} />
           </AdminSidebarPageContainer>
         </ChatProvider>
       </main>

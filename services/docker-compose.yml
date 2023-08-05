@@ -31,11 +31,10 @@ services:
     privileged: true
     volumes:
       - ./app-service:/app
-      - ./protos:/app/protos # Copies protos into the container at dir /app/protos
     working_dir: /app
     build:
-      context: .
-      dockerfile: ./app-service/Dockerfile.local
+      context: ./app-service
+      dockerfile: ./Dockerfile.local
     ports:
       - 8080:8080
     restart: on-failure
@@ -54,6 +53,7 @@ services:
       CUSTOMERIO_SITE_ID: ${CUSTOMERIO_SITE_ID}
       CUSTOMERIO_API_KEY: ${CUSTOMERIO_API_KEY}
       CUSTOMERIO_APP_API_KEY: ${CUSTOMERIO_APP_API_KEY}
+      INFERENCE_SERVICE_URL: dns:///inference-service:443
   web:
     networks:
       - dev

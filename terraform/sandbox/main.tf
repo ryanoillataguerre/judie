@@ -200,6 +200,118 @@ resource "google_project_service" "sqladmin-api" {
 #   repository_id = "inference-service"
 # }
 
+resource "google_cloud_run_service" "inference-service" {
+  name = "inference-service"
+  location = "us-west1"
+  autogenerate_revision_name = true
+
+  template {
+    spec {
+      containers {
+        image = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
+        env {
+          name = "DATABASE_URL"
+          value = "postgres://postgres:${random_password.password.result}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
+        }
+        env {
+          name = "OPENAI_API_KEY"
+          value = var.env_openai_api_key
+        }
+        env {
+          name = "PINECONE_API_KEY"
+          value = var.env_pinecone_api_key
+        }
+        env {
+          name = "PINECONE_ENVIRONMENT"
+          value = var.env_pinecone_environment
+        }
+        env {
+          name = "GRPC_PORT"
+          value = var.grpc_port
+        }
+        env {
+          name = "GRPC_HEALTH_PORT"
+          value = var.grpc_health_port
+        }
+        env {
+          name = "WOLFRAM_APP_ID"
+          value = var.wolfram_app_id
+        }
+        startup_probe {
+          initial_delay_seconds = 100
+          failure_threshold = 3
+          period_seconds = 60
+          grpc {
+            service = "grpc.health.v1.Health"
+          }
+        }
+        liveness_probe {
+          initial_delay_seconds = 100
+          failure_threshold = 3
+          period_seconds = 360
+          grpc {
+            service = "grpc.health.v1.Health"
+          }
+        }
+
+        ports {
+          container_port = 443
+          name = "h2c"
+        }
+      }
+    }
+
+
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/maxScale"      = "100"
+        "autoscaling.knative.dev/minScale"      = "1"
+        # Is this superfluous now?
+        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
+        "run.googleapis.com/client-name"        = "cloud-console"
+        "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
+        "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
+        "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+
+  # This addresses an annoying bug where apply hangs after someone has manually edited the service in Cloud Run console
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["client.knative.dev/user-image"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
+      template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
+      metadata[0].annotations["client.knative.dev/user-image"],
+      metadata[0].annotations["run.googleapis.com/client-name"],
+      metadata[0].annotations["run.googleapis.com/client-version"],
+      metadata[0].annotations["run.googleapis.com/launch-stage"],
+      metadata[0].annotations["serving.knative.dev/creator"],
+      metadata[0].annotations["serving.knative.dev/lastModifier"],
+      metadata[0].annotations["run.googleapis.com/ingress-status"],
+      metadata[0].labels["cloud.googleapis.com/location"],
+      template[0].spec[0].containers[0].image
+    ]
+  }
+
+  depends_on = [google_project_service.run_api, google_sql_database_instance.core, google_artifact_registry_repository.inference-service, google_vpc_access_connector.connector]
+}
+
+resource google_cloud_run_service_iam_member public_access {
+  service = google_cloud_run_service.inference-service.name
+  location = google_cloud_run_service.inference-service.location
+  project = google_cloud_run_service.inference-service.project
+  role = "roles/run.invoker"
+  member = "allUsers"
+}
+
 # Create the Cloud Run service
 resource "google_cloud_run_service" "app-service" {
   name = "app-service"
@@ -270,6 +382,10 @@ resource "google_cloud_run_service" "app-service" {
           name = "CUSTOMERIO_SITE_ID"
           value = var.env_customerio_site_id
         }
+        env {
+          name = "INFERENCE_SERVICE_URL"
+          value = "${trimprefix(google_cloud_run_service.inference-service.status[0].url, "https://")}:443"
+        }
         startup_probe {
           initial_delay_seconds = 10
           failure_threshold = 3
@@ -318,6 +434,7 @@ resource "google_cloud_run_service" "app-service" {
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],
@@ -388,6 +505,7 @@ resource "google_cloud_run_service" "web" {
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
+      template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],
@@ -401,104 +519,6 @@ resource "google_cloud_run_service" "web" {
   }
 
   depends_on = [google_project_service.run_api, google_cloud_run_service.app-service, google_artifact_registry_repository.web]
-}
-
-resource "google_cloud_run_service" "inference-service" {
-  name = "inference-service"
-  location = "us-west1"
-  autogenerate_revision_name = true
-
-  template {
-    spec {
-      containers {
-        image = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
-        env {
-          name = "DATABASE_URL"
-          value = "postgres://postgres:${random_password.password.result}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
-        }
-        env {
-          name = "OPENAI_API_KEY"
-          value = var.env_openai_api_key
-        }
-        env {
-          name = "PINECONE_API_KEY"
-          value = var.env_pinecone_api_key
-        }
-        env {
-          name = "PINECONE_ENVIRONMENT"
-          value = var.env_pinecone_environment
-        }
-        env {
-          name = "GRPC_PORT"
-          value = var.grpc_port
-        }
-        env {
-          name = "GRPC_HEALTH_PORT"
-          value = var.grpc_health_port
-        }
-        env {
-          name = "WOLFRAM_APP_ID"
-          value = var.wolfram_app_id
-        }
-        startup_probe {
-          initial_delay_seconds = 100
-          failure_threshold = 3
-          period_seconds = 60
-          grpc {
-            service = "grpc.health.v1.Health"
-          }
-        }
-        liveness_probe {
-          initial_delay_seconds = 100
-          failure_threshold = 3
-          period_seconds = 360
-          grpc {
-            service = "grpc.health.v1.Health"
-          }
-        }
-      }
-    }
-
-
-    metadata {
-      annotations = {
-        "autoscaling.knative.dev/maxScale"      = "100"
-        "autoscaling.knative.dev/minScale"      = "1"
-        # Is this superfluous now?
-        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
-        "run.googleapis.com/client-name"        = "cloud-console"
-        "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
-        "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
-        "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
-      }
-    }
-  }
-
-  traffic {
-    percent         = 100
-    latest_revision = true
-  }
-
-  # This addresses an annoying bug where apply hangs after someone has manually edited the service in Cloud Run console
-  lifecycle {
-    ignore_changes = [
-      template[0].metadata[0].annotations["client.knative.dev/user-image"],
-      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
-      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
-      template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
-      metadata[0].annotations["client.knative.dev/user-image"],
-      metadata[0].annotations["run.googleapis.com/client-name"],
-      metadata[0].annotations["run.googleapis.com/client-version"],
-      metadata[0].annotations["run.googleapis.com/launch-stage"],
-      metadata[0].annotations["serving.knative.dev/creator"],
-      metadata[0].annotations["serving.knative.dev/lastModifier"],
-      metadata[0].annotations["run.googleapis.com/ingress-status"],
-      metadata[0].labels["cloud.googleapis.com/location"],
-      template[0].spec[0].containers[0].image
-    ]
-  }
-
-  depends_on = [google_project_service.run_api, google_sql_database_instance.core, google_artifact_registry_repository.app-service, google_vpc_access_connector.connector]
 }
 
 
@@ -520,7 +540,7 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
 }
 # Allow unauthenticated users to invoke the service
 # TEMP: Remove this
-resource "google_cloud_run_service_iam_member" "run_all_users_service" {
+resource "google_cloud_run_service_iam_member" "run_all_users_app_service" {
   service  = google_cloud_run_service.app-service.name
   location = google_cloud_run_service.app-service.location
   role     = "roles/run.invoker"

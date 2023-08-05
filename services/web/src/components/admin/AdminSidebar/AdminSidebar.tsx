@@ -442,9 +442,12 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             {entities?.schools?.map((school) => (
               <SidebarSchool school={school} key={school.id} />
             ))}
-            {/* {entities?.rooms?.map((room) => (
-              <SidebarRoom room={room} />
-            ))} */}
+            {entities?.rooms &&
+              !entities?.organizations?.length &&
+              !entities?.schools?.length &&
+              entities?.rooms?.map((room) => (
+                <SidebarRoom key={room.id} room={room} />
+              ))}
           </Flex>
         ) : (
           <Flex

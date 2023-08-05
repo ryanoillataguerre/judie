@@ -44,8 +44,11 @@ services
 
 ## Build and push the corresponding service's Docker Image
 
-- `docker buildx build --platform linux/amd64 -t us-west1-docker.pkg.dev/{GCP_PROJECT_ID}/{REPOSITORY}/{IMAGE_NAME}:latest {PATH_TO_SERVICE_ROOT}`
-- `docker push us-west1-docker.pkg.dev/{GCP_PROJECT_ID}/{REPOSITORY}/{IMAGE_NAME}:latest`
+```
+cd ./infrastructure/deployment
+./sandbox_app_service.sh
+./sandbox_web.sh
+```
 
 ## Redeploy Cloud Run service with new image
 
