@@ -1,4 +1,12 @@
-import { memo, use, useContext, useEffect, useMemo, useRef } from "react";
+import {
+  memo,
+  use,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
@@ -57,9 +65,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     return newMessages.map((message, index) => {
       const isLast = index + 1 === messages.length;
       const key = `${message.type}-${
-        isLast && message.type === MessageType.BOT
-          ? "mostRecent"
-          : message.readableContent?.slice(0, 9).includes("undefined")
+        message.readableContent?.slice(0, 9).includes("undefined")
           ? message.readableContent?.slice(9, 50)
           : message.readableContent?.slice(0, 50)
       }`;
@@ -77,6 +83,22 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     }
     return shouldShowSubjectSelector;
   }, [chat?.messages?.length, tempUserMessage, chatId, tempUserMessageChatId]);
+
+  const [animatedEllipsisStringValue, setAnimatedEllipsisStringValue] =
+    useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimatedEllipsisStringValue((prev) => {
+        if (prev.length === 3) {
+          return ".";
+        } else {
+          return prev + ".";
+        }
+      });
+    }, 400);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Flex
@@ -149,10 +171,12 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
               key={`${MessageType.BOT}-mostRecent`}
               message={{
                 type: MessageType.BOT,
-                readableContent: beingStreamedMessage?.slice(9, -1) || "...",
+                readableContent:
+                  beingStreamedMessage?.slice(9, -1) ||
+                  animatedEllipsisStringValue,
                 createdAt: new Date(),
               }}
-              isStreaming={streaming}
+              // isStreaming={streaming}
             />
           )}
         </ScrollContainer>
