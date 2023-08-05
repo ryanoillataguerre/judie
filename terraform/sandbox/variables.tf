@@ -15,62 +15,62 @@ variable "gcp_project" {
 }
 
 variable "env_openai_api_key" {
-  type = string
+  type        = string
   description = "OpenAI API Key"
 }
 variable "env_pinecone_api_key" {
-  type = string
+  type        = string
   description = "Pinecone API Key"
 }
 variable "env_pinecone_environment" {
-  type = string
+  type        = string
   description = "Pinecone zone"
 }
 variable "env_session_secret" {
-  type = string
+  type        = string
   description = "Session secret"
 }
 variable "env_stripe_whsec" {
-  type = string
+  type        = string
   description = "Stripe webhook secret"
 }
 variable "env_stripe_monthly_price_id" {
-  type = string
+  type        = string
   description = "Stripe monthly planprice ID"
 }
 
 variable "env_stripe_sk" {
-  type = string
+  type        = string
   description = "Stripe secret key"
 }
 variable "env_stripe_employee_coupon_id" {
-  type = string
+  type        = string
   description = "Stripe employee coupon ID"
 }
 
 variable "env_customerio_api_key" {
-  type = string
+  type        = string
   description = "CustomerIO API Key"
 }
 variable "env_customerio_app_api_key" {
-  type = string
+  type        = string
   description = "CustomerIO App API Key"
 }
 
 variable "env_customerio_site_id" {
-  type = string
+  type        = string
   description = "CustomerIO site ID"
 }
 
 variable "grpc_port" {
-  type = string
+  type        = string
   description = "Port Cloud Run sends gRPC traffic over"
 }
 variable "grpc_health_port" {
-  type = string
+  type        = string
   description = "Port Cloud Run sends gRPC based health and liveliness checks over"
 }
 variable "wolfram_app_id" {
-  type = string
+  type        = string
   description = "Application ID for Wolfram API access"
 }

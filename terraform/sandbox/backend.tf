@@ -5,13 +5,13 @@ terraform {
       source = "hashicorp/google"
     }
     google-beta = {
-      source  = "hashicorp/google-beta"
+      source = "hashicorp/google-beta"
     }
   }
   # TODO: Add this to prod after bucket is successfully created
   backend "gcs" {
-    bucket  = "b09bcadeb5f255f1-bucket-tfstate"
-    prefix  = "terraform/state"
+    bucket = "b09bcadeb5f255f1-bucket-tfstate"
+    prefix = "terraform/state"
   }
 }
 

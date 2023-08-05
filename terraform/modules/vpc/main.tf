@@ -30,10 +30,10 @@ module "vpc" {
 
   # Private Subnet
   resource "google_compute_subnetwork" "private-subnetwork" {
-    name = "private-subnet"
+    name          = "private-subnet"
     ip_cidr_range = "10.10.0.0/28"
-    region = "us-west1"
-    network = google_compute_network.private_network.name
+    region        = "us-west1"
+    network       = google_compute_network.private_network.name
   }
 
   # Reserve global internal address range for the peering
@@ -55,13 +55,13 @@ module "vpc" {
   }
 
   resource "google_vpc_access_connector" "connector" {
-    name          = "vpc-access-conn"
+    name = "vpc-access-conn"
     subnet {
       name = google_compute_subnetwork.private-subnetwork.name
     }
     min_instances = 2
     max_instances = var.access_connector_max_instances
-    project = var.gcp_project
-    region  = var.gcp_region
+    project       = var.gcp_project
+    region        = var.gcp_region
   }
 }

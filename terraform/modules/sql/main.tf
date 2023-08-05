@@ -7,11 +7,11 @@ resource "google_sql_database_instance" "default" {
   settings {
     activation_policy = "ALWAYS"
     availability_type = "REGIONAL"
-    pricing_plan = "PER_USE"
-    tier         = var.db_tier
-    
+    pricing_plan      = "PER_USE"
+    tier              = var.db_tier
+
     backup_configuration {
-      enabled                        = false
+      enabled = false
     }
 
     disk_autoresize       = true
@@ -37,7 +37,7 @@ resource "google_sql_database_instance" "default" {
       zone = "us-west1-a"
     }
   }
-  depends_on       = [google_service_networking_connection.private_vpc_connection]
+  depends_on = [google_service_networking_connection.private_vpc_connection]
 }
 
 resource "random_password" "password" {

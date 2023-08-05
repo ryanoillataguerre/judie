@@ -117,7 +117,7 @@ resource "google_project_service" "sqladmin-api" {
 #     availability_type = "REGIONAL"
 #     pricing_plan = "PER_USE"
 #     tier         = "db-f1-micro"
-    
+
 #     backup_configuration {
 #       enabled                        = false
 #     }
@@ -201,8 +201,8 @@ resource "google_project_service" "sqladmin-api" {
 # }
 
 resource "google_cloud_run_service" "inference-service" {
-  name = "inference-service"
-  location = "us-west1"
+  name                       = "inference-service"
+  location                   = "us-west1"
   autogenerate_revision_name = true
 
   template {
@@ -210,45 +210,45 @@ resource "google_cloud_run_service" "inference-service" {
       containers {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
         env {
-          name = "DATABASE_URL"
+          name  = "DATABASE_URL"
           value = "postgres://postgres:${random_password.password.result}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
         }
         env {
-          name = "OPENAI_API_KEY"
+          name  = "OPENAI_API_KEY"
           value = var.env_openai_api_key
         }
         env {
-          name = "PINECONE_API_KEY"
+          name  = "PINECONE_API_KEY"
           value = var.env_pinecone_api_key
         }
         env {
-          name = "PINECONE_ENVIRONMENT"
+          name  = "PINECONE_ENVIRONMENT"
           value = var.env_pinecone_environment
         }
         env {
-          name = "GRPC_PORT"
+          name  = "GRPC_PORT"
           value = var.grpc_port
         }
         env {
-          name = "GRPC_HEALTH_PORT"
+          name  = "GRPC_HEALTH_PORT"
           value = var.grpc_health_port
         }
         env {
-          name = "WOLFRAM_APP_ID"
+          name  = "WOLFRAM_APP_ID"
           value = var.wolfram_app_id
         }
         startup_probe {
           initial_delay_seconds = 100
-          failure_threshold = 3
-          period_seconds = 60
+          failure_threshold     = 3
+          period_seconds        = 60
           grpc {
             service = "grpc.health.v1.Health"
           }
         }
         liveness_probe {
           initial_delay_seconds = 100
-          failure_threshold = 3
-          period_seconds = 360
+          failure_threshold     = 3
+          period_seconds        = 360
           grpc {
             service = "grpc.health.v1.Health"
           }
@@ -256,7 +256,7 @@ resource "google_cloud_run_service" "inference-service" {
 
         ports {
           container_port = 443
-          name = "h2c"
+          name           = "h2c"
         }
       }
     }
@@ -264,11 +264,11 @@ resource "google_cloud_run_service" "inference-service" {
 
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale"      = "100"
-        "autoscaling.knative.dev/minScale"      = "1"
+        "autoscaling.knative.dev/maxScale" = "100"
+        "autoscaling.knative.dev/minScale" = "1"
         # Is this superfluous now?
-        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
-        "run.googleapis.com/client-name"        = "cloud-console"
+        "run.googleapis.com/cloudsql-instances"   = google_sql_database_instance.core.connection_name
+        "run.googleapis.com/client-name"          = "cloud-console"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
@@ -304,18 +304,18 @@ resource "google_cloud_run_service" "inference-service" {
   depends_on = [google_project_service.run_api, google_sql_database_instance.core, google_artifact_registry_repository.inference-service, google_vpc_access_connector.connector]
 }
 
-resource google_cloud_run_service_iam_member public_access {
-  service = google_cloud_run_service.inference-service.name
+resource "google_cloud_run_service_iam_member" "public_access" {
+  service  = google_cloud_run_service.inference-service.name
   location = google_cloud_run_service.inference-service.location
-  project = google_cloud_run_service.inference-service.project
-  role = "roles/run.invoker"
-  member = "allUsers"
+  project  = google_cloud_run_service.inference-service.project
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
 
 # Create the Cloud Run service
 resource "google_cloud_run_service" "app-service" {
-  name = "app-service"
-  location = "us-west1"
+  name                       = "app-service"
+  location                   = "us-west1"
   autogenerate_revision_name = true
 
   template {
@@ -323,73 +323,73 @@ resource "google_cloud_run_service" "app-service" {
       containers {
         image = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
         env {
-          name = "DATABASE_URL"
+          name  = "DATABASE_URL"
           value = "postgres://postgres:${random_password.password.result}@${google_sql_database_instance.core.private_ip_address}:5432/postgres"
         }
         env {
-          name = "REDIS_HOST"
+          name  = "REDIS_HOST"
           value = google_redis_instance.redis-core.host
         }
         env {
-          name = "REDIS_PORT"
+          name  = "REDIS_PORT"
           value = "6379"
         }
         env {
-          name = "NODE_ENV"
+          name  = "NODE_ENV"
           value = "sandbox"
         }
         env {
-          name = "OPENAI_API_KEY"
+          name  = "OPENAI_API_KEY"
           value = var.env_openai_api_key
         }
         env {
-          name = "PINECONE_API_KEY"
+          name  = "PINECONE_API_KEY"
           value = var.env_pinecone_api_key
         }
         env {
-          name = "PINECONE_ENVIRONMENT"
+          name  = "PINECONE_ENVIRONMENT"
           value = var.env_pinecone_environment
         }
         env {
-          name = "SESSION_SECRET"
+          name  = "SESSION_SECRET"
           value = var.env_session_secret
         }
         env {
-          name = "STRIPE_WEBHOOK_SECRET"
+          name  = "STRIPE_WEBHOOK_SECRET"
           value = var.env_stripe_whsec
         }
         env {
-          name = "STRIPE_MONTHLY_PRICE_ID"
+          name  = "STRIPE_MONTHLY_PRICE_ID"
           value = var.env_stripe_monthly_price_id
         }
         env {
-          name = "STRIPE_SK"
+          name  = "STRIPE_SK"
           value = var.env_stripe_sk
         }
         env {
-          name = "STRIPE_EMPLOYEE_COUPON_ID"
+          name  = "STRIPE_EMPLOYEE_COUPON_ID"
           value = var.env_stripe_employee_coupon_id
         }
         env {
-          name = "CUSTOMERIO_API_KEY"
+          name  = "CUSTOMERIO_API_KEY"
           value = var.env_customerio_api_key
         }
         env {
-          name = "CUSTOMERIO_APP_API_KEY"
+          name  = "CUSTOMERIO_APP_API_KEY"
           value = var.env_customerio_app_api_key
         }
         env {
-          name = "CUSTOMERIO_SITE_ID"
+          name  = "CUSTOMERIO_SITE_ID"
           value = var.env_customerio_site_id
         }
         env {
-          name = "INFERENCE_SERVICE_URL"
+          name  = "INFERENCE_SERVICE_URL"
           value = "${trimprefix(google_cloud_run_service.inference-service.status[0].url, "https://")}:443"
         }
         startup_probe {
           initial_delay_seconds = 10
-          failure_threshold = 3
-          period_seconds = 10
+          failure_threshold     = 3
+          period_seconds        = 10
           http_get {
             path = "/healthcheck"
             port = 8080
@@ -397,8 +397,8 @@ resource "google_cloud_run_service" "app-service" {
         }
         liveness_probe {
           initial_delay_seconds = 10
-          failure_threshold = 3
-          period_seconds = 360
+          failure_threshold     = 3
+          period_seconds        = 360
           http_get {
             path = "/healthcheck"
             port = 8080
@@ -407,14 +407,14 @@ resource "google_cloud_run_service" "app-service" {
       }
     }
 
-    
+
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale"      = "100"
-        "autoscaling.knative.dev/minScale"      = "1"
+        "autoscaling.knative.dev/maxScale" = "100"
+        "autoscaling.knative.dev/minScale" = "1"
         # Is this superfluous now?
-        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.core.connection_name
-        "run.googleapis.com/client-name"        = "cloud-console"
+        "run.googleapis.com/cloudsql-instances"   = google_sql_database_instance.core.connection_name
+        "run.googleapis.com/client-name"          = "cloud-console"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/app-service/app-service:latest"
@@ -451,8 +451,8 @@ resource "google_cloud_run_service" "app-service" {
 }
 
 resource "google_cloud_run_service" "web" {
-  name = "web"
-  location = "us-west1"
+  name                       = "web"
+  location                   = "us-west1"
   autogenerate_revision_name = true
 
   template {
@@ -462,7 +462,7 @@ resource "google_cloud_run_service" "web" {
         # Env variables must be defined at build time for Next.js
         startup_probe {
           initial_delay_seconds = 10
-          failure_threshold = 3
+          failure_threshold     = 3
           http_get {
             path = "/api/healthcheck"
             port = 3000
@@ -470,8 +470,8 @@ resource "google_cloud_run_service" "web" {
         }
         liveness_probe {
           initial_delay_seconds = 10
-          failure_threshold = 3
-          period_seconds = 360
+          failure_threshold     = 3
+          period_seconds        = 360
           http_get {
             path = "/api/healthcheck"
             port = 3000
@@ -484,8 +484,8 @@ resource "google_cloud_run_service" "web" {
     }
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale"      = "1"
-        "autoscaling.knative.dev/maxScale"      = "100"
+        "autoscaling.knative.dev/minScale"        = "1"
+        "autoscaling.knative.dev/maxScale"        = "100"
         "run.googleapis.com/vpc-access-connector" = google_vpc_access_connector.connector.id
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
         "client.knative.dev/user-image"           = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
@@ -526,7 +526,7 @@ resource "google_cloud_run_service" "web" {
 resource "google_secret_manager_secret" "tf-vars_secret" {
   secret_id = "sandbox_tf_vars"
 
-  replication{
+  replication {
     automatic = true
   }
 }
