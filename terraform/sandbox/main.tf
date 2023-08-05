@@ -13,9 +13,12 @@ resource "google_project_service" "sqladmin-api" {
   service = "sqladmin.googleapis.com"
 }
 
-# Create default VPC network
+# Store backend state in Cloud Storage
 
-# # Store backend state in Cloud Storage
+module "backend-bucket" {
+  source = "../modules/bucket"
+  name   = "judie-tfstate-sandbox"
+}
 
 resource "google_dns_managed_zone" "web-public" {
   dns_name      = "app.sandbox.judie.io."
@@ -40,7 +43,7 @@ module "vpc" {
   project                        = var.gcp_project
   name                           = "sandbox"
   region                         = "us-west1"
-  access_connector_max_instances = 2
+  access_connector_max_instances = 3
   web_public_dns_zone            = google_dns_managed_zone.web-public.name
   app_service_public_dns_zone    = google_dns_managed_zone.app-service-public.name
 }
@@ -97,6 +100,7 @@ module "web_ar_repo" {
 # Cloud Run
 
 # Inference Service
+# Temp removed while image is set up
 module "inference-service" {
   name     = "inference-service"
   location = "us-west1"

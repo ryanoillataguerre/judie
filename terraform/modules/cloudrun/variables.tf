@@ -54,7 +54,7 @@ variable "cpus" {
 }
 
 variable "env" {
-  type = set(
+  type = list(
     object({
       key   = string,
       value = string,

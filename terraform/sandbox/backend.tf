@@ -10,7 +10,7 @@ terraform {
   }
   # TODO: Add this to prod after bucket is successfully created
   backend "gcs" {
-    bucket = "b09bcadeb5f255f1-bucket-tfstate"
+    bucket = "judie-sandbox-backup-tfstate"
     prefix = "terraform/state"
   }
 }

@@ -12,7 +12,7 @@ variable "project" {
 }
 variable "access_connector_max_instances" {
   type        = number
-  default     = 2
+  default     = 3
   description = "Maximum number of access connector instances"
 }
 variable "region" {

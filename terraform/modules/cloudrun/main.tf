@@ -24,7 +24,7 @@ resource "google_cloud_run_service" "default" {
 
         # Populate straight environment variables.
         dynamic "env" {
-          for_each = [for e in var.env : e if e.value != null]
+          for_each = var.env
 
           content {
             name  = env.value.key
@@ -32,7 +32,7 @@ resource "google_cloud_run_service" "default" {
           }
         }
         startup_probe {
-          initial_delay_seconds = 100
+          initial_delay_seconds = 10
           failure_threshold     = 3
           period_seconds        = 60
 
@@ -51,7 +51,7 @@ resource "google_cloud_run_service" "default" {
           }
         }
         liveness_probe {
-          initial_delay_seconds = 100
+          initial_delay_seconds = 10
           failure_threshold     = 3
           period_seconds        = 360
 
@@ -76,12 +76,12 @@ resource "google_cloud_run_service" "default" {
       labels = var.labels
 
       annotations = merge({
-        "run.googleapis.com/cpu-throttling"        = var.cpu_throttling
-        "autoscaling.knative.dev/minScale"         = "1"
-        "autoscaling.knative.dev/maxScale"         = "${var.max_instances}"
-        "client.knative.dev/user-image"            = var.image
-        "run.googleapis.com/cloudsql-instances"    = join(",", var.cloudsql_connections)
-        "run.googleapis.com/ingress"               = var.ingress
+        "run.googleapis.com/cpu-throttling"     = var.cpu_throttling
+        "autoscaling.knative.dev/minScale"      = "1"
+        "autoscaling.knative.dev/maxScale"      = "${var.max_instances}"
+        "client.knative.dev/user-image"         = var.image
+        "run.googleapis.com/cloudsql-instances" = join(",", var.cloudsql_connections)
+        # "run.googleapis.com/ingress"               = var.ingress
         "run.googleapis.com/client-name"           = "terraform",
         "run.googleapis.com/execution-environment" = var.execution_environment
         },
