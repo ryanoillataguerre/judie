@@ -18,7 +18,6 @@ import CodeBlock from "./CodeBlock";
 import { FC, memo, useContext } from "react";
 import ReactMarkdown, { Options } from "react-markdown";
 import { AiOutlineUser, AiFillRobot } from "react-icons/ai";
-import styles from "./MessageRow.module.css";
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
