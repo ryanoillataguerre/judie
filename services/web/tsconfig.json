@@ -22,6 +22,6 @@
       "./src/typings"
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.scss"],
   "exclude": ["node_modules"]
 }
