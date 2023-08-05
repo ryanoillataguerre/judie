@@ -2,7 +2,7 @@ resource "google_sql_database_instance" "default" {
   database_version = "POSTGRES_14"
   name             = var.db_name
   project          = var.project
-  region           = var.gcp_region
+  region           = var.region
 
   settings {
     activation_policy = "ALWAYS"
@@ -11,7 +11,7 @@ resource "google_sql_database_instance" "default" {
     tier              = var.db_tier
 
     backup_configuration {
-      enabled = false
+      enabled = var.backups_enabled
     }
 
     disk_autoresize       = true
@@ -30,14 +30,13 @@ resource "google_sql_database_instance" "default" {
       }
 
       ipv4_enabled    = true
-      private_network = google_compute_network.private_network.self_link
+      private_network = var.private_network_link
     }
 
     location_preference {
       zone = "us-west1-a"
     }
   }
-  depends_on = [google_service_networking_connection.private_vpc_connection]
 }
 
 resource "random_password" "password" {

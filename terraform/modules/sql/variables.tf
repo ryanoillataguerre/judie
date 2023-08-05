@@ -6,7 +6,7 @@ variable "project" {
   type        = string
   description = "GCP Project"
 }
-variable "gcp_region" {
+variable "region" {
   type        = string
   description = "GCP Region"
 }
@@ -18,4 +18,10 @@ variable "disk_size" {
   type        = number
   default     = 50
   description = "Disk size (GB)"
+}
+
+variable "backups_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable backups"
 }

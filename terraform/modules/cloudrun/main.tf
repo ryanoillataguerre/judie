@@ -1,4 +1,3 @@
-
 resource "google_cloud_run_service" "default" {
   name                       = var.name
   location                   = var.location
@@ -18,23 +17,44 @@ resource "google_cloud_run_service" "default" {
             memory = "${var.memory}Mi"
           }
         }
-        # image = "us-west1-docker.pkg.dev/${var.project}/${var.name}/${var.name}:latest"
-        # Env variables must be defined at build time for Next.js
+        # HTTP
         startup_probe {
+          count                 = var.healthcheck_grpc_service == null ? 1 : 0
           initial_delay_seconds = 10
           failure_threshold     = 3
+          period_seconds        = 60
           http_get {
             path = var.healthcheck_path
             port = var.healthcheck_port
           }
         }
         liveness_probe {
+          count                 = var.healthcheck_grpc_service == null ? 1 : 0
           initial_delay_seconds = 10
           failure_threshold     = 3
           period_seconds        = 360
           http_get {
             path = var.healthcheck_path
             port = var.healthcheck_port
+          }
+        }
+        # GRPC
+        startup_probe {
+          count                 = var.healthcheck_grpc_service == null ? 0 : 1
+          initial_delay_seconds = 10
+          failure_threshold     = 3
+          period_seconds        = 60
+          grpc {
+            service = var.healthcheck_grpc_service
+          }
+        }
+        liveness_probe {
+          count                 = var.healthcheck_grpc_service == null ? 0 : 1
+          initial_delay_seconds = 10
+          failure_threshold     = 3
+          period_seconds        = 360
+          grpc {
+            service = var.healthcheck_grpc_service
           }
         }
         ports {
@@ -59,21 +79,19 @@ resource "google_cloud_run_service" "default" {
       labels = var.labels
 
       annotations = merge({
-        "run.googleapis.com/cpu-throttling"     = var.cpu_throttling
-        "autoscaling.knative.dev/minScale"      = "1"
-        "autoscaling.knative.dev/maxScale"      = "${var.max_instances}"
-        "client.knative.dev/user-image"         = var.image
-        "run.googleapis.com/cloudsql-instances" = join(",", var.cloudsql_connections)
-        "run.googleapis.com/ingress"            = var.ingress
-        "run.googleapis.com/client-name" = "terraform" },
-
-        # Make into a variable?
+        "run.googleapis.com/cpu-throttling"        = var.cpu_throttling
+        "autoscaling.knative.dev/minScale"         = "1"
+        "autoscaling.knative.dev/maxScale"         = "${var.max_instances}"
+        "client.knative.dev/user-image"            = var.image
+        "run.googleapis.com/cloudsql-instances"    = join(",", var.cloudsql_connections)
+        "run.googleapis.com/ingress"               = var.ingress
+        "run.googleapis.com/client-name"           = "terraform",
+        "run.googleapis.com/execution-environment" = var.execution_environment
+        },
         var.vpc_access.connector == null ? {} : {
           "run.googleapis.com/vpc-access-connector" = var.vpc_access.connector
           "run.googleapis.com/vpc-access-egress"    = var.vpc_access.egress
         }
-
-
       )
     }
   }
@@ -103,6 +121,15 @@ resource "google_cloud_run_service" "default" {
     ]
   }
 
+}
+
+resource "google_cloud_run_service_iam_member" "public_access" {
+  count    = var.allow_public_access ? 1 : 0
+  service  = google_cloud_run_service.default.name
+  location = google_cloud_run_service.default.location
+  project  = google_cloud_run_service.default.project
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
 
 resource "google_cloud_run_domain_mapping" "domains" {

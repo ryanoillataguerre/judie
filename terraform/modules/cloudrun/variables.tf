@@ -14,11 +14,6 @@ variable "location" {
   description = "Location of the service."
 }
 
-variable "project" {
-  type        = string
-  description = "Location of the service."
-}
-
 // --
 
 variable "allow_public_access" {
@@ -32,6 +27,12 @@ variable "cloudsql_connections" {
   type        = set(string)
   default     = []
   description = "Cloud SQL connections to attach to container instances."
+}
+
+variable "execution_environment" {
+  type        = string
+  default     = "gen1"
+  description = "Execution environment to run container instances under."
 }
 
 variable "concurrency" {
@@ -114,7 +115,6 @@ variable "container_port" {
 
 variable "project" {
   type        = string
-  default     = null
   description = "Google Cloud project in which to create resources."
 }
 
@@ -126,7 +126,7 @@ variable "service_account_email" {
 
 variable "timeout" {
   type        = number
-  default     = 60
+  default     = 240
   description = "Maximum duration (in seconds) allowed for responding to requests."
 }
 
@@ -151,4 +151,10 @@ variable "healthcheck_port" {
   type        = number
   default     = 8080
   description = "Port to use for healthchecks."
+}
+
+variable "healthcheck_grpc_service" {
+  type        = string
+  default     = null
+  description = "Fully qualified name of a gRPC service to use for healthchecks."
 }
