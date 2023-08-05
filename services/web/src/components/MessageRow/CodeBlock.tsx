@@ -57,10 +57,6 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  const displayCopyCode = useBreakpointValue({
-    base: false,
-    md: true,
-  });
   return (
     <Flex
       style={{
@@ -90,35 +86,33 @@ const CodeBlock: FC<Props> = memo(({ language, value }) => {
           {language}
         </Text>
 
-        {displayCopyCode && (
-          <Flex
-            style={{
-              alignItems: "center",
-            }}
-          >
-            <Button variant="ghost" onClick={copyToClipboard}>
-              {isCopied ? (
-                <HiOutlineClipboardCheck
-                  size={18}
-                  style={{
-                    marginRight: "0.2rem",
-                  }}
-                />
-              ) : (
-                <HiOutlineClipboardList
-                  size={18}
-                  style={{
-                    marginRight: "0.2rem",
-                  }}
-                />
-              )}
-              {isCopied ? "Copied!" : "Copy"}
-            </Button>
-            <Button variant="ghost" onClick={downloadAsFile}>
-              <BsDownload size={18} />
-            </Button>
-          </Flex>
-        )}
+        <Flex
+          style={{
+            alignItems: "center",
+          }}
+        >
+          <Button variant="ghost" onClick={copyToClipboard}>
+            {isCopied ? (
+              <HiOutlineClipboardCheck
+                size={18}
+                style={{
+                  marginRight: "0.2rem",
+                }}
+              />
+            ) : (
+              <HiOutlineClipboardList
+                size={18}
+                style={{
+                  marginRight: "0.2rem",
+                }}
+              />
+            )}
+            {isCopied ? "Copied!" : "Copy"}
+          </Button>
+          <Button variant="ghost" onClick={downloadAsFile}>
+            <BsDownload size={18} />
+          </Button>
+        </Flex>
       </Flex>
 
       <SyntaxHighlighter
