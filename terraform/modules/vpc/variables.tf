@@ -6,7 +6,7 @@ variable "app_service_public_dns_zone" {
   type        = string
   description = "Public DNS zone for the app service"
 }
-variable "gcp_project" {
+variable "project" {
   type        = string
   description = "GCP Project"
 }

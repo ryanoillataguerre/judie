@@ -6,7 +6,7 @@ variable "instance_name" {
   type        = string
   description = "Name of the redis instance"
 }
-variable "gcp_project" {
+variable "project" {
   type        = string
   description = "GCP project"
 }

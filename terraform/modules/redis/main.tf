@@ -5,7 +5,7 @@ module "redis" {
     location_id             = "us-west1-a"
     memory_size_gb          = 1
     name                    = var.instance_name
-    project                 = var.gcp_project
+    project                 = var.project
     read_replicas_mode      = "READ_REPLICAS_DISABLED"
     redis_version           = "REDIS_6_X"
     region                  = "us-west1"

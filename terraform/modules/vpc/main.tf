@@ -10,7 +10,7 @@ module "vpc" {
     dns_name      = "${var.web_public_dns_zone}."
     force_destroy = false
     name          = "web-public"
-    project       = var.gcp_project
+    project       = var.project
     visibility    = "public"
   }
 
@@ -18,7 +18,7 @@ module "vpc" {
     dns_name      = "${var.app_service_public_dns_zone}.}"
     force_destroy = false
     name          = "app-service-public"
-    project       = var.gcp_project
+    project       = var.project
     visibility    = "public"
   }
 
@@ -61,7 +61,7 @@ module "vpc" {
     }
     min_instances = 2
     max_instances = var.access_connector_max_instances
-    project       = var.gcp_project
+    project       = var.project
     region        = var.gcp_region
   }
 }

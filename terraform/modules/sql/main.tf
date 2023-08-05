@@ -1,7 +1,7 @@
 resource "google_sql_database_instance" "default" {
   database_version = "POSTGRES_14"
   name             = var.db_name
-  project          = var.gcp_project
+  project          = var.project
   region           = var.gcp_region
 
   settings {
