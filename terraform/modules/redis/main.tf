@@ -1,5 +1,5 @@
 module "redis" {
-  resource "google_redis_instance" {
+  resource "google_redis_instance" "default" {
     authorized_network      = var.private_network_id
     connect_mode            = "DIRECT_PEERING"
     location_id             = "us-west1-a"
