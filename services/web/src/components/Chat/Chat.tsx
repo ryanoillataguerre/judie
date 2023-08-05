@@ -62,8 +62,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
         newMessages = [...newMessages, tempUserMessage];
       }
     }
-    return newMessages.map((message, index) => {
-      const isLast = index + 1 === messages.length;
+    return newMessages.map((message) => {
       const key = `${message.type}-${
         message.readableContent?.slice(0, 9).includes("undefined")
           ? message.readableContent?.slice(9, 50)
@@ -149,19 +148,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           <SubjectSelector width={"100%"} selectSubject={submitSubject} />
         </VStack>
       ) : (
-        // <ScrollContainer>
-        //     {renderedMessages}
-        //     {beingStreamedMessage && (streaming || (beingStreamedChatId === chatId)) && (
-        //       <MessageRow
-        //         key={`${MessageType.BOT}-mostRecent`}
-        //         message={{
-        //           type: MessageType.BOT,
-        //           readableContent: beingStreamedMessage.slice(9, -1),
-        //           createdAt: new Date(),
-        //         }}
-        //       />
-        //     )}
-        //   </ScrollContainer>
         <ScrollContainer>
           {renderedMessages}
           {(streaming ||
@@ -176,7 +162,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                   animatedEllipsisStringValue,
                 createdAt: new Date(),
               }}
-              // isStreaming={streaming}
             />
           )}
         </ScrollContainer>
