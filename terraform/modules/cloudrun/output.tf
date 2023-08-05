@@ -53,17 +53,17 @@ output "entrypoint" {
   description = "Entrypoint command used in the service."
 }
 
-output "env" {
-  value = [
-    for env in local.env : {
-      key     = env.key
-      value   = env.value
-      secret  = env.secret.name
-      version = env.secret.name != null ? env.secret.version : null
-    }
-  ]
-  description = "Environment variables injected into container instances."
-}
+# output "env" {
+#   value = [
+#     for env in local.env : {
+#       key     = env.key
+#       value   = env.value
+#       secret  = env.secret.name
+#       version = env.secret.name != null ? env.secret.version : null
+#     }
+#   ]
+#   description = "Environment variables injected into container instances."
+# }
 
 output "execution_environment" {
   value       = google_cloud_run_service.default.template[0].metadata[0].annotations["run.googleapis.com/execution-environment"]
@@ -120,11 +120,6 @@ output "project" {
   description = "Google Cloud project in which resources were created."
 }
 
-output "revision" {
-  value       = var.revision
-  description = "Revision name that was created."
-}
-
 output "service_account_email" {
   value       = google_cloud_run_service.default.template[0].spec[0].service_account_name != "" ? google_cloud_run_service.default.template[0].spec[0].service_account_name : null
   description = "IAM service account email to assigned to container instances."
@@ -133,20 +128,6 @@ output "service_account_email" {
 output "timeout" {
   value       = tonumber(google_cloud_run_service.default.template[0].spec[0].timeout_seconds)
   description = "Maximum duration (in seconds) allowed for responding to requests."
-}
-
-output "volumes" {
-  value = toset([
-    for vol in local.volumes : {
-      path   = vol.path
-      secret = vol.secret.name
-      versions = {
-        for item in vol.items : item.filename => item.version
-      }
-    }
-  ])
-
-  description = "Secrets mounted as volumes into the service."
 }
 
 output "vpc_access" {

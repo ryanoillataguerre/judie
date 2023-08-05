@@ -48,13 +48,16 @@ module "vpc" {
 # Cloud SQL DB
 
 module "sql_db" {
-  source          = "../modules/sql"
-  project         = var.gcp_project
-  db_name         = "core"
-  region          = "us-west1"
-  db_tier         = "db-f1-micro"
-  disk_size       = 50
-  backups_enabled = false
+  source               = "../modules/sql"
+  project              = var.gcp_project
+  db_name              = "core"
+  region               = "us-west1"
+  db_tier              = "db-f1-micro"
+  disk_size            = 50
+  backups_enabled      = false
+  private_network_link = module.vpc.private_network_link
+
+  depends_on = [module.vpc]
 }
 
 # Redis Instance
@@ -65,6 +68,8 @@ module "redis_instance" {
   region             = "us-west1"
   instance_name      = "redis-core"
   private_network_id = module.vpc.private_network_id
+
+  depends_on = [module.vpc]
 }
 
 # Artifact Registry
@@ -103,50 +108,55 @@ module "inference-service" {
   # Optional parameters
   allow_public_access = true
   cloudsql_connections = [
-    sql_db.connection_name
+    module.sql_db.connection_name
   ]
   concurrency = 80
   cpus        = 1
   env = [
     {
-      name  = "DATABASE_URL"
-      value = "postgres://postgres:${sql_db.db_user_password}@${sql_db.private_ip_address}:5432/postgres"
+      key   = "DATABASE_URL"
+      value = "postgres://postgres:${module.sql_db.db_user_password}@${module.sql_db.private_ip_address}:5432/postgres"
     },
     {
-      name  = "OPENAI_API_KEY"
+      key   = "OPENAI_API_KEY"
       value = var.env_openai_api_key
     },
     {
-      name  = "PINECONE_API_KEY"
+      key   = "PINECONE_API_KEY"
       value = var.env_pinecone_api_key
     },
     {
-      name  = "PINECONE_ENVIRONMENT"
+      key   = "PINECONE_ENVIRONMENT"
       value = var.env_pinecone_environment
     },
     {
-      name  = "GRPC_PORT"
+      key   = "GRPC_PORT"
       value = var.grpc_port
     },
     {
-      name  = "GRPC_HEALTH_PORT"
+      key   = "GRPC_HEALTH_PORT"
       value = var.grpc_health_port
     },
     {
-      name  = "WOLFRAM_APP_ID"
+      key   = "WOLFRAM_APP_ID"
       value = var.wolfram_app_id
     }
   ]
-  execution_environment    = "gen1"
-  http2                    = true
-  max_instances            = 50
-  memory                   = 512
-  container_port           = 443
-  healthcheck_grpc_service = "grpc.health.v1.Health"
-  project                  = var.gcp_project
-  vpc_access               = { connector = vpc.connector_id }
+  execution_environment = "gen1"
+  http2                 = true
+  max_instances         = 50
+  memory                = 512
+  container_port        = 443
+  project               = var.gcp_project
+  vpc_access            = { connector = module.vpc.connector_id }
+  startup_probe_grpc = [{
+    service = "grpc.health.v1.Health"
+  }]
+  liveness_probe_grpc = [{
+    service = "grpc.health.v1.Health"
+  }]
 
-  depends_on = [vpc.default, sql_db.default, inference_service_ar_repo.default]
+  depends_on = [module.vpc.connector_id, module.sql_db.private_ip_address, module.sql_db.db_user_password, module.inference_service_ar_repo]
 }
 
 # App Service
@@ -161,74 +171,74 @@ module "app-service" {
   # Optional parameters
   allow_public_access = true
   cloudsql_connections = [
-    sql_db.connection_name
+    module.sql_db.connection_name
   ]
   concurrency = 60
   cpus        = 1
   env = [
     {
-      name  = "DATABASE_URL"
-      value = "postgres://postgres:${sql_db.db_user_password}@${sql_db.private_ip_address}:5432/postgres"
+      key   = "DATABASE_URL"
+      value = "postgres://postgres:${module.sql_db.db_user_password}@${module.sql_db.private_ip_address}:5432/postgres"
     },
     {
-      name  = "REDIS_HOST"
-      value = redis_instance.host
+      key   = "REDIS_HOST"
+      value = module.redis_instance.host
     },
     {
-      name  = "REDIS_PORT"
+      key   = "REDIS_PORT"
       value = "6379"
     },
     {
-      name  = "NODE_ENV"
+      key   = "NODE_ENV"
       value = "sandbox"
     },
     {
-      name  = "OPENAI_API_KEY"
+      key   = "OPENAI_API_KEY"
       value = var.env_openai_api_key
     },
     {
-      name  = "PINECONE_API_KEY"
+      key   = "PINECONE_API_KEY"
       value = var.env_pinecone_api_key
     },
     {
-      name  = "PINECONE_ENVIRONMENT"
+      key   = "PINECONE_ENVIRONMENT"
       value = var.env_pinecone_environment
     },
     {
-      name  = "SESSION_SECRET"
+      key   = "SESSION_SECRET"
       value = var.env_session_secret
     },
     {
-      name  = "STRIPE_WEBHOOK_SECRET"
+      key   = "STRIPE_WEBHOOK_SECRET"
       value = var.env_stripe_whsec
     },
     {
-      name  = "STRIPE_MONTHLY_PRICE_ID"
+      key   = "STRIPE_MONTHLY_PRICE_ID"
       value = var.env_stripe_monthly_price_id
     },
     {
-      name  = "STRIPE_SK"
+      key   = "STRIPE_SK"
       value = var.env_stripe_sk
     },
     {
-      name  = "STRIPE_EMPLOYEE_COUPON_ID"
+      key   = "STRIPE_EMPLOYEE_COUPON_ID"
       value = var.env_stripe_employee_coupon_id
     },
     {
-      name  = "CUSTOMERIO_API_KEY"
+      key   = "CUSTOMERIO_API_KEY"
       value = var.env_customerio_api_key
     },
     {
-      name  = "CUSTOMERIO_APP_API_KEY"
+      key   = "CUSTOMERIO_APP_API_KEY"
       value = var.env_customerio_app_api_key
     },
     {
-      name  = "CUSTOMERIO_SITE_ID"
+      key   = "CUSTOMERIO_SITE_ID"
       value = var.env_customerio_site_id
     },
     {
-      name  = "INFERENCE_SERVICE_URL"
-      value = "${trimprefix(inference-service.url, "https://")}:443"
+      key   = "INFERENCE_SERVICE_URL"
+      value = "${trimprefix(module.inference-service.url, "https://")}:443"
     }
   ]
   execution_environment = "gen1"
@@ -236,12 +246,18 @@ module "app-service" {
   max_instances         = 50
   memory                = 512
   container_port        = 8080
-  healthcheck_path      = "/healthcheck"
-  healthcheck_port      = 8080
   project               = var.gcp_project
-  vpc_access            = { connector = vpc.connector_id }
+  vpc_access            = { connector = module.vpc.connector_id }
+  startup_probe_http = [{
+    port = 8080
+    path = "/healthcheck"
+  }]
+  liveness_probe_http = [{
+    port = 8080
+    path = "/healthcheck"
+  }]
 
-  depends_on = [vpc.default, sql_db.default, inference-service.default, redis_instance.default, app_service_ar_repo.default]
+  depends_on = [module.vpc, module.sql_db, module.inference-service, module.redis_instance, module.app_service_ar_repo]
 }
 
 # Web
@@ -262,10 +278,17 @@ module "web" {
   max_instances         = 50
   memory                = 1024
   container_port        = 3000
-  healthcheck_path      = "/api/healthcheck"
-  healthcheck_port      = 3000
   project               = var.gcp_project
-  vpc_access            = { connector = vpc.connector_id }
+  vpc_access            = { connector = module.vpc.connector_id }
 
-  depends_on = [vpc.default, sql_db.default, inference-service.default, app-service.default]
+  startup_probe_http = [{
+    port = 8080
+    path = "/api/healthcheck"
+  }]
+  liveness_probe_http = [{
+    port = 8080
+    path = "/api/healthcheck"
+  }]
+
+  depends_on = [module.vpc, module.sql_db, module.inference-service, module.app-service]
 }

@@ -141,20 +141,55 @@ variable "vpc_access" {
   }
 }
 
-variable "healthcheck_path" {
-  type        = string
-  default     = "/healthcheck"
-  description = "Path to use for healthchecks."
+# variable "healthcheck_path" {
+#   type        = string
+#   default     = "/healthcheck"
+#   description = "Path to use for healthchecks."
+# }
+
+# variable "healthcheck_port" {
+#   type        = number
+#   default     = 8080
+#   description = "Port to use for healthchecks."
+# }
+
+# variable "healthcheck_grpc_service" {
+#   type        = string
+#   default     = null
+#   description = "Fully qualified name of a gRPC service to use for healthchecks."
+# }
+
+# Attempt at dynamic
+variable "startup_probe_http" {
+  type = list(object({
+    path = string
+    port = number
+  }))
+  default     = []
+  description = "Only use this or `startup_probe_grpc`."
 }
 
-variable "healthcheck_port" {
-  type        = number
-  default     = 8080
-  description = "Port to use for healthchecks."
+variable "liveness_probe_http" {
+  type = list(object({
+    path = string
+    port = number
+  }))
+  default     = []
+  description = "Only use this or `liveness_probe_grpc`."
 }
 
-variable "healthcheck_grpc_service" {
-  type        = string
-  default     = null
-  description = "Fully qualified name of a gRPC service to use for healthchecks."
+variable "startup_probe_grpc" {
+  type = list(object({
+    service = string
+  }))
+  default     = []
+  description = "Only use this or `startup_probe_http`."
+}
+
+variable "liveness_probe_grpc" {
+  type = list(object({
+    service = string
+  }))
+  default     = []
+  description = "Only use this or `liveness_probe_http`."
 }

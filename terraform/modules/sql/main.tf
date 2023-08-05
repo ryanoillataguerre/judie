@@ -45,8 +45,8 @@ resource "random_password" "password" {
   override_special = "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
 }
 
-resource "google_sql_user" "core_db_master_user" {
-  instance = google_sql_database_instance.core.name
+resource "google_sql_user" "db_master_user" {
+  instance = google_sql_database_instance.default.name
   name     = "postgres"
   password = random_password.password.result
 }

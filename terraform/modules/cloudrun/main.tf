@@ -17,46 +17,6 @@ resource "google_cloud_run_service" "default" {
             memory = "${var.memory}Mi"
           }
         }
-        # HTTP
-        startup_probe {
-          count                 = var.healthcheck_grpc_service == null ? 1 : 0
-          initial_delay_seconds = 10
-          failure_threshold     = 3
-          period_seconds        = 60
-          http_get {
-            path = var.healthcheck_path
-            port = var.healthcheck_port
-          }
-        }
-        liveness_probe {
-          count                 = var.healthcheck_grpc_service == null ? 1 : 0
-          initial_delay_seconds = 10
-          failure_threshold     = 3
-          period_seconds        = 360
-          http_get {
-            path = var.healthcheck_path
-            port = var.healthcheck_port
-          }
-        }
-        # GRPC
-        startup_probe {
-          count                 = var.healthcheck_grpc_service == null ? 0 : 1
-          initial_delay_seconds = 10
-          failure_threshold     = 3
-          period_seconds        = 60
-          grpc {
-            service = var.healthcheck_grpc_service
-          }
-        }
-        liveness_probe {
-          count                 = var.healthcheck_grpc_service == null ? 0 : 1
-          initial_delay_seconds = 10
-          failure_threshold     = 3
-          period_seconds        = 360
-          grpc {
-            service = var.healthcheck_grpc_service
-          }
-        }
         ports {
           name           = var.http2 ? "h2c" : "http1"
           container_port = var.container_port
@@ -71,7 +31,44 @@ resource "google_cloud_run_service" "default" {
             value = env.value.value
           }
         }
+        startup_probe {
+          initial_delay_seconds = 100
+          failure_threshold     = 3
+          period_seconds        = 60
 
+          dynamic "http_get" {
+            for_each = var.startup_probe_http
+            content {
+              port = http_get.value.port
+              path = http_get.value.path
+            }
+          }
+          dynamic "grpc" {
+            for_each = var.startup_probe_grpc
+            content {
+              service = grpc.value.service
+            }
+          }
+        }
+        liveness_probe {
+          initial_delay_seconds = 100
+          failure_threshold     = 3
+          period_seconds        = 360
+
+          dynamic "http_get" {
+            for_each = var.liveness_probe_http
+            content {
+              port = http_get.value.port
+              path = http_get.value.path
+            }
+          }
+          dynamic "grpc" {
+            for_each = var.liveness_probe_grpc
+            content {
+              service = grpc.value.service
+            }
+          }
+        }
 
       }
     }
@@ -141,9 +138,9 @@ resource "google_cloud_run_domain_mapping" "domains" {
 
   metadata {
     namespace = google_cloud_run_service.default.project
-    annotations = {
-      "run.googleapis.com/launch-stage" = local.launch_stage
-    }
+    # annotations = {
+    #   "run.googleapis.com/launch-stage" = var.launch_stage
+    # }
   }
 
   spec {

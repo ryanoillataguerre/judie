@@ -25,3 +25,8 @@ variable "backups_enabled" {
   default     = true
   description = "Enable backups"
 }
+
+variable "private_network_link" {
+  type        = string
+  description = "Private network link"
+}
