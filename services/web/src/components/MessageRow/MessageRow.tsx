@@ -67,70 +67,64 @@ const MessageRow = ({
         }}
       >
         {message.type === MessageType.BOT ? (
-          <Box as="span">
-            <MemoizedReactMarkdown
-              remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeMathjax]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || "");
-
-                  console.log("rendering code", {
-                    key: message,
-                  });
-                  return !inline ? (
-                    <CodeBlock
-                      key={message?.createdAt?.toString() || ""}
-                      language={(match && match[1]) || ""}
-                      value={String(children).replace(/\n$/, "")}
-                      {...props}
-                    />
-                  ) : (
-                    <Code className={className} {...props}>
-                      {children}
-                    </Code>
-                  );
-                },
-                table({ children }) {
-                  return <Table variant="simple">{children}</Table>;
-                },
-                tr({ children }) {
-                  return <Tr>{children}</Tr>;
-                },
-                td({ children }) {
-                  return <Td>{children}</Td>;
-                },
-                th({ children }) {
-                  return <Thead>{children}</Thead>;
-                },
-                p({ children }) {
-                  return (
-                    <Text as="span">
-                      {children}
-                      {isStreaming ? (
-                        <Box
-                          __css={{
-                            "@keyframes cursor-blink": {
-                              "0%": { opacity: 0 },
-                              "100%": { opacity: 1 },
-                            },
-                            width: "5px",
-                            height: "20px",
-                            marginBottom: "-0.2rem",
-                            background: "white",
-                            display: "inline-block",
-                            animation: "cursor-blink 1.5s steps(2) infinite",
-                          }}
-                        ></Box>
-                      ) : null}
-                    </Text>
-                  );
-                },
-              }}
-            >
-              {message.readableContent || ""}
-            </MemoizedReactMarkdown>
-          </Box>
+          <MemoizedReactMarkdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeMathjax]}
+            components={{
+              code({ node, inline, className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || "");
+                return !inline ? (
+                  <CodeBlock
+                    key={message?.createdAt?.toString() || ""}
+                    language={(match && match[1]) || ""}
+                    value={String(children).replace(/\n$/, "")}
+                    {...props}
+                  />
+                ) : (
+                  <Code className={className} {...props}>
+                    {children}
+                  </Code>
+                );
+              },
+              table({ children }) {
+                return <Table variant="simple">{children}</Table>;
+              },
+              tr({ children }) {
+                return <Tr>{children}</Tr>;
+              },
+              td({ children }) {
+                return <Td>{children}</Td>;
+              },
+              th({ children }) {
+                return <Thead>{children}</Thead>;
+              },
+              // p({ children }) {
+              //   return (
+              //     <Text as="span">
+              //       {children}
+              //       {isStreaming ? (
+              //         <Box
+              //           __css={{
+              //             "@keyframes cursor-blink": {
+              //               "0%": { opacity: 0 },
+              //               "100%": { opacity: 1 },
+              //             },
+              //             width: "5px",
+              //             height: "20px",
+              //             marginBottom: "-0.2rem",
+              //             background: "white",
+              //             display: "inline-block",
+              //             animation: "cursor-blink 1.5s steps(2) infinite",
+              //           }}
+              //         ></Box>
+              //       ) : null}
+              //     </Text>
+              //   );
+              // },
+            }}
+          >
+            {message.readableContent || ""}
+          </MemoizedReactMarkdown>
         ) : (
           <Flex>{message.readableContent}</Flex>
         )}

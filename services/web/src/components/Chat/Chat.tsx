@@ -63,9 +63,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           ? message.readableContent?.slice(9, 50)
           : message.readableContent?.slice(0, 50)
       }`;
-      if (key === "BOT-mostRecent") {
-        console.log("shouldShowStreaming", isLast && streaming);
-      }
       return <MessageRow key={key} message={message} />;
     });
   }, [messages, tempUserMessage, streaming, chatId, tempUserMessageChatId]);
@@ -130,21 +127,34 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           <SubjectSelector width={"100%"} selectSubject={submitSubject} />
         </VStack>
       ) : (
+        // <ScrollContainer>
+        //     {renderedMessages}
+        //     {beingStreamedMessage && (streaming || (beingStreamedChatId === chatId)) && (
+        //       <MessageRow
+        //         key={`${MessageType.BOT}-mostRecent`}
+        //         message={{
+        //           type: MessageType.BOT,
+        //           readableContent: beingStreamedMessage.slice(9, -1),
+        //           createdAt: new Date(),
+        //         }}
+        //       />
+        //     )}
+        //   </ScrollContainer>
         <ScrollContainer>
           {renderedMessages}
-          {beingStreamedMessage
-            ? (streaming || beingStreamedChatId === chatId) && (
-                <MessageRow
-                  key={`${MessageType.BOT}-mostRecent`}
-                  message={{
-                    type: MessageType.BOT,
-                    readableContent: beingStreamedMessage.slice(9, -1),
-                    createdAt: new Date(),
-                  }}
-                  isStreaming={streaming}
-                />
-              )
-            : null}
+          {(streaming ||
+            beingStreamedChatId === chatId ||
+            beingStreamedMessage) && (
+            <MessageRow
+              key={`${MessageType.BOT}-mostRecent`}
+              message={{
+                type: MessageType.BOT,
+                readableContent: beingStreamedMessage?.slice(9, -1) || "...",
+                createdAt: new Date(),
+              }}
+              isStreaming={streaming}
+            />
+          )}
         </ScrollContainer>
       )}
     </Flex>

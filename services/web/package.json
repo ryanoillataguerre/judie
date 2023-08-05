@@ -43,10 +43,7 @@
     "rehype-mathjax": "^4.0.2",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
-<<<<<<< Updated upstream
     "sass": "^1.64.2",
-=======
->>>>>>> Stashed changes
     "typescript": "4.9.5",
     "xlsx": "^0.18.5"
   },
