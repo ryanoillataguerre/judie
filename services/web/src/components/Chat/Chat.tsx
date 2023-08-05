@@ -7,7 +7,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { Flex, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
+import {
+  Flex,
+  Spinner,
+  Text,
+  VStack,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRow from "../MessageRow/MessageRow";
@@ -15,6 +21,7 @@ import { MessageType } from "@judie/data/types/api";
 import ScrollContainer from "../ScrollContainer/ScrollContainer";
 import Paywall from "../Paywall/Paywall";
 import { useRouter } from "next/router";
+import Loading from "../lottie/Loading/Loading";
 
 const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   const {
@@ -110,7 +117,9 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       }}
     >
       <Paywall isOpen={paywallOpen ?? false} setIsOpen={setPaywallOpen} />
-      {showSubjectSelector ? (
+      {!chat || (chat && !chat.subject && !renderedMessages?.length) ? (
+        <Spinner size="xl" colorScheme="teal" />
+      ) : showSubjectSelector ? (
         <VStack
           style={{
             width: subjectSelectorWidth,
