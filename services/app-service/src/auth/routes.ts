@@ -1,28 +1,44 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import { errorPassthrough, handleValidationErrors } from "../utils/express.js";
-import { signup, signin, addToWaitlist, forgotPassword, resetPassword } from "./service.js";
+import {
+  signup,
+  signin,
+  addToWaitlist,
+  forgotPassword,
+  resetPassword,
+  setUserSessionId,
+} from "./service.js";
+
+export const signupValidation = [
+  body("email").exists().isEmail(),
+  body("password").isString().exists(),
+  body("firstName").isString().optional(),
+  body("lastName").isString().optional(),
+  body("receivePromotions").isBoolean().toBoolean().exists(),
+  body("role").isString().optional(),
+  body("districtOrSchool").isString().optional(),
+];
 
 const router = Router();
 
 router.post(
   "/signup",
-  [
-    body("email").exists().isEmail(),
-    body("password").isString().exists(),
-    body("firstName").isString().optional(),
-    body("lastName").isString().optional(),
-    body("receivePromotions").isBoolean().toBoolean().exists(),
-    body("role").isString().optional(),
-    body("districtOrSchool").isString().optional(),
-  ],
+  signupValidation,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const { email, password, firstName, lastName, receivePromotions, role, districtOrSchool } =
-      req.body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      receivePromotions,
+      role,
+      districtOrSchool,
+    } = req.body;
     // Create user
-    const userId = await signup({
+    const user = await signup({
       email,
       password,
       firstName,
@@ -32,8 +48,13 @@ router.post(
       districtOrSchool,
     });
     // Create session for user
-    session.userId = userId;
-    res.status(201).send({ success: true });
+    session.userId = user.id;
+    session.save();
+    await setUserSessionId({
+      userId: user.id,
+      sessionId: session.id,
+    });
+    res.status(201).send({ user });
   })
 );
 
@@ -45,10 +66,15 @@ router.post(
     const session = req.session;
     const { email, password } = req.body;
     // Create user
-    const userId = await signin({ email, password });
+    const user = await signin({ email, password });
     // Create session for user
-    session.userId = userId;
-    res.status(200).send({ success: true });
+    session.userId = user.id;
+    session.save();
+    await setUserSessionId({
+      userId: user.id,
+      sessionId: session.id,
+    });
+    res.status(200).send({ user });
   })
 );
 
@@ -63,28 +89,35 @@ router.post(
   })
 );
 
-router.post("/forgot-password", [body("email").exists().isEmail()], handleValidationErrors, errorPassthrough(async (req: Request, res: Response) => {
-  const { email } = req.body;
-  const origin = req.headers.origin;
-  await forgotPassword({email, origin: origin as string });
-  res.status(200).send({
-    data: {
-      success: true,
-    },
-  });
-}))
+router.post(
+  "/forgot-password",
+  [body("email").exists().isEmail()],
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const origin = req.headers.origin;
+    await forgotPassword({ email, origin: origin as string });
+    res.status(200).send({
+      data: {
+        success: true,
+      },
+    });
+  })
+);
 
-router.post("/reset-password", [
-  body("password").exists(), 
-  body("token").exists(), 
-], handleValidationErrors, errorPassthrough(async (req: Request, res: Response) => {
-  const { password, token } = req.body;
-  await resetPassword({password, token });
-  res.status(200).send({
-    data: {
-      success: true,
-    },
-  });
-}))
+router.post(
+  "/reset-password",
+  [body("password").exists(), body("token").exists()],
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { password, token } = req.body;
+    await resetPassword({ password, token });
+    res.status(200).send({
+      data: {
+        success: true,
+      },
+    });
+  })
+);
 
 export default router;

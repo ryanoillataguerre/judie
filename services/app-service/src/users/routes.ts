@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import { errorPassthrough, requireAuth } from "../utils/express.js";
-import { getUser, updateUser } from "./service.js";
+import {
+  getUser,
+  getUserPermissions,
+  updateUser,
+  verifyUserEmail,
+} from "./service.js";
 import { Chat, Message, Subscription, User } from "@prisma/client";
 import { body } from "express-validator";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -48,10 +53,29 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    const user = await getUser({ id: session.userId });
-    res.status(200).send({
-      data: transformUser(user),
-    });
+    const admin = req.query.admin;
+    try {
+      const user = await getUser(
+        { id: session.userId },
+        {
+          permissions: admin
+            ? {
+                include: {
+                  organization: true,
+                  school: true,
+                  room: true,
+                },
+              }
+            : true,
+          subscription: true,
+        }
+      );
+      res.status(200).send({
+        data: transformUser(user),
+      });
+    } catch (err) {
+      throw new UnauthorizedError("No user id found in session");
+    }
   })
 );
 
@@ -91,6 +115,31 @@ router.get(
     );
     res.status(200).send({
       data: link,
+    });
+  })
+);
+
+router.get(
+  "/permissions",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    const user = await getUserPermissions({
+      id: session.userId as string,
+    });
+
+    res.status(200).send({
+      data: user,
+    });
+  })
+);
+
+router.post(
+  "/:userId/verify",
+  errorPassthrough(async (req: Request, res: Response) => {
+    const user = await verifyUserEmail(req.params.userId as string);
+    res.status(200).send({
+      data: user,
     });
   })
 );

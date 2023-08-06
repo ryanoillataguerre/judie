@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import useAuth from "./useAuth";
 
 const REDIRECT_FROM_PATHS = ["/signin", "/signup"];
-export default () => {
+const useUnauthRedirect = () => {
   const router = useRouter();
   const auth = useAuth();
   useEffect(() => {
@@ -20,3 +20,5 @@ export default () => {
     }
   }, [auth, router]);
 };
+
+export default useUnauthRedirect;

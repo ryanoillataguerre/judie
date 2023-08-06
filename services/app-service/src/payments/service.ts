@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { getUser, updateUser } from "../user/service.js";
+import { getUser, updateUser } from "../users/service.js";
 import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
 import {
   Prisma,

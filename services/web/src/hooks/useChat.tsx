@@ -4,11 +4,23 @@ import {
   createChatMutation,
   putChatMutation,
 } from "@judie/data/mutations";
-import { GET_CHAT_BY_ID, getChatByIdQuery, getUserChatsQuery, GET_USER_CHATS } from "@judie/data/queries";
+import {
+  GET_CHAT_BY_ID,
+  getChatByIdQuery,
+  getUserChatsQuery,
+  GET_USER_CHATS,
+} from "@judie/data/queries";
 import { Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
-import {  useCallback, createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
@@ -98,8 +110,12 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setTempUserMessageChatId(undefined);
     setStreaming(false);
     window?.sessionStorage.clear();
-
-  }, [setBeingStreamedMessage, setBeingStreamedChatId, setTempUserMessage, setTempUserMessageChatId]);
+  }, [
+    setBeingStreamedMessage,
+    setBeingStreamedChatId,
+    setTempUserMessage,
+    setTempUserMessageChatId,
+  ]);
 
   useEffect(() => {
     if (beingStreamedMessage) {
@@ -111,7 +127,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (beingStreamedMessage) {
       const timeout = setTimeout(() => {
-        reset()
+        reset();
       }, 5000);
       return () => {
         clearTimeout(timeout);
@@ -134,58 +150,62 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         // setBeingStreamedMessage(undefined);
         setTempUserMessage(undefined);
       }
-    }
-    router.events.on('routeChangeStart', abortStream);
+    };
+    router.events.on("routeChangeStart", abortStream);
     return () => {
-      router.events.off('routeChangeStart', abortStream);
-    }
+      router.events.off("routeChangeStart", abortStream);
+    };
   }, [router, beingStreamedMessage, abortController, setBeingStreamedMessage]);
 
   const userChatsQuery = useQuery({
     queryKey: [GET_USER_CHATS, auth.userData?.id],
     enabled: false,
     refetchOnWindowFocus: false,
-    queryFn: getUserChatsQuery
+    queryFn: getUserChatsQuery,
   });
-  const streamCallback = useCallback((message: string) => {
-    if (message.includes(`{"error":`)) {
-      return;
-    }
-    if (message.includes("undefined")) {
-      const newMessage = message.replace("undefined", "");
-      setBeingStreamedMessage((prev) => prev + newMessage);
-    } else {
-      setBeingStreamedMessage((prev) => prev + message);
-    }
-  }, [streaming, setBeingStreamedMessage]);
+  const streamCallback = useCallback(
+    (message: string) => {
+      if (message.includes(`{"error":`)) {
+        return;
+      }
+      if (message.includes("undefined")) {
+        const newMessage = message.replace("undefined", "");
+        setBeingStreamedMessage((prev) => prev + newMessage);
+      } else {
+        setBeingStreamedMessage((prev) => prev + message);
+      }
+    },
+    [streaming, setBeingStreamedMessage]
+  );
 
   useEffect(() => {
     return () => {
       reset();
       setStreaming(false);
-    }
-  }, [])
-  
-  const completionOnError = useCallback((err: HTTPResponseError) => {
-    console.log('errored!')
+    };
+  }, []);
+
+  const completionOnError = (err: HTTPResponseError) => {
+    console.log("completion on error", err.message);
     setBeingStreamedChatId(() => undefined);
     setBeingStreamedMessage(() => undefined);
     setTempUserMessageChatId(() => undefined);
-    setTempUserMessage(() => undefined);
+    // setTempUserMessage(() => undefined);
     setStreaming(() => false);
-    
+
     if (err.response.code === 429) {
       setPaywallOpen(true);
     } else {
       toast({
         title: "Oops!",
-        description: err.message || "Something went wrong changing pages, please try again.",
+        description: err.message || "Something went wrong, please try again.",
         status: "error",
         duration: 2000,
         isClosable: true,
       });
     }
-  }, [setBeingStreamedChatId, setBeingStreamedMessage, setTempUserMessageChatId, setTempUserMessage, setStreaming, toast, setPaywallOpen]);
+    existingChatQuery.refetch();
+  };
 
   const completionMutation = useMutation({
     mutationFn: ({ query }: { query: string }): Promise<string> => {
@@ -199,6 +219,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
+            console.log("stream ended");
             setBeingStreamedChatId(undefined);
             auth.refresh();
             userChatsQuery.refetch();
@@ -206,7 +227,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             setBeingStreamedMessage(undefined);
             setStreaming(false);
           },
-          onError: completionOnError
+          onError: completionOnError,
         });
       } else {
         toast({
@@ -279,103 +300,118 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
   });
 
+  const addMessage = useCallback(
+    async (prompt: string) => {
+      // Guard clauses
+      if (
+        !prompt ||
+        prompt.length === 0 ||
+        prompt.replace("\n", "").length === 0
+      ) {
+        return;
+      }
+      if (!chatId) {
+        console.error("No chatId found");
+        toast({
+          title: "Oops!",
+          description:
+            "Something went wrong, please create a new chat or refresh.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+      if (
+        streaming ||
+        (beingStreamedChatId && beingStreamedChatId !== chatId)
+      ) {
+        toast({
+          title: "Please wait for the previous message to respond",
+          description:
+            "If this message persists, please log out and back in again.",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
 
-  // console.log('outside callback - streaming', streaming)
-  // console.log('outside callback - beingStreamedMessage', beingStreamedMessage)
-  // console.log('outside callback - beingStreamedChatId', beingStreamedChatId)
-
-  const addMessage = useCallback(async (prompt: string) => {
-    // Guard clauses
-    if (!prompt || prompt.length === 0 || (prompt.replace("\n", "").length === 0)) {
-      return;
-    }
-    if (!chatId) {
-      console.error("No chatId found")
-      toast({
-        title: "Oops!",
-        description:
-          "Something went wrong, please create a new chat or refresh.",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-    if ((streaming) || (beingStreamedChatId && (beingStreamedChatId !== chatId))) {
-      toast({
-        title: "Please wait for the previous message to respond",
-        description: "If this message persists, please log out and back in again.",
-        status: "warning",
-        duration: 2000,
-        isClosable: true,
-      });
-      return;
-    }
-    
-    setTempUserMessage(() => 
-      ({
+      setTempUserMessage(() => ({
         type: MessageType.USER,
         readableContent: prompt,
         createdAt: new Date(),
-      })
-    );
-    setTempUserMessageChatId(chatId);
-    // Call mutation
-    await completionMutation.mutateAsync({ query: prompt });
-    
-  }, [chatId, beingStreamedMessage, completionMutation, toast, streaming, setStreaming, setTempUserMessage, beingStreamedChatId]);
+      }));
+      setTempUserMessageChatId(chatId);
+      // Call mutation
+      await completionMutation.mutateAsync({ query: prompt });
+    },
+    [
+      chatId,
+      beingStreamedMessage,
+      completionMutation,
+      toast,
+      streaming,
+      setStreaming,
+      setTempUserMessage,
+      beingStreamedChatId,
+    ]
+  );
 
   // User sets a subject from the chat window
-  const submitSubject = useCallback(async (subject: string) => {
-    if (!chatId) {
-      // Create a chat
-      await createChat.mutateAsync({
+  const submitSubject = useCallback(
+    async (subject: string) => {
+      if (!chatId) {
+        // Create a chat
+        await createChat.mutateAsync({
+          subject,
+        });
+        return;
+      }
+      await putChat.mutateAsync({
+        chatId,
         subject,
       });
-      return;
-    }
-    await putChat.mutateAsync({
-      chatId,
-      subject,
-    });
-    existingChatQuery.refetch();
-    userChatsQuery.refetch();
-  }, [chatId, createChat, putChat, existingChatQuery, userChatsQuery]);
+      existingChatQuery.refetch();
+      userChatsQuery.refetch();
+    },
+    [chatId, createChat, putChat, existingChatQuery, userChatsQuery]
+  );
 
   const providerValue = useMemo(() => {
-      return {
-        chat: existingChatQuery.data,
-        addMessage,
-        streaming,
-        messages,
-        beingStreamedMessage,
-        displayWelcome,
-        paywallOpen,
-        submitSubject,
-        activeChatId: chatId,
-        tempUserMessage,
-        setTempUserMessage,
-        setPaywallOpen,
-        beingStreamedChatId,
-        tempUserMessageChatId,
-        reset
-      };
-    }, [
-      existingChatQuery.data,
+    return {
+      chat: existingChatQuery.data,
       addMessage,
+      streaming,
       messages,
       beingStreamedMessage,
       displayWelcome,
       paywallOpen,
       submitSubject,
-      chatId,
+      activeChatId: chatId,
       tempUserMessage,
       setTempUserMessage,
-      streaming,
       setPaywallOpen,
       beingStreamedChatId,
       tempUserMessageChatId,
-      reset
-    ]);
+      reset,
+    };
+  }, [
+    existingChatQuery.data,
+    addMessage,
+    messages,
+    beingStreamedMessage,
+    displayWelcome,
+    paywallOpen,
+    submitSubject,
+    chatId,
+    tempUserMessage,
+    setTempUserMessage,
+    streaming,
+    setPaywallOpen,
+    beingStreamedChatId,
+    tempUserMessageChatId,
+    reset,
+  ]);
   return (
     <ChatContext.Provider value={providerValue}>
       {children}

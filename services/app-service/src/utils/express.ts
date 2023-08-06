@@ -12,7 +12,7 @@ import {
 import { Redis } from "ioredis";
 import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
-import { getUser, updateUser } from "../user/service.js";
+import { getUser, updateUser } from "../users/service.js";
 import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
 import { SubscriptionStatus, UserRole } from "@prisma/client";
 
@@ -97,7 +97,7 @@ export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   }
 };
 
-export const requireAdminAuth = async (
+export const requireJudieAuth = async (
   req: Request,
   _: Response,
   next: NextFunction
@@ -107,7 +107,7 @@ export const requireAdminAuth = async (
       throw new UnauthorizedError("Not authorized");
     }
     const user = await getUser({ id: req.session?.userId });
-    if (!user?.email.includes("judie.io")) {
+    if (!(user?.role === UserRole.JUDIE)) {
       throw new UnauthorizedError("Not authorized");
     }
     next();
@@ -166,6 +166,8 @@ const redisClient = new Redis({
 export const sessionStore = new RedisStore({ client: redisClient });
 export const sessionLayer = () =>
   session({
+    unset: "destroy",
+    rolling: true,
     name: "judie_sid",
     store: sessionStore,
     secret: process.env.SESSION_SECRET || "secret",

@@ -45,7 +45,9 @@ router.post(
     const checkoutSession = await checkout(
       session.userId,
       req.body.currentUrl
-        ? `${req.body.currentUrl}?${req.body.currentUrl.includes("?id=") ? "&paid=true" : "?paid=true"}`
+        ? `${req.body.currentUrl}?${
+            req.body.currentUrl.includes("?id=") ? "&paid=true" : "?paid=true"
+          }`
         : `${req.headers.origin}/chat?paid=true`,
       req.body.currentUrl || `${req.headers.origin}/chat`
     );

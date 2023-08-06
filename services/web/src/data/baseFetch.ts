@@ -87,7 +87,7 @@ export async function baseFetch({
   onChunkReceived,
   onStreamEnd,
   onError,
-  abortController
+  abortController,
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
@@ -109,7 +109,18 @@ export async function baseFetch({
         signal: abortController?.signal || null,
       }).then(async (res) => {
         if (res.status === 429) {
-          onError?.(new HTTPResponseError({ error: "No messages remaining today" }, 429));
+          onError?.(
+            new HTTPResponseError({ error: "No messages remaining today" }, 429)
+          );
+          return;
+        }
+        if (res.status > 300) {
+          onError?.(
+            new HTTPResponseError(
+              { error: "Something went wrong. Please try again." },
+              500
+            )
+          );
           return;
         }
         const reader = res.body?.getReader();

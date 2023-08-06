@@ -1,16 +1,22 @@
 import bcrypt from "bcryptjs";
-import {
-  BadRequestError,
-  UnauthorizedError,
-} from "../utils/errors/index.js";
+import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { User, UserRole } from "@prisma/client";
+import { GradeYear, User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
-import {cioClient} from "../utils/customerio.js";
-import { createForgotPasswordToken, getForgotPasswordToken, deleteForgotPasswordToken } from "../utils/redis.js";
-import { sendUserForgotPasswordEmail } from "../cio/service.js";
+import { cioClient } from "../utils/customerio.js";
+import {
+  createForgotPasswordToken,
+  getForgotPasswordToken,
+  deleteForgotPasswordToken,
+} from "../utils/redis.js";
+import {
+  sendUserForgotPasswordEmail,
+  sendVerificationEmail,
+} from "../cio/service.js";
+import { sessionStore } from "../utils/express.js";
+import { Environment, getEnv } from "../utils/env.js";
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firstName: user.firstName,
@@ -32,14 +38,16 @@ export const signup = async ({
   receivePromotions,
   role,
   districtOrSchool,
+  gradeYear,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   receivePromotions: boolean;
-  role: UserRole;
+  role?: UserRole;
   districtOrSchool?: string;
+  gradeYear?: GradeYear;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -61,8 +69,6 @@ export const signup = async ({
   // Hash password
   const _password = await bcrypt.hash(password, 10);
 
-  // TODO: Calculate role
-
   const newUser = await dbClient.user.create({
     data: {
       firstName,
@@ -71,10 +77,14 @@ export const signup = async ({
       password: _password,
       receivePromotions,
       role: role || UserRole.STUDENT,
+      gradeYear,
+    },
+    include: {
+      subscription: true,
     },
   });
 
-  cioClient.identify(newUser.id, {
+  await cioClient.identify(newUser.id, {
     email: newUser.email,
     created_at: newUser.createdAt,
     first_name: newUser.firstName,
@@ -93,12 +103,12 @@ export const signup = async ({
   // Identify in Segment
   analytics.identify({
     userId: newUser.id,
-    traits: {
-      ...transformUserForSegment(newUser, districtOrSchool),
-    },
+    traits: transformUserForSegment(newUser, districtOrSchool),
   });
 
-  return newUser.id;
+  await sendVerificationEmail({ user: newUser });
+
+  return newUser;
 };
 
 export const signin = async ({
@@ -114,6 +124,9 @@ export const signin = async ({
     where: {
       email,
     },
+    include: {
+      subscription: true,
+    },
   });
   if (!user) {
     throw new UnauthorizedError("Invalid email or password");
@@ -127,17 +140,15 @@ export const signin = async ({
 
   analytics.identify({
     userId: user.id,
-    traits: {
-      ...transformUserForSegment(user),
-    },
+    traits: transformUserForSegment(user),
   });
 
-  cioClient.identify(user.id, {
+  await cioClient.identify(user.id, {
     email: user.email,
     last_logged_in: new Date().toISOString(),
   });
 
-  return user.id;
+  return user;
 };
 
 export const addToWaitlist = async ({ email }: { email: string }) => {
@@ -155,7 +166,7 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
     });
     cioClient.identify(email, {
       email,
-      waitlist: true
+      waitlist: true,
     });
   } catch (err) {
     console.error(err);
@@ -163,7 +174,13 @@ export const addToWaitlist = async ({ email }: { email: string }) => {
   }
 };
 
-export const forgotPassword = async ({email, origin}: {email: string; origin: string}) => {
+export const forgotPassword = async ({
+  email,
+  origin,
+}: {
+  email: string;
+  origin: string;
+}) => {
   const user = await dbClient.user.findUnique({
     where: {
       email,
@@ -172,17 +189,28 @@ export const forgotPassword = async ({email, origin}: {email: string; origin: st
   if (!user) {
     throw new BadRequestError("Invalid email");
   }
+  const env: Environment = getEnv();
   // Create token and store in Redis
   const token = await createForgotPasswordToken({ userId: user.id });
-  const url = `${`${origin.slice(0, 8)}app.${origin.slice(8, origin.length)}` || "https://app.judie.io"}/reset-password?token=${token}`;
+  const url = `${
+    `${
+      env === Environment.Local ? origin.slice(0, 7) : origin.slice(0, 8)
+    }app.${origin.slice(8, origin.length)}` || "https://app.judie.io"
+  }/reset-password?token=${token}`;
   // Send email with link to reset password
   return await sendUserForgotPasswordEmail({
     user,
     url,
   });
-}
+};
 
-export const resetPassword = async ({token, password}: {token: string; password: string}) => {
+export const resetPassword = async ({
+  token,
+  password,
+}: {
+  token: string;
+  password: string;
+}) => {
   // Check Redis for token
   const userId = await getForgotPasswordToken({ token });
   if (!userId) {
@@ -200,4 +228,41 @@ export const resetPassword = async ({token, password}: {token: string; password:
   });
   // Delete token from Redis
   await deleteForgotPasswordToken({ token });
-}
+};
+
+export const setUserSessionId = async ({
+  userId,
+  sessionId,
+}: {
+  userId: string;
+  sessionId: string;
+}) => {
+  await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      lastSessionId: sessionId,
+    },
+  });
+};
+
+export const destroyUserSession = async ({ userId }: { userId: string }) => {
+  const user = await dbClient.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  const userSid = user?.lastSessionId;
+  if (!userSid) {
+    console.info(
+      `Attempted to destroy session for user ${userId} but no session found`
+    );
+    return;
+  }
+  sessionStore.destroy(userSid, (err) => {
+    if (err) {
+      console.error("Error destroying session", err);
+    }
+  });
+};

@@ -8,6 +8,10 @@ const nextConfig = {
     };
     return config;
   },
+  experimental: {
+    esmExternals: 'loose'
+  },
+  transpilePackages: ["@nivo"]
 };
 
 module.exports = nextConfig;

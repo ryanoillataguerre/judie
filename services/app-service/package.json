@@ -53,9 +53,13 @@
     "grpc_tools_node_protoc_ts": "^5.3.3",
     "helmet": "^6.0.1",
     "ioredis": "^5.3.1",
+    "long": "^5.2.3",
+    "moment": "^2.29.4",
     "morgan": "^1.10.0",
     "openai": "^3.2.1",
+    "protobufjs": "^7.2.4",
     "stripe": "^12.2.0",
+    "ts-proto": "^1.156.2",
     "twilio": "^4.8.0",
     "validator": "^13.9.0"
   },

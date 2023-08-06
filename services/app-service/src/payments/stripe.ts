@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { User } from "@prisma/client";
 import { createCustomer, handleSubscriptionCreated } from "./service.js";
-import { getUser } from "../user/service.js";
+import { getUser } from "../users/service.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const stripe = new Stripe(process.env.STRIPE_SK || "", {
