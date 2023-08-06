@@ -3,10 +3,10 @@ output "name" {
   description = "Name of the service."
 }
 
-output "image" {
-  value       = google_cloud_run_service.default.metadata[0].annotations["client.knative.dev/user-image"]
-  description = "Docker image name."
-}
+# output "image" {
+#   value       = google_cloud_run_service.default.metadata[0].annotations["client.knative.dev/user-image"]
+#   description = "Docker image name."
+# }
 
 output "location" {
   value       = google_cloud_run_service.default.location

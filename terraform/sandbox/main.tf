@@ -150,7 +150,7 @@ module "inference-service" {
   http2                 = true
   max_instances         = 50
   memory                = 512
-  container_port        = 443
+  container_port        = 8080
   project               = var.gcp_project
   vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
   startup_probe_grpc = [{
@@ -251,7 +251,7 @@ module "app-service" {
   memory                = 512
   container_port        = 8080
   project               = var.gcp_project
-  vpc_access            = { connector = module.vpc.connector_id }
+  vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
   startup_probe_http = [{
     port = 8080
     path = "/healthcheck"
@@ -286,11 +286,11 @@ module "web" {
   vpc_access            = { connector = module.vpc.connector_id }
 
   startup_probe_http = [{
-    port = 8080
+    port = 3000
     path = "/api/healthcheck"
   }]
   liveness_probe_http = [{
-    port = 8080
+    port = 3000
     path = "/api/healthcheck"
   }]
 
