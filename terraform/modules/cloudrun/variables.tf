@@ -193,3 +193,15 @@ variable "liveness_probe_grpc" {
   default     = []
   description = "Only use this or `liveness_probe_http`."
 }
+
+variable "startup_initial_delay_seconds" {
+  type        = number
+  default     = 100
+  description = "Number of seconds after the container has started before probes are initiated."
+}
+
+variable "liveness_initial_delay_seconds" {
+  type        = number
+  default     = 100
+  description = "Number of seconds after the container has started before probes are initiated."
+}

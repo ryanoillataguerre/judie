@@ -149,8 +149,8 @@ module "inference-service" {
   execution_environment = "gen1"
   http2                 = true
   max_instances         = 50
-  memory                = 512
-  container_port        = 8080
+  memory                = 1024
+  container_port        = 443
   project               = var.gcp_project
   vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
   startup_probe_grpc = [{
@@ -245,13 +245,15 @@ module "app-service" {
       value = "${trimprefix(module.inference-service.url, "https://")}:443"
     }
   ]
-  execution_environment = "gen1"
-  http2                 = false
-  max_instances         = 50
-  memory                = 512
-  container_port        = 8080
-  project               = var.gcp_project
-  vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
+  execution_environment          = "gen1"
+  http2                          = false
+  max_instances                  = 50
+  memory                         = 512
+  container_port                 = 8080
+  startup_initial_delay_seconds  = 30
+  liveness_initial_delay_seconds = 30
+  project                        = var.gcp_project
+  vpc_access                     = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
   startup_probe_http = [{
     port = 8080
     path = "/healthcheck"
@@ -275,15 +277,17 @@ module "web" {
   image = "us-west1-docker.pkg.dev/${var.gcp_project}/web/web:latest"
 
   # Optional parameters
-  allow_public_access   = true
-  cpus                  = 1
-  execution_environment = "gen1"
-  http2                 = false
-  max_instances         = 50
-  memory                = 1024
-  container_port        = 3000
-  project               = var.gcp_project
-  vpc_access            = { connector = module.vpc.connector_id }
+  allow_public_access            = true
+  cpus                           = 1
+  execution_environment          = "gen1"
+  http2                          = false
+  max_instances                  = 50
+  memory                         = 1024
+  container_port                 = 3000
+  project                        = var.gcp_project
+  startup_initial_delay_seconds  = 30
+  liveness_initial_delay_seconds = 30
+  vpc_access                     = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
 
   startup_probe_http = [{
     port = 3000

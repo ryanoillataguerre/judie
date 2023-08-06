@@ -32,7 +32,7 @@ resource "google_cloud_run_service" "default" {
           }
         }
         startup_probe {
-          initial_delay_seconds = 100
+          initial_delay_seconds = var.startup_initial_delay_seconds
           failure_threshold     = 3
           period_seconds        = 60
 
@@ -51,7 +51,7 @@ resource "google_cloud_run_service" "default" {
           }
         }
         liveness_probe {
-          initial_delay_seconds = 100
+          initial_delay_seconds = var.liveness_initial_delay_seconds
           failure_threshold     = 3
           period_seconds        = 360
 
@@ -82,7 +82,8 @@ resource "google_cloud_run_service" "default" {
         "client.knative.dev/user-image"         = var.image
         "run.googleapis.com/cloudsql-instances" = join(",", var.cloudsql_connections)
         # "run.googleapis.com/ingress"               = var.ingress
-        "run.googleapis.com/client-name"           = "terraform",
+        "run.googleapis.com/client-name" = "terraform",
+        # TODO: Explore gen2 execution env for each service
         "run.googleapis.com/execution-environment" = var.execution_environment
         },
         var.vpc_access.connector == null ? {} : {
@@ -117,7 +118,6 @@ resource "google_cloud_run_service" "default" {
       template[0].spec[0].containers[0].image
     ]
   }
-
 }
 
 resource "google_cloud_run_service_iam_member" "public_access" {
