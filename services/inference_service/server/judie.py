@@ -4,18 +4,9 @@ from inference_service.openai_manager import openai_manager
 from inference_service.prisma_app_client import prisma_manager
 from typing import Optional, Iterator
 import logging
-from dataclasses import dataclass
+from inference_service.server.judie_data import SessionConfig
 
 logger = logging.getLogger("inference_logger")
-
-@dataclass
-class History:
-    chat_list: List[Dict]
-
-@dataclass
-class SessionConfig:
-    subject: Optional[str] = None
-    history: History
 
 
 def yield_judie_response(

@@ -2,6 +2,7 @@ import openai
 from typing import List, Dict
 import logging
 from dataclasses import dataclass
+from inference_service.server.judie_data import SessionConfig
 
 logger = logging.getLogger("inference_logger")
 
@@ -64,12 +65,11 @@ def identify_math_exp(message: str) -> str:
     return response_return
 
 
-def comprehension_score(message_config:) -> int:
+def comprehension_score(session_config: SessionConfig) -> int:
     prompt = [
         {
             "role": "system",
-            "content": '',
+            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversation given their last response or question.",
         },
-        {'role': 'assistant', "content": }
-        {"role": "user", "content": message},
-    ]
+    ].extend(SessionConfig.history.get_openai_format()[-5:])
+    # arbitrarily use last five messages as conversation window
