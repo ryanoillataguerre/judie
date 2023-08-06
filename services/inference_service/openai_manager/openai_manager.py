@@ -65,6 +65,7 @@ def identify_math_exp(message: str) -> str:
     return response_return
 
 
+"""
 def comprehension_score(session_config: SessionConfig) -> int:
     prompt = [
         {
@@ -73,3 +74,4 @@ def comprehension_score(session_config: SessionConfig) -> int:
         },
     ].extend(SessionConfig.history.get_openai_format()[-5:])
     # arbitrarily use last five messages as conversation window
+"""
