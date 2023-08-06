@@ -34,7 +34,7 @@ resource "google_cloud_run_service" "default" {
         startup_probe {
           initial_delay_seconds = 10
           failure_threshold     = 3
-          period_seconds        = 60
+          period_seconds        = 10
 
           dynamic "http_get" {
             for_each = var.startup_probe_http

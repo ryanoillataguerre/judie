@@ -152,7 +152,7 @@ module "inference-service" {
   memory                = 512
   container_port        = 443
   project               = var.gcp_project
-  vpc_access            = { connector = module.vpc.connector_id }
+  vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
   startup_probe_grpc = [{
     service = "grpc.health.v1.Health"
   }]
