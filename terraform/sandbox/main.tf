@@ -153,6 +153,7 @@ module "inference-service" {
   container_port        = 443
   project               = var.gcp_project
   vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
+  # map_domains           = ["inference-service.sandbox.judie.io"]
   startup_probe_grpc = [{
     service = "grpc.health.v1.Health"
   }]
@@ -254,6 +255,7 @@ module "app-service" {
   liveness_initial_delay_seconds = 30
   project                        = var.gcp_project
   vpc_access                     = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
+  map_domains                    = ["app-service.sandbox.judie.io"]
   startup_probe_http = [{
     port = 8080
     path = "/healthcheck"
@@ -288,6 +290,7 @@ module "web" {
   startup_initial_delay_seconds  = 30
   liveness_initial_delay_seconds = 30
   vpc_access                     = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
+  map_domains                    = ["app.sandbox.judie.io"]
 
   startup_probe_http = [{
     port = 3000
