@@ -91,68 +91,68 @@ module "web_ar_repo" {
 # Cloud Run
 
 # Inference Service
-module "inference-service" {
-  name     = "inference-service"
-  location = "us-west1"
+# module "inference-service" {
+#   name     = "inference-service"
+#   location = "us-west1"
 
-  source = "../modules/cloudrun"
+#   source = "../modules/cloudrun"
 
-  image = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
+#   image = "us-west1-docker.pkg.dev/${var.gcp_project}/inference-service/inference_service:latest"
 
-  # Optional parameters
-  allow_public_access = true
-  cloudsql_connections = [
-    module.sql_db.connection_name
-  ]
-  concurrency = 80
-  cpus        = 1
-  env = [
-    {
-      key   = "DATABASE_URL"
-      value = "postgres://postgres:${module.sql_db.db_user_password}@${module.sql_db.private_ip_address}:5432/postgres"
-    },
-    {
-      key   = "OPENAI_API_KEY"
-      value = var.env_openai_api_key
-    },
-    {
-      key   = "PINECONE_API_KEY"
-      value = var.env_pinecone_api_key
-    },
-    {
-      key   = "PINECONE_ENVIRONMENT"
-      value = var.env_pinecone_environment
-    },
-    {
-      key   = "GRPC_PORT"
-      value = var.grpc_port
-    },
-    {
-      key   = "GRPC_HEALTH_PORT"
-      value = var.grpc_health_port
-    },
-    {
-      key   = "WOLFRAM_APP_ID"
-      value = var.wolfram_app_id
-    }
-  ]
-  execution_environment = "gen1"
-  http2                 = true
-  max_instances         = 50
-  memory                = 1024
-  container_port        = 443
-  project               = var.gcp_project
-  vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
-  # map_domains           = ["inference-service.judie.io"]
-  startup_probe_grpc = [{
-    service = "grpc.health.v1.Health"
-  }]
-  liveness_probe_grpc = [{
-    service = "grpc.health.v1.Health"
-  }]
+#   # Optional parameters
+#   allow_public_access = true
+#   cloudsql_connections = [
+#     module.sql_db.connection_name
+#   ]
+#   concurrency = 80
+#   cpus        = 1
+#   env = [
+#     {
+#       key   = "DATABASE_URL"
+#       value = "postgres://postgres:${module.sql_db.db_user_password}@${module.sql_db.private_ip_address}:5432/postgres"
+#     },
+#     {
+#       key   = "OPENAI_API_KEY"
+#       value = var.env_openai_api_key
+#     },
+#     {
+#       key   = "PINECONE_API_KEY"
+#       value = var.env_pinecone_api_key
+#     },
+#     {
+#       key   = "PINECONE_ENVIRONMENT"
+#       value = var.env_pinecone_environment
+#     },
+#     {
+#       key   = "GRPC_PORT"
+#       value = var.grpc_port
+#     },
+#     {
+#       key   = "GRPC_HEALTH_PORT"
+#       value = var.grpc_health_port
+#     },
+#     {
+#       key   = "WOLFRAM_APP_ID"
+#       value = var.wolfram_app_id
+#     }
+#   ]
+#   execution_environment = "gen1"
+#   http2                 = true
+#   max_instances         = 50
+#   memory                = 1024
+#   container_port        = 443
+#   project               = var.gcp_project
+#   vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
+#   # map_domains           = ["inference-service.judie.io"]
+#   startup_probe_grpc = [{
+#     service = "grpc.health.v1.Health"
+#   }]
+#   liveness_probe_grpc = [{
+#     service = "grpc.health.v1.Health"
+#   }]
 
-  depends_on = [module.vpc.connector_id, module.sql_db.private_ip_address, module.sql_db.db_user_password, module.inference_service_ar_repo]
-}
+#   depends_on = [module.vpc.connector_id, module.sql_db.private_ip_address, module.sql_db.db_user_password, module.inference_service_ar_repo]
+# }
 
 # App Service
 module "app-service" {
@@ -185,7 +185,7 @@ module "app-service" {
     },
     {
       key   = "NODE_ENV"
-      value = "sandbox"
+      value = "production"
     },
     {
       key   = "OPENAI_API_KEY"
@@ -232,9 +232,13 @@ module "app-service" {
       value = var.env_customerio_site_id
     },
     {
-      key   = "INFERENCE_SERVICE_URL"
-      value = "${trimprefix(module.inference-service.url, "https://")}:443"
+      key   = "SEGMENT_WRITE_KEY"
+      value = var.env_segment_write_key
     }
+    # {
+    #   key   = "INFERENCE_SERVICE_URL"
+    #   value = "${trimprefix(module.inference-service.url, "https://")}:443"
+    # }
   ]
   execution_environment          = "gen1"
   http2                          = false
@@ -255,7 +259,9 @@ module "app-service" {
     path = "/healthcheck"
   }]
 
-  depends_on = [module.vpc, module.sql_db, module.inference-service, module.redis_instance, module.app_service_ar_repo]
+  depends_on = [module.vpc, module.sql_db,
+    # module.inference-service,
+  module.redis_instance, module.app_service_ar_repo]
 }
 
 # Web
@@ -282,6 +288,13 @@ module "web" {
   vpc_access                     = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
   map_domains                    = ["app.judie.io"]
 
+  env = [
+    {
+      key   = "NEXT_PUBLIC_SEGMENT_WRITE_KEY"
+      value = var.env_segment_write_key
+    }
+  ]
+
   startup_probe_http = [{
     port = 3000
     path = "/api/healthcheck"
@@ -291,5 +304,7 @@ module "web" {
     path = "/api/healthcheck"
   }]
 
-  depends_on = [module.vpc, module.sql_db, module.inference-service, module.app-service]
+  depends_on = [module.vpc, module.sql_db,
+    # module.inference-service,
+  module.app-service]
 }

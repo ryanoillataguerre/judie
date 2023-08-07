@@ -43,6 +43,10 @@ variable "env_stripe_sk" {
   type        = string
   description = "Stripe secret key"
 }
+variable "env_segment_write_key" {
+  type        = string
+  description = "Segment write key"
+}
 variable "env_stripe_employee_coupon_id" {
   type        = string
   description = "Stripe employee coupon ID"
