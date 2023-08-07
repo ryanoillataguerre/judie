@@ -9,7 +9,7 @@ terraform {
     }
   }
   backend "gcs" {
-    bucket = "judie-tfstate-sandbox"
+    bucket = "judie-tfstate-production"
     prefix = "terraform/state"
   }
 }
