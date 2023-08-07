@@ -8,9 +8,8 @@ terraform {
       source = "hashicorp/google-beta"
     }
   }
-  # TODO: Add this to prod after bucket is successfully created
   backend "gcs" {
-    bucket = "judie-sandbox-backup-tfstate"
+    bucket = "judie-tfstate-sandbox"
     prefix = "terraform/state"
   }
 }

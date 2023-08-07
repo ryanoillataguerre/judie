@@ -28,6 +28,14 @@ resource "google_sql_database_instance" "default" {
         name  = "ryan-home"
         value = "76.33.133.137"
       }
+      authorized_networks {
+        name  = "brody-cupertino"
+        value = "24.7.118.219"
+      }
+      authorized_networks {
+        name  = "brody-oc"
+        value = "72.196.69.192"
+      }
 
       ipv4_enabled    = true
       private_network = var.private_network_link

@@ -100,7 +100,6 @@ module "web_ar_repo" {
 # Cloud Run
 
 # Inference Service
-# Temp removed while image is set up
 module "inference-service" {
   name     = "inference-service"
   location = "us-west1"
