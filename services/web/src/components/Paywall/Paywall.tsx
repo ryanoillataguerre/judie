@@ -19,6 +19,7 @@ import {
   CREATE_CHECKOUT_SESSION,
   createCheckoutSessionMutation,
 } from "@judie/data/mutations";
+import { useRouter } from "next/router";
 
 const SubscribeCard = ({
   onClick,
@@ -156,9 +157,12 @@ const Paywall = ({
     }
   }, [userData, setIsOpen]);
 
+  const router = useRouter();
   const currentUrl = useMemo(() => {
-    return typeof window !== "undefined" ? window?.location?.href : "";
-  }, []);
+    return typeof window !== "undefined"
+      ? `${window.location.origin}${router.asPath}`
+      : "";
+  }, [router]);
 
   const {
     data: checkoutSessionUrl,
