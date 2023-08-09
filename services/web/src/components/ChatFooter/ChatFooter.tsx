@@ -16,6 +16,7 @@ import {
   VStack,
   chakra,
   shouldForwardProp,
+  Spinner,
 } from "@chakra-ui/react";
 import { ChatContext } from "@judie/hooks/useChat";
 import {
@@ -25,6 +26,7 @@ import {
   useRef,
   useEffect,
   useContext,
+  useMemo,
 } from "react";
 import { AiOutlineEnter } from "react-icons/ai";
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from "react-icons/bi";
@@ -70,18 +72,17 @@ const ChakraCircle = chakra(motion.div, {
 
 const RecordButton = ({
   onFinishRecording,
+  setIsRecording,
 }: {
-  onFinishRecording?: (text: string) => void;
+  onFinishRecording: (text: string) => void;
+  setIsRecording: (isRecording: boolean) => void;
 }) => {
   const {
     startRecording,
     stopRecording,
-    togglePauseResume,
     recordingBlob,
     isRecording,
-    isPaused,
     recordingTime,
-    mediaRecorder,
   } = useAudioRecorder({
     echoCancellation: true,
     noiseSuppression: true,
@@ -90,8 +91,7 @@ const RecordButton = ({
   const transcribeMutation = useMutation({
     mutationFn: whisperTranscribeMutation,
     onSuccess: (data) => {
-      console.log("whisper response data", data);
-      onFinishRecording?.(data.transcript);
+      onFinishRecording(data.transcript);
     },
   });
 
@@ -99,12 +99,15 @@ const RecordButton = ({
     if (!recordingBlob) return;
     const formData = new FormData();
     formData.append("audio", recordingBlob);
-    console.log("recordingBlob", recordingBlob);
     // Send formData with mutation
     transcribeMutation.mutate({
       data: formData,
     });
   }, [recordingBlob, transcribeMutation.mutate]);
+
+  useEffect(() => {
+    setIsRecording(isRecording);
+  }, [isRecording]);
 
   // If recording for 1 min, stop recording and send
   useEffect(() => {
@@ -112,6 +115,37 @@ const RecordButton = ({
       stopRecording();
     }
   }, [recordingTime]);
+
+  const buttonContent = useMemo(() => {
+    if (isRecording) {
+      return (
+        <ChakraCircle
+          animate={{
+            scale: [1, 1.3, 1],
+          }}
+          // @ts-ignore no problem in operation, although type error appears.
+          transition={{
+            duration: 1.2,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
+          borderRadius={"50%"}
+          padding="2"
+          bg={"red.400"}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="1rem"
+          height="1rem"
+        ></ChakraCircle>
+      );
+    }
+    if (transcribeMutation.isLoading) {
+      return <Spinner color={"teal.300"} size={"sm"} />;
+    }
+    return <BiSolidMicrophone fill={"white"} size={18} />;
+  }, [isRecording, transcribeMutation.isLoading]);
 
   return (
     <Button
@@ -134,31 +168,7 @@ const RecordButton = ({
         }
       }}
     >
-      {/* <AudioReactRecorder state={recordingState} onStop={onStop} /> */}
-      {isRecording ? (
-        <ChakraCircle
-          animate={{
-            scale: [1, 1.3, 1],
-          }}
-          // @ts-ignore no problem in operation, although type error appears.
-          transition={{
-            duration: 1.2,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "loop",
-          }}
-          borderRadius={"50%"}
-          padding="2"
-          bg={"red.400"}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          width="1rem"
-          height="1rem"
-        ></ChakraCircle>
-      ) : (
-        <BiSolidMicrophone fill={"white"} size={18} />
-      )}
+      {buttonContent}
     </Button>
   );
 };
@@ -166,6 +176,8 @@ const RecordButton = ({
 const ChatInput = () => {
   const { addMessage, chat } = useContext(ChatContext);
   const [chatValue, setChatValue] = useState<string>("");
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+
   const onSubmit = useCallback(
     (
       e: FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>
@@ -250,6 +262,7 @@ const ChatInput = () => {
               _hover={{
                 borderColor: "teal",
               }}
+              disabled={isRecording}
               onChange={(e) => setChatValue(e.target.value)}
               placeholder="Ask Judie anything..."
               style={{
@@ -261,6 +274,7 @@ const ChatInput = () => {
             <VStack height={"100%"}>
               <SendButton />
               <RecordButton
+                setIsRecording={setIsRecording}
                 onFinishRecording={(text) =>
                   setChatValue((prev) =>
                     prev.length ? [prev, text].join("\n") : text
