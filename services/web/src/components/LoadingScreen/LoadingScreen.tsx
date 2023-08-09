@@ -6,7 +6,7 @@ const LoadingScreen = () => {
   return (
     <Flex
       style={{
-        height: "100%",
+        height: "100vh",
         width: "100%",
         alignItems: "center",
         justifyContent: "center",

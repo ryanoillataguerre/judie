@@ -2,7 +2,7 @@ import {
   InviteRow,
   InviteSheetRole,
 } from "@judie/components/admin/InviteModal";
-import { HTTPResponseError, baseFetch } from "./baseFetch";
+import { HTTPResponseError, baseFetch, baseFetchFormData } from "./baseFetch";
 import {
   Chat,
   GradeYear,
@@ -325,6 +325,21 @@ export const bulkInviteMutation = async ({
     url: `/admin/invites/bulk`,
     method: "POST",
     body: { organizationId, invites },
+  });
+  return response.data;
+};
+
+interface TranscribeResponse {
+  transcript: string;
+}
+export const whisperTranscribeMutation = async ({
+  data,
+}: {
+  data: FormData;
+}): Promise<TranscribeResponse> => {
+  const response = await baseFetchFormData({
+    url: `/chat/whisper/transcribe`,
+    form: data,
   });
   return response.data;
 };

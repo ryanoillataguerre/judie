@@ -1,11 +1,7 @@
 import { InternalError, NotFoundError } from "../utils/errors/index.js";
-import { PineconeClient, QueryRequest } from "@pinecone-database/pinecone";
-import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from "openai";
+import { ChatCompletionRequestMessage } from "openai";
 import dbClient from "../utils/prisma.js";
 import { Chat, Message, MessageType, Prisma } from "@prisma/client";
-import { ChatAndMessageResponse } from "./types.js";
-import { subjectToNamespaceMap, subjectToPromptMap } from "./consts.js";
-import { IncomingMessage } from "http";
 import { Response } from "express";
 import { getChatCompletion } from "../inference/service.js";
 

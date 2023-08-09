@@ -13,6 +13,9 @@ import {
   Text,
   ToastPosition,
   HStack,
+  VStack,
+  chakra,
+  shouldForwardProp,
 } from "@chakra-ui/react";
 import { ChatContext } from "@judie/hooks/useChat";
 import {
@@ -24,8 +27,20 @@ import {
   useContext,
 } from "react";
 import { AiOutlineEnter } from "react-icons/ai";
+import { BiSolidMicrophone, BiSolidMicrophoneOff } from "react-icons/bi";
 import { BsSend, BsShift } from "react-icons/bs";
+import { motion, isValidMotionProp } from "framer-motion";
+import dynamic from "next/dynamic";
+import { useAudioRecorder } from "react-audio-voice-recorder";
+import { useMutation } from "react-query";
+import { whisperTranscribeMutation } from "@judie/data/mutations";
 
+const ReactMediaRecorder = dynamic(
+  () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder),
+  {
+    ssr: false,
+  }
+);
 const SendButton = () => {
   return (
     <Button
@@ -44,6 +59,110 @@ const SendButton = () => {
     </Button>
   );
 };
+
+const ChakraCircle = chakra(motion.div, {
+  /**
+   * Allow motion props and non-Chakra props to be forwarded.
+   */
+  shouldForwardProp: (prop) =>
+    isValidMotionProp(prop) || shouldForwardProp(prop),
+});
+
+const RecordButton = ({
+  onFinishRecording,
+}: {
+  onFinishRecording?: (text: string) => void;
+}) => {
+  const {
+    startRecording,
+    stopRecording,
+    togglePauseResume,
+    recordingBlob,
+    isRecording,
+    isPaused,
+    recordingTime,
+    mediaRecorder,
+  } = useAudioRecorder({
+    echoCancellation: true,
+    noiseSuppression: true,
+  });
+
+  const transcribeMutation = useMutation({
+    mutationFn: whisperTranscribeMutation,
+    onSuccess: (data) => {
+      console.log("whisper response data", data);
+      onFinishRecording?.(data.transcript);
+    },
+  });
+
+  useEffect(() => {
+    if (!recordingBlob) return;
+    const formData = new FormData();
+    formData.append("audio", recordingBlob);
+    console.log("recordingBlob", recordingBlob);
+    // Send formData with mutation
+    transcribeMutation.mutate({
+      data: formData,
+    });
+  }, [recordingBlob, transcribeMutation.mutate]);
+
+  // If recording for 1 min, stop recording and send
+  useEffect(() => {
+    if (recordingTime >= 60) {
+      stopRecording();
+    }
+  }, [recordingTime]);
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      colorScheme="white"
+      style={{
+        padding: "0 0.5rem",
+        height: "99%", // 100% extends a LITTLE over the bottom of the textArea
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: "0.5rem",
+      }}
+      onClick={() => {
+        if (isRecording) {
+          stopRecording();
+        } else {
+          startRecording();
+        }
+      }}
+    >
+      {/* <AudioReactRecorder state={recordingState} onStop={onStop} /> */}
+      {isRecording ? (
+        <ChakraCircle
+          animate={{
+            scale: [1, 1.3, 1],
+          }}
+          // @ts-ignore no problem in operation, although type error appears.
+          transition={{
+            duration: 1.2,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
+          borderRadius={"50%"}
+          padding="2"
+          bg={"red.400"}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="1rem"
+          height="1rem"
+        ></ChakraCircle>
+      ) : (
+        <BiSolidMicrophone fill={"white"} size={18} />
+      )}
+    </Button>
+  );
+};
+
 const ChatInput = () => {
   const { addMessage, chat } = useContext(ChatContext);
   const [chatValue, setChatValue] = useState<string>("");
@@ -139,7 +258,16 @@ const ChatInput = () => {
                 backgroundColor: bgColor,
               }}
             />
-            <SendButton />
+            <VStack height={"100%"}>
+              <SendButton />
+              <RecordButton
+                onFinishRecording={(text) =>
+                  setChatValue((prev) =>
+                    prev.length ? [prev, text].join("\n") : text
+                  )
+                }
+              />
+            </VStack>
           </HStack>
         </LightMode>
         {/* <InputRightElement style={{ height: "100%" }}>
