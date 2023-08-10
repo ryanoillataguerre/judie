@@ -26,6 +26,7 @@ import { useMutation, useQuery } from "react-query";
 import { createMessageNarration } from "@judie/data/mutations";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Howl } from "howler";
+import { HiStop } from "react-icons/hi";
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -45,17 +46,39 @@ const NarrateButton = ({ message }: { message: Message }) => {
     },
   });
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState(
+    message.audioFileUrl
+      ? new Howl({
+          src: message.audioFileUrl,
+          html5: true,
+        })
+      : null
+  );
   const playAudioFile = () => {
     setIsPlaying(true);
-    if (message.audioFileUrl) {
-      const sound = new Howl({
-        src: message.audioFileUrl,
-        html5: true,
+
+    if (!sound) {
+      setSound(() => {
+        if (message.audioFileUrl) {
+          return new Howl({
+            src: message.audioFileUrl,
+            html5: true,
+          });
+        }
+        return null;
       });
+    }
+    if (sound) {
       sound.play();
       sound.on("end", () => {
         setIsPlaying(false);
       });
+    }
+  };
+  const stopPlaying = () => {
+    setIsPlaying(false);
+    if (sound) {
+      sound.stop();
     }
   };
   const hasAudio = !!message.audioFileUrl;
@@ -65,7 +88,9 @@ const NarrateButton = ({ message }: { message: Message }) => {
       size={"sm"}
       onClick={() =>
         hasAudio
-          ? playAudioFile()
+          ? isPlaying
+            ? stopPlaying()
+            : playAudioFile()
           : narrateMessageMutation.mutate({
               messageId: message.id,
             })
@@ -73,18 +98,26 @@ const NarrateButton = ({ message }: { message: Message }) => {
       position="relative"
       type="button"
     >
-      {narrateMessageMutation.isLoading || isPlaying ? (
+      {narrateMessageMutation.isLoading ? (
         <Spinner
           aria-label="Creating narration..."
           colorScheme="white"
           size={"sm"}
         />
       ) : hasAudio ? (
-        <Tooltip label={"Play Narration"} placement={"top"}>
-          <Box>
-            <HiPlay size={20} />
-          </Box>
-        </Tooltip>
+        isPlaying ? (
+          <Tooltip label={"Stop Narration"} placement={"top"}>
+            <Box>
+              <HiStop size={20} />
+            </Box>
+          </Tooltip>
+        ) : (
+          <Tooltip label={"Play Narration"} placement={"top"}>
+            <Box>
+              <HiPlay size={20} />
+            </Box>
+          </Tooltip>
+        )
       ) : (
         <Tooltip label={"Create Narration"} placement={"top"}>
           <Box>
