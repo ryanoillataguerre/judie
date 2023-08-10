@@ -65,9 +65,15 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     scroll();
   }, [messages, tempUserMessage, beingStreamedMessage]);
 
+  const existingChatQuery = useQuery({
+    queryKey: [GET_CHAT_BY_ID, chatId],
+    enabled: !!chatId,
+    refetchOnWindowFocus: false,
+    queryFn: () => getChatByIdQuery(chatId as string),
+  });
   const renderedMessages = useMemo(() => {
     let newMessages: UIMessageType[] = messages;
-    if (streaming) {
+    if (streaming && beingStreamedChatId === chatId) {
       if (tempUserMessage && tempUserMessageChatId === chatId) {
         newMessages = [...newMessages, tempUserMessage];
       }
@@ -80,14 +86,14 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       }`;
       return <MessageRow key={key} message={message} />;
     });
-  }, [messages, tempUserMessage, streaming, chatId, tempUserMessageChatId]);
-
-  const existingChatQuery = useQuery({
-    queryKey: [GET_CHAT_BY_ID, chatId],
-    enabled: !!chatId,
-    refetchOnWindowFocus: false,
-    queryFn: () => getChatByIdQuery(chatId as string),
-  });
+  }, [
+    messages,
+    tempUserMessage,
+    streaming,
+    chatId,
+    tempUserMessageChatId,
+    existingChatQuery.isLoading,
+  ]);
 
   // const showSubjectSelector: boolean = useMemo(() => {
   //   let shouldShowSubjectSelector: boolean = true;

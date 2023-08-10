@@ -140,6 +140,7 @@ model Message {
   content         String
   readableContent String      @map("readable_content")
   type            MessageType
+  audioFileUrl    String?     @map("audio_file_url")
   chatId          String      @map("chat_id")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime?   @updatedAt @map("updated_at")
