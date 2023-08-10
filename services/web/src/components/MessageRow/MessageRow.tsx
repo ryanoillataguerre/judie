@@ -15,57 +15,94 @@ import {
   WrapItem,
   Box,
 } from "@chakra-ui/react";
-import { MessageType } from "@judie/data/types/api";
+import { Message, MessageType } from "@judie/data/types/api";
 import { UIMessageType } from "@judie/hooks/useChat";
 import CodeBlock from "./CodeBlock";
-import { FC, memo } from "react";
+import { FC, memo, useState } from "react";
 import ReactMarkdown, { Options } from "react-markdown";
 import { AiOutlineUser, AiFillRobot } from "react-icons/ai";
-import { HiSpeakerWave } from "react-icons/hi2";
+import { HiSpeakerWave, HiPlay } from "react-icons/hi2";
 import { useMutation, useQuery } from "react-query";
 import { createMessageNarration } from "@judie/data/mutations";
+import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
+import { Howl } from "howler";
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
   (prevProps, nextProps) => prevProps.children === nextProps.children
 );
 
-const NarrateButton = ({ message }: { message: UIMessageType }) => {
+const NarrateButton = ({ message }: { message: Message }) => {
+  const { refetch } = useQuery({
+    queryKey: [GET_CHAT_BY_ID, message.chatId],
+    queryFn: () => getChatByIdQuery(message.chatId),
+    enabled: false,
+  });
   const narrateMessageMutation = useMutation({
     mutationFn: createMessageNarration,
+    onSuccess: () => {
+      refetch();
+    },
   });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playAudioFile = () => {
+    setIsPlaying(true);
+    if (message.audioFileUrl) {
+      const sound = new Howl({
+        src: message.audioFileUrl,
+        html5: true,
+      });
+      sound.play();
+      sound.on("end", () => {
+        setIsPlaying(false);
+      });
+    }
+  };
+  const hasAudio = !!message.audioFileUrl;
   return (
     <Button
       variant={"ghost"}
       size={"sm"}
       onClick={() =>
-        narrateMessageMutation.mutate({
-          messageId: message.id,
-        })
+        hasAudio
+          ? playAudioFile()
+          : narrateMessageMutation.mutate({
+              messageId: message.id,
+            })
       }
       position="relative"
       type="button"
     >
-      {narrateMessageMutation.isLoading ? (
+      {narrateMessageMutation.isLoading || isPlaying ? (
         <Spinner
           aria-label="Creating narration..."
           colorScheme="white"
           size={"sm"}
         />
-      ) : (
-        // <WrapItem>
-        <Tooltip label={"Create Narration"} placement={"top"}>
+      ) : hasAudio ? (
+        <Tooltip label={"Play Narration"} placement={"top"}>
           <Box>
-            <HiSpeakerWave size={20} onClick={() => {}} />
+            <HiPlay size={20} />
           </Box>
         </Tooltip>
-        // </WrapItem>
+      ) : (
+        <Tooltip label={"Create Narration"} placement={"top"}>
+          <Box>
+            <HiSpeakerWave size={20} />
+          </Box>
+        </Tooltip>
       )}
     </Button>
   );
 };
 
-const MessageRow = ({ message }: { message: UIMessageType }) => {
+const MessageRow = ({
+  message,
+  beingStreamed,
+}: {
+  message: UIMessageType;
+  beingStreamed?: boolean;
+}) => {
   const userBgColor = useColorModeValue("#D9F0ED", "#373f58");
   return (
     <Flex
@@ -142,7 +179,7 @@ const MessageRow = ({ message }: { message: UIMessageType }) => {
           <Flex>{message.readableContent}</Flex>
         )}
       </Flex>
-      {message.type === MessageType.BOT ? (
+      {message.type === MessageType.BOT && !beingStreamed ? (
         <Flex
           style={{
             width: "15%",
@@ -152,7 +189,7 @@ const MessageRow = ({ message }: { message: UIMessageType }) => {
             justifyContent: "flex-start",
           }}
         >
-          <NarrateButton message={message} />
+          <NarrateButton message={message as Message} />
         </Flex>
       ) : null}
     </Flex>

@@ -40,6 +40,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     setPaywallOpen,
     displayWelcome,
   } = useContext(ChatContext);
+  console.log("messages", messages);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
@@ -64,6 +65,8 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   useEffect(() => {
     scroll();
   }, [messages, tempUserMessage, beingStreamedMessage]);
+
+  // console.log("chatId", chatId);
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -181,6 +184,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
             (beingStreamedChatId === chatId && beingStreamedMessage)) && (
             <MessageRow
               key={`${MessageType.BOT}-mostRecent`}
+              beingStreamed={true}
               message={{
                 type: MessageType.BOT,
                 readableContent:

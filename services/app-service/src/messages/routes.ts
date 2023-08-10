@@ -47,7 +47,9 @@ router.post(
     try {
       await createAudioFile(message.readableContent, filePath);
     } catch (err) {
-      throw new InternalError("Error creating audio file");
+      throw new InternalError("Error creating audio file", 500, {
+        originalError: err,
+      });
     }
     const bucketFilePath = `messages/${message.id}.mp3`;
     const publicUrl = `https://storage.googleapis.com/${process.env.GCLOUD_BUCKET_NAME}/${bucketFilePath}`;
