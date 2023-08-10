@@ -107,6 +107,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       setTempUserMessageChatId(undefined);
       setStreaming(false);
       setDisplayWelcome(true);
+      setMessages([]);
+    } else {
+      setMessages([]);
     }
   }, [chatId]);
 
@@ -197,7 +200,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const completionOnError = (err: HTTPResponseError) => {
-    console.log("completion on error", err.message);
     setBeingStreamedChatId(() => undefined);
     setBeingStreamedMessage(() => undefined);
     setTempUserMessageChatId(() => undefined);
@@ -230,7 +232,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           abortController,
           setChatValue: streamCallback,
           onStreamEnd: async () => {
-            console.log("stream ended");
             setBeingStreamedChatId(undefined);
             auth.refresh();
             userChatsQuery.refetch();

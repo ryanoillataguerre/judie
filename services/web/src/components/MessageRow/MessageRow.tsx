@@ -12,7 +12,6 @@ import {
   Button,
   Spinner,
   Tooltip,
-  WrapItem,
   Box,
 } from "@chakra-ui/react";
 import { Message, MessageType } from "@judie/data/types/api";
@@ -26,7 +25,7 @@ import { useMutation, useQuery } from "react-query";
 import { createMessageNarration } from "@judie/data/mutations";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Howl } from "howler";
-import { BsFillStopFill, BsStopFill } from "react-icons/bs";
+import { BsStopFill } from "react-icons/bs";
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,

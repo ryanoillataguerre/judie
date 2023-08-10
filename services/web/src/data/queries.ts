@@ -167,3 +167,11 @@ export const getUserByIdQuery = async (id: string): Promise<User> => {
   });
   return response.data;
 };
+
+export const getMessageByIdQuery = async (id: string): Promise<any> => {
+  const response = await baseFetch({
+    url: `/messages/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};

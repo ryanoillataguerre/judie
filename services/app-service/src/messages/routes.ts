@@ -8,6 +8,8 @@ import NotFoundError from "../utils/errors/NotFoundError.js";
 import { Environment, getEnv } from "../utils/env.js";
 import InternalError from "../utils/errors/InternalError.js";
 import { temporaryFile } from "tempy";
+import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
+import BadRequestError from "../utils/errors/BadRequestError.js";
 
 const getStorageOptions = (): StorageOptions => {
   const environment = getEnv();
@@ -70,6 +72,28 @@ router.post(
     });
     res.status(201).send({
       data: updatedMessage,
+    });
+  })
+);
+
+router.get(
+  "/:messageId",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    if (!req.params.messageId) {
+      throw new BadRequestError("Message id is required");
+    }
+    const message = await getMessageById(req.params.messageId);
+    if (!message) {
+      throw new NotFoundError("Message not found");
+    }
+
+    res.status(200).json({
+      data: message,
     });
   })
 );
