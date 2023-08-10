@@ -18,7 +18,7 @@ import {
 import { Message, MessageType } from "@judie/data/types/api";
 import { UIMessageType } from "@judie/hooks/useChat";
 import CodeBlock from "./CodeBlock";
-import { FC, memo, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import ReactMarkdown, { Options } from "react-markdown";
 import { AiOutlineUser, AiFillRobot } from "react-icons/ai";
 import { HiSpeakerWave, HiPlay } from "react-icons/hi2";
@@ -54,6 +54,17 @@ const NarrateButton = ({ message }: { message: Message }) => {
         })
       : null
   );
+
+  useEffect(() => {
+    if (message.audioFileUrl) {
+      setSound(
+        new Howl({
+          src: message.audioFileUrl,
+          html5: true,
+        })
+      );
+    }
+  }, [message.audioFileUrl]);
   const playAudioFile = () => {
     setIsPlaying(true);
 
