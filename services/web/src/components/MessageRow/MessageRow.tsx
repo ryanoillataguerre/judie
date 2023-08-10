@@ -26,7 +26,7 @@ import { useMutation, useQuery } from "react-query";
 import { createMessageNarration } from "@judie/data/mutations";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Howl } from "howler";
-import { HiStop } from "react-icons/hi";
+import { BsFillStopFill, BsStopFill } from "react-icons/bs";
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -108,7 +108,7 @@ const NarrateButton = ({ message }: { message: Message }) => {
         isPlaying ? (
           <Tooltip label={"Stop Narration"} placement={"top"}>
             <Box>
-              <HiStop size={20} />
+              <BsStopFill size={20} />
             </Box>
           </Tooltip>
         ) : (
