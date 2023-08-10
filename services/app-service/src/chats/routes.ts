@@ -20,6 +20,10 @@ import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
 import dbClient from "../utils/prisma.js";
+import multer from "multer";
+import { transcribeAudio } from "../openai/service.js";
+import { Readable } from "stream";
+import { temporaryDirectory } from "tempy";
 
 const router = Router();
 
@@ -187,6 +191,35 @@ router.delete(
     res.status(200).json({
       data: { success: true },
     });
+  })
+);
+
+// Can factor this out into its own module if whisper usage expands
+const storage = multer.memoryStorage();
+let upload = multer({ dest: "tmp/", storage });
+// Whisper transcription
+router.post(
+  "/whisper/transcribe",
+  requireAuth,
+  upload.single("audio"),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    // How to get formData?
+    const audioFile = req.file;
+
+    if (audioFile) {
+      const readableStream = Readable.from(audioFile.buffer);
+
+      const tempDir = temporaryDirectory();
+      (readableStream as any).path = `${tempDir}/audio.wav`;
+      const transcript = await transcribeAudio(readableStream);
+      res.status(200).json({
+        data: { transcript },
+      });
+    }
   })
 );
 

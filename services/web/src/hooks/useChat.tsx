@@ -100,6 +100,17 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    if (!chatId) {
+      setBeingStreamedMessage(undefined);
+      setBeingStreamedChatId(undefined);
+      setTempUserMessage(undefined);
+      setTempUserMessageChatId(undefined);
+      setStreaming(false);
+      setDisplayWelcome(true);
+    }
+  }, [chatId]);
+
+  useEffect(() => {
     setStreaming(false);
   }, [chatId]);
 

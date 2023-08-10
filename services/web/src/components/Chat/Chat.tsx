@@ -65,9 +65,17 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     scroll();
   }, [messages, tempUserMessage, beingStreamedMessage]);
 
+  // console.log("chatId", chatId);
+
+  const existingChatQuery = useQuery({
+    queryKey: [GET_CHAT_BY_ID, chatId],
+    enabled: !!chatId,
+    refetchOnWindowFocus: false,
+    queryFn: () => getChatByIdQuery(chatId as string),
+  });
   const renderedMessages = useMemo(() => {
     let newMessages: UIMessageType[] = messages;
-    if (streaming) {
+    if (streaming && beingStreamedChatId === chatId) {
       if (tempUserMessage && tempUserMessageChatId === chatId) {
         newMessages = [...newMessages, tempUserMessage];
       }
@@ -80,25 +88,14 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       }`;
       return <MessageRow key={key} message={message} />;
     });
-  }, [messages, tempUserMessage, streaming, chatId, tempUserMessageChatId]);
-
-  const existingChatQuery = useQuery({
-    queryKey: [GET_CHAT_BY_ID, chatId],
-    enabled: !!chatId,
-    refetchOnWindowFocus: false,
-    queryFn: () => getChatByIdQuery(chatId as string),
-  });
-
-  // const showSubjectSelector: boolean = useMemo(() => {
-  //   let shouldShowSubjectSelector: boolean = true;
-  //   if (chat?.messages?.length) {
-  //     shouldShowSubjectSelector = false;
-  //   }
-  //   if (tempUserMessage && tempUserMessageChatId === chatId) {
-  //     shouldShowSubjectSelector = false;
-  //   }
-  //   return shouldShowSubjectSelector;
-  // }, [chat?.messages?.length, tempUserMessage, chatId, tempUserMessageChatId]);
+  }, [
+    messages,
+    tempUserMessage,
+    streaming,
+    chatId,
+    tempUserMessageChatId,
+    existingChatQuery.isLoading,
+  ]);
 
   const [animatedEllipsisStringValue, setAnimatedEllipsisStringValue] =
     useState("");
@@ -172,10 +169,10 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
         <ScrollContainer>
           {renderedMessages}
           {(streaming ||
-            beingStreamedChatId === chatId ||
-            beingStreamedMessage) && (
+            (beingStreamedChatId === chatId && beingStreamedMessage)) && (
             <MessageRow
               key={`${MessageType.BOT}-mostRecent`}
+              beingStreamed={true}
               message={{
                 type: MessageType.BOT,
                 readableContent:

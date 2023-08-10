@@ -150,3 +150,28 @@ export async function baseFetch({
     throw err;
   }
 }
+
+export const baseFetchFormData = async ({
+  url,
+  form,
+}: {
+  url: string;
+  form: FormData;
+}) => {
+  const reqHeaders: any = {
+    // "Content-Type": "multipart/form-data",
+  };
+  const apiUri = getApiUri();
+  const sessionCookie = getCookie(SESSION_COOKIE);
+  if (sessionCookie) {
+    reqHeaders.Cookie = `judie_sid=${sessionCookie};`;
+  }
+  const response = await fetch(`${apiUri}${url}`, {
+    headers: reqHeaders,
+    credentials: "include",
+    method: "POST",
+    body: form,
+  });
+  await checkStatus(response);
+  return response.json();
+};

@@ -1,3 +1,7 @@
+locals {
+  bucket_name = "judie-audio-sandbox"
+}
+
 # Enable necessary management APIs
 resource "google_project_service" "run_api" {
   service = "run.googleapis.com"
@@ -18,6 +22,11 @@ resource "google_project_service" "sqladmin-api" {
 module "backend-bucket" {
   source = "../modules/bucket"
   name   = "judie-tfstate-sandbox"
+}
+
+module "audio-file-bucket" {
+  source = "../modules/bucket"
+  name   = local.bucket_name
 }
 
 resource "google_dns_managed_zone" "web-public" {
@@ -243,7 +252,16 @@ module "app-service" {
     {
       key   = "INFERENCE_SERVICE_URL"
       value = "${trimprefix(module.inference-service.url, "https://")}:443"
+    },
+    {
+      key   = "ELEVENLABS_API_KEY"
+      value = var.env_elevenlabs_api_key
+    },
+    {
+      key   = "GCLOUD_BUCKET_NAME"
+      value = local.bucket_name
     }
+
   ]
   execution_environment          = "gen1"
   http2                          = false

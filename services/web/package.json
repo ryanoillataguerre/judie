@@ -26,11 +26,13 @@
     "cookies-next": "^2.1.1",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
-    "framer-motion": "^10.2.5",
+    "framer-motion": "^10.15.1",
+    "howler": "^2.2.3",
     "lottie-react": "^2.4.0",
     "moment": "^2.29.4",
     "next": "13.2.4",
     "react": "18.2.0",
+    "react-audio-voice-recorder": "^2.1.2",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.7",
     "react-icons": "^4.8.0",
@@ -48,6 +50,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.7",
     "@types/react-syntax-highlighter": "^15.5.7"
   }
 }

@@ -135,6 +135,7 @@ export interface Message {
   id: string;
   content: string;
   readableContent: string;
+  audioFileUrl?: string;
   type: MessageType;
   chatId: string;
   createdAt: Date;
