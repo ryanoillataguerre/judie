@@ -243,7 +243,12 @@ module "app-service" {
     {
       key   = "INFERENCE_SERVICE_URL"
       value = "${trimprefix(module.inference-service.url, "https://")}:443"
-    }
+    },
+    {
+      key   = "ELEVENLABS_API_KEY"
+      value = var.env_elevenlabs_api_key
+    },
+
   ]
   execution_environment          = "gen1"
   http2                          = false

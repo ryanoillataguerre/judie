@@ -33,7 +33,7 @@ export interface TempMessage {
   createdAt?: Date;
 }
 
-export type UIMessageType = Message | TempMessage;
+export type UIMessageType = Message & TempMessage;
 
 interface UseChatData {
   activeChatId?: string;
@@ -98,6 +98,17 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const abortController = useMemo(() => {
     return new AbortController();
   }, []);
+
+  useEffect(() => {
+    if (!chatId) {
+      setBeingStreamedMessage(undefined);
+      setBeingStreamedChatId(undefined);
+      setTempUserMessage(undefined);
+      setTempUserMessageChatId(undefined);
+      setStreaming(false);
+      setDisplayWelcome(true);
+    }
+  }, [chatId]);
 
   useEffect(() => {
     setStreaming(false);

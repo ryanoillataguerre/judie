@@ -343,3 +343,15 @@ export const whisperTranscribeMutation = async ({
   });
   return response.data;
 };
+
+export const createMessageNarration = async ({
+  messageId,
+}: {
+  messageId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/messages/${messageId}/narrate`,
+    method: "POST",
+  });
+  return response.data;
+};

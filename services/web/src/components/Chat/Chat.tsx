@@ -172,8 +172,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
         <ScrollContainer>
           {renderedMessages}
           {(streaming ||
-            beingStreamedChatId === chatId ||
-            beingStreamedMessage) && (
+            (beingStreamedChatId === chatId && beingStreamedMessage)) && (
             <MessageRow
               key={`${MessageType.BOT}-mostRecent`}
               message={{
