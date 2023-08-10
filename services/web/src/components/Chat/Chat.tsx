@@ -40,7 +40,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     setPaywallOpen,
     displayWelcome,
   } = useContext(ChatContext);
-  console.log("messages", messages);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
@@ -97,17 +96,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     tempUserMessageChatId,
     existingChatQuery.isLoading,
   ]);
-
-  // const showSubjectSelector: boolean = useMemo(() => {
-  //   let shouldShowSubjectSelector: boolean = true;
-  //   if (chat?.messages?.length) {
-  //     shouldShowSubjectSelector = false;
-  //   }
-  //   if (tempUserMessage && tempUserMessageChatId === chatId) {
-  //     shouldShowSubjectSelector = false;
-  //   }
-  //   return shouldShowSubjectSelector;
-  // }, [chat?.messages?.length, tempUserMessage, chatId, tempUserMessageChatId]);
 
   const [animatedEllipsisStringValue, setAnimatedEllipsisStringValue] =
     useState("");

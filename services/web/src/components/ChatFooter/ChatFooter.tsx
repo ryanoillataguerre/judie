@@ -2,9 +2,7 @@ import {
   Button,
   Box,
   Flex,
-  Input,
   InputGroup,
-  InputRightElement,
   LightMode,
   useBreakpointValue,
   useColorModeValue,
@@ -29,20 +27,13 @@ import {
   useMemo,
 } from "react";
 import { AiOutlineEnter } from "react-icons/ai";
-import { BiSolidMicrophone, BiSolidMicrophoneOff } from "react-icons/bi";
-import { BsSend, BsShift } from "react-icons/bs";
+import { BiSolidMicrophone } from "react-icons/bi";
+import { BsSend } from "react-icons/bs";
 import { motion, isValidMotionProp } from "framer-motion";
-import dynamic from "next/dynamic";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { useMutation } from "react-query";
 import { whisperTranscribeMutation } from "@judie/data/mutations";
 
-const ReactMediaRecorder = dynamic(
-  () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder),
-  {
-    ssr: false,
-  }
-);
 const SendButton = () => {
   return (
     <Button
