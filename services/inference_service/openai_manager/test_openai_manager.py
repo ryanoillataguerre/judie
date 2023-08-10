@@ -51,3 +51,7 @@ def test_math_expressions(env_setup):
     response = openai_manager.identify_math_exp(expression)
     print(response)
     assert response == "none"
+
+
+def test_comprehension(env_setup):
+    assert False

@@ -35,6 +35,34 @@ def test_create_history(env_setup):
 
     assert history.get_last_user_message() == "Sick content here"
 
+    history.add_turn(
+        inference_service.server.judie_data.ChatTurn(
+            role=inference_service.server.judie_data.Role.ASSISTANT,
+            content="Wow that was sick content",
+        )
+    )
+
+    assert history.get_last_user_message() == "Sick content here"
+
+    history.add_turn(
+        inference_service.server.judie_data.ChatTurn(
+            role=inference_service.server.judie_data.Role.USER,
+            content="This is even sicker",
+        )
+    )
+
+    assert history.get_last_user_message() == "This is even sicker"
+
 
 def test_history_openai_fmt(env_setup):
-    pass
+    history = inference_service.server.judie_data.History()
+    history.add_turn(
+        inference_service.server.judie_data.ChatTurn(
+            role=inference_service.server.judie_data.Role.USER,
+            content="Sick content here",
+        )
+    )
+
+    assert history.get_openai_format() == [
+        {"role": "user", "content": "Sick content here"}
+    ]

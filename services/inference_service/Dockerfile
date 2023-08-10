@@ -17,6 +17,6 @@ EXPOSE 443
 EXPOSE 8080
 
 
-ENV GRPC_VERBOSITY=debug
+#ENV GRPC_VERBOSITY=debug
 
 CMD ["python", "-u", "inference_service/server/inference_service_server.py"]

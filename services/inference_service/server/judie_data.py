@@ -16,10 +16,10 @@ class ChatTurn:
 
 
 class History:
-    chat_list: List[ChatTurn]
+    chat_turns_list: List[ChatTurn]
 
     def __init__(self):
-        self.chat_list = []
+        self.chat_turns_list = []
 
     def add_turn(self, turn: ChatTurn) -> None:
         """
@@ -28,18 +28,21 @@ class History:
         :param turn: New turn to append to history
         :return:
         """
-        self.chat_list.append(turn)
+        self.chat_turns_list.append(turn)
 
     def get_last_user_message(self) -> Optional[str]:
         i = 1
-        while i <= len(self.chat_list):
-            if self.chat_list[-1 * i].role == Role.USER:
-                return self.chat_list[-1 * i].content
+        while i <= len(self.chat_turns_list):
+            if self.chat_turns_list[-1 * i].role == Role.USER:
+                return self.chat_turns_list[-1 * i].content
             i += 1
         return None
 
     def get_openai_format(self) -> List[Dict]:
-        raise NotImplementedError
+        openai_fmt_list = []
+        for turn in self.chat_turns_list:
+            openai_fmt_list.append({"role": turn.role.value, "content": turn.content})
+        return openai_fmt_list
 
 
 @dataclass
