@@ -72,20 +72,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     queryFn: () => getChatByIdQuery(chatId as string),
   });
   const renderedMessages = useMemo(() => {
-    if (existingChatQuery.isLoading) {
-      return (
-        <Flex
-          style={{
-            height: "100%",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Spinner colorScheme="blue.400" />
-        </Flex>
-      );
-    }
     let newMessages: UIMessageType[] = messages;
     if (streaming && beingStreamedChatId === chatId) {
       if (tempUserMessage && tempUserMessageChatId === chatId) {
@@ -177,6 +163,18 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
             <SubjectSelector width={"100%"} selectSubject={submitSubject} />
           </VStack>
         )
+      ) : existingChatQuery.isLoading ? (
+        <Flex
+          style={{
+            height: "100%",
+            width: "100%",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Spinner colorScheme="blue.400" />
+        </Flex>
       ) : (
         <ScrollContainer>
           {renderedMessages}
