@@ -61,3 +61,14 @@ export const getInvitesForRoom = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const deleteRoomById = async ({ id }: { id: string }) => {
+  return await dbClient.room.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+};
