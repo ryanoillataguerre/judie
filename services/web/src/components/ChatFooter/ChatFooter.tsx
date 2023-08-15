@@ -106,7 +106,7 @@ const RecordButton = ({
       stopRecording();
     }
   }, [recordingTime]);
-
+  const micColor = useColorModeValue("black", "white");
   const buttonContent = useMemo(() => {
     if (isRecording) {
       return (
@@ -135,7 +135,7 @@ const RecordButton = ({
     if (transcribeMutation.isLoading) {
       return <Spinner color={"teal.300"} size={"sm"} />;
     }
-    return <BiSolidMicrophone fill={"white"} size={18} />;
+    return <BiSolidMicrophone fill={micColor} size={18} />;
   }, [isRecording, transcribeMutation.isLoading]);
 
   return (
