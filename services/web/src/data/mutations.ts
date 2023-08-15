@@ -355,3 +355,11 @@ export const createMessageNarration = async ({
   });
   return response.data;
 };
+
+export const deleteRoomMutation = async ({ roomId }: { roomId: string }) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${roomId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};

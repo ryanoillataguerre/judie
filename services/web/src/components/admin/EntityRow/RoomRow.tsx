@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 
 const RoomRow = ({ room }: { room: Room }) => {
   const router = useRouter();
+
   return (
     <Button
       variant={"outline"}

@@ -1,4 +1,5 @@
 import {
+  Button,
   Table,
   TableContainer,
   Tbody,
@@ -10,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Room } from "@judie/data/types/api";
 import { useRouter } from "next/router";
+import { FaTrashAlt } from "react-icons/fa";
 
 const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
   const router = useRouter();
@@ -39,6 +41,11 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
               }}
             >
               <Td>{room.name}</Td>
+              <Td>
+                <Button>
+                  <FaTrashAlt size={16} />
+                </Button>
+              </Td>
             </Tr>
           ))}
         </Tbody>

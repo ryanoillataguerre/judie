@@ -1,12 +1,14 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import {
+  errorPassthrough,
   handleValidationErrors,
   requireAuth,
   requireJudieAuth,
 } from "../utils/express.js";
 import {
   createRoom,
+  deleteRoomById,
   getInvitesForRoom,
   getRoomById,
   getUsersForRoom,
@@ -18,6 +20,7 @@ import {
 } from "../admin/service.js";
 import { createPermission } from "../permissions/service.js";
 import { PermissionType } from "@prisma/client";
+import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const router = Router();
 
@@ -29,7 +32,7 @@ router.post(
     body("schoolId").isString().optional(),
   ],
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { name, schoolId, organizationId } = req.body;
     // Validate user has organization-level privileges
     if (schoolId) {
@@ -85,14 +88,14 @@ router.post(
     res.status(201).json({
       data: room,
     });
-  }
+  })
 );
 
 router.get(
   "/:roomId/users",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
     await validateRoomAdmin({
@@ -105,14 +108,14 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
 );
 
 router.get(
   "/:roomId",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
     await validateRoomAdmin({
@@ -125,14 +128,14 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
 );
 
 router.get(
   "/:roomId/invites",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
     await validateRoomAdmin({
@@ -145,7 +148,32 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
+);
+
+router.delete(
+  "/:roomId",
+  requireAuth,
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const roomId = req.params.roomId;
+    const room = await getRoomById({
+      id: roomId,
+    });
+    if (room?.schoolId) {
+      await validateSchoolAdmin({
+        userId: userId as string,
+        schoolId: room.schoolId,
+      });
+    } else {
+      throw new UnauthorizedError("User is not authorized to delete this room");
+    }
+    await deleteRoomById({
+      id: roomId,
+    });
+    res.status(204).send();
+  })
 );
 
 export default router;
