@@ -11,6 +11,7 @@ export const getUsersForSchool = async ({ id }: { id: string }) => {
   const permissionsWithUsers = await dbClient.permission.findMany({
     where: {
       schoolId: id,
+      deletedAt: null,
       userId: {
         not: null,
       },
@@ -51,6 +52,7 @@ export const getSchoolById = async ({ id }: { id: string }) => {
 export const getInvitesForSchool = async ({ id }: { id: string }) => {
   return await dbClient.invite.findMany({
     where: {
+      deletedAt: null,
       permissions: {
         some: {
           schoolId: id,

@@ -34,7 +34,11 @@ export const validateOrganizationAdmin = async ({
       id: userId,
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
   // God mode
@@ -75,7 +79,11 @@ export const validateSchoolAdmin = async ({
       id: userId,
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
   // God mode
@@ -118,7 +126,11 @@ export const validateRoomAdmin = async ({
       id: userId,
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
   // God mode
@@ -142,53 +154,6 @@ export const validateRoomAdmin = async ({
   }
   return;
 };
-
-// Necessary? If so, going to be a pain to implement efficiently
-// const validateUserViewability = async ({
-//   userId,
-//   targetUserId,
-// }: {
-//   userId: string;
-//   targetUserId: string;
-// }) => {
-//   const user = await dbClient.user.findUnique({
-//     where: {
-//       id: userId,
-//     },
-//     include: {
-//       permissions: true,
-//     },
-//   });
-//   const targetUser = await dbClient.user.findUnique({
-//     where: {
-//       id: targetUserId,
-//     },
-//     include: {
-//       permissions: true,
-//     },
-//   });
-//   if (!targetUser) {
-//     return;
-//   }
-//   // God mode
-//   if (user?.role === UserRole.JUDIE) {
-//     return;
-//   }
-//   // The gods are invisible
-//   if (targetUser.role === UserRole.JUDIE) {
-//     throw new UnauthorizedError(
-//       "You do not have permission to perform this action"
-//     );
-//   }
-
-//   // Return if:
-//   // Any of the user's permissions match the target user's permissions
-//   // If permission has only an organizationId, match on that
-//   // If permission has a schoolId, match on that
-//   // If permission has a roomId, match on that
-
-//   return;
-// };
 
 export const getUserAdmin = async (
   params: Prisma.UserWhereUniqueInput
@@ -246,6 +211,7 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
   const queryResults = await dbClient.permission.findMany({
     where: {
       userId: id,
+      deletedAt: null,
     },
     include: {
       organization: {
@@ -385,6 +351,7 @@ export const getUsersForAdminUser = async ({ id }: { id: string }) => {
     where: {
       permissions: {
         some: {
+          deletedAt: null,
           OR: [
             {
               roomId: {
