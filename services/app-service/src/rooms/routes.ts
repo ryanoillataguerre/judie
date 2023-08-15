@@ -172,7 +172,11 @@ router.delete(
     await deleteRoomById({
       id: roomId,
     });
-    res.status(204).send();
+    res.status(200).send({
+      data: {
+        success: true,
+      },
+    });
   })
 );
 

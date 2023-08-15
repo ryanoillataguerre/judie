@@ -217,15 +217,26 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
       organization: {
         include: {
           schools: {
+            where: {
+              deletedAt: null,
+            },
             include: {
-              rooms: true,
+              rooms: {
+                where: {
+                  deletedAt: null,
+                },
+              },
             },
           },
         },
       },
       school: {
         include: {
-          rooms: true,
+          rooms: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
       room: true,
@@ -245,7 +256,8 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
     if (
       permission.type === PermissionType.ORG_ADMIN &&
       permission.organization?.id &&
-      !organizationIdMap[permission.organization.id]
+      !organizationIdMap[permission.organization.id] &&
+      !permission.organization.deletedAt
     ) {
       acc.push(permission.organization);
       organizationIdMap[permission.organization.id] = true;
@@ -258,7 +270,8 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
     if (
       permission.type === PermissionType.SCHOOL_ADMIN &&
       permission.school?.id &&
-      !schoolIdMap[permission.school.id]
+      !schoolIdMap[permission.school.id] &&
+      !permission.school.deletedAt
     ) {
       acc.push(permission.school);
       schoolIdMap[permission.school.id] = true;
@@ -271,7 +284,8 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
     if (
       permission.type === PermissionType.ROOM_ADMIN &&
       permission.room?.id &&
-      !roomIdMap[permission.room.id]
+      !roomIdMap[permission.room.id] &&
+      !permission.room.deletedAt
     ) {
       acc.push(permission.room);
       roomIdMap[permission.room.id] = true;
@@ -304,9 +318,17 @@ export const getEntitiesForUser = async ({ id }: { id: string }) => {
   } = {
     organizations: organizationsFormatted,
     schools: schoolsFormatted.filter(
-      (school) => school?.id && !organizationSchoolIds.includes(school.id)
+      (school) =>
+        school?.id &&
+        !organizationSchoolIds.includes(school.id) &&
+        !school?.deletedAt
     ),
-    rooms: roomsFormatted,
+    rooms: roomsFormatted.filter(
+      (room) =>
+        room?.id &&
+        // !schoolRoomIds.includes(room.id) &&
+        !room?.deletedAt
+    ),
   };
 
   return formattedResults;

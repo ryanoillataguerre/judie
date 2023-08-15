@@ -53,11 +53,6 @@ const AdminRoom = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
-      {/* <DeleteRoomModal
-        roomId={roomData?.id}
-        isOpen={isDeleteOpen}
-        setIsOpen={setIsDeleteOpen}
-      /> */}
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
@@ -71,9 +66,6 @@ const AdminRoom = ({ id }: { id: string }) => {
         >
           {roomData?.name}
         </Text>
-        <Button variant={"outline"} colorScheme="red">
-          Delete Room
-        </Button>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

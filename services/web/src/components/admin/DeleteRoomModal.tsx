@@ -1,30 +1,17 @@
 import {
-  Flex,
-  FormControl,
-  FormLabel,
+  Button,
   HStack,
-  Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
-import {
-  createSchoolMutation,
-  deleteRoomMutation,
-} from "@judie/data/mutations";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { deleteRoomMutation } from "@judie/data/mutations";
+import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
-import Button from "../Button/Button";
-import { GET_ORG_BY_ID, getOrgByIdQuery } from "@judie/data/queries";
-import useAuth from "@judie/hooks/useAuth";
-
-interface SubmitData {
-  name: string;
-  address?: string;
-}
+import { GET_SCHOOL_BY_ID, getSchoolByIdQuery } from "@judie/data/queries";
+import { useRouter } from "next/router";
 
 const DeleteRoomModal = ({
   isOpen,
@@ -36,10 +23,18 @@ const DeleteRoomModal = ({
   roomId: string;
 }) => {
   const [success, setSuccess] = useState(false);
+  const schoolId = useRouter().query?.schoolId as string;
+  const { refetch } = useQuery({
+    queryKey: [GET_SCHOOL_BY_ID, schoolId],
+    queryFn: () => getSchoolByIdQuery(schoolId),
+    enabled: !!schoolId,
+  });
   const deleteRoom = useMutation({
     mutationFn: deleteRoomMutation,
     onSuccess: () => {
       setSuccess(true);
+      refetch();
+      onClose();
     },
   });
 
@@ -70,11 +65,11 @@ const DeleteRoomModal = ({
           >
             <Button onClick={onClose}>Cancel</Button>
             <Button
-              onClick={() => {
+              onClick={() =>
                 deleteRoom.mutate({
                   roomId,
-                });
-              }}
+                })
+              }
               isLoading={deleteRoom.isLoading}
               colorScheme="red"
               mr={4}
