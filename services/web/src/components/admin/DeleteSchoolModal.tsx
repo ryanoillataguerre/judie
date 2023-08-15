@@ -16,9 +16,12 @@ import { useMutation, useQuery } from "react-query";
 import {
   GET_ORG_BY_ID,
   GET_SCHOOL_BY_ID,
+  GET_USER_ENTITIES,
   getSchoolByIdQuery,
+  getUserEntitiesQuery,
 } from "@judie/data/queries";
 import { useRouter } from "next/router";
+import useAuth from "@judie/hooks/useAuth";
 
 const DeleteSchoolModal = ({
   isOpen,
@@ -29,6 +32,7 @@ const DeleteSchoolModal = ({
   onClose: () => void;
   schoolId: string;
 }) => {
+  const { userData } = useAuth();
   const [success, setSuccess] = useState(false);
   const organizationId = useRouter().query?.organizationId as string;
   const { refetch } = useQuery({
@@ -36,11 +40,18 @@ const DeleteSchoolModal = ({
     queryFn: () => getSchoolByIdQuery(organizationId),
     enabled: !!organizationId,
   });
+  const { refetch: refreshEntities } = useQuery({
+    queryKey: [GET_USER_ENTITIES, userData?.id],
+    queryFn: getUserEntitiesQuery,
+    enabled: false,
+  });
+
   const deleteSchool = useMutation({
     mutationFn: deleteSchoolMutation,
     onSuccess: () => {
       setSuccess(true);
       refetch();
+      refreshEntities();
       onClose();
     },
   });

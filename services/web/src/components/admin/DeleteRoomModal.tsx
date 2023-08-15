@@ -10,8 +10,14 @@ import {
 import { deleteRoomMutation } from "@judie/data/mutations";
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
-import { GET_SCHOOL_BY_ID, getSchoolByIdQuery } from "@judie/data/queries";
+import {
+  GET_SCHOOL_BY_ID,
+  GET_USER_ENTITIES,
+  getSchoolByIdQuery,
+  getUserEntitiesQuery,
+} from "@judie/data/queries";
 import { useRouter } from "next/router";
+import useAuth from "@judie/hooks/useAuth";
 
 const DeleteRoomModal = ({
   isOpen,
@@ -22,6 +28,7 @@ const DeleteRoomModal = ({
   onClose: () => void;
   roomId: string;
 }) => {
+  const { userData } = useAuth();
   const [success, setSuccess] = useState(false);
   const schoolId = useRouter().query?.schoolId as string;
   const { refetch } = useQuery({
@@ -29,11 +36,18 @@ const DeleteRoomModal = ({
     queryFn: () => getSchoolByIdQuery(schoolId),
     enabled: !!schoolId,
   });
+  const { refetch: refreshEntities } = useQuery({
+    queryKey: [GET_USER_ENTITIES, userData?.id],
+    queryFn: getUserEntitiesQuery,
+    enabled: false,
+  });
+
   const deleteRoom = useMutation({
     mutationFn: deleteRoomMutation,
     onSuccess: () => {
       setSuccess(true);
       refetch();
+      refreshEntities();
       onClose();
     },
   });
