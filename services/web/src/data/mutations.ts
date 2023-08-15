@@ -363,3 +363,15 @@ export const deleteRoomMutation = async ({ roomId }: { roomId: string }) => {
   });
   return response.data;
 };
+
+export const deleteSchoolMutation = async ({
+  schoolId,
+}: {
+  schoolId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/${schoolId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
