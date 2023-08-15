@@ -150,7 +150,9 @@ router.delete(
         organizationId: school.organizationId,
       });
     } else {
-      throw new UnauthorizedError("User is not authorized to delete this room");
+      throw new UnauthorizedError(
+        "User is not authorized to delete this school"
+      );
     }
     await deleteSchoolById({
       id: schoolId,
