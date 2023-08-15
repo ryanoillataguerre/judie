@@ -12,6 +12,7 @@ export const getUsersForRoom = async ({ id }: { id: string }) => {
       userId: {
         not: null,
       },
+      deletedAt: null,
     },
     include: {
       user: {
@@ -51,6 +52,7 @@ export const getInvitesForRoom = async ({ id }: { id: string }) => {
       permissions: {
         some: {
           roomId: id,
+          deletedAt: null,
         },
       },
     },
