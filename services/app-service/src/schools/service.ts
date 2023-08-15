@@ -68,3 +68,14 @@ export const getInvitesForSchool = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const deleteSchoolById = async ({ id }: { id: string }) => {
+  return await dbClient.school.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+};
