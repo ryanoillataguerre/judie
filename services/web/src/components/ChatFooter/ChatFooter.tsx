@@ -107,6 +107,10 @@ const RecordButton = ({
     }
   }, [recordingTime]);
 
+<<<<<<< Updated upstream
+=======
+  const micColor = useColorModeValue("black", "white");
+>>>>>>> Stashed changes
   const buttonContent = useMemo(() => {
     if (isRecording) {
       return (
