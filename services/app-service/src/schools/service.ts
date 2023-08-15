@@ -43,7 +43,11 @@ export const getSchoolById = async ({ id }: { id: string }) => {
       id,
     },
     include: {
-      rooms: true,
+      rooms: {
+        where: {
+          deletedAt: null,
+        },
+      },
       users: true,
     },
   });
