@@ -259,3 +259,20 @@ export const handleSubscriptionCreated = async (
   };
   await createSubscription(subscriptionData);
 };
+
+export const handleSubscriptionCancelled = async (
+  subscription: Stripe.Subscription
+) => {
+  if (subscription.cancel_at) {
+    const subscriptionId = subscription.id;
+    const subscriptionData: Prisma.SubscriptionUpdateInput = {
+      canceledAt: new Date(subscription.cancel_at),
+    };
+    await dbClient.subscription.update({
+      where: {
+        stripeId: subscriptionId,
+      },
+      data: subscriptionData,
+    });
+  }
+};

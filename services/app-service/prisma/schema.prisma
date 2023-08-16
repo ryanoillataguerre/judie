@@ -68,7 +68,7 @@ model Subscription {
   userId                     String             @unique @map("user_id")
   status                     SubscriptionStatus
   type                       SubscriptionType
-  stripeId                   String?            @map("stripe_id")
+  stripeId                   String?            @unique @map("stripe_id")
   appleTransactionId         String?            @map("apple_transaction_id")
   originalAppleTransactionId String?            @map("original_apple_transaction_id")
   canceledAt                 DateTime?          @map("canceled_at")
