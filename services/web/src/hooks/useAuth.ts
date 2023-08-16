@@ -114,7 +114,7 @@ export default function useAuth({
     isLoading: entitiesLoading,
     refetch: refreshEntities,
   } = useQuery({
-    queryKey: [GET_USER_ENTITIES, sessionCookie],
+    queryKey: [GET_USER_ENTITIES, userData?.id],
     queryFn: getUserEntitiesQuery,
     enabled: !!isAdmin,
     retry(failureCount, error) {

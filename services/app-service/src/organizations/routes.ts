@@ -10,6 +10,7 @@ import {
   getInvitesForOrganization,
   getOrganizationById,
   getUsersForOrganization,
+  updateOrganization,
 } from "./service.js";
 import { validateOrganizationAdmin } from "../admin/service.js";
 import { PermissionType } from "@prisma/client";
@@ -99,6 +100,31 @@ router.post(
       });
       await sendInviteEmail({ invite: newInvite });
     }
+
+    res.status(201).json({
+      data: organization,
+    });
+  }
+);
+
+router.put(
+  "/:organizationId",
+  [body("name").isString().exists()],
+  // Only Judie employees can create organizations
+  requireJudieAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { name } = req.body;
+    const { userId } = req.session;
+
+    await validateOrganizationAdmin({
+      userId: userId as string,
+      organizationId: req.params.organizationId,
+    });
+
+    const organization = await updateOrganization(req.params.organizationId, {
+      name,
+    });
 
     res.status(201).json({
       data: organization,

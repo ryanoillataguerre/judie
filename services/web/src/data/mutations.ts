@@ -355,3 +355,38 @@ export const createMessageNarration = async ({
   });
   return response.data;
 };
+
+export const deleteRoomMutation = async ({ roomId }: { roomId: string }) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${roomId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
+export const deleteSchoolMutation = async ({
+  schoolId,
+}: {
+  schoolId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/${schoolId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
+export const putOrgMutation = async ({
+  organizationId,
+  name,
+}: {
+  organizationId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/organizations/${organizationId}`,
+    method: "PUT",
+    body: { name },
+  });
+  return response.data;
+};

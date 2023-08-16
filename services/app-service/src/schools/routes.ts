@@ -8,6 +8,7 @@ import {
 } from "../utils/express.js";
 import {
   createSchool,
+  deleteSchoolById,
   getInvitesForSchool,
   getSchoolById,
   getUsersForSchool,
@@ -18,6 +19,7 @@ import {
 } from "../admin/service.js";
 import { createPermission } from "../permissions/service.js";
 import { PermissionType } from "@prisma/client";
+import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const router = Router();
 
@@ -128,6 +130,37 @@ router.get(
     });
     res.status(200).send({
       data: users,
+    });
+  })
+);
+
+router.delete(
+  "/:schoolId",
+  requireAuth,
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const schoolId = req.params.schoolId;
+    const school = await getSchoolById({
+      id: schoolId,
+    });
+    if (school?.organizationId) {
+      await validateOrganizationAdmin({
+        userId: userId as string,
+        organizationId: school.organizationId,
+      });
+    } else {
+      throw new UnauthorizedError(
+        "User is not authorized to delete this school"
+      );
+    }
+    await deleteSchoolById({
+      id: schoolId,
+    });
+    res.status(200).send({
+      data: {
+        success: true,
+      },
     });
   })
 );
