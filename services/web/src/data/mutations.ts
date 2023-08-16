@@ -375,3 +375,18 @@ export const deleteSchoolMutation = async ({
   });
   return response.data;
 };
+
+export const putOrgMutation = async ({
+  organizationId,
+  name,
+}: {
+  organizationId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/organizations/${organizationId}`,
+    method: "PUT",
+    body: { name },
+  });
+  return response.data;
+};

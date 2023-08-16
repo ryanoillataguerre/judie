@@ -18,7 +18,7 @@ import {
   getOrgByIdQuery,
   getUsersForOrgQuery,
 } from "@judie/data/queries";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import CreateSchoolModal from "../CreateSchoolModal";
@@ -26,9 +26,11 @@ import SchoolsTable from "../tables/SchoolsTable";
 import RoomsTable from "../tables/RoomsTable";
 import UsersTable from "../tables/UsersTable";
 import InvitesTable from "../tables/InvitesTable";
+import EditableTitle from "../EditableTitle";
+import { putOrgMutation } from "@judie/data/mutations";
 
 const AdminOrganization = ({ id }: { id: string }) => {
-  const { data: organizationData } = useQuery({
+  const { data: organizationData, refetch: refetchOrg } = useQuery({
     queryKey: [GET_ORG_BY_ID, id],
     queryFn: () => getOrgByIdQuery(id),
     enabled: !!id,
@@ -44,6 +46,13 @@ const AdminOrganization = ({ id }: { id: string }) => {
     queryKey: [GET_INVITES_FOR_ORG, id],
     queryFn: () => getInvitesForOrgQuery(id),
     enabled: !!id,
+  });
+
+  const editOrgMutation = useMutation({
+    mutationFn: putOrgMutation,
+    onSuccess: () => {
+      refetchOrg();
+    },
   });
 
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
@@ -71,13 +80,22 @@ const AdminOrganization = ({ id }: { id: string }) => {
         paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        <Text
+        <EditableTitle
+          title={organizationData?.name as string}
+          onChange={(value) => {
+            editOrgMutation.mutate({
+              organizationId: organizationData?.id as string,
+              name: value,
+            });
+          }}
+        />
+        {/* <Text
           style={{
             fontSize: "2rem",
           }}
         >
           {organizationData?.name}
-        </Text>
+        </Text> */}
         <Button
           size={"sm"}
           variant={"solid"}

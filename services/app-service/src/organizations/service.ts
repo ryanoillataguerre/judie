@@ -66,3 +66,16 @@ export const getInvitesForOrganization = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const updateOrganization = async (
+  organizationId: string,
+  params: Prisma.OrganizationUpdateInput
+) => {
+  const newOrg = await dbClient.organization.update({
+    where: {
+      id: organizationId,
+    },
+    data: params,
+  });
+  return newOrg;
+};
