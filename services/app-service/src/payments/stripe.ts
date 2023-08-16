@@ -1,6 +1,10 @@
 import Stripe from "stripe";
 import { User } from "@prisma/client";
-import { createCustomer, handleSubscriptionCreated } from "./service.js";
+import {
+  createCustomer,
+  handleSubscriptionCreated,
+  handleSubscriptionDeleted,
+} from "./service.js";
 import { getUser } from "../users/service.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
@@ -63,6 +67,9 @@ export const handleStripeWebhookEvents = async (
           case "customer.subscription.deleted":
             console.info("customer.subscription.deleted");
             console.info(event.data);
+            await handleSubscriptionDeleted(
+              event.data.object as Stripe.Subscription
+            );
             break;
           case "checkout.session.completed":
             console.info("checkout.session.completed");
