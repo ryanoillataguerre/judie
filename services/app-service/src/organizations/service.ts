@@ -16,7 +16,6 @@ export const getUsersForOrganization = async ({ id }: { id: string }) => {
       userId: {
         not: null,
       },
-      deletedAt: null,
     },
     include: {
       user: {
@@ -59,23 +58,9 @@ export const getInvitesForOrganization = async ({ id }: { id: string }) => {
           organizationId: id,
         },
       },
-      deletedAt: null,
     },
     include: {
       permissions: true,
     },
   });
-};
-
-export const updateOrganization = async (
-  organizationId: string,
-  params: Prisma.OrganizationUpdateInput
-) => {
-  const newOrg = await dbClient.organization.update({
-    where: {
-      id: organizationId,
-    },
-    data: params,
-  });
-  return newOrg;
 };

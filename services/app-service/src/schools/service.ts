@@ -11,7 +11,6 @@ export const getUsersForSchool = async ({ id }: { id: string }) => {
   const permissionsWithUsers = await dbClient.permission.findMany({
     where: {
       schoolId: id,
-      deletedAt: null,
       userId: {
         not: null,
       },
@@ -43,11 +42,7 @@ export const getSchoolById = async ({ id }: { id: string }) => {
       id,
     },
     include: {
-      rooms: {
-        where: {
-          deletedAt: null,
-        },
-      },
+      rooms: true,
       users: true,
     },
   });
@@ -56,7 +51,6 @@ export const getSchoolById = async ({ id }: { id: string }) => {
 export const getInvitesForSchool = async ({ id }: { id: string }) => {
   return await dbClient.invite.findMany({
     where: {
-      deletedAt: null,
       permissions: {
         some: {
           schoolId: id,
@@ -65,17 +59,6 @@ export const getInvitesForSchool = async ({ id }: { id: string }) => {
     },
     include: {
       permissions: true,
-    },
-  });
-};
-
-export const deleteSchoolById = async ({ id }: { id: string }) => {
-  return await dbClient.school.update({
-    where: {
-      id,
-    },
-    data: {
-      deletedAt: new Date(),
     },
   });
 };

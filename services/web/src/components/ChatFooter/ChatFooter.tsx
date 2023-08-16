@@ -106,9 +106,7 @@ const RecordButton = ({
       stopRecording();
     }
   }, [recordingTime]);
-
   const micColor = useColorModeValue("black", "white");
-
   const buttonContent = useMemo(() => {
     if (isRecording) {
       return (
