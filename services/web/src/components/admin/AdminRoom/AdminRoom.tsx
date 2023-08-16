@@ -1,6 +1,4 @@
 import {
-  Button,
-  HStack,
   Tab,
   TabIndicator,
   TabList,
@@ -22,8 +20,6 @@ import { useQuery } from "react-query";
 import UsersTable from "../tables/UsersTable";
 import { Invite, User } from "@judie/data/types/api";
 import InvitesTable from "../tables/InvitesTable";
-import { useState } from "react";
-import DeleteRoomModal from "../DeleteRoomModal";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData } = useQuery({
@@ -53,20 +49,14 @@ const AdminRoom = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
-      <HStack
-        alignItems={"center"}
-        justifyContent={"space-between"}
-        width={"100%"}
+      <Text
+        style={{
+          marginTop: "2rem",
+          fontSize: "2rem",
+        }}
       >
-        <Text
-          style={{
-            marginTop: "2rem",
-            fontSize: "2rem",
-          }}
-        >
-          {roomData?.name}
-        </Text>
-      </HStack>
+        {roomData?.name}
+      </Text>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {roomUserData?.length ? <Tab>Users</Tab> : null}

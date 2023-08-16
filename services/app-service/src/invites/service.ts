@@ -24,9 +24,6 @@ export const validateInviteRights = async ({
     where: { id: userId },
     include: {
       permissions: {
-        where: {
-          deletedAt: null,
-        },
         include: {
           organization: {
             include: {
@@ -166,7 +163,7 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
       permissions: true,
     },
   });
-  if (!invite || invite.deletedAt) {
+  if (!invite) {
     throw new UnauthorizedError("Invite not found - it may have expired.");
   }
 

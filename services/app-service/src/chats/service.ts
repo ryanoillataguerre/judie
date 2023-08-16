@@ -97,9 +97,7 @@ export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
 
 export const getChatInternal = async (params: Prisma.ChatWhereUniqueInput) => {
   const chat = await dbClient.chat.findUnique({
-    where: {
-      ...params,
-    },
+    where: params,
     include: {
       messages: {
         orderBy: {
