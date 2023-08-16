@@ -6,7 +6,13 @@ import {
   updateUser,
   verifyUserEmail,
 } from "./service.js";
-import { Chat, Message, Subscription, User } from "@prisma/client";
+import {
+  Chat,
+  Message,
+  Subscription,
+  SubscriptionStatus,
+  User,
+} from "@prisma/client";
 import { body } from "express-validator";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import { createStripeBillingPortalSession } from "../payments/stripe.js";
@@ -70,6 +76,24 @@ router.get(
           subscription: true,
         }
       );
+      // TODO: Create a job to turn subs with a canceledAt in the past into canceled subs
+      if (
+        user?.subscription?.canceledAt &&
+        new Date(user?.subscription?.canceledAt).getTime() <
+          new Date().getTime() &&
+        user?.subscription?.status !== SubscriptionStatus.CANCELED
+      ) {
+        const newUser = await updateUser(user.id, {
+          subscription: {
+            update: {
+              status: SubscriptionStatus.CANCELED,
+            },
+          },
+        });
+        return res.status(200).send({
+          data: transformUser(newUser),
+        });
+      }
       res.status(200).send({
         data: transformUser(user),
       });
