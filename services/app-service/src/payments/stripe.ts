@@ -3,7 +3,7 @@ import { User } from "@prisma/client";
 import {
   createCustomer,
   handleSubscriptionCreated,
-  handleSubscriptionDeleted,
+  handleSubscriptionCancelled,
 } from "./service.js";
 import { getUser } from "../users/service.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -64,7 +64,7 @@ export const handleStripeWebhookEvents = async (
             const canceled = !!(event.data.object as Stripe.Subscription)
               ?.canceled_at;
             if (canceled) {
-              await handleSubscriptionDeleted(
+              await handleSubscriptionCancelled(
                 event.data.object as Stripe.Subscription
               );
             }

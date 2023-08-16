@@ -260,7 +260,7 @@ export const handleSubscriptionCreated = async (
   await createSubscription(subscriptionData);
 };
 
-export const handleSubscriptionDeleted = async (
+export const handleSubscriptionCancelled = async (
   subscription: Stripe.Subscription
 ) => {
   if (subscription.cancel_at) {
