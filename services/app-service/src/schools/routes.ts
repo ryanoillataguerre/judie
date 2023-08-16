@@ -4,7 +4,6 @@ import {
   errorPassthrough,
   handleValidationErrors,
   requireAuth,
-  requireJudieAuth,
 } from "../utils/express.js";
 import {
   createSchool,

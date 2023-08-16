@@ -396,3 +396,18 @@ export const putSchoolMutation = async ({
   });
   return response.data;
 };
+
+export const putRoomMutation = async ({
+  roomId,
+  name,
+}: {
+  roomId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${roomId}`,
+    method: "PUT",
+    body: { name },
+  });
+  return response.data;
+};

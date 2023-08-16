@@ -1,5 +1,4 @@
 import {
-  Button,
   HStack,
   Tab,
   TabIndicator,
@@ -7,7 +6,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   VStack,
 } from "@chakra-ui/react";
 import {
@@ -18,15 +16,15 @@ import {
   getRoomByIdQuery,
   getUsersForRoomQuery,
 } from "@judie/data/queries";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import UsersTable from "../tables/UsersTable";
 import { Invite, User } from "@judie/data/types/api";
 import InvitesTable from "../tables/InvitesTable";
-import { useState } from "react";
-import DeleteRoomModal from "../DeleteRoomModal";
+import { putRoomMutation } from "@judie/data/mutations";
+import EditableTitle from "../EditableTitle";
 
 const AdminRoom = ({ id }: { id: string }) => {
-  const { data: roomData } = useQuery({
+  const { data: roomData, refetch: refetchRoom } = useQuery({
     queryKey: [GET_ROOM_BY_ID, id],
     queryFn: () => getRoomByIdQuery(id),
     enabled: !!id,
@@ -40,6 +38,13 @@ const AdminRoom = ({ id }: { id: string }) => {
     queryKey: [GET_INVITES_FOR_ROOM, id],
     queryFn: () => getInvitesForRoomQuery(id),
     enabled: !!id,
+  });
+
+  const editRoomMutation = useMutation({
+    mutationFn: putRoomMutation,
+    onSuccess: () => {
+      refetchRoom();
+    },
   });
 
   return (
@@ -58,14 +63,15 @@ const AdminRoom = ({ id }: { id: string }) => {
         justifyContent={"space-between"}
         width={"100%"}
       >
-        <Text
-          style={{
-            marginTop: "2rem",
-            fontSize: "2rem",
+        <EditableTitle
+          title={roomData?.name as string}
+          onChange={(value) => {
+            editRoomMutation.mutate({
+              roomId: roomData?.id as string,
+              name: value,
+            });
           }}
-        >
-          {roomData?.name}
-        </Text>
+        />
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

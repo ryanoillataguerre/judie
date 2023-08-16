@@ -72,3 +72,16 @@ export const deleteRoomById = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const updateRoom = async (
+  roomId: string,
+  params: Prisma.RoomUpdateInput
+) => {
+  const newRoom = await dbClient.room.update({
+    where: {
+      id: roomId,
+    },
+    data: params,
+  });
+  return newRoom;
+};

@@ -4,7 +4,6 @@ import {
   errorPassthrough,
   handleValidationErrors,
   requireAuth,
-  requireJudieAuth,
 } from "../utils/express.js";
 import {
   createRoom,
@@ -12,12 +11,9 @@ import {
   getInvitesForRoom,
   getRoomById,
   getUsersForRoom,
+  updateRoom,
 } from "./service.js";
-import {
-  validateOrganizationAdmin,
-  validateRoomAdmin,
-  validateSchoolAdmin,
-} from "../admin/service.js";
+import { validateRoomAdmin, validateSchoolAdmin } from "../admin/service.js";
 import { createPermission } from "../permissions/service.js";
 import { PermissionType } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -178,6 +174,30 @@ router.delete(
       },
     });
   })
+);
+
+router.put(
+  "/:roomId",
+  [body("name").isString().exists()],
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { name } = req.body;
+    const { userId } = req.session;
+
+    await validateRoomAdmin({
+      userId: userId as string,
+      roomId: req.params.roomId,
+    });
+
+    const school = await updateRoom(req.params.roomId, {
+      name,
+    });
+
+    res.status(201).json({
+      data: school,
+    });
+  }
 );
 
 export default router;
