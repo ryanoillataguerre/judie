@@ -3,6 +3,7 @@ import openai
 from dotenv import load_dotenv
 import os
 from inference_service.openai_manager import openai_manager
+import inference_service.server.judie_data
 
 
 @pytest.fixture
@@ -54,4 +55,16 @@ def test_math_expressions(env_setup):
 
 
 def test_comprehension(env_setup):
-    assert False
+    history = inference_service.server.judie_data.History()
+    history.add_turn(
+        inference_service.server.judie_data.ChatTurn(
+            role=inference_service.server.judie_data.Role.USER,
+            content="Sick content here",
+        )
+    )
+    sesh = inference_service.server.judie_data.SessionConfig(
+        history=history, subject=""
+    )
+    comp_score = openai_manager.comprehension_score(session_config=sesh)
+
+    assert comp_score in [i for i in range(11)]

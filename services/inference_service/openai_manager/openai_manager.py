@@ -66,13 +66,15 @@ def identify_math_exp(message: str) -> str:
 
 
 def comprehension_score(session_config: SessionConfig) -> Optional[int]:
+    print(session_config.history.get_openai_format()[-5:])
     prompt = [
         {
             "role": "system",
             "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversationand subject material given their last response or question.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
         },
-    ].extend(session_config.history.get_openai_format()[-5:])
+    ] + session_config.history.get_openai_format()[-5:]
     # arbitrarily use last five messages as conversation window
+    print(prompt)
 
     comp_score = get_gpt_response(
         messages=prompt,

@@ -47,5 +47,5 @@ class History:
 
 @dataclass
 class SessionConfig:
-    # history: History
+    history: History
     subject: Optional[str] = None
