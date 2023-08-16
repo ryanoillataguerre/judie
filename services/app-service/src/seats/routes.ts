@@ -16,7 +16,7 @@ router.put(
     body("organizationId").isString().optional(),
     body("schoolId").isString().optional(),
   ],
-  // Only Judie employees can create organizations
+  // Only Judie employees can edit seats
   requireJudieAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {

@@ -1,15 +1,6 @@
-import {
-  InviteRow,
-  InviteSheetRole,
-} from "@judie/components/admin/InviteModal";
+import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch, baseFetchFormData } from "./baseFetch";
-import {
-  Chat,
-  GradeYear,
-  Message,
-  PermissionType,
-  UserRole,
-} from "./types/api";
+import { GradeYear, Message, PermissionType, UserRole } from "./types/api";
 
 export interface ChatResponse {
   id: string;
@@ -385,6 +376,21 @@ export const putOrgMutation = async ({
 }) => {
   const response = await baseFetch({
     url: `/admin/organizations/${organizationId}`,
+    method: "PUT",
+    body: { name },
+  });
+  return response.data;
+};
+
+export const putSchoolMutation = async ({
+  schoolId,
+  name,
+}: {
+  schoolId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/${schoolId}`,
     method: "PUT",
     body: { name },
   });

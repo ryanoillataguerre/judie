@@ -12,6 +12,7 @@ import {
   getInvitesForSchool,
   getSchoolById,
   getUsersForSchool,
+  updateSchool,
 } from "./service.js";
 import {
   validateOrganizationAdmin,
@@ -163,6 +164,30 @@ router.delete(
       },
     });
   })
+);
+
+router.put(
+  "/:schoolId",
+  [body("name").isString().exists()],
+  requireAuth,
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
+    const { name } = req.body;
+    const { userId } = req.session;
+
+    await validateSchoolAdmin({
+      userId: userId as string,
+      schoolId: req.params.schoolId,
+    });
+
+    const school = await updateSchool(req.params.schoolId, {
+      name,
+    });
+
+    res.status(201).json({
+      data: school,
+    });
+  }
 );
 
 export default router;

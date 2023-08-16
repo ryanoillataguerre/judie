@@ -79,3 +79,16 @@ export const deleteSchoolById = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const updateSchool = async (
+  schoolId: string,
+  params: Prisma.SchoolUpdateInput
+) => {
+  const newSchool = await dbClient.school.update({
+    where: {
+      id: schoolId,
+    },
+    data: params,
+  });
+  return newSchool;
+};

@@ -110,8 +110,7 @@ router.post(
 router.put(
   "/:organizationId",
   [body("name").isString().exists()],
-  // Only Judie employees can create organizations
-  requireJudieAuth,
+  requireAuth,
   handleValidationErrors,
   async (req: Request, res: Response) => {
     const { name } = req.body;

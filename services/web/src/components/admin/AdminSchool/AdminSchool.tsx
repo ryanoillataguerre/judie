@@ -7,7 +7,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   VStack,
 } from "@chakra-ui/react";
 import {
@@ -18,20 +17,19 @@ import {
   getSchoolByIdQuery,
   getUsersForSchoolQuery,
 } from "@judie/data/queries";
-import { useQuery } from "react-query";
-import RoomRow from "../EntityRow/RoomRow";
+import { useMutation, useQuery } from "react-query";
 import { useState } from "react";
 import CreateRoomModal from "../CreateRoomModal";
 import { PlusSquareIcon } from "@chakra-ui/icons";
-import UserRow from "../EntityRow/UserRow";
-import InviteRow from "../EntityRow/InviteRow";
 import InvitesTable from "../tables/InvitesTable";
 import { Invite, Room, User } from "@judie/data/types/api";
 import UsersTable from "../tables/UsersTable";
 import RoomsTable from "../tables/RoomsTable";
+import EditableTitle from "../EditableTitle";
+import { putSchoolMutation } from "@judie/data/mutations";
 
 const AdminSchool = ({ id }: { id: string }) => {
-  const { data: schoolData } = useQuery({
+  const { data: schoolData, refetch: refetchSchool } = useQuery({
     queryKey: [GET_SCHOOL_BY_ID, id],
     queryFn: () => getSchoolByIdQuery(id),
     enabled: !!id,
@@ -49,6 +47,13 @@ const AdminSchool = ({ id }: { id: string }) => {
   });
 
   const [createRoomOpen, setCreateRoomOpen] = useState(false);
+
+  const editSchoolMutation = useMutation({
+    mutationFn: putSchoolMutation,
+    onSuccess: () => {
+      refetchSchool();
+    },
+  });
 
   return (
     <VStack
@@ -74,13 +79,16 @@ const AdminSchool = ({ id }: { id: string }) => {
         paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        <Text
-          style={{
-            fontSize: "2rem",
+        <EditableTitle
+          title={schoolData?.name as string}
+          onChange={(value) => {
+            editSchoolMutation.mutate({
+              schoolId: schoolData?.id as string,
+              name: value,
+            });
           }}
-        >
-          {schoolData?.name}
-        </Text>
+        />
+
         <Button
           size={"sm"}
           variant={"solid"}
