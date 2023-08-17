@@ -37,7 +37,7 @@ const AdminRoot = () => {
   const [displayCreateOrg, setDisplayCreateOrg] = useState(false);
   const [createOrgModalOpen, setCreateOrgModalOpen] = useState(false);
 
-  const { data: users } = useQuery({
+  const { data: users, isLoading } = useQuery({
     queryKey: [GET_USERS_FOR_ADMIN_USER, userData?.id],
     queryFn: getUsersForAdminUserQuery,
   });
@@ -107,7 +107,7 @@ const AdminRoot = () => {
             <RoomsTable rooms={rooms} />
           </TabPanel>
           <TabPanel>
-            <UsersTable users={users as User[]} />
+            <UsersTable users={users as User[]} loading={isLoading} />
           </TabPanel>
         </TabPanels>
         <TabIndicator />
