@@ -50,9 +50,6 @@ const UsersTable = ({
     }
     return users.slice(page * USER_PAGE_SIZE, (page + 1) * USER_PAGE_SIZE);
   }, [users, page]);
-  console.log(page);
-  console.log(totalPageCount);
-  console.log(totalPageCount - page === 0);
   return (
     <TableContainer>
       <Table variant={"simple"} size="md">
