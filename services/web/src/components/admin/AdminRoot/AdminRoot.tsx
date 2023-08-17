@@ -13,9 +13,6 @@ import {
 import { Organization, School, User, UserRole } from "@judie/data/types/api";
 import useAuth from "@judie/hooks/useAuth";
 import { useEffect, useState } from "react";
-import OrgRow from "../EntityRow/OrgRow";
-import SchoolRow from "../EntityRow/SchoolRow";
-import RoomRow from "../EntityRow/RoomRow";
 import useFlatAllEntities from "@judie/hooks/useFlatAllEntities";
 import { PlusSquareIcon } from "@chakra-ui/icons";
 import CreateOrgModal from "../CreateOrgModal";
@@ -24,7 +21,6 @@ import {
   GET_USERS_FOR_ADMIN_USER,
   getUsersForAdminUserQuery,
 } from "@judie/data/queries";
-import UserRow from "../EntityRow/UserRow";
 import OrganizationsTable from "../tables/OrganizationsTable";
 import SchoolsTable from "../tables/SchoolsTable";
 import RoomsTable from "../tables/RoomsTable";

@@ -411,3 +411,15 @@ export const putRoomMutation = async ({
   });
   return response.data;
 };
+
+export const resendInviteMutation = async ({
+  inviteId,
+}: {
+  inviteId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/invites/${inviteId}/resend`,
+    method: "POST",
+  });
+  return response.data;
+};
