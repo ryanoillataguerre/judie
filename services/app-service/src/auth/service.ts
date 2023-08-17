@@ -14,6 +14,7 @@ import {
 import {
   sendUserForgotPasswordEmail,
   sendVerificationEmail,
+  sendWelcomeEmail,
 } from "../cio/service.js";
 import { sessionStore } from "../utils/express.js";
 import { Environment, getEnv } from "../utils/env.js";
@@ -106,6 +107,7 @@ export const signup = async ({
     traits: transformUserForSegment(newUser, districtOrSchool),
   });
 
+  await sendWelcomeEmail({ user: newUser });
   await sendVerificationEmail({ user: newUser });
 
   return newUser;
