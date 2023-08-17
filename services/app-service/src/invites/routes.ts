@@ -10,6 +10,7 @@ import { BulkInviteBody, bulkInvite, invite, redeemInvite } from "./service.js";
 import dbClient from "../utils/prisma.js";
 import { signupValidation } from "../auth/routes.js";
 import { setUserSessionId } from "../auth/service.js";
+import { sendInviteEmail } from "../cio/service.js";
 
 const router = Router();
 
@@ -141,6 +142,7 @@ const bulkInviteValidation = [
 router.post(
   "/bulk",
   bulkInviteValidation,
+  requireAuth,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -153,6 +155,34 @@ router.post(
 
     res.status(201).send({
       data: invites,
+    });
+  })
+);
+
+router.post(
+  "/:inviteId/resend",
+  [param("inviteId").isString()],
+  requireAuth,
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    // Get invite by ID
+    const invite = await dbClient.invite.findUnique({
+      where: {
+        id: req.params.inviteId,
+      },
+    });
+    if (!invite) {
+      res.status(404).send({
+        error: "Invite not found",
+      });
+      return;
+    }
+    // Resend invite
+    await sendInviteEmail({
+      invite,
+    });
+    res.status(200).send({
+      data: invite,
     });
   })
 );
