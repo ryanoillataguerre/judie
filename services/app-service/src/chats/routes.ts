@@ -223,4 +223,26 @@ router.post(
   })
 );
 
+router.post(
+  "/:chatId/context/pdf",
+  requireAuth,
+  upload.single("file"),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const file = req.file;
+    if (file) {
+      console.log("got file");
+    }
+    // TODO: Get transcript of file
+    // TODO: Save to chat as system prompt?
+
+    res.status(200).send({
+      data: "chatgoeshere",
+    });
+  })
+);
+
 export default router;

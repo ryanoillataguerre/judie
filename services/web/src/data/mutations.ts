@@ -423,3 +423,17 @@ export const resendInviteMutation = async ({
   });
   return response.data;
 };
+
+export const uploadAssignmentMutation = async ({
+  chatId,
+  data,
+}: {
+  chatId: string;
+  data: FormData;
+}) => {
+  const response = await baseFetchFormData({
+    url: `/chat/${chatId}/context/pdf`,
+    form: data,
+  });
+  return response.data;
+};

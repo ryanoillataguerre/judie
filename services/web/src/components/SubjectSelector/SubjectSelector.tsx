@@ -2,6 +2,7 @@ import { Select, SelectProps } from "@chakra-ui/react";
 import { adminSubjects, subjects } from "../../data/static/subjects";
 import { useMemo } from "react";
 import useAuth from "@judie/hooks/useAuth";
+
 interface SubjectSelectorProps extends SelectProps {
   selectSubject: (subject: string) => void;
 }
