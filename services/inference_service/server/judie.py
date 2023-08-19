@@ -24,7 +24,7 @@ def yield_judie_response(
     :param app_db: Prisma manager for app DB connection
     :return: Generator of response chunk strings
     """
-    history = prisma_manager.get_chat_history(chat_id=chat_id, app_db=app_db)
+    history = config.history
 
     if history.last_msg_is_user():
         sys_prompt = prompt_generator.generate_question_answer_prompt(
