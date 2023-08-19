@@ -1,47 +1,52 @@
-import { createWorker } from "tesseract.js";
-import { fromBuffer } from "pdf2pic";
 import InternalError from "../utils/errors/InternalError.js";
-import { temporaryDirectory, temporaryFile } from "tempy";
-import { PDFDocument } from "pdf-lib";
-import { readFileSync, writeFileSync } from "fs";
-import { readFile, writeFile } from "fs/promises";
-
-const worker = await createWorker({
-  logger: (m) => console.log(m),
-});
+import { temporaryFile } from "tempy";
+import { writeFile } from "fs/promises";
+import PDFServicesSdk from "@adobe/pdfservices-node-sdk";
+import AdmZip from "adm-zip";
 
 export const extractTextFromPdf = async (file: Express.Multer.File) => {
   try {
     const tempPdfPath = temporaryFile();
-    const tempPngPath = temporaryDirectory();
-    // Write PDF to disk
+    const tempOutputZip = temporaryFile({ extension: "zip" });
     await writeFile(tempPdfPath, file.buffer);
-    // TODO: Go with Adobe - this shit sucks
-    // https://developer.adobe.com/document-services/docs/overview/pdf-services-api/howtos/ocr-pdf/
-    // const numPages = (await PDFDocument.load(file.buffer)).getPageCount();
-    // console.log("page count", numPages);
-    // const pngFileName = (Math.random() * 100000000000000).toString();
-    // const options = {
-    //   density: 300,
-    //   saveFilename: pngFileName,
-    //   savePath: tempPngPath,
-    //   format: "png",
-    // };
-    // console.log("converting");
-    // const convert = fromBuffer(file.buffer, options);
-    // const response = await convert(numPages, { responseType: "image" });
-    // console.log("converted", response);
-    // const imgPath = response.path;
+    const credentials = (PDFServicesSdk.Credentials as any)
+      .servicePrincipalCredentialsBuilder()
+      .withClientId(process.env.PDF_SERVICES_CLIENT_ID || "")
+      .withClientSecret(process.env.PDF_SERVICES_CLIENT_SECRET || "")
+      .build();
+    const executionContext =
+      PDFServicesSdk.ExecutionContext.create(credentials);
 
-    // const image = await readFile(imgPath);
-    // await worker.loadLanguage("eng");
-    // await worker.initialize("eng");
-    // const {
-    //   data: { text },
-    // } = await worker.recognize(image);
-    // console.log("text", text);
-    // await worker.terminate();
-    // return text;
+    // Build extractPDF options
+    const options =
+      new PDFServicesSdk.ExtractPDF.options.ExtractPdfOptions.Builder()
+        .addElementsToExtract(
+          PDFServicesSdk.ExtractPDF.options.ExtractElementType.TEXT
+        )
+        .build();
+    const extractPDFOperation = PDFServicesSdk.ExtractPDF.Operation.createNew();
+    const input = PDFServicesSdk.FileRef.createFromLocalFile(
+      tempPdfPath,
+      PDFServicesSdk.ExtractPDF.SupportedSourceFormat.pdf
+    );
+    extractPDFOperation.setInput(input);
+    // Set options
+    extractPDFOperation.setOptions(options);
+
+    // Generating a file name
+    await extractPDFOperation
+      .execute(executionContext)
+      .then((result) => result.saveAsFile(tempOutputZip));
+
+    let zip = new AdmZip(tempOutputZip);
+    let jsondata = zip.readAsText("structuredData.json");
+    let data = JSON.parse(jsondata);
+    const text = data.elements.reduce(
+      (acc: string, element: any) =>
+        element?.Text?.length ? `${acc}\n${element.Text}` : acc,
+      ""
+    );
+    return text;
   } catch (err) {
     console.error("PDF parsing error: ", err);
     throw new InternalError("Could not process PDF");

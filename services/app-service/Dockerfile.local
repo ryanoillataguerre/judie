@@ -1,11 +1,7 @@
 FROM node:20
 
 WORKDIR /app
-# COPY ./build_protos.sh /opt/build_protos.sh
 COPY . .
-RUN apt-get update
-RUN apt-get install ghostscript -y
-RUN apt-get install graphicsmagick -y
 
 RUN yarn
 RUN yarn run generate

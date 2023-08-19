@@ -2,7 +2,6 @@ FROM node:20 AS builder
 WORKDIR /app
 COPY ./build_protos.sh /opt/build_protos.sh
 COPY app-service .
-# COPY protos/inference_service/server/inference_service.proto ./protos/inference_service.proto
 RUN yarn install
 RUN yarn run generate
 RUN /opt/build_protos.sh
@@ -10,9 +9,6 @@ RUN yarn build
 
 FROM node:20-alpine AS final
 WORKDIR /app
-RUN apt-get update
-RUN apt-get install ghostscript -y
-RUN apt-get install graphicsmagick -y
 COPY --from=builder ./app/dist ./dist
 COPY --from=builder ./app/prisma ./prisma
 COPY --from=builder ./app/protos ./protos
