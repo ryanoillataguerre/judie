@@ -2,6 +2,7 @@ from typing import Optional
 import prisma
 from typing import List, Dict
 from collections import deque
+from inference_service.server.judie_data import History, ChatTurn, Role
 
 
 def get_chat(
@@ -20,6 +21,26 @@ def get_chat(
 
     chats = sorted(chats, key=lambda x: x.createdAt)
     return chats
+
+
+def get_chat_history(
+    chat_id: str,
+    app_db: Optional[prisma.Prisma] = None,
+) -> History:
+    chats = get_chat(chat_id=chat_id, app_db=app_db)
+
+    hist = History()
+
+    for chat in chats:
+        if chat.type == "USER":
+            turn = ChatTurn(role=Role.USER, content=chat.content)
+        elif chat.type == "BOT":
+            turn = ChatTurn(role=Role.ASSISTANT, content=chat.content)
+        else:
+            continue
+
+        hist.add_turn(turn)
+    return hist
 
 
 def get_chat_openai_fmt(

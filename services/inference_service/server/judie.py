@@ -8,6 +8,9 @@ from inference_service.server.judie_data import SessionConfig
 
 logger = logging.getLogger("inference_logger")
 
+# 32,000 chars ~= 8,000 tokens
+TOTAL_PROMPT_LIMIT = 31000
+
 
 def yield_judie_response(
     chat_id: Optional[str],
@@ -21,16 +24,19 @@ def yield_judie_response(
     :param app_db: Prisma manager for app DB connection
     :return: Generator of response chunk strings
     """
-    history = prisma_manager.get_chat_openai_fmt(chat_id=chat_id, app_db=app_db)
+    history = prisma_manager.get_chat_history(chat_id=chat_id, app_db=app_db)
 
-    if history[-1]["role"] == "user":
+    if history.last_msg_is_user():
         sys_prompt = prompt_generator.generate_question_answer_prompt(
-            question=history[-1]["content"], subject=config.subject
+            question=history.get_last_user_message(), subject=config.subject
         )
         logger.info(f"Full prompt: {sys_prompt}")
 
         full_messages = openai_manager.concat_sys_and_messages_openai(
-            sys_prompt=sys_prompt, messages=history
+            sys_prompt=sys_prompt,
+            messages=history.get_openai_format(
+                length_limit=TOTAL_PROMPT_LIMIT - len(sys_prompt)
+            ),
         )
         logger.info(f"Full messages: \n{full_messages}")
         openai_config = openai_manager.OpenAiConfig(stream=True)
@@ -48,4 +54,7 @@ def yield_judie_response(
 
 
 def grab_chat_config(chat_id: Optional[str]) -> SessionConfig:
-    return SessionConfig(subject=prisma_manager.get_subject(chat_id=chat_id))
+    return SessionConfig(
+        history=prisma_manager.get_chat_history(chat_id=chat_id),
+        subject=prisma_manager.get_subject(chat_id=chat_id),
+    )
