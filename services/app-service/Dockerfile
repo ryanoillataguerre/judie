@@ -2,6 +2,9 @@ FROM node:20 AS builder
 WORKDIR /app
 COPY ./build_protos.sh /opt/build_protos.sh
 COPY app-service .
+# RUN sudo apt-get update
+# RUN sudo apt-get install ghostscript
+# RUN sudo apt-get install graphicsmagick
 # COPY protos/inference_service/server/inference_service.proto ./protos/inference_service.proto
 RUN yarn install
 RUN yarn run generate

@@ -24,6 +24,7 @@ import multer from "multer";
 import { transcribeAudio } from "../openai/service.js";
 import { Readable } from "stream";
 import { temporaryDirectory } from "tempy";
+import { extractTextFromPdf } from "../pdf/service.js";
 
 const router = Router();
 
@@ -234,7 +235,7 @@ router.post(
     }
     const file = req.file;
     if (file) {
-      console.log("got file");
+      const text = await extractTextFromPdf(file);
     }
     // TODO: Get transcript of file
     // TODO: Save to chat as system prompt?
