@@ -19,16 +19,15 @@ const AssignmentUploader = ({}: {}) => {
   });
   const handleFileChange = (e: FormEvent<HTMLInputElement>) => {
     e.preventDefault();
-    console.log("event", e);
     let formData = new FormData();
     formData.append("file", (e.target as any).files[0]);
-    console.log("file changed");
     if (!chatId) {
       toast({
         status: "error",
         title: "Error",
         description: "Must be in a chat to upload context",
       });
+      return;
     }
     uploadMutation.mutate({
       chatId: chatId as string,
