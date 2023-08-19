@@ -61,6 +61,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "openai": "^3.2.1",
+    "pdf-lib": "^1.17.1",
+    "pdf2pic": "^3.0.1",
     "protobufjs": "^7.2.4",
     "stripe": "^12.2.0",
     "tempy": "^3.1.0",

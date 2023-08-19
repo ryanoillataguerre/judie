@@ -29,6 +29,7 @@ const AssignmentUploader = ({}: {}) => {
         title: "Error",
         description: "Must be in a chat to upload context",
       });
+      return;
     }
     uploadMutation.mutate({
       chatId: chatId as string,
