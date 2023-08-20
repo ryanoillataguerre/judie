@@ -140,11 +140,13 @@ export const getUserChats = async (userId: string) => {
 export const getCompletion = async ({
   chatId,
   query,
+  readableContent,
   userId,
   response,
 }: {
   chatId?: string;
   query: string;
+  readableContent?: string;
   userId: string;
   response: Response;
 }) => {
@@ -166,7 +168,7 @@ export const getCompletion = async ({
 
   // Add message to chat
   await createMessage({
-    readableContent: query,
+    readableContent: readableContent || query,
     content: query,
     type: MessageType.USER,
     chat: {
@@ -239,4 +241,23 @@ export const deleteMostRecentChatMessage = async ({
       id: message.id,
     },
   });
+};
+
+export const getPDFTextPrompt = ({ text }: { text: string }) => {
+  const basePrompt =
+    "I need help with the following assignment. Please help me with my questions with this context in mind.";
+  const prompt = `${basePrompt}
+    \n
+    ${text}
+    `;
+  return {
+    readableContent: `${basePrompt}\n[...]`,
+    query: prompt,
+  };
+};
+
+export const validateMaxMessageLength = (message: string) => {
+  if (message.length > 4000) {
+    throw new InternalError("Content too long");
+  }
 };

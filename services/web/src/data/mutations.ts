@@ -1,5 +1,5 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
-import { HTTPResponseError, baseFetch, baseFetchFormData } from "./baseFetch";
+import { HTTPResponseError, baseFetch } from "./baseFetch";
 import { GradeYear, Message, PermissionType, UserRole } from "./types/api";
 
 export interface ChatResponse {
@@ -328,9 +328,11 @@ export const whisperTranscribeMutation = async ({
 }: {
   data: FormData;
 }): Promise<TranscribeResponse> => {
-  const response = await baseFetchFormData({
+  const response = await baseFetch({
     url: `/chat/whisper/transcribe`,
-    form: data,
+    body: data,
+    method: "POST",
+    form: true,
   });
   return response.data;
 };
@@ -427,13 +429,28 @@ export const resendInviteMutation = async ({
 export const uploadAssignmentMutation = async ({
   chatId,
   data,
+  setChatValue,
+  onStreamEnd,
+  onError,
+  abortController,
 }: {
   chatId: string;
   data: FormData;
-}) => {
-  const response = await baseFetchFormData({
+  setChatValue: (chat: string) => void;
+  onStreamEnd?: () => void;
+  onError?: (error: HTTPResponseError) => void;
+  abortController?: AbortController;
+}): Promise<string> => {
+  const response = await baseFetch({
     url: `/chat/${chatId}/context/pdf`,
-    form: data,
+    body: data,
+    method: "POST",
+    stream: true,
+    onChunkReceived: setChatValue,
+    onStreamEnd,
+    onError,
+    abortController,
+    form: true,
   });
-  return response.data;
+  return response;
 };
