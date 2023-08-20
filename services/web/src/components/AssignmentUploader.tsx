@@ -1,22 +1,12 @@
 import { Button, Input, Tooltip, useToast } from "@chakra-ui/react";
-import { uploadAssignmentMutation } from "@judie/data/mutations";
+import { ChatContext } from "@judie/hooks/useChat";
 import { useRouter } from "next/router";
-import { FormEvent, useRef } from "react";
-import { useMutation } from "react-query";
+import { FormEvent, useContext, useRef } from "react";
 
 const AssignmentUploader = ({}: {}) => {
   const toast = useToast();
   const chatId = useRouter().query.id;
-  const uploadMutation = useMutation({
-    mutationFn: uploadAssignmentMutation,
-    onSuccess: () => {
-      toast({
-        status: "success",
-        title: "Success",
-        description: "Assignment uploaded",
-      });
-    },
-  });
+  const { uploadAssignment, streaming } = useContext(ChatContext);
   const handleFileChange = (e: FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     let formData = new FormData();
@@ -29,10 +19,7 @@ const AssignmentUploader = ({}: {}) => {
       });
       return;
     }
-    uploadMutation.mutate({
-      chatId: chatId as string,
-      data: formData,
-    });
+    uploadAssignment(formData);
   };
   const inputRef = useRef<HTMLInputElement | null>(null);
   return (
@@ -42,7 +29,7 @@ const AssignmentUploader = ({}: {}) => {
         placement={"top"}
         padding={2}
         borderRadius={4}
-        isDisabled={uploadMutation.isLoading || uploadMutation.isSuccess}
+        isDisabled={streaming}
       >
         <Button
           // h={"100%"}
@@ -51,8 +38,8 @@ const AssignmentUploader = ({}: {}) => {
           onClick={() => {
             inputRef.current?.click();
           }}
-          isLoading={uploadMutation.isLoading}
-          isDisabled={uploadMutation.isLoading || uploadMutation.isSuccess}
+          isLoading={streaming}
+          isDisabled={streaming}
         >
           Upload
         </Button>

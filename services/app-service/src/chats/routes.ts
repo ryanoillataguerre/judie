@@ -14,6 +14,8 @@ import {
   getUserChats,
   updateChat,
   deleteChatsForUser,
+  getPDFTextPrompt,
+  validateMaxMessageLength,
 } from "./service.js";
 import { Chat, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -25,6 +27,8 @@ import { transcribeAudio } from "../openai/service.js";
 import { Readable } from "stream";
 import { temporaryDirectory } from "tempy";
 import { extractTextFromPdf } from "../pdf/service.js";
+import InternalError from "../utils/errors/InternalError.js";
+import BadRequestError from "../utils/errors/BadRequestError.js";
 
 const router = Router();
 
@@ -235,14 +239,28 @@ router.post(
     }
     const file = req.file;
     if (file) {
+      // Get transcript of file
       const text = await extractTextFromPdf(file);
+      if (text) {
+        // Ensure length of message isn't going to bankrupt us in tokens
+        validateMaxMessageLength(text);
+        const { readableContent, query } = getPDFTextPrompt({ text });
+        // Save to chat as first message, but with readable content as just the base prompt
+        // Get completion from inference service
+        await getCompletion({
+          chatId: req.params.chatId,
+          userId: session.userId,
+          response: res,
+          query,
+          readableContent,
+        });
+        res.status(200).end();
+      } else {
+        throw new BadRequestError("Could not read PDF");
+      }
+    } else {
+      throw new BadRequestError("No file provided");
     }
-    // TODO: Get transcript of file
-    // TODO: Save to chat as system prompt?
-
-    res.status(200).send({
-      data: "chatgoeshere",
-    });
   })
 );
 

@@ -3,6 +3,7 @@ import {
   completionFromQueryMutation,
   createChatMutation,
   putChatMutation,
+  uploadAssignmentMutation,
 } from "@judie/data/mutations";
 import {
   GET_CHAT_BY_ID,
@@ -16,7 +17,6 @@ import useAuth from "./useAuth";
 import {
   useCallback,
   createContext,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -25,7 +25,8 @@ import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useStorageState from "./useStorageState";
 import { useRouter } from "next/router";
-import { set } from "react-hook-form";
+
+const PDF_UPLOAD_TEMP_USER_MESSAGE = `I need help with the following assignment. Please help me with my questions with this context in mind.\n[...]`;
 
 export interface TempMessage {
   type?: MessageType.BOT | MessageType.USER;
@@ -51,6 +52,7 @@ interface UseChatData {
   beingStreamedChatId?: string;
   tempUserMessageChatId?: string;
   reset: () => void;
+  uploadAssignment: (data: FormData) => void;
 }
 
 export const ChatContext = createContext<UseChatData>({
@@ -69,6 +71,7 @@ export const ChatContext = createContext<UseChatData>({
   beingStreamedChatId: undefined,
   tempUserMessageChatId: undefined,
   reset: () => {},
+  uploadAssignment: () => {},
 });
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
@@ -96,6 +99,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   >(undefined, "tempUserMessageChatId");
 
   const abortController = useMemo(() => {
+    return new AbortController();
+  }, []);
+  const uploadAbortController = useMemo(() => {
     return new AbortController();
   }, []);
 
@@ -332,6 +338,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           duration: 2000,
           isClosable: true,
         });
+        return;
       }
       if (
         streaming ||
@@ -366,6 +373,100 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
+    ]
+  );
+
+  const uploadMutation = useMutation({
+    mutationFn: ({ chatId, data }: { chatId: string; data: FormData }) => {
+      setStreaming(true);
+      setBeingStreamedMessage(undefined);
+      setBeingStreamedChatId(chatId);
+      return uploadAssignmentMutation({
+        chatId,
+        data,
+        setChatValue: streamCallback,
+        abortController: uploadAbortController,
+        onStreamEnd: async () => {
+          setBeingStreamedChatId(undefined);
+          auth.refresh();
+          userChatsQuery.refetch();
+          await existingChatQuery.refetch();
+          setBeingStreamedMessage(undefined);
+          setStreaming(false);
+        },
+        onError: completionOnError,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        status: "success",
+        title: "Success",
+        description: "Assignment uploaded",
+      });
+    },
+  });
+
+  const uploadAssignment = useCallback(
+    async (data: FormData) => {
+      console.log("uploadAssignment");
+      if (!existingChatQuery.data?.subject) {
+        console.error("No subject");
+        toast({
+          title: "Oops!",
+          description:
+            "Please add a subject to the chat before you upload your assignment.",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+        });
+        return Promise.reject();
+      }
+      if (!chatId) {
+        console.error("No chatId found");
+        toast({
+          title: "Oops!",
+          description:
+            "Something went wrong, please create a new chat or refresh.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
+      if (
+        streaming ||
+        (beingStreamedChatId && beingStreamedChatId !== chatId)
+      ) {
+        toast({
+          title: "Please wait for the previous message to respond",
+          description:
+            "If this message persists, please log out and back in again.",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
+      setTempUserMessage(() => ({
+        type: MessageType.USER,
+        readableContent: PDF_UPLOAD_TEMP_USER_MESSAGE,
+        createdAt: new Date(),
+      }));
+      setTempUserMessageChatId(chatId);
+      // Call mutation
+      console.log("mutating");
+      await uploadMutation.mutateAsync({ data, chatId });
+    },
+    [
+      chatId,
+      beingStreamedMessage,
+      uploadMutation,
+      toast,
+      streaming,
+      setStreaming,
+      setTempUserMessage,
+      beingStreamedChatId,
+      existingChatQuery.data?.subject,
     ]
   );
 
@@ -406,6 +507,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       beingStreamedChatId,
       tempUserMessageChatId,
       reset,
+      uploadAssignment,
     };
   }, [
     existingChatQuery.data,
@@ -423,6 +525,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     beingStreamedChatId,
     tempUserMessageChatId,
     reset,
+    uploadAssignment,
   ]);
   return (
     <ChatContext.Provider value={providerValue}>
