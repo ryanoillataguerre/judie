@@ -408,7 +408,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   const uploadAssignment = useCallback(
     async (data: FormData) => {
-      console.log("uploadAssignment");
       if (!existingChatQuery.data?.subject) {
         console.error("No subject");
         toast({
@@ -454,7 +453,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       }));
       setTempUserMessageChatId(chatId);
       // Call mutation
-      console.log("mutating");
       await uploadMutation.mutateAsync({ data, chatId });
     },
     [
