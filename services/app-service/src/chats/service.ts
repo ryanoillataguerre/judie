@@ -246,7 +246,7 @@ export const deleteMostRecentChatMessage = async ({
 export const getPDFTextPrompt = ({ text }: { text: string }) => {
   const basePrompt =
     "I need help with the following assignment. Please help me with my questions with this context in mind.";
-  const prompt = `${basePrompt}
+  const prompt = `Be sure not to give the student the answer directly, rather, respond with a small prompt to stimulate a conversation about how to solve the problems in this assignment.\n${basePrompt}
     \n
     ${text}
     `;
