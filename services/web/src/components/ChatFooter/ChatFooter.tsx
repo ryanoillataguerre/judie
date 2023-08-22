@@ -36,6 +36,8 @@ import { whisperTranscribeMutation } from "@judie/data/mutations";
 import AssignmentUploader from "../AssignmentUploader";
 
 const SendButton = () => {
+  const sendColor = useColorModeValue("black", "white");
+
   return (
     <Button
       type="submit"
@@ -49,7 +51,7 @@ const SendButton = () => {
         borderRadius: "0.5rem",
       }}
     >
-      <BsSend fill={"white"} size={18} />
+      <BsSend fill={sendColor} size={18} />
     </Button>
   );
 };
@@ -139,7 +141,7 @@ const RecordButton = ({
       return <Spinner color={"teal.300"} size={"sm"} />;
     }
     return <BiSolidMicrophone fill={micColor} size={18} />;
-  }, [isRecording, transcribeMutation.isLoading]);
+  }, [isRecording, transcribeMutation.isLoading, micColor]);
 
   return (
     <Button
@@ -246,39 +248,40 @@ const ChatInput = () => {
   return (
     <form onSubmit={onSubmit}>
       <InputGroup>
-        <LightMode>
-          {!messages.length && <AssignmentUploader />}
-          <HStack spacing={4} width={"100%"}>
-            <Textarea
-              onKeyUp={onKeyUp}
-              autoFocus={chat?.subject ? true : false}
-              ref={ref}
-              value={chatValue}
-              _hover={{
-                borderColor: "teal",
-              }}
-              disabled={isRecording}
-              onChange={(e) => setChatValue(e.target.value)}
-              placeholder="Ask Judie anything..."
-              style={{
-                width: "100%",
-                padding: "auto 6rem auto 0",
-                backgroundColor: bgColor,
-              }}
+        {/* <LightMode> */}
+        {!messages.length && <AssignmentUploader />}
+        <HStack spacing={4} width={"100%"}>
+          <Textarea
+            onKeyUp={onKeyUp}
+            autoFocus={chat?.subject ? true : false}
+            ref={ref}
+            value={chatValue}
+            _hover={{
+              borderColor: "teal",
+            }}
+            disabled={isRecording}
+            onChange={(e) => setChatValue(e.target.value)}
+            placeholder="Ask Judie anything..."
+            style={{
+              width: "100%",
+              padding: "auto 6rem auto 0",
+              backgroundColor: bgColor,
+              resize: "none",
+            }}
+          />
+          <VStack height={"100%"}>
+            <SendButton />
+            <RecordButton
+              setIsRecording={setIsRecording}
+              onFinishRecording={(text) =>
+                setChatValue((prev) =>
+                  prev.length ? [prev, text].join("\n") : text
+                )
+              }
             />
-            <VStack height={"100%"}>
-              <SendButton />
-              <RecordButton
-                setIsRecording={setIsRecording}
-                onFinishRecording={(text) =>
-                  setChatValue((prev) =>
-                    prev.length ? [prev, text].join("\n") : text
-                  )
-                }
-              />
-            </VStack>
-          </HStack>
-        </LightMode>
+          </VStack>
+        </HStack>
+        {/* </LightMode> */}
         {/* <InputRightElement style={{ height: "100%" }}>
           
         </InputRightElement> */}
