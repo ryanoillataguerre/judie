@@ -12,6 +12,10 @@ const buttonComponentStyle: ComponentStyleConfig = {
   baseStyle: {},
   // styles for different sizes ("sm", "md", "lg")
   sizes: {
+    sm: {
+      height: "2rem",
+      borderRadius: "1rem",
+    },
     md: {
       height: "3rem",
       borderRadius: "1.5rem",

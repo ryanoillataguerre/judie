@@ -34,7 +34,8 @@ const AssignmentUploader = ({}: {}) => {
         <Button
           // h={"100%"}
           type={"button"}
-          colorScheme="teal"
+          size={"sm"}
+          variant={"purp"}
           onClick={() => {
             inputRef.current?.click();
           }}
