@@ -33,7 +33,12 @@ router.post(
 
 router.put(
   "/:folderId",
-  [body("title").isString(), param("folderId").exists()],
+  [
+    body("title").isString(),
+    param("folderId").exists(),
+    body("newChats").optional().isArray(),
+    body("removedChats").optional().isArray(),
+  ],
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -43,6 +48,24 @@ router.put(
 
     const folder = await updateFolder(req.params.folderId, {
       userTitle: req.body?.title || undefined,
+      ...(req.body.newChats
+        ? {
+            chats: {
+              connect: req.body.newChats.map((chatId: string) => ({
+                id: chatId,
+              })),
+            },
+          }
+        : {}),
+      ...(req.body.removedChats
+        ? {
+            chats: {
+              disconnect: req.body.removedChats.map((chatId: string) => ({
+                id: chatId,
+              })),
+            },
+          }
+        : {}),
     });
 
     res.status(200).json({
