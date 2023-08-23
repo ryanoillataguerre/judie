@@ -27,10 +27,12 @@ const DeleteSchoolModal = ({
   isOpen,
   onClose,
   schoolId,
+  schoolName,
 }: {
   isOpen: boolean;
   onClose: () => void;
   schoolId: string;
+  schoolName: string | undefined | null;
 }) => {
   const { userData } = useAuth();
   const [success, setSuccess] = useState(false);
@@ -75,6 +77,20 @@ const DeleteSchoolModal = ({
           >
             Are you sure you want to delete this school?
           </Text>
+          {schoolName && (
+            <Text
+              style={{
+                fontSize: "1.4rem",
+                fontWeight: 800,
+                color: "#E53e3e",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              {schoolName}
+            </Text>
+          )}
+
           <HStack
             mt={4}
             width={"100%"}

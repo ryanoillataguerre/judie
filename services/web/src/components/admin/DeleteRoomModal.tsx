@@ -23,10 +23,12 @@ const DeleteRoomModal = ({
   isOpen,
   onClose,
   roomId,
+  roomName,
 }: {
   isOpen: boolean;
   onClose: () => void;
   roomId: string;
+  roomName: string | undefined | null;
 }) => {
   const { userData } = useAuth();
   const [success, setSuccess] = useState(false);
@@ -71,6 +73,20 @@ const DeleteRoomModal = ({
           >
             Are you sure you want to delete this room?
           </Text>
+          {roomName && (
+            <Text
+              style={{
+                fontSize: "1.4rem",
+                fontWeight: 800,
+                color: "#E53e3e",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              {roomName}
+            </Text>
+          )}
+
           <HStack
             mt={4}
             width={"100%"}
