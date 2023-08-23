@@ -9,3 +9,18 @@ export const createFolder = async (params: Prisma.ChatFolderCreateInput) => {
   });
   return newChat;
 };
+
+export const updateFolder = async (
+  folderId: string,
+  params: Prisma.ChatFolderUpdateInput
+) => {
+  const newChat = await dbClient.chatFolder.update({
+    data: {
+      ...params,
+    },
+    where: {
+      id: folderId,
+    },
+  });
+  return newChat;
+};
