@@ -1,5 +1,6 @@
 from inference_service.server import judie_data
 from inference_service.server import judie
+from inference_service.server.judie import generate_chat_metadata
 from inference_service.test_client.test_chats_config import TEST_CHAT_ID_2
 from inference_service.test_client.testing_utils import env_setup
 
@@ -13,7 +14,7 @@ def test_get_config(env_setup):
 def test_judie_stream(env_setup):
     sesh = judie.grab_chat_config(TEST_CHAT_ID_2)
 
-    response = judie.yield_judie_response(TEST_CHAT_ID_2, config=sesh)
+    response = judie.yield_judie_response(config=sesh)
     for i in response:
         print(i)
 
@@ -108,3 +109,8 @@ def test_session_config(env_setup):
 
     assert sesh_config.subject == "Microeconomics"
     assert sesh_config.history.get_last_user_message() == "Sick content here"
+
+
+def test_generate_metadata(env_setup):
+    sesh = judie.grab_chat_config(TEST_CHAT_ID_2)
+    assert "comprehension" in generate_chat_metadata(sesh)

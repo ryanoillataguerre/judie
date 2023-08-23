@@ -70,7 +70,7 @@ def comprehension_score(session_config: SessionConfig) -> Optional[int]:
     prompt = [
         {
             "role": "system",
-            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversationand subject material given their last response or question.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
+            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversationand subject material given the context of the conversation and the last user response or question after the tutor.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
         },
     ] + session_config.history.get_openai_format()[-5:]
     # arbitrarily use last five messages as conversation window
@@ -78,9 +78,12 @@ def comprehension_score(session_config: SessionConfig) -> Optional[int]:
 
     comp_score = get_gpt_response(
         messages=prompt,
-        openai_config=OpenAiConfig(temperature=0.5, stream=False, max_tokens=10),
+        openai_config=OpenAiConfig(temperature=0.3, stream=False, max_tokens=10),
     )
     score_str = next(comp_score)
+    print(score_str)
+    logger.info(f"Comprehension score: {score_str}")
+
     if score_str.isnumeric():
         return int(score_str)
     else:

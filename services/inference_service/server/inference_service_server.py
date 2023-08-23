@@ -10,6 +10,7 @@ import openai
 from concurrent import futures
 from inference_service.logging_utils import logging_utils
 from inference_service.server import judie
+from inference_service.server.judie import generate_chat_metadata
 
 
 def setup_env():
@@ -34,10 +35,22 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
         chat_id = request.chat_id
 
         chat_config = judie.grab_chat_config(chat_id)
+        logger.debug(f"Grabbed config for chat {chat_id}")
 
-        response = judie.yield_judie_response(chat_id, config=chat_config)
+        meta_data = generate_chat_metadata(chat_config)
+
+        response = judie.yield_judie_response(config=chat_config)
+
+        first_message = True
         for part in response:
-            yield inference_service_pb2.TutorResponse(responsePart=part)
+            if first_message:
+                yield inference_service_pb2.TutorResponse(
+                    responsePart=part, chatMetaData=meta_data
+                )
+                first_message = False
+            yield inference_service_pb2.TutorResponse(
+                responsePart=part, chatMetaData={}
+            )
 
     def ServerConnectionCheck(self, request, context):
         logger.info(f"Server connection check request: {request}")

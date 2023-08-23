@@ -2,7 +2,7 @@ import prisma
 from inference_service.prompts import prompt_generator
 from inference_service.openai_manager import openai_manager
 from inference_service.prisma_app_client import prisma_manager
-from typing import Optional, Iterator
+from typing import Optional, Iterator, Dict
 import logging
 from inference_service.server.judie_data import SessionConfig
 
@@ -13,15 +13,11 @@ TOTAL_PROMPT_LIMIT = 31000
 
 
 def yield_judie_response(
-    chat_id: Optional[str],
     config: SessionConfig,
-    app_db: Optional[prisma.Prisma] = None,
 ) -> Optional[Iterator[str]]:
     """
     Wrapper around main logic for streaming based Judie Chat.
-    :param chat_id: uuid string for chat objects in app DB
     :param config: config object for relevant session data like subject or user type
-    :param app_db: Prisma manager for app DB connection
     :return: Generator of response chunk strings
     """
     history = config.history
@@ -58,3 +54,12 @@ def grab_chat_config(chat_id: Optional[str]) -> SessionConfig:
         history=prisma_manager.get_chat_history(chat_id=chat_id),
         subject=prisma_manager.get_subject(chat_id=chat_id),
     )
+
+
+def generate_chat_metadata(chat_config: SessionConfig) -> Dict[str, str]:
+    """
+    Generate full chat metadata to pass back to the caller
+    :param chat_config: config for the chat
+    :return: dict of str metadata identifiers and values
+    """
+    return {"comprehension": str(openai_manager.comprehension_score(chat_config))}
