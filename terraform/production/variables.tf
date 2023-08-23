@@ -66,6 +66,11 @@ variable "env_customerio_site_id" {
   description = "CustomerIO site ID"
 }
 
+variable "env_elevenlabs_api_key" {
+  type        = string
+  description = "Elevenlabs API Key"
+}
+
 variable "grpc_port" {
   type        = string
   description = "Port Cloud Run sends gRPC traffic over"
