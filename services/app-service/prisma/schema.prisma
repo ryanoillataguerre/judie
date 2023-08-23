@@ -108,25 +108,43 @@ model User {
   rooms                Room[]
   permissions          Permission[]
   createdOrganizations Organization[] @relation("creator")
+  ChatFolder           ChatFolder[]
 
   @@index([id, email])
   @@map("users")
 }
 
 model Chat {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  subject      String?
+  userTitle    String?   @map("user_title")
+  chatFolderId String?   @map("chat_folder_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime? @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  user     User        @relation(fields: [userId], references: [id])
+  messages Message[]
+  folder   ChatFolder? @relation(fields: [chatFolderId], references: [id])
+
+  @@index([id, userId])
+  @@map("chats")
+}
+
+model ChatFolder {
   id        String    @id @default(uuid())
   userId    String    @map("user_id")
-  subject   String?
   userTitle String?   @map("user_title")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  user     User      @relation(fields: [userId], references: [id])
-  messages Message[]
+  user  User   @relation(fields: [userId], references: [id])
+  chats Chat[]
 
   @@index([id, userId])
-  @@map("chats")
+  @@map("chat_folders")
 }
 
 enum MessageType {
