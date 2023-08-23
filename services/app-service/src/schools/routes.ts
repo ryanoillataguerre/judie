@@ -33,7 +33,7 @@ router.post(
   requireAuth,
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
-    const { name, organizationId } = req.body;
+    const { name, organizationId, address } = req.body;
     // Validate user has organization-level privileges
     await validateOrganizationAdmin({
       userId: req.session.userId as string,
@@ -41,6 +41,7 @@ router.post(
     });
     const school = await createSchool({
       name,
+      ...(address && { address }),
       organization: {
         connect: {
           id: organizationId,
