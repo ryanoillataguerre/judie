@@ -46,6 +46,7 @@ const theme = extendTheme({
       900: "#202123",
       700: "#2a3448",
     },
+    // Customized at https://themera.vercel.app/
     purple: {
       "50": "#F0E9FB",
       "100": "#D6C2F5",
