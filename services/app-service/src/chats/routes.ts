@@ -147,6 +147,7 @@ router.put(
     body("subject").optional(),
     param("chatId").exists(),
     body("userTitle").optional(),
+    body("folderId").optional(),
   ],
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -158,6 +159,16 @@ router.put(
     const newChat = await updateChat(chatId, {
       subject,
       userTitle,
+
+      ...(req.body.folderId
+        ? {
+            folder: {
+              connect: {
+                id: req.body.folderId,
+              },
+            },
+          }
+        : {}),
     });
 
     res.status(200).json({
