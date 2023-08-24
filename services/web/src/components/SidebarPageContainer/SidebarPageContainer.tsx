@@ -5,6 +5,7 @@ import useStorageState from "@judie/hooks/useStorageState";
 
 interface SidebarPageContainerProps {
   children: React.ReactNode;
+  scroll?: boolean;
 }
 
 const OpenCloseButton = ({
@@ -45,7 +46,10 @@ const OpenCloseButton = ({
   );
 };
 
-const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
+const SidebarPageContainer = ({
+  children,
+  scroll = true,
+}: SidebarPageContainerProps) => {
   const isMobile = useBreakpointValue({
     base: true,
     md: false,
@@ -64,12 +68,12 @@ const SidebarPageContainer = ({ children }: SidebarPageContainerProps) => {
     >
       <Sidebar isOpen={isOpen} />
       <Box
+        overflow={scroll ? "scroll" : "hidden"}
         style={{
           width: "100%",
           height: "100%",
           maxHeight: "100vh",
           position: "relative",
-          overflow: "hidden",
         }}
       >
         <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />
