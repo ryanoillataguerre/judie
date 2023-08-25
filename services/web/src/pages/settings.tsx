@@ -17,19 +17,107 @@ import {
   HStack,
   Spacer,
   Avatar,
+  DarkMode,
+  InputRightElement,
+  IconButton,
+  useToast,
 } from "@chakra-ui/react";
+import { HiEye, HiEyeOff } from "react-icons/hi";
 import InputField from "@judie/components/settings/InputField";
 import { Search2Icon } from "@chakra-ui/icons";
-
+import { useForm } from "react-hook-form";
+import useAuth from "@judie/hooks/useAuth";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
 import {
   GET_PORTAL_LINK,
   getBillingPortalLinkQuery,
 } from "@judie/data/queries";
 import Head from "next/head";
-import { useQuery } from "react-query";
+import RoundButton from "@judie/components/RoundButton/RoundButton";
+import { useMutation, useQuery } from "react-query";
+import { useState } from "react";
+import { HTTPResponseError } from "@judie/data/baseFetch";
+import { putUserMutation } from "@judie/data/mutations";
+
+interface ChangePasswordSubmitData {
+  oldPassword: string;
+  newPassword: string;
+  repeatPassword: string;
+}
+
+interface ChangeNameSubmitData {
+  firstName: string;
+  lastName: string;
+}
 
 const SettingsPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  // const [isUserUpdateLoading, setIsUserUpdateLoading] = useState(false);
+  // const [isPasswordUpdateLoading, setIsPasswordUpdateLoading] = useState(false);
+
+  const { userData, logout } = useAuth();
+  const toast = useToast();
+
+  console.log("userData: ", userData);
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting },
+  } = useForm<ChangePasswordSubmitData>({
+    defaultValues: {
+      oldPassword: "",
+      newPassword: "",
+      repeatPassword: "",
+    },
+    reValidateMode: "onBlur",
+  });
+
+  const {
+    handleSubmit: profileHandleSubmit,
+    register: profileRegister,
+    formState: { errors: profileErrors, isSubmitting: isProfileSumbitting },
+  } = useForm<ChangeNameSubmitData>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+    },
+    reValidateMode: "onBlur",
+  });
+
+  const { mutateAsync: userMutateAsync, isLoading: userMutateIsLoading } =
+    useMutation({
+      mutationFn: putUserMutation,
+      onSuccess: () => {
+        toast({
+          title: "Success",
+          description: "Your profile has been updated",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+      onError: (err: HTTPResponseError) => {
+        console.error("Error signing up", err);
+        toast({
+          title: "Error signing up",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+    });
+
+  async function onSubmit(values: any) {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        alert(JSON.stringify(values, null, 2));
+        resolve();
+      }, 3000);
+    });
+  }
+
   const getBillingPortal = useQuery(GET_PORTAL_LINK, {
     queryFn: getBillingPortalLinkQuery,
     enabled: false,
@@ -99,10 +187,10 @@ const SettingsPage = () => {
                 bg="brand.primary"
                 color={"white"}
                 borderRadius={11}
-                h={{ base: "auto", md: "104px" }}
+                h={{ base: "auto", lg: "104px" }}
                 mt={"10px"}
                 mb={"40px"}
-                direction={{ base: "column", md: "row" }}
+                direction={{ base: "column", lg: "row" }}
                 gap={{ base: "15px", md: "0px" }}
               >
                 <Flex alignItems={"center"}>
@@ -113,41 +201,30 @@ const SettingsPage = () => {
                     src=""
                   />
                   <Flex flexDirection={"column"} gap={"5px"}>
-                    <Text fontSize={18}>Username</Text>
+                    <Text
+                      fontSize={18}
+                    >{`${userData?.firstName} ${userData?.lastName}`}</Text>
                     <Text fontSize={14} color="gray.400">
-                      email
+                      {userData?.email}
                     </Text>
                   </Flex>
                 </Flex>
                 <Spacer display={{ base: "none", md: "block" }} />
                 <Flex justifyContent={"center"} gap={"15px"}>
-                  <Button
-                    borderRadius={"100px"}
-                    py={15}
-                    px={30}
-                    alignSelf={"center"}
-                    fontSize={{ base: "16px", md: "18px" }}
-                    h={"auto"}
-                    bg={"white"}
-                    color={"brand.primary"}
-                    _hover={{ bg: "brand.lightGray2" }}
-                    onClick={() => getBillingPortal.refetch()}
-                  >
-                    Manage Billing
-                  </Button>
-                  <Button
-                    borderRadius={"100px"}
-                    py={15}
-                    px={{ base: "20px", md: "30px" }}
-                    alignSelf={"center"}
-                    fontSize={{ base: "16px", md: "18px" }}
-                    h={"auto"}
-                    bg={"white"}
-                    color={"brand.primary"}
-                    _hover={{ bg: "brand.lightGray2" }}
-                  >
-                    Log out
-                  </Button>
+                  <DarkMode>
+                    <RoundButton
+                      text="Manage Billing"
+                      fontSize={{ base: "16px", lg: "18px" }}
+                      onClick={() => getBillingPortal.refetch()}
+                    />
+                    <RoundButton
+                      text="Log out"
+                      fontSize={{ base: "16px", lg: "18px" }}
+                      onClick={() => {
+                        logout();
+                      }}
+                    />
+                  </DarkMode>
                 </Flex>
               </Flex>
               <VStack w={"100%"} spacing={"30px"}>
@@ -163,42 +240,60 @@ const SettingsPage = () => {
                     <Text>All the information about you</Text>
                   </Flex>
                   <Divider display={{ base: "block", lg: "none" }} />
-                  <VStack gap={{ base: "15px", xl: "10px" }} w={"100%"}>
-                    <Flex
-                      direction={{ base: "column", xl: "row" }}
-                      w={"100%"}
-                      gap={"15px"}
-                    >
-                      <Flex w={"100%"} direction="column">
-                        <FormLabel>Name</FormLabel>
-                        <InputField placeholder="Marcus Choice"></InputField>
+
+                  <Flex
+                    as="form"
+                    onSubmit={handleSubmit(onSubmit)}
+                    w={"100%"}
+                    direction={"column"}
+                    gap={"20px"}
+                  >
+                    <VStack gap={{ base: "15px", xl: "10px" }} w={"100%"}>
+                      <Flex
+                        direction={{ base: "column", xl: "row" }}
+                        w={"100%"}
+                        gap={"15px"}
+                      >
+                        <Flex w={"100%"} direction="column">
+                          <FormLabel>First Name</FormLabel>
+                          <InputField placeholder={"First Name"}></InputField>
+                        </Flex>
+                        <Flex w={"100%"} direction={"column"}>
+                          <FormLabel>Last Name</FormLabel>
+                          <InputField placeholder={"Last Name"}></InputField>
+                        </Flex>
                       </Flex>
-                      <Flex w={"100%"} direction={"column"}>
-                        <FormLabel>User Name</FormLabel>
-                        <InputField placeholder="@marcus.ch"></InputField>
+                      <Flex
+                        direction={{ base: "column", xl: "row" }}
+                        w={"100%"}
+                        gap={{ base: "0px", xl: "15px" }}
+                      >
+                        <Flex w={"100%"} direction={"column"}>
+                          {/* <FormLabel>Phone Number</FormLabel>
+                          <InputField
+                            type="number"
+                            placeholder="🇮🇹 +39 | 3335839398"
+                          ></InputField> */}
+                          <Spacer />
+                        </Flex>
+                        <Flex w={"100%"} direction="column">
+                          <FormLabel>Mail</FormLabel>
+                          <InputField
+                            type={"email"}
+                            placeholder="marcus.choice@gmail.com"
+                          ></InputField>
+                        </Flex>
                       </Flex>
-                    </Flex>
-                    <Flex
-                      direction={{ base: "column", xl: "row" }}
-                      w={"100%"}
-                      gap={"15px"}
-                    >
-                      <Flex w={"100%"} direction="column">
-                        <FormLabel>Mail</FormLabel>
-                        <InputField
-                          type={"email"}
-                          placeholder="marcus.choice@gmail.com"
-                        ></InputField>
-                      </Flex>
-                      <Flex w={"100%"} direction={"column"}>
-                        <FormLabel>Phone Number</FormLabel>
-                        <InputField
-                          type="number"
-                          placeholder="🇮🇹 +39 | 3335839398"
-                        ></InputField>
-                      </Flex>
-                    </Flex>
-                  </VStack>
+                    </VStack>
+                    <RoundButton
+                      fontSize={{ base: "16px", lg: "18px" }}
+                      alignSelf={{ base: "center", md: "flex-end" }}
+                      text="Update Details"
+                      type="submit"
+                      loading={userMutateIsLoading}
+                      // onClick={() => getBillingPortal.refetch()}
+                    />
+                  </Flex>
                 </Flex>
                 <Flex
                   direction={{ base: "column", lg: "row" }}
@@ -212,47 +307,72 @@ const SettingsPage = () => {
                     <Text>Check or change password</Text>
                   </Flex>
                   <Divider display={{ base: "block", lg: "none" }} />
-                  <VStack gap={{ base: "15px", xl: "10px" }} w={"100%"}>
-                    <Flex
-                      direction={{ base: "column", xl: "row" }}
-                      w={"100%"}
-                      gap={"15px"}
-                    >
-                      <Flex w={"100%"} direction="column">
-                        <FormLabel>Current password</FormLabel>
-                        <InputField
-                          type="password"
-                          placeholder="*********"
-                        ></InputField>
+                  <Flex w={"100%"} direction={"column"} gap={"20px"}>
+                    <VStack gap={{ base: "15px", xl: "10px" }} w={"100%"}>
+                      <Flex
+                        direction={{ base: "column", xl: "row" }}
+                        w={"100%"}
+                        gap={"15px"}
+                      >
+                        <Flex w={"100%"} direction="column">
+                          <FormLabel>Current password</FormLabel>
+                          <InputGroup size="md">
+                            <InputRightElement>
+                              <IconButton
+                                variant="link"
+                                aria-label={
+                                  showPassword
+                                    ? "Mask password"
+                                    : "Reveal password"
+                                }
+                                icon={showPassword ? <HiEyeOff /> : <HiEye />}
+                                onClick={() => setShowPassword(!showPassword)}
+                              />
+                            </InputRightElement>
+                            <InputField
+                              type={showPassword ? "text" : "password"}
+                              isRequired
+                              placeholder="*********"
+                              {...register("oldPassword", {})}
+                            ></InputField>
+                          </InputGroup>
+                        </Flex>
+                        <Flex w={"100%"} direction={"column"}>
+                          <FormLabel>New password</FormLabel>
+                          <InputField
+                            type="password"
+                            placeholder="Write here"
+                          ></InputField>
+                        </Flex>
                       </Flex>
-                      <Flex w={"100%"} direction={"column"}>
-                        <FormLabel>New password</FormLabel>
-                        <InputField
-                          type="password"
-                          placeholder="Write here"
-                        ></InputField>
-                      </Flex>
-                    </Flex>
-                    <Flex
-                      direction={{ base: "column", xl: "row" }}
-                      w={"100%"}
-                      gap={{ base: "0px", xl: "15px" }}
-                    >
-                      <Flex w={"100%"} direction="column">
-                        <Spacer />
-                      </Flex>
+                      <Flex
+                        direction={{ base: "column", xl: "row" }}
+                        w={"100%"}
+                        gap={{ base: "0px", xl: "15px" }}
+                      >
+                        <Flex w={"100%"} direction="column">
+                          <Spacer />
+                        </Flex>
 
-                      <Flex w={"100%"} direction={"column"}>
-                        <FormLabel>Confirm new password</FormLabel>
-                        <InputField
-                          type="password"
-                          placeholder="Write here"
-                        ></InputField>
+                        <Flex w={"100%"} direction={"column"}>
+                          <FormLabel>Confirm new password</FormLabel>
+                          <InputField
+                            type="password"
+                            placeholder="Write here"
+                          ></InputField>
+                        </Flex>
                       </Flex>
-                    </Flex>
-                  </VStack>
+                    </VStack>
+                    <RoundButton
+                      fontSize={{ base: "16px", lg: "18px" }}
+                      alignSelf={{ base: "center", md: "flex-end" }}
+                      mb={"80px"}
+                      text="Update Password"
+                      // onClick={() => getBillingPortal.refetch()}
+                    />
+                  </Flex>
                 </Flex>
-                <Flex
+                {/* <Flex
                   direction={{ base: "column", lg: "row" }}
                   w={"100%"}
                   gap={{ base: "10px", lg: "50px" }}
@@ -284,7 +404,7 @@ const SettingsPage = () => {
                       </Flex>
                     </Flex>
                   </VStack>
-                </Flex>
+                </Flex> */}
               </VStack>
 
               {/* <Text fontWeight="bold" fontSize={"2rem"} marginBottom={"1rem"}>

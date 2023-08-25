@@ -33,6 +33,7 @@ const theme = extendTheme({
       secondary: "#6D4B9F",
       lightGray: "#A3A3A3",
       lightGray2: "#E2E8F0",
+      lightPrimary: "#C31478",
     },
   },
 });

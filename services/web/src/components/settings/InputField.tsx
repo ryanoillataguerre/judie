@@ -1,11 +1,11 @@
-import { Input } from "@chakra-ui/react";
+import { Input, InputProps as BaseInputProps } from "@chakra-ui/react";
 
 import React from "react";
 
-type InputFieldProps = {
+interface InputFieldProps extends BaseInputProps {
   placeholder: string;
   type?: string;
-};
+}
 
 const InputField = ({
   placeholder,
