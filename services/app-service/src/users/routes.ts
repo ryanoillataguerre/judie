@@ -104,6 +104,26 @@ router.get(
 );
 
 router.put(
+  "/me",
+  [body("firstName").optional()],
+  [body("lastName").optional()],
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const user = await updateUser(session.userId, {
+      firstName: req.body.firstName ?? undefined,
+      lastName: req.body.lastName ?? undefined,
+    });
+    res.status(200).send({
+      data: transformUser(user),
+    });
+  })
+);
+
+router.put(
   "/",
   [body("firstName").optional()],
   [body("lastName").optional()],

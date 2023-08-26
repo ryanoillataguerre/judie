@@ -12,6 +12,7 @@ import {
   Heading,
   Divider,
   InputLeftElement,
+  FormErrorMessage,
   InputGroup,
   VStack,
   HStack,
@@ -52,18 +53,16 @@ interface ChangeNameSubmitData {
 
 const SettingsPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  // const [isUserUpdateLoading, setIsUserUpdateLoading] = useState(false);
-  // const [isPasswordUpdateLoading, setIsPasswordUpdateLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const { userData, logout } = useAuth();
   const toast = useToast();
 
-  console.log("userData: ", userData);
-
   const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
+    handleSubmit: passwordHandleSubmit,
+    register: passwordRegister,
+    formState: { errors: passwordErrors, isSubmitting: isPasswordSumbitting },
   } = useForm<ChangePasswordSubmitData>({
     defaultValues: {
       oldPassword: "",
@@ -79,8 +78,8 @@ const SettingsPage = () => {
     formState: { errors: profileErrors, isSubmitting: isProfileSumbitting },
   } = useForm<ChangeNameSubmitData>({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      firstName: userData?.firstName,
+      lastName: userData?.lastName,
     },
     reValidateMode: "onBlur",
   });
@@ -98,9 +97,9 @@ const SettingsPage = () => {
         });
       },
       onError: (err: HTTPResponseError) => {
-        console.error("Error signing up", err);
+        console.error("Error updating profile", err);
         toast({
-          title: "Error signing up",
+          title: "Error updating profile",
           description: err.message,
           status: "error",
           duration: 5000,
@@ -109,13 +108,53 @@ const SettingsPage = () => {
       },
     });
 
-  async function onSubmit(values: any) {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2));
-        resolve();
-      }, 3000);
-    });
+  const {
+    mutateAsync: passwordMutateAsync,
+    isLoading: passwordMutateIsLoading,
+  } = useMutation({
+    // TODO add mutationFn
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Your password has been updated",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error updating password", err);
+      toast({
+        title: "Error updating password",
+        description: err.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+  });
+
+  async function onSubmitUserInfo({ firstName, lastName }: any) {
+    try {
+      await userMutateAsync({
+        firstName,
+        lastName,
+      });
+    } catch (err) {}
+  }
+
+  async function onSubmitPasswordInfo({
+    oldPassword,
+    newPassword,
+    repeatPassword,
+  }: any) {
+    try {
+      // await passwordMutateAsync({
+      //   oldPassword,
+      //   newPassword,
+      //   repeatPassword,
+      // });
+    } catch (err) {}
   }
 
   const getBillingPortal = useQuery(GET_PORTAL_LINK, {
@@ -241,11 +280,12 @@ const SettingsPage = () => {
                   </Flex>
                   <Divider display={{ base: "block", lg: "none" }} />
 
-                  <Flex
+                  <Box
                     as="form"
-                    onSubmit={handleSubmit(onSubmit)}
+                    display={"flex"}
+                    flexDirection={"column"}
+                    onSubmit={profileHandleSubmit(onSubmitUserInfo)}
                     w={"100%"}
-                    direction={"column"}
                     gap={"20px"}
                   >
                     <VStack gap={{ base: "15px", xl: "10px" }} w={"100%"}>
@@ -256,11 +296,27 @@ const SettingsPage = () => {
                       >
                         <Flex w={"100%"} direction="column">
                           <FormLabel>First Name</FormLabel>
-                          <InputField placeholder={"First Name"}></InputField>
+
+                          <Input
+                            placeholder={"First Name"}
+                            defaultValue={userData?.firstName}
+                            {...profileRegister("firstName", {
+                              required: "This is required",
+                              minLength: {
+                                value: 4,
+                                message: "Minimum length should be 4",
+                              },
+                            })}
+                          />
                         </Flex>
                         <Flex w={"100%"} direction={"column"}>
                           <FormLabel>Last Name</FormLabel>
-                          <InputField placeholder={"Last Name"}></InputField>
+
+                          <Input
+                            placeholder={"Last Name"}
+                            defaultValue={userData?.lastName}
+                            {...profileRegister("lastName", {})}
+                          />
                         </Flex>
                       </Flex>
                       <Flex
@@ -280,7 +336,9 @@ const SettingsPage = () => {
                           <FormLabel>Mail</FormLabel>
                           <InputField
                             type={"email"}
-                            placeholder="marcus.choice@gmail.com"
+                            placeholder="judie@judie.io"
+                            value={userData?.email}
+                            isReadOnly
                           ></InputField>
                         </Flex>
                       </Flex>
@@ -290,10 +348,9 @@ const SettingsPage = () => {
                       alignSelf={{ base: "center", md: "flex-end" }}
                       text="Update Details"
                       type="submit"
-                      loading={userMutateIsLoading}
-                      // onClick={() => getBillingPortal.refetch()}
+                      loading={isProfileSumbitting}
                     />
-                  </Flex>
+                  </Box>
                 </Flex>
                 <Flex
                   direction={{ base: "column", lg: "row" }}
@@ -307,7 +364,13 @@ const SettingsPage = () => {
                     <Text>Check or change password</Text>
                   </Flex>
                   <Divider display={{ base: "block", lg: "none" }} />
-                  <Flex w={"100%"} direction={"column"} gap={"20px"}>
+                  <Flex
+                    as="form"
+                    w={"100%"}
+                    direction={"column"}
+                    gap={"20px"}
+                    onSubmit={passwordHandleSubmit(onSubmitPasswordInfo)}
+                  >
                     <VStack gap={{ base: "15px", xl: "10px" }} w={"100%"}>
                       <Flex
                         direction={{ base: "column", xl: "row" }}
@@ -329,20 +392,40 @@ const SettingsPage = () => {
                                 onClick={() => setShowPassword(!showPassword)}
                               />
                             </InputRightElement>
-                            <InputField
+                            <Input
                               type={showPassword ? "text" : "password"}
                               isRequired
                               placeholder="*********"
-                              {...register("oldPassword", {})}
-                            ></InputField>
+                              {...passwordRegister("oldPassword", {})}
+                            ></Input>
                           </InputGroup>
                         </Flex>
                         <Flex w={"100%"} direction={"column"}>
                           <FormLabel>New password</FormLabel>
-                          <InputField
-                            type="password"
-                            placeholder="Write here"
-                          ></InputField>
+                          <InputGroup size="md">
+                            <InputRightElement>
+                              <IconButton
+                                variant="link"
+                                aria-label={
+                                  showNewPassword
+                                    ? "Mask password"
+                                    : "Reveal password"
+                                }
+                                icon={
+                                  showNewPassword ? <HiEyeOff /> : <HiEye />
+                                }
+                                onClick={() =>
+                                  setShowNewPassword(!showNewPassword)
+                                }
+                              />
+                            </InputRightElement>
+                            <Input
+                              type={showNewPassword ? "text" : "password"}
+                              isRequired
+                              placeholder="Write here"
+                              {...passwordRegister("newPassword", {})}
+                            ></Input>
+                          </InputGroup>
                         </Flex>
                       </Flex>
                       <Flex
@@ -356,10 +439,29 @@ const SettingsPage = () => {
 
                         <Flex w={"100%"} direction={"column"}>
                           <FormLabel>Confirm new password</FormLabel>
-                          <InputField
-                            type="password"
-                            placeholder="Write here"
-                          ></InputField>
+                          <InputGroup size="md">
+                            <InputRightElement>
+                              <IconButton
+                                variant="link"
+                                aria-label={
+                                  showRepeatPassword
+                                    ? "Mask password"
+                                    : "Reveal password"
+                                }
+                                icon={
+                                  showRepeatPassword ? <HiEyeOff /> : <HiEye />
+                                }
+                                onClick={() =>
+                                  setShowRepeatPassword(!showRepeatPassword)
+                                }
+                              />
+                            </InputRightElement>
+                            <InputField
+                              type={showRepeatPassword ? "text" : "password"}
+                              placeholder="Write here"
+                              {...passwordRegister("repeatPassword", {})}
+                            ></InputField>
+                          </InputGroup>
                         </Flex>
                       </Flex>
                     </VStack>
@@ -368,7 +470,8 @@ const SettingsPage = () => {
                       alignSelf={{ base: "center", md: "flex-end" }}
                       mb={"80px"}
                       text="Update Password"
-                      // onClick={() => getBillingPortal.refetch()}
+                      type="submit"
+                      loading={passwordMutateIsLoading}
                     />
                   </Flex>
                 </Flex>
