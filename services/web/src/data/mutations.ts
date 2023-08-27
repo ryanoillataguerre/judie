@@ -1,6 +1,12 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
-import { GradeYear, Message, PermissionType, UserRole } from "./types/api";
+import {
+  ChatFolder,
+  GradeYear,
+  Message,
+  PermissionType,
+  UserRole,
+} from "./types/api";
 
 export interface ChatResponse {
   id: string;
@@ -9,6 +15,7 @@ export interface ChatResponse {
   createdAt: string;
   updatedAt: string;
   messages: Message[];
+  folder?: ChatFolder;
 }
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({

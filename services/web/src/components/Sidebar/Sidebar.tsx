@@ -76,7 +76,7 @@ const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   );
 };
 
-const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
+export const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
   if (chat.userTitle) {
     const result = chat.userTitle.slice(0, 20);
     if (result.length === 20) {

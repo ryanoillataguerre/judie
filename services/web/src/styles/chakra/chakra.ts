@@ -1,3 +1,9 @@
+import "@fontsource/dm-sans/400.css";
+import "@fontsource/dm-sans/500.css";
+import "@fontsource/dm-sans/700.css";
+import "@fontsource/dm-sans/800.css";
+import "@fontsource/dm-sans/900.css";
+
 import { ComponentStyleConfig, extendTheme } from "@chakra-ui/react";
 import type { StyleFunctionProps } from "@chakra-ui/styled-system";
 import { mode } from "@chakra-ui/theme-tools";
@@ -5,6 +11,29 @@ import { mode } from "@chakra-ui/theme-tools";
 const config = {
   initialColorMode: "dark",
   useSystemColorMode: false,
+};
+
+const textComponentStyle: ComponentStyleConfig = {
+  baseStyle: {
+    fontSize: "1rem",
+    fontWeight: 500,
+  },
+  variants: {
+    header: {
+      fontSize: "2rem",
+      fontWeight: "bold",
+    },
+    subheader: (props: StyleFunctionProps) => ({
+      color: "gray.500",
+      fontWeight: 500,
+      fontSize: "1.375rem",
+    }),
+    headerDetail: (props: StyleFunctionProps) => ({
+      color: "gray.500",
+      fontWeight: 500,
+      fontSize: "1.125rem",
+    }),
+  },
 };
 
 const buttonComponentStyle: ComponentStyleConfig = {
@@ -34,6 +63,18 @@ const buttonComponentStyle: ComponentStyleConfig = {
         bg: props.colorMode === "dark" ? "purple.600" : "purple.800",
       },
     }),
+    secondary: (props: StyleFunctionProps) => ({
+      bg: "transparent",
+      borderColor: props.colorMode === "dark" ? "#D3D3D3" : "#676767",
+      borderWidth: "1px",
+      padding: "0.5rem 1rem",
+      _hover: {
+        bg: props.colorMode === "dark" ? "#676767" : "#D3D3D3",
+      },
+      _active: {
+        bg: props.colorMode === "dark" ? "#D3D3D3" : "gray.700",
+      },
+    }),
   },
   // default values for 'size', 'variant' and 'colorScheme'
   defaultProps: {
@@ -45,10 +86,16 @@ const buttonComponentStyle: ComponentStyleConfig = {
 
 const theme = extendTheme({
   config,
+  fonts: {
+    heading: `'DM Sans', sans-serif`,
+    body: `'DM Sans', sans-serif`,
+  },
   colors: {
     brand: {
       900: "#202123",
       700: "#2a3448",
+      backgroundLight: "#F6F6F6",
+      backgroundDark: "#252525",
     },
     // Customized at https://themera.vercel.app/
     purple: {
@@ -73,6 +120,7 @@ const theme = extendTheme({
   },
   components: {
     Button: buttonComponentStyle,
+    Text: textComponentStyle,
   },
 });
 
