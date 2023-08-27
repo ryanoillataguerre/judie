@@ -1,21 +1,13 @@
 import {
   Box,
-  Button,
   Flex,
-  Link,
   Text,
-  FormControl,
   FormLabel,
   Input,
-  Select,
-  FormHelperText,
   Heading,
   Divider,
-  InputLeftElement,
-  FormErrorMessage,
   InputGroup,
   VStack,
-  HStack,
   Spacer,
   Avatar,
   DarkMode,
@@ -24,8 +16,6 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import InputField from "@judie/components/settings/InputField";
-import { Search2Icon } from "@chakra-ui/icons";
 import { useForm } from "react-hook-form";
 import useAuth from "@judie/hooks/useAuth";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
@@ -38,7 +28,7 @@ import RoundButton from "@judie/components/RoundButton/RoundButton";
 import { useMutation, useQuery } from "react-query";
 import { useState } from "react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
-import { putUserMutation } from "@judie/data/mutations";
+import { changePasswordMutation, putUserMutation } from "@judie/data/mutations";
 
 interface ChangePasswordSubmitData {
   oldPassword: string;
@@ -113,6 +103,7 @@ const SettingsPage = () => {
     isLoading: passwordMutateIsLoading,
   } = useMutation({
     // TODO add mutationFn
+    mutationFn: changePasswordMutation,
     onSuccess: () => {
       toast({
         title: "Success",
@@ -147,13 +138,13 @@ const SettingsPage = () => {
     oldPassword,
     newPassword,
     repeatPassword,
-  }: any) {
+  }: ChangePasswordSubmitData) {
     try {
-      // await passwordMutateAsync({
-      //   oldPassword,
-      //   newPassword,
-      //   repeatPassword,
-      // });
+      await passwordMutateAsync({
+        oldPassword,
+        newPassword,
+        passwordConfirm: repeatPassword,
+      });
     } catch (err) {}
   }
 
@@ -326,20 +317,20 @@ const SettingsPage = () => {
                       >
                         <Flex w={"100%"} direction={"column"}>
                           {/* <FormLabel>Phone Number</FormLabel>
-                          <InputField
+                          <Input
                             type="number"
                             placeholder="🇮🇹 +39 | 3335839398"
-                          ></InputField> */}
+                          ></Input> */}
                           <Spacer />
                         </Flex>
                         <Flex w={"100%"} direction="column">
-                          <FormLabel>Mail</FormLabel>
-                          <InputField
+                          <FormLabel>Email</FormLabel>
+                          <Input
                             type={"email"}
                             placeholder="judie@judie.io"
                             value={userData?.email}
                             isReadOnly
-                          ></InputField>
+                          ></Input>
                         </Flex>
                       </Flex>
                     </VStack>
@@ -456,11 +447,12 @@ const SettingsPage = () => {
                                 }
                               />
                             </InputRightElement>
-                            <InputField
+                            <Input
                               type={showRepeatPassword ? "text" : "password"}
                               placeholder="Write here"
+                              isRequired
                               {...passwordRegister("repeatPassword", {})}
-                            ></InputField>
+                            ></Input>
                           </InputGroup>
                         </Flex>
                       </Flex>

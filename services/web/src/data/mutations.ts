@@ -422,11 +422,32 @@ export const putUserMutation = async ({
   lastName?: string;
 }) => {
   const response = await baseFetch({
-    url: `/users/me`,
+    url: `/user/me`,
     method: "PUT",
     body: {
       firstName,
       lastName,
+    },
+  });
+  return response.data;
+};
+
+export const changePasswordMutation = async ({
+  oldPassword,
+  newPassword,
+  passwordConfirm,
+}: {
+  oldPassword: string;
+  newPassword: string;
+  passwordConfirm: string;
+}) => {
+  const response = await baseFetch({
+    url: `/auth/change-password`,
+    method: "PUT",
+    body: {
+      oldPassword,
+      newPassword,
+      passwordConfirm,
     },
   });
   return response.data;
