@@ -424,7 +424,10 @@ export const putUserMutation = async ({
   const response = await baseFetch({
     url: `/users/me`,
     method: "PUT",
-    body: { ...(firstName && { firstName }), ...(lastName && { lastName }) },
+    body: {
+      firstName,
+      lastName,
+    },
   });
   return response.data;
 };
