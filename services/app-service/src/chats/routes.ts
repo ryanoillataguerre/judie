@@ -17,7 +17,7 @@ import {
   getPDFTextPrompt,
   validateMaxMessageLength,
 } from "./service.js";
-import { Chat, Message } from "@prisma/client";
+import { Chat, ChatFolder, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
@@ -32,7 +32,9 @@ import BadRequestError from "../utils/errors/BadRequestError.js";
 
 const router = Router();
 
-const transformChat = (chat: Chat & { messages: Message[] }) => {
+const transformChat = (
+  chat: Chat & { messages: Message[]; folder?: ChatFolder }
+) => {
   return {
     id: chat.id,
     userTitle: chat.userTitle,
@@ -41,7 +43,8 @@ const transformChat = (chat: Chat & { messages: Message[] }) => {
     updatedAt: chat.updatedAt,
     userId: chat.userId,
     messages: chat.messages?.length ? chat.messages.reverse() : [],
-  } as Chat & { messages: Message[] };
+    folder: chat.folder,
+  } as Chat & { messages: Message[]; folder?: ChatFolder };
 };
 
 router.post(
@@ -87,6 +90,7 @@ router.get(
     // Typecasting to transform - need to better define transformChat type
     const chats = (await getUserChats(session.userId)) as (Chat & {
       messages: Message[];
+      folder?: ChatFolder;
     })[];
 
     res.status(200).json({

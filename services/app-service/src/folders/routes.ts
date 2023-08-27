@@ -2,9 +2,28 @@ import { Request, Response, Router } from "express";
 import { body, param } from "express-validator";
 import { errorPassthrough, requireAuth } from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
-import { createFolder, updateFolder } from "./service.js";
+import {
+  createFolder,
+  getUserFoldersWithChatCounts,
+  updateFolder,
+} from "./service.js";
 
 const router = Router();
+
+router.get(
+  "/",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const folders = await getUserFoldersWithChatCounts(session.userId);
+    res.status(200).json({
+      data: folders,
+    });
+  })
+);
 
 router.post(
   "/",

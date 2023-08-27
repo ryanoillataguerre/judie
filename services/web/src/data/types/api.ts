@@ -142,6 +142,16 @@ export interface Message {
   updatedAt: Date | null;
 }
 
+export interface ChatFolder {
+  id: string;
+  userId: string;
+  userTitle: string | null;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  chats?: Chat[];
+}
+
 export interface Chat {
   id: string;
   userId: string;
