@@ -414,6 +414,21 @@ export const putRoomMutation = async ({
   return response.data;
 };
 
+export const putUserMutation = async ({
+  firstName,
+  lastName,
+}: {
+  firstName?: string;
+  lastName?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/users/me`,
+    method: "PUT",
+    body: { ...(firstName && { firstName }), ...(lastName && { lastName }) },
+  });
+  return response.data;
+};
+
 export const resendInviteMutation = async ({
   inviteId,
 }: {
