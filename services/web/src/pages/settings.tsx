@@ -29,6 +29,7 @@ import { useMutation, useQuery } from "react-query";
 import { useState } from "react";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import { changePasswordMutation, putUserMutation } from "@judie/data/mutations";
+import { useRouter } from "next/router";
 
 interface ChangePasswordSubmitData {
   oldPassword: string;
@@ -46,8 +47,9 @@ const SettingsPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
-  const { userData, logout } = useAuth();
+  const { userData, logout, refresh } = useAuth();
   const toast = useToast();
+  const router = useRouter();
 
   const {
     handleSubmit: passwordHandleSubmit,
@@ -85,6 +87,7 @@ const SettingsPage = () => {
           duration: 5000,
           isClosable: true,
         });
+        refresh();
       },
       onError: (err: HTTPResponseError) => {
         console.error("Error updating profile", err);
@@ -231,11 +234,11 @@ const SettingsPage = () => {
                     src=""
                   />
                   <Flex flexDirection={"column"} gap={"5px"}>
-                    <Text
-                      fontSize={18}
-                    >{`${userData?.firstName} ${userData?.lastName}`}</Text>
+                    <Text fontSize={18}>{`${userData?.firstName ?? ""} ${
+                      userData?.lastName ?? ""
+                    }`}</Text>
                     <Text fontSize={14} color="gray.400">
-                      {userData?.email}
+                      {userData?.email ?? ""}
                     </Text>
                   </Flex>
                 </Flex>
@@ -252,6 +255,7 @@ const SettingsPage = () => {
                       fontSize={{ base: "16px", lg: "18px" }}
                       onClick={() => {
                         logout();
+                        router.push("/");
                       }}
                     />
                   </DarkMode>
