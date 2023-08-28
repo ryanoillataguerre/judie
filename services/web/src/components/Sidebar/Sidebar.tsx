@@ -591,7 +591,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             if (router.pathname.includes("/admin")) {
               router.push("/admin");
             } else {
-              router.push("/chat");
+              router.push("/dashboard");
             }
           }}
         >

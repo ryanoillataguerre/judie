@@ -71,8 +71,6 @@ const DashboardFoldersList = () => {
     enabled: !!auth?.userData?.id,
   });
 
-  console.log("foldersQuery", foldersQuery);
-
   const colorMode = useColorMode();
   const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
   const purpleHexCode = useToken("colors", colorKey);

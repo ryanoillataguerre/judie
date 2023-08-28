@@ -1,5 +1,4 @@
 import {
-  Box,
   Center,
   Spinner,
   Table,
@@ -11,13 +10,8 @@ import {
   Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
-import useAuth from "@judie/hooks/useAuth";
-import { useQuery } from "react-query";
-import TableFooter from "./admin/tables/TableFooter";
 import { useRouter } from "next/router";
 import { getTitleForChat } from "./Sidebar/Sidebar";
-import { useMemo, useState } from "react";
 import { Chat } from "@judie/data/types/api";
 
 const ChatsTable = ({
