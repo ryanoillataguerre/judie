@@ -413,6 +413,45 @@ export const putRoomMutation = async ({
   return response.data;
 };
 
+export const putUserMutation = async ({
+  firstName,
+  lastName,
+}: {
+  firstName?: string;
+  lastName?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/user/me`,
+    method: "PUT",
+    body: {
+      firstName,
+      lastName,
+    },
+  });
+  return response.data;
+};
+
+export const changePasswordMutation = async ({
+  oldPassword,
+  newPassword,
+  passwordConfirm,
+}: {
+  oldPassword: string;
+  newPassword: string;
+  passwordConfirm: string;
+}) => {
+  const response = await baseFetch({
+    url: `/auth/change-password`,
+    method: "PUT",
+    body: {
+      oldPassword,
+      newPassword,
+      passwordConfirm,
+    },
+  });
+  return response.data;
+};
+
 export const resendInviteMutation = async ({
   inviteId,
 }: {
