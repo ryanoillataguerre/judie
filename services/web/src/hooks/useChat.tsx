@@ -1,5 +1,4 @@
 import {
-  ChatResponse,
   completionFromQueryMutation,
   createChatMutation,
   putChatMutation,
@@ -11,7 +10,7 @@ import {
   getUserChatsQuery,
   GET_USER_CHATS,
 } from "@judie/data/queries";
-import { Message, MessageType } from "@judie/data/types/api";
+import { Chat, Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
 import useAuth from "./useAuth";
 import {
@@ -38,7 +37,7 @@ export type UIMessageType = Message | TempMessage;
 
 interface UseChatData {
   activeChatId?: string;
-  chat?: ChatResponse;
+  chat?: Chat;
   streaming: boolean;
   addMessage: (message: string) => void;
   messages: Message[];

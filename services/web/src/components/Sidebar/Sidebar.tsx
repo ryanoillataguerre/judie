@@ -6,7 +6,11 @@ import {
   useContext,
   useCallback,
 } from "react";
-import { PermissionType, SubscriptionStatus } from "@judie/data/types/api";
+import {
+  Chat,
+  PermissionType,
+  SubscriptionStatus,
+} from "@judie/data/types/api";
 import {
   Box,
   Button,
@@ -39,7 +43,6 @@ import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useMutation, useQuery } from "react-query";
 import {
-  ChatResponse,
   deleteChatMutation,
   clearConversationsMutation,
   putChatMutation,
@@ -76,7 +79,7 @@ const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   );
 };
 
-const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
+export const getTitleForChat = (chat: Chat, sliced?: boolean) => {
   if (chat.userTitle) {
     const result = chat.userTitle.slice(0, 20);
     if (result.length === 20) {
@@ -100,7 +103,7 @@ const SidebarChat = ({
   setBeingEditedChatId,
   beingEditedChatId,
 }: {
-  chat: ChatResponse;
+  chat: Chat;
   setBeingDeletedChatId: (chatId: string) => void;
   setBeingEditedChatId: (chatId: string | null) => void;
   beingEditedChatId?: string | null;
@@ -588,7 +591,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             if (router.pathname.includes("/admin")) {
               router.push("/admin");
             } else {
-              router.push("/chat");
+              router.push("/dashboard");
             }
           }}
         >

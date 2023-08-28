@@ -46,7 +46,7 @@ const SigninForm = () => {
     mutationFn: signinMutation,
     onSuccess: () => {
       router.push({
-        pathname: "/chat",
+        pathname: "/dashboard",
         query: router.query,
       });
     },
