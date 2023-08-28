@@ -150,15 +150,20 @@ export interface ChatFolder {
   updatedAt: Date | null;
   deletedAt: Date | null;
   chats?: Chat[];
+  _count?: {
+    chats: number;
+  };
 }
 
 export interface Chat {
   id: string;
   userId: string;
-  usertitle?: string;
+  userTitle?: string;
+  subject?: string;
   createdAt: Date;
   updatedAt: Date | null;
   messages: Message[];
+  folder?: ChatFolder;
 }
 
 export enum UserRole {
