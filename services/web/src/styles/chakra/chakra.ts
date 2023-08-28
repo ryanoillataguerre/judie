@@ -33,6 +33,15 @@ const textComponentStyle: ComponentStyleConfig = {
       fontWeight: 500,
       fontSize: "1.125rem",
     }),
+    title: {
+      fontWeight: 500,
+      fontSize: "1.125rem",
+    },
+    detail: {
+      color: "gray.500",
+      fontWeight: 400,
+      fontSize: "0.875rem",
+    },
   },
 };
 

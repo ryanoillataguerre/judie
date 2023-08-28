@@ -29,8 +29,14 @@ export const getUserFoldersWithChatCounts = async (userId: string) => {
   const folders = await dbClient.chatFolder.findMany({
     where: {
       userId,
+      deletedAt: null,
     },
     select: {
+      id: true,
+      userTitle: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true,
       _count: {
         select: {
           chats: true,

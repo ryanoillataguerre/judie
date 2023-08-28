@@ -1,6 +1,7 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
 import {
+  Chat,
   ChatFolder,
   GradeYear,
   Message,
@@ -8,15 +9,6 @@ import {
   UserRole,
 } from "./types/api";
 
-export interface ChatResponse {
-  id: string;
-  userTitle?: string;
-  subject?: string;
-  createdAt: string;
-  updatedAt: string;
-  messages: Message[];
-  folder?: ChatFolder;
-}
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
   query,
@@ -122,7 +114,7 @@ export const createChatMutation = async ({
   subject,
 }: {
   subject?: string | undefined;
-}): Promise<ChatResponse> => {
+}): Promise<Chat> => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",
@@ -141,7 +133,7 @@ export const putChatMutation = async ({
   chatId: string;
   subject?: string;
   userTitle?: string;
-}): Promise<ChatResponse> => {
+}): Promise<Chat> => {
   const response = await baseFetch({
     url: `/chat/${chatId}`,
     method: "PUT",
@@ -460,4 +452,13 @@ export const uploadAssignmentMutation = async ({
     form: true,
   });
   return response;
+};
+
+export const createFolderMutation = async ({ title }: { title: string }) => {
+  const response = await baseFetch({
+    url: `/folders`,
+    method: "POST",
+    body: { title },
+  });
+  return response.data;
 };

@@ -2,6 +2,9 @@ import { HStack, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
 import DashboardHeader from "./DashboardHeader";
 import useAuth from "@judie/hooks/useAuth";
 import ChatsTable from "./ChatsTable";
+import { useQuery } from "react-query";
+import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
+import DashboardFoldersList from "./DashboardFoldersList";
 
 const Dashboard = () => {
   const { userData } = useAuth();
@@ -10,8 +13,22 @@ const Dashboard = () => {
     base: "2rem",
     md: "2rem",
   });
+  const { data: chatsData, isLoading: isGetChatsLoading } = useQuery(
+    [GET_USER_CHATS, userData?.id],
+    {
+      queryFn: getUserChatsQuery,
+      staleTime: 60000,
+      enabled: !!userData?.id,
+    }
+  );
   return (
-    <VStack paddingX={xPadding} paddingY={"1rem"} maxH={"100%"} w={"100%"}>
+    <VStack
+      paddingX={xPadding}
+      paddingY={"1rem"}
+      h={"100%"}
+      w={"100%"}
+      overflowY={"scroll"}
+    >
       {/* Dashboard Header */}
       <DashboardHeader />
       {/* Title */}
@@ -22,6 +39,7 @@ const Dashboard = () => {
         </Text>
       </VStack>
       {/* Folders section */}
+      <DashboardFoldersList />
       {/* Chats list (scrollable container) */}
       <HStack
         justifyContent={"flex-start"}
@@ -32,7 +50,7 @@ const Dashboard = () => {
       >
         <Text variant={"subheader"}>Chats</Text>
       </HStack>
-      <ChatsTable />
+      <ChatsTable chats={chatsData} isLoading={isGetChatsLoading} />
     </VStack>
   );
 };

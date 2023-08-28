@@ -1,6 +1,7 @@
 import { baseFetch } from "./baseFetch";
-import { ChatResponse } from "./mutations";
 import {
+  Chat,
+  ChatFolder,
   EntitiesResponse,
   Invite,
   Organization,
@@ -23,7 +24,7 @@ export const getMeQuery = async ({
 };
 
 export const GET_USER_CHATS = "GET_USER_CHATS";
-export const getUserChatsQuery = async (): Promise<ChatResponse[]> => {
+export const getUserChatsQuery = async (): Promise<Chat[]> => {
   const response = await baseFetch({
     url: "/chat",
     method: "GET",
@@ -32,7 +33,7 @@ export const getUserChatsQuery = async (): Promise<ChatResponse[]> => {
 };
 
 export const GET_CHAT_BY_ID = "GET_CHAT_BY_ID";
-export const getChatByIdQuery = async (id: string): Promise<ChatResponse> => {
+export const getChatByIdQuery = async (id: string): Promise<Chat> => {
   const response = await baseFetch({
     url: `/chat/${id}`,
     method: "GET",
@@ -168,9 +169,19 @@ export const getUserByIdQuery = async (id: string): Promise<User> => {
   return response.data;
 };
 
+export const MESSAGE_BY_ID = "MESSAGE_BY_ID";
 export const getMessageByIdQuery = async (id: string): Promise<any> => {
   const response = await baseFetch({
     url: `/messages/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_USER_FOLDERS = "GET_USER_FOLDERS";
+export const getUserFoldersQuery = async (): Promise<ChatFolder[]> => {
+  const response = await baseFetch({
+    url: `/folders`,
     method: "GET",
   });
   return response.data;
