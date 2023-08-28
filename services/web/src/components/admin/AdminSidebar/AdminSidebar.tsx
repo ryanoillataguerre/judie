@@ -268,8 +268,8 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
     entities?.schools?.length ||
     entities?.rooms?.length;
 
-  const onChatClick = useCallback(() => {
-    router.push("/chat");
+  const onDashClick = useCallback(() => {
+    router.push("/dashboard");
   }, [router]);
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
@@ -300,9 +300,9 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
       {
         icon: <BsFillChatTextFill />,
-        key: "chat",
-        label: "Chat",
-        onClick: onChatClick,
+        key: "dashboard",
+        label: "Dashboard",
+        onClick: onDashClick,
       },
       {
         icon: <ColorModeSwitcher />,
@@ -310,7 +310,7 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
     ];
     return options;
-  }, [auth, router, onChatClick]);
+  }, [auth, router, onDashClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({

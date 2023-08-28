@@ -129,6 +129,7 @@ export const getUserChats = async (userId: string) => {
           },
         },
       },
+      folder: true,
     },
     orderBy: {
       updatedAt: "desc",

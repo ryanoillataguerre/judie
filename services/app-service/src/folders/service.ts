@@ -1,20 +1,20 @@
-import { Prisma } from "@prisma/client";
+import { ChatFolder, Prisma } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createFolder = async (params: Prisma.ChatFolderCreateInput) => {
-  const newChat = await dbClient.chatFolder.create({
+  const newChatFolder: ChatFolder = await dbClient.chatFolder.create({
     data: {
       ...params,
     },
   });
-  return newChat;
+  return newChatFolder;
 };
 
 export const updateFolder = async (
   folderId: string,
   params: Prisma.ChatFolderUpdateInput
 ) => {
-  const newChat = await dbClient.chatFolder.update({
+  const newChatFolder = await dbClient.chatFolder.update({
     data: {
       ...params,
     },
@@ -22,5 +22,30 @@ export const updateFolder = async (
       id: folderId,
     },
   });
-  return newChat;
+  return newChatFolder;
+};
+
+export const getUserFoldersWithChatCounts = async (userId: string) => {
+  const folders = await dbClient.chatFolder.findMany({
+    where: {
+      userId,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      userTitle: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true,
+      _count: {
+        select: {
+          chats: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return folders;
 };

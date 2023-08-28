@@ -1052,6 +1052,11 @@
   dependencies:
     "@floating-ui/core" "^1.3.1"
 
+"@fontsource/dm-sans@^5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@fontsource/dm-sans/-/dm-sans-5.0.9.tgz#8a8371142ac555f0735349dffb9f6f9b72aac7c4"
+  integrity sha512-DdnfTba2Xsk0cQSKiJCiUmrdfLtP/rT/pfb66FxzI+jq4tXNc74oHNTvBgHaZ19gvuxo3Pr/YnPrtDQjsnj6kw==
+
 "@hookform/error-message@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@hookform/error-message/-/error-message-2.0.1.tgz#6a37419106e13664ad6a29c9dae699ae6cd276b8"
