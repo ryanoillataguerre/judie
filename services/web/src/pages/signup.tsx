@@ -368,8 +368,7 @@ export const SignupForm = ({
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
-          variant={"solid"}
+          variant={"purp"}
           loading={isLoading}
           label="Sign Up"
           type="submit"
