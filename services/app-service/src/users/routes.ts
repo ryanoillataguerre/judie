@@ -1,5 +1,9 @@
 import { Router, Request, Response } from "express";
-import { errorPassthrough, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import {
   getUser,
   getUserPermissions,
@@ -108,6 +112,7 @@ router.put(
   [body("firstName").optional()],
   [body("lastName").optional()],
   [body("receivePromotions").isBoolean().optional()],
+  handleValidationErrors,
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;

@@ -181,7 +181,7 @@ router.put(
   [body("name").isString().exists()],
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
     const { userId } = req.session;
 
@@ -197,7 +197,7 @@ router.put(
     res.status(201).json({
       data: school,
     });
-  }
+  })
 );
 
 export default router;

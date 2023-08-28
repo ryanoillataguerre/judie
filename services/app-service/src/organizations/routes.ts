@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
 import {
+  errorPassthrough,
   handleValidationErrors,
   requireAuth,
   requireJudieAuth,
@@ -32,7 +33,7 @@ router.post(
   // Only Judie employees can create organizations
   requireJudieAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const {
       name,
       primaryContactEmail,
@@ -104,7 +105,7 @@ router.post(
     res.status(201).json({
       data: organization,
     });
-  }
+  })
 );
 
 router.put(
@@ -112,7 +113,7 @@ router.put(
   [body("name").isString().exists()],
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
     const { userId } = req.session;
 
@@ -128,14 +129,14 @@ router.put(
     res.status(201).json({
       data: organization,
     });
-  }
+  })
 );
 
 router.get(
   "/:organizationId/users",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
@@ -148,14 +149,14 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
 );
 
 router.get(
   "/:organizationId",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
@@ -168,14 +169,14 @@ router.get(
     res.status(200).send({
       data: org,
     });
-  }
+  })
 );
 
 router.get(
   "/:organizationId/invites",
   requireAuth,
   handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
@@ -188,7 +189,7 @@ router.get(
     res.status(200).send({
       data: users,
     });
-  }
+  })
 );
 
 export default router;
