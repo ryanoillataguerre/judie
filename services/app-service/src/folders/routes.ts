@@ -32,7 +32,7 @@ router.get(
 router.post(
   "/",
   [body("title").isString()],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -63,7 +63,7 @@ router.put(
     body("newChats").optional().isArray(),
     body("removedChats").optional().isArray(),
   ],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;

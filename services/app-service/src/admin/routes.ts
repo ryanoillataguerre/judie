@@ -3,13 +3,16 @@ import invitesRouter from "../invites/routes.js";
 import organizationsRouter from "../organizations/routes.js";
 import schoolsRouter from "../schools/routes.js";
 import roomsRouter from "../rooms/routes.js";
-import { errorPassthrough, handleValidationErrors, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import {
   getEntitiesForUser,
   getUserAdmin,
   getUsersForAdminUser,
 } from "./service.js";
-import { query } from "express-validator";
 
 // Admin Router
 const router = Router();
@@ -53,7 +56,7 @@ const adminUserRouter = Router();
 adminUserRouter.get(
   "/:userId",
   requireAuth,
-  handleValidationErrors
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     // TODO Ryan: Validate current user can view this user
     const session = req.session;

@@ -32,7 +32,7 @@ router.post(
   ],
   // Only Judie employees can create organizations
   requireJudieAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const {
       name,
@@ -112,7 +112,7 @@ router.put(
   "/:organizationId",
   [body("name").isString().exists()],
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
     const { userId } = req.session;
@@ -135,7 +135,7 @@ router.put(
 router.get(
   "/:organizationId/users",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
@@ -155,7 +155,7 @@ router.get(
 router.get(
   "/:organizationId",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const organizationId = req.params.organizationId;
@@ -175,7 +175,7 @@ router.get(
 router.get(
   "/:organizationId/invites",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const organizationId = req.params.organizationId;

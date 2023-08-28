@@ -112,7 +112,7 @@ router.put(
   [body("firstName").optional()],
   [body("lastName").optional()],
   [body("receivePromotions").isBoolean().optional()],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;

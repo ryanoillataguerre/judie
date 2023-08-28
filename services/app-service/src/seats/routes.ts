@@ -22,7 +22,7 @@ router.put(
   ],
   // Only Judie employees can edit seats
   requireJudieAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { count } = req.body;
     const { userId } = req.session;
