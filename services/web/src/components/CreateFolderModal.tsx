@@ -45,7 +45,6 @@ const CreateFolderModal = ({
       setSuccess(true);
       reset();
       setIsOpen(false);
-      // TODO: Refresh folders
       foldersQuery.refetch();
     },
   });
