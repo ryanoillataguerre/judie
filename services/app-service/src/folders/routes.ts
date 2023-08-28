@@ -1,6 +1,10 @@
 import { Request, Response, Router } from "express";
 import { body, param } from "express-validator";
-import { errorPassthrough, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import {
   createFolder,
@@ -28,6 +32,7 @@ router.get(
 router.post(
   "/",
   [body("title").isString()],
+  errorPassthrough(handleValidationErrors),
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -58,6 +63,7 @@ router.put(
     body("newChats").optional().isArray(),
     body("removedChats").optional().isArray(),
   ],
+  errorPassthrough(handleValidationErrors),
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
