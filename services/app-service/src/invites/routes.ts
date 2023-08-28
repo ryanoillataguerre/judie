@@ -36,7 +36,7 @@ router.post(
     body("permissions.*.schoolId").isString().optional(),
     body("permissions.*.roomId").isString().optional(),
   ],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const body = req.body as CreateInviteBody;
@@ -106,7 +106,7 @@ router.post(
     body("lastName").isString().optional(),
     body("password").isString().exists(),
   ],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     // Get invite
     const newUser = await redeemInvite({
@@ -143,7 +143,7 @@ router.post(
   "/bulk",
   bulkInviteValidation,
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const body = req.body as BulkInviteBody;
@@ -163,7 +163,7 @@ router.post(
   "/:inviteId/resend",
   [param("inviteId").isString()],
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     // Get invite by ID
     const invite = await dbClient.invite.findUnique({

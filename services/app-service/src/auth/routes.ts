@@ -26,7 +26,7 @@ const router = Router();
 router.post(
   "/signup",
   signupValidation,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const {
@@ -62,7 +62,7 @@ router.post(
 router.post(
   "/signin",
   [body("email").exists().isEmail(), body("password").isString().exists()],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const { email, password } = req.body;
@@ -105,7 +105,7 @@ router.put(
 router.post(
   "/waitlist",
   [body("email").exists().isEmail()],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { email } = req.body;
     await addToWaitlist({ email });
@@ -116,7 +116,7 @@ router.post(
 router.post(
   "/forgot-password",
   [body("email").exists().isEmail()],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { email } = req.body;
     const origin = req.headers.origin;
@@ -132,7 +132,7 @@ router.post(
 router.post(
   "/reset-password",
   [body("password").exists(), body("token").exists()],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { password, token } = req.body;
     await resetPassword({ password, token });

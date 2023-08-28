@@ -27,7 +27,6 @@ import { transcribeAudio } from "../openai/service.js";
 import { Readable } from "stream";
 import { temporaryDirectory } from "tempy";
 import { extractTextFromPdf } from "../pdf/service.js";
-import InternalError from "../utils/errors/InternalError.js";
 import BadRequestError from "../utils/errors/BadRequestError.js";
 
 const router = Router();
@@ -52,7 +51,7 @@ router.post(
   [body("query").exists()],
   [query("chatId").optional()],
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(messageRateLimit),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -102,6 +101,7 @@ router.get(
 router.get(
   "/:chatId",
   requireAuth,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {
@@ -124,6 +124,7 @@ router.post(
   "/",
   [body("subject").optional()],
   requireAuth,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {
@@ -152,6 +153,7 @@ router.put(
     param("chatId").exists(),
     body("userTitle").optional(),
   ],
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {

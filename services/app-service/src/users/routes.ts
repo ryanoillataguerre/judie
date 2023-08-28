@@ -1,5 +1,9 @@
 import { Router, Request, Response } from "express";
-import { errorPassthrough, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import {
   getUser,
   getUserPermissions,
