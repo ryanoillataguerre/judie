@@ -1,4 +1,4 @@
-import { HStack, Text, VStack, useBreakpointValue } from "@chakra-ui/react";
+import { HStack, Text, VStack } from "@chakra-ui/react";
 import DashboardHeader from "./DashboardHeader";
 import useAuth from "@judie/hooks/useAuth";
 import ChatsTable from "./ChatsTable";
@@ -9,10 +9,6 @@ import DashboardFoldersList from "./DashboardFoldersList";
 const Dashboard = () => {
   const { userData } = useAuth();
 
-  const xPadding = useBreakpointValue({
-    base: "2rem",
-    md: "2rem",
-  });
   const { data: chatsData, isLoading: isGetChatsLoading } = useQuery(
     [GET_USER_CHATS, userData?.id],
     {
@@ -23,7 +19,7 @@ const Dashboard = () => {
   );
   return (
     <VStack
-      paddingX={xPadding}
+      paddingX={"2rem"}
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
