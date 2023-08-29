@@ -58,6 +58,30 @@ const transformUser = (
   return user;
 };
 
+router.put(
+  "/me",
+  [body("firstName").optional()],
+  [body("lastName").optional()],
+  [body("receivePromotions").isBoolean().optional()],
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const user = await updateUser(session.userId, {
+      ...(req.body.firstName ? { firstName: req.body.firstName } : {}),
+      ...(req.body.lastName ? { lastName: req.body.lastName } : {}),
+      ...(req.body.receivePromotions !== undefined
+        ? { receivePromotions: req.body.receivePromotions }
+        : {}),
+    });
+    res.status(200).send({
+      data: transformUser(user),
+    });
+  })
+);
+
 router.get(
   "/me",
   requireAuth,
@@ -104,29 +128,6 @@ router.get(
     } catch (err) {
       throw new UnauthorizedError("No user id found in session");
     }
-  })
-);
-
-router.put(
-  "/",
-  [body("firstName").optional()],
-  [body("lastName").optional()],
-  [body("receivePromotions").isBoolean().optional()],
-  errorPassthrough(handleValidationErrors),
-  requireAuth,
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    if (!session.userId) {
-      throw new UnauthorizedError("No user id found in session");
-    }
-    const user = await updateUser(session.userId, {
-      firstName: req.body.firstName ?? undefined,
-      lastName: req.body.lastName ?? undefined,
-      receivePromotions: req.body.receivePromotions ?? undefined,
-    });
-    res.status(200).send({
-      data: transformUser(user),
-    });
   })
 );
 

@@ -7,6 +7,7 @@ import "@fontsource/dm-sans/900.css";
 import { ComponentStyleConfig, extendTheme } from "@chakra-ui/react";
 import type { StyleFunctionProps } from "@chakra-ui/styled-system";
 import { mode } from "@chakra-ui/theme-tools";
+import { defineStyleConfig } from "@chakra-ui/react";
 
 const config = {
   initialColorMode: "dark",
@@ -92,8 +93,26 @@ const buttonComponentStyle: ComponentStyleConfig = {
     // colorScheme: '',
   },
 };
+const formLabelStyle = defineStyleConfig({
+  // The styles all button have in common
+  baseStyle: {
+    mb: "10px",
+    fontSize: "14px",
+  },
+  // Two sizes: sm and md
+  sizes: {},
+  // Two variants: outline and solid
+  variants: {},
+  // The default size and variant values
+  defaultProps: {},
+});
 
 const theme = extendTheme({
+  components: {
+    FormLabel: formLabelStyle,
+    Button: buttonComponentStyle,
+    Text: textComponentStyle,
+  },
   config,
   fonts: {
     heading: `'DM Sans', sans-serif`,
@@ -103,8 +122,15 @@ const theme = extendTheme({
     brand: {
       900: "#202123",
       700: "#2a3448",
+
+      primary: "#3C1478",
+      secondary: "#6D4B9F",
+      lightGray: "#A3A3A3",
+      lightGray2: "#E2E8F0",
+      lightPrimary: "#C31478",
       backgroundLight: "#F6F6F6",
       backgroundDark: "#252525",
+
     },
     // Customized at https://themera.vercel.app/
     purple: {
@@ -127,10 +153,7 @@ const theme = extendTheme({
       },
     }),
   },
-  components: {
-    Button: buttonComponentStyle,
-    Text: textComponentStyle,
-  },
+
 });
 
 export default theme;

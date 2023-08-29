@@ -25,11 +25,9 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <ChatProvider>
-          <SidebarPageContainer>
+          <SidebarPageContainer scroll={false}>
             <ChatNavbar />
-            <Chat
-              initialQuery={query}
-            />
+            <Chat initialQuery={query} />
             <ChatFooter />
           </SidebarPageContainer>
         </ChatProvider>
