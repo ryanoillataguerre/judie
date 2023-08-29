@@ -20,9 +20,9 @@ import {
 } from "@chakra-ui/react";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
-import MessageRow from "../MessageRow/MessageRow";
+import MessageRowBubble from "../MessageRowBubble/MessageRowBubble";
 import { MessageType } from "@judie/data/types/api";
-import ScrollContainer from "../ScrollContainer/ScrollContainer";
+import ScrollContainerBubbles from "../ScrollContainerBubbles/ScrollContainerBubbles";
 import Paywall from "../Paywall/Paywall";
 import { useRouter } from "next/router";
 import Loading from "../lottie/Loading/Loading";
@@ -89,7 +89,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           ? message.readableContent?.slice(9, 50)
           : message.readableContent?.slice(0, 50)
       }`;
-      return <MessageRow key={key} message={message} />;
+      return <MessageRowBubble key={key} message={message} />;
     });
   }, [
     messages,
@@ -182,11 +182,11 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           <Spinner colorScheme="blue.400" />
         </Flex>
       ) : (
-        <ScrollContainer>
+        <ScrollContainerBubbles>
           {renderedMessages}
           {(streaming ||
             (beingStreamedChatId === chatId && beingStreamedMessage)) && (
-            <MessageRow
+            <MessageRowBubble
               key={`${MessageType.BOT}-mostRecent`}
               beingStreamed={true}
               message={{
@@ -198,7 +198,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
               }}
             />
           )}
-        </ScrollContainer>
+        </ScrollContainerBubbles>
       )}
     </Flex>
   );

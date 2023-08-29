@@ -40,13 +40,18 @@ const SendButton = () => {
   return (
     <Button
       type="submit"
-      colorScheme="teal"
       style={{
         padding: "0 0",
         height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+      }}
+      _hover={{
+        backgroundColor: "brand.secondary",
+        svg: {
+          fill: "white",
+        },
       }}
       border={"none"}
       bg={"transparent"}
@@ -147,7 +152,7 @@ const RecordButton = ({
     <Button
       type="button"
       // variant="outline"
-      colorScheme="teal"
+      // colorScheme="teal"
       bg={"transparent"}
       style={{
         padding: "0 0rem",
@@ -155,6 +160,12 @@ const RecordButton = ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+      }}
+      _hover={{
+        backgroundColor: "brand.secondary",
+        svg: {
+          fill: "white",
+        },
       }}
       border={"none"}
       onClick={() => {
@@ -290,7 +301,7 @@ const ChatInput = () => {
           display={"flex"}
           width={"100%"}
           h={"auto"}
-          mb={"20px"}
+          mb={"40px"}
           alignItems={"center"}
         >
           <Textarea
@@ -299,7 +310,7 @@ const ChatInput = () => {
             ref={ref}
             value={chatValue}
             _hover={{
-              borderColor: "teal",
+              borderColor: "brand.primary",
             }}
             disabled={isRecording}
             onChange={(e) => setChatValue(e.target.value)}
@@ -317,7 +328,7 @@ const ChatInput = () => {
           />
           <HStack
             position={"absolute"}
-            bottom={"9px"}
+            bottom={"10px"}
             right={"16px"}
             height={"30px"}
             zIndex={2}
