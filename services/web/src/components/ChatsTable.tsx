@@ -5,6 +5,7 @@ import {
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -17,9 +18,11 @@ import { Chat } from "@judie/data/types/api";
 const ChatsTable = ({
   chats,
   isLoading,
+  folderName,
 }: {
   chats?: Chat[];
   isLoading?: boolean;
+  folderName?: string;
 }) => {
   const router = useRouter();
 
@@ -40,7 +43,7 @@ const ChatsTable = ({
         <Center width={"100%"} height={"100%"}>
           <Spinner colorScheme={"purple"} />
         </Center>
-      ) : (
+      ) : chats?.length ? (
         <Table variant={"simple"} size="md">
           <Thead position={"sticky"} top={0} backgroundColor={headerBgColor}>
             <Tr>
@@ -63,7 +66,7 @@ const ChatsTable = ({
                 }}
               >
                 <Td>{getTitleForChat(chat)}</Td>
-                <Td>{chat.folder?.userTitle || "n/a"}</Td>
+                <Td>{chat.folder?.userTitle || folderName || "n/a"}</Td>
                 <Td>
                   {chat.updatedAt
                     ? new Date(chat.updatedAt)?.toISOString().replace(/T.*/, "")
@@ -73,6 +76,10 @@ const ChatsTable = ({
             ))}
           </Tbody>
         </Table>
+      ) : (
+        <Center width={"100%"}>
+          <Text variant={"subheaderDetail"}>No chats yet!</Text>
+        </Center>
       )}
     </TableContainer>
   );

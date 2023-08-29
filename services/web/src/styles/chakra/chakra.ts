@@ -25,6 +25,10 @@ const textComponentStyle: ComponentStyleConfig = {
       fontWeight: "bold",
     },
     subheader: (props: StyleFunctionProps) => ({
+      fontWeight: 500,
+      fontSize: "1.375rem",
+    }),
+    subheaderDetail: (props: StyleFunctionProps) => ({
       color: "gray.500",
       fontWeight: 500,
       fontSize: "1.375rem",
@@ -130,7 +134,6 @@ const theme = extendTheme({
       lightPrimary: "#C31478",
       backgroundLight: "#F6F6F6",
       backgroundDark: "#252525",
-
     },
     // Customized at https://themera.vercel.app/
     purple: {
@@ -153,7 +156,6 @@ const theme = extendTheme({
       },
     }),
   },
-
 });
 
 export default theme;

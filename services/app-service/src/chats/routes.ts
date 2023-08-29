@@ -122,7 +122,7 @@ router.get(
 
 router.post(
   "/",
-  [body("subject").optional()],
+  [body("subject").optional(), body("folderId").optional()],
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -136,6 +136,15 @@ router.post(
           id: session.userId,
         },
       },
+      ...(req.body?.folderId
+        ? {
+            folder: {
+              connect: {
+                id: req.body.folderId,
+              },
+            },
+          }
+        : {}),
       subject: req.body?.subject || undefined,
     });
 

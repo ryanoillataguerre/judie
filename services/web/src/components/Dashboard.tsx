@@ -44,7 +44,7 @@ const Dashboard = () => {
         marginTop={"1.5rem"}
         marginBottom={"1rem"}
       >
-        <Text variant={"subheader"}>Chats</Text>
+        <Text variant={"subheaderDetail"}>Chats</Text>
       </HStack>
       <ChatsTable chats={chatsData} isLoading={isGetChatsLoading} />
     </VStack>
