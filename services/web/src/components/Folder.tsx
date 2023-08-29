@@ -1,11 +1,14 @@
 import {
   Box,
   Button,
+  Center,
   Divider,
   HStack,
   Text,
   VStack,
+  useColorMode,
   useToast,
+  useToken,
 } from "@chakra-ui/react";
 import { createChatMutation } from "@judie/data/mutations";
 import { GET_FOLDER_BY_ID, getFolderByIdQuery } from "@judie/data/queries";
@@ -13,6 +16,7 @@ import { useRouter } from "next/router";
 import { BsArrowLeft } from "react-icons/bs";
 import { useMutation, useQuery } from "react-query";
 import ChatsTable from "./ChatsTable";
+import { HiMiniFolderOpen } from "react-icons/hi2";
 
 const Folder = ({ id }: { id: string }) => {
   const router = useRouter();
@@ -43,6 +47,10 @@ const Folder = ({ id }: { id: string }) => {
       });
     },
   });
+
+  const colorMode = useColorMode();
+  const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
+  const purpleHexCode = useToken("colors", colorKey);
   return (
     <VStack
       paddingX={"2rem"}
@@ -64,6 +72,9 @@ const Folder = ({ id }: { id: string }) => {
               margin: "0 1rem",
             }}
           />
+          <Center borderRadius={"0.5rem"} padding={"0.5rem"} bgColor={"white"}>
+            <HiMiniFolderOpen size={24} color={purpleHexCode} />
+          </Center>
           <Text variant={"subheader"}>{folderQuery?.data?.userTitle}</Text>
         </HStack>
         <Box />
