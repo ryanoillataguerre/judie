@@ -1,14 +1,9 @@
 import {
-  Box,
   Button,
   Center,
-  Grid,
-  GridItem,
   HStack,
-  SimpleGrid,
   Text,
   VStack,
-  useBreakpoint,
   useBreakpointValue,
   useColorMode,
   useToken,
@@ -20,12 +15,10 @@ import { BsArrowRight } from "react-icons/bs";
 import { HiMiniFolderOpen } from "react-icons/hi2";
 import { useQuery } from "react-query";
 
-const FolderCard = ({
-  id,
+export const FolderCard = ({
   title,
   chatCount,
 }: {
-  id: string;
   title?: string | null;
   chatCount?: number;
 }) => {
@@ -121,7 +114,6 @@ const DashboardFoldersList = () => {
           return (
             <FolderCard
               key={folder.id}
-              id={folder.id}
               title={folder.userTitle}
               chatCount={folder?._count?.chats}
             />
