@@ -49,3 +49,14 @@ export const getUserFoldersWithChatCounts = async (userId: string) => {
   });
   return folders;
 };
+
+export const getFolderById = (id: string) => {
+  return dbClient.chatFolder.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      chats: true,
+    },
+  });
+};

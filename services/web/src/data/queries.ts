@@ -186,3 +186,16 @@ export const getUserFoldersQuery = async (): Promise<ChatFolder[]> => {
   });
   return response.data;
 };
+
+export const GET_FOLDER_BY_ID = "GET_FOLDER_BY_ID";
+export const getFolderByIdQuery = async ({
+  id,
+}: {
+  id: string;
+}): Promise<ChatFolder> => {
+  const response = await baseFetch({
+    url: `/folders/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};

@@ -55,6 +55,7 @@ const Folders = () => {
             return (
               <FolderCard
                 key={folder.id}
+                id={folder.id}
                 title={folder.userTitle}
                 chatCount={folder?._count?.chats}
               />

@@ -8,11 +8,29 @@ import {
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import {
   createFolder,
+  getFolderById,
   getUserFoldersWithChatCounts,
   updateFolder,
 } from "./service.js";
 
 const router = Router();
+
+router.get(
+  "/:folderId",
+  [param("folderId").exists()],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const folder = await getFolderById(req.params.folderId as string);
+    res.status(200).json({
+      data: folder,
+    });
+  })
+);
 
 router.get(
   "/",
