@@ -14,7 +14,8 @@ import {
   Tooltip,
   Box,
   Avatar,
-  Spacer,
+  Tag,
+  TagLabel,
 } from "@chakra-ui/react";
 import { Message, MessageType } from "@judie/data/types/api";
 import { UIMessageType } from "@judie/hooks/useChat";
@@ -29,6 +30,8 @@ import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { Howl } from "howler";
 import { BsStopFill } from "react-icons/bs";
 import useAuth from "@judie/hooks/useAuth";
+import { ChatContext } from "@judie/hooks/useChat";
+import { useContext } from "react";
 
 export const MemoizedReactMarkdown: FC<Options> = memo(
   ReactMarkdown,
@@ -150,7 +153,10 @@ const MessageRow = ({
   beingStreamed?: boolean;
 }) => {
   const { userData } = useAuth();
+  const chat = useContext(ChatContext);
+  const subject = chat.chat?.subject;
   const useJudieLogo = useColorModeValue("/logo.svg", "/logo_dark.svg");
+
   return (
     <Flex
       flexDirection={message.type === MessageType.USER ? "row-reverse" : "row"}

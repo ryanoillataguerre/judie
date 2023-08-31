@@ -1,5 +1,18 @@
-import { Box } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Tag,
+  TagLabel,
+  useColorModeValue,
+  Divider,
+} from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ChatContext } from "@judie/hooks/useChat";
+import { useContext } from "react";
+import { getTopicEmoji } from "@judie/utils/topicEmoji";
+
+import SidebarChatNav from "@judie/components/SidebarChatNav/SidebarChatNav";
+import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 
 const ScrollContainerBubbles = ({
   children,
@@ -12,6 +25,11 @@ const ScrollContainerBubbles = ({
   const [prevInnerDivHeight, setPrevInnerDivHeight] = useState<number | null>(
     null
   );
+
+  const chatContext = useContext(ChatContext);
+  const subject = chatContext.chat?.subject;
+  const bgColor = useColorModeValue("#FFF", "#333");
+  const fontColor = useColorModeValue("#000", "#FFF");
 
   // const [showScrollButton, setShowScrollButton] = useState(false);
 
@@ -56,7 +74,17 @@ const ScrollContainerBubbles = ({
         height: "100%",
         width: "100%",
       }}
+      display={"flex"}
+      flexDirection={"row"}
     >
+      {/* <Divider
+        orientation="vertical"
+        mt={"40px"}
+        mx={"10px"}
+        height={"75%"}
+        w={"1px"}
+        backgroundColor={"#8E8E8E"}
+      /> */}
       <Box
         ref={outerDiv}
         style={{
@@ -64,7 +92,7 @@ const ScrollContainerBubbles = ({
           height: "100%",
           overflow: "scroll",
         }}
-        // display={"flex"}
+        flexGrow={1}
         justifyContent={"center"}
         alignItems={"center"}
       >
@@ -72,14 +100,37 @@ const ScrollContainerBubbles = ({
           ref={innerDiv}
           style={{
             position: "relative",
-            paddingBottom: "10rem",
+            paddingBottom: "0rem",
           }}
           mx={"auto"}
           width={"100%"}
+          h={"100%"}
           maxW={"860px"}
           display={"flex"}
+          justifyContent={"space-between"}
           flexDirection={"column"}
         >
+          {subject && (
+            <Tag
+              size={"xl"}
+              variant={"solid"}
+              bg={bgColor}
+              borderRadius="full"
+              width={"fit-content"}
+              mx={"auto"}
+              px={"20px"}
+              py={"10px"}
+              border={"1px solid"}
+              borderColor={"rgba(60, 20, 120, 0.80)"}
+              my={"30px"}
+              position={"sticky"}
+              top={0}
+              zIndex={1}
+              color={fontColor}
+            >
+              <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
+            </Tag>
+          )}
           {children}
         </Box>
       </Box>

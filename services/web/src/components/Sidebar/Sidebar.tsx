@@ -1,7 +1,6 @@
 import {
   useMemo,
   useState,
-  useEffect,
   CSSProperties,
   useContext,
   useCallback,
@@ -15,13 +14,8 @@ import {
   Box,
   Button,
   Divider,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Flex,
-  IconButton,
   Image,
-  Input,
   Spinner,
   Stack,
   Text,
@@ -30,7 +24,6 @@ import {
   ModalOverlay,
   ModalContent,
   useColorModeValue,
-  useEditableControls,
   useToast,
   useBreakpointValue,
 } from "@chakra-ui/react";
@@ -45,17 +38,14 @@ import { useMutation, useQuery } from "react-query";
 import {
   deleteChatMutation,
   clearConversationsMutation,
-  putChatMutation,
   createChatMutation,
 } from "@judie/data/mutations";
 import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
-import { MessageType } from "@judie/data/types/api";
-import { TbPencil } from "react-icons/tb";
-import { AiOutlineCheck } from "react-icons/ai";
-import { RxCross2 } from "react-icons/rx";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 import UpgradeButton from "../UpgradeButton/UpgradeButton";
 import { BiHelpCircle } from "react-icons/bi";
+import SidebarChatItem from "@judie/components/SidebarChatItem/SidebarChatItem";
+import { getTitleForChat } from "@judie/utils/chat/getTitleForChat";
 
 interface SidebarButtonProps {
   icon?: JSX.Element | undefined;
@@ -75,182 +65,6 @@ const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
       >
         {label}
       </Text>
-    </Button>
-  );
-};
-
-export const getTitleForChat = (chat: Chat, sliced?: boolean) => {
-  if (chat.userTitle) {
-    const result = chat.userTitle.slice(0, 20);
-    if (result.length === 20) {
-      return result + "...";
-    }
-    return result;
-  }
-  if (chat.subject) {
-    const result = chat.subject.slice(0, 20);
-    if (result.length === 20) {
-      return result + "...";
-    }
-    return result;
-  }
-  return "Untitled";
-};
-
-const SidebarChat = ({
-  chat,
-  setBeingDeletedChatId,
-  setBeingEditedChatId,
-  beingEditedChatId,
-}: {
-  chat: Chat;
-  setBeingDeletedChatId: (chatId: string) => void;
-  setBeingEditedChatId: (chatId: string | null) => void;
-  beingEditedChatId?: string | null;
-}) => {
-  const router = useRouter();
-
-  const [editingValue, setEditingValue] = useState<string>();
-
-  const selectedChatId = useMemo(() => {
-    if (router.query.id) {
-      return router.query.id;
-    }
-  }, [router]);
-  const isSelected = selectedChatId === chat.id;
-
-  // Edit single chat title mutation
-  const editTitleMutation = useMutation({
-    mutationFn: ({ title }: { title: string }) =>
-      putChatMutation({
-        chatId: beingEditedChatId || "",
-        userTitle: title,
-      }),
-  });
-
-  // const isEditing = beingEditedChatId === chat.id;
-
-  const EditableControls = () => {
-    const {
-      isEditing,
-      getSubmitButtonProps,
-      getCancelButtonProps,
-      getEditButtonProps,
-    } = useEditableControls();
-    // No other good way to set the being edited chat ID other than this unfortunately
-    // onClicks are reserved for submitbuttonprops etc.
-    useEffect(() => {
-      if (isEditing) {
-        setBeingEditedChatId(chat.id);
-      }
-    }, [isEditing]);
-    return (
-      <Flex
-        style={{
-          flexDirection: "row",
-          height: "90%",
-        }}
-      >
-        <IconButton
-          aria-label="Edit Chat Title"
-          variant="ghost"
-          size="xs"
-          zIndex={100}
-          // onClick={isEditing ? null : () => setIsBeingEditedChatId(chat.id)}
-          {...(isEditing ? getSubmitButtonProps() : getEditButtonProps())}
-          icon={
-            isEditing ? (
-              <AiOutlineCheck size={18} color={"#A3A3A3"} />
-            ) : (
-              <TbPencil size={18} color="#A3A3A3" />
-            )
-          }
-        />
-        <IconButton
-          aria-label="Delete Chat"
-          variant="ghost"
-          size="xs"
-          zIndex={100}
-          {...(isEditing
-            ? getCancelButtonProps()
-            : {
-                onClick: () => setBeingDeletedChatId(chat.id),
-              })}
-          icon={
-            isEditing ? (
-              <RxCross2 size={18} color={"#A3A3A3"} />
-            ) : (
-              <TfiTrash size={18} color="#A3A3A3" />
-            )
-          }
-        />
-      </Flex>
-    );
-  };
-
-  return (
-    <Button
-      variant={isSelected ? "solid" : "ghost"}
-      style={{ width: "100%", marginTop: "0.3rem", marginBottom: "0.3rem" }}
-      zIndex={10}
-    >
-      <Editable
-        onClick={() => {
-          if (!editingValue) {
-            router.push({
-              query: {
-                id: chat.id,
-              },
-              pathname: "/chat",
-            });
-          }
-        }}
-        defaultValue={getTitleForChat(chat, true)}
-        placeholder={getTitleForChat(chat, true)}
-        style={{
-          fontSize: 14,
-          fontWeight: 500,
-          width: "100%",
-        }}
-        isPreviewFocusable={false}
-        onChange={(value) => {
-          setEditingValue(value);
-        }}
-        onSubmit={async () => {
-          if (editingValue !== getTitleForChat(chat, true)) {
-            await editTitleMutation.mutateAsync({
-              title: editingValue as string,
-            });
-          }
-          setEditingValue("");
-          setBeingEditedChatId(null);
-        }}
-        onAbort={() => {
-          setEditingValue("");
-        }}
-      >
-        <Flex
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            padding: "0.5rem 0",
-          }}
-        >
-          <Flex
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <EditablePreview cursor="pointer" />
-            <Input textAlign={"start"} as={EditableInput} />
-          </Flex>
-          <EditableControls />
-        </Flex>
-      </Editable>
     </Button>
   );
 };
@@ -672,7 +486,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             }}
           >
             {data?.map((chat) => (
-              <SidebarChat
+              <SidebarChatItem
                 chat={chat}
                 key={chat.id}
                 beingEditedChatId={beingEditedChatId}

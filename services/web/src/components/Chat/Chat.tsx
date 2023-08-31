@@ -29,6 +29,7 @@ import Loading from "../lottie/Loading/Loading";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
 import { useMutation, useQuery } from "react-query";
 import { uploadAssignmentMutation } from "@judie/data/mutations";
+import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 
 const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   const {
@@ -198,6 +199,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
               }}
             />
           )}
+          <ChatFooter />
         </ScrollContainerBubbles>
       )}
     </Flex>
