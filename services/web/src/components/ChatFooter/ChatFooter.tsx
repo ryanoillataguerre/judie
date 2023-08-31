@@ -377,14 +377,13 @@ const ChatFooter = () => {
         justifyContent: "flex-end",
         alignItems: "center",
         position: "sticky",
-        bottom: "48px",
+        bottom: "0px",
         left: 0,
-        paddingTop: "2rem",
         backgroundImage: gradientColor,
       }}
       pb={"0px"}
       mt={6}
-      // minH={"10rem"}
+      pt={0}
     >
       <Box
         style={{

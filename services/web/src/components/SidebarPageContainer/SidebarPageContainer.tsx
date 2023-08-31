@@ -68,7 +68,7 @@ const SidebarPageContainer = ({
       }}
     >
       <Sidebar isOpen={isOpen} />
-      <SidebarChatNav />
+
       <Box
         overflow={scroll ? "scroll" : "hidden"}
         style={{

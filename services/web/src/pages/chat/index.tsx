@@ -5,6 +5,7 @@ import Chat from "@judie/components/Chat/Chat";
 import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
 import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 import { ChatProvider } from "@judie/hooks/useChat";
+import SidebarChatNav from "@judie/components/SidebarChatNav/SidebarChatNav";
 
 interface ChatPageProps {
   query?: string;
@@ -26,7 +27,7 @@ export default function ChatPage({ query }: ChatPageProps) {
       <main>
         <ChatProvider>
           <SidebarPageContainer scroll={false}>
-            <ChatNavbar />
+            {/* <ChatNavbar /> */}
             <Chat initialQuery={query} />
             {/* <ChatFooter /> */}
           </SidebarPageContainer>

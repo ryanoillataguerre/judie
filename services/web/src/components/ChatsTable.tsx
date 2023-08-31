@@ -11,7 +11,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { getTitleForChat } from "./Sidebar/Sidebar";
+import { getTitleForChat } from "@judie/utils/chat/getTitleForChat";
 import { Chat } from "@judie/data/types/api";
 
 const ChatsTable = ({
