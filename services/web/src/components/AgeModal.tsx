@@ -212,7 +212,7 @@ const AgeModal = () => {
                 }}
                 variant={"purp"}
                 disabled={!isDateValid || (isDateValid && !isUserOver13)}
-                // isLoading={createFolder.isLoading}
+                isLoading={dobAndConsentMutation.isLoading}
                 type="submit"
               >
                 Submit
