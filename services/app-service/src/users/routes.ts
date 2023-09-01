@@ -7,7 +7,9 @@ import {
 import {
   getUser,
   getUserPermissions,
+  parentalConsentUser,
   updateUser,
+  userAgeConsent,
   verifyUserEmail,
 } from "./service.js";
 import {
@@ -131,6 +133,30 @@ router.get(
   })
 );
 
+router.post(
+  "/dob-consent",
+  [
+    body("dateOfBirth").isString().exists(),
+    body("parentEmail").isEmail().optional().withMessage("Invalid email"),
+  ],
+  handleValidationErrors,
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const user = await userAgeConsent({
+      userId: session.userId,
+      dateOfBirth: req.body.dateOfBirth,
+      parentEmail: req.body.parentEmail,
+    });
+    res.status(200).send({
+      data: transformUser(user),
+    });
+  })
+);
+
 router.get(
   "/billing-portal-link",
   requireAuth,
@@ -167,9 +193,23 @@ router.get(
 router.post(
   "/:userId/verify",
   errorPassthrough(async (req: Request, res: Response) => {
-    const user = await verifyUserEmail(req.params.userId as string);
+    await verifyUserEmail(req.params.userId as string);
     res.status(200).send({
-      data: user,
+      data: {
+        success: true,
+      },
+    });
+  })
+);
+
+router.post(
+  "/:userId/parental-consent",
+  errorPassthrough(async (req: Request, res: Response) => {
+    await parentalConsentUser(req.params.userId as string);
+    res.status(200).send({
+      data: {
+        success: true,
+      },
     });
   })
 );

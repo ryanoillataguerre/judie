@@ -31,6 +31,7 @@ import { useMutation, useQuery } from "react-query";
 import { uploadAssignmentMutation } from "@judie/data/mutations";
 import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 import SidebarChatNav from "../SidebarChatNav/SidebarChatNav";
+import AgeModal from "../AgeModal";
 
 const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   const {
@@ -128,6 +129,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       }}
       w={"100%"}
     >
+      <AgeModal />
       <SidebarChatNav />
       <Flex align={"center"} justify={"center"} w={"100%"} h={"100%"}>
         <Paywall isOpen={paywallOpen ?? false} setIsOpen={setPaywallOpen} />
