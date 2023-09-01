@@ -12,7 +12,6 @@ FROM node:20-alpine AS final
 WORKDIR /app
 COPY --from=builder ./app/dist ./dist
 COPY --from=builder ./app/prisma ./prisma
-COPY --from=builder ./app/protos ./protos
 COPY app-service/package.json .
 COPY app-service/yarn.lock .
 RUN yarn install --production
