@@ -15,6 +15,7 @@ message ChatDetails{
 
 message TutorResponse{
   string responsePart = 1;
+  map<string,string> chatMetaData = 2;
 }
 
 message ReturnConnectedCheck{

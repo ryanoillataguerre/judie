@@ -15,7 +15,7 @@ import {
   updateChat,
   deleteChatsForUser,
   getPDFTextPrompt,
-  validateMaxMessageLength,
+  validateMaxAssignmentLength,
 } from "./service.js";
 import { Chat, ChatFolder, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -28,6 +28,7 @@ import { Readable } from "stream";
 import { temporaryDirectory } from "tempy";
 import { extractTextFromPdf } from "../pdf/service.js";
 import BadRequestError from "../utils/errors/BadRequestError.js";
+import { createChatAssignment } from "../assignments/service.js";
 
 const router = Router();
 
@@ -122,7 +123,7 @@ router.get(
 
 router.post(
   "/",
-  [body("subject").optional()],
+  [body("subject").optional(), body("folderId").optional()],
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -136,6 +137,15 @@ router.post(
           id: session.userId,
         },
       },
+      ...(req.body?.folderId
+        ? {
+            folder: {
+              connect: {
+                id: req.body.folderId,
+              },
+            },
+          }
+        : {}),
       subject: req.body?.subject || undefined,
     });
 
@@ -249,9 +259,14 @@ router.post(
       const text = await extractTextFromPdf(file);
       if (text) {
         // Ensure length of message isn't going to bankrupt us in tokens
-        validateMaxMessageLength(text);
+        validateMaxAssignmentLength(text);
         const { readableContent, query } = getPDFTextPrompt({ text });
-        // Save to chat as first message, but with readable content as just the base prompt
+        // Save to DB as Assignment
+        await createChatAssignment({
+          chatId: req.params.chatId,
+          text,
+        });
+
         // Get completion from inference service
         await getCompletion({
           chatId: req.params.chatId,

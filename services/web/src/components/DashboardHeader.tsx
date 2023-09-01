@@ -68,7 +68,7 @@ const DashboardHeader = () => {
           isLoading={createChat.isLoading}
           onClick={() => createChat.mutate({})}
         >
-          <Text variant={"button"}>+ Create new chat</Text>
+          <Text variant={"button"}>+ Create a new chat</Text>
         </Button>
         <Button
           size={buttonSize}

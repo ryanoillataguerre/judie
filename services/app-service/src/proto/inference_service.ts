@@ -13,7 +13,6 @@ import {
   ServiceError,
   UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-// Note: You have to add ".js" to this extension because we're using ESM...
 import _m0 from "protobufjs/minimal.js";
 
 export const protobufPackage = "inferenceServiceServer";
@@ -24,6 +23,12 @@ export interface ChatDetails {
 
 export interface TutorResponse {
   responsePart: string;
+  chatMetaData: { [key: string]: string };
+}
+
+export interface TutorResponse_ChatMetaDataEntry {
+  key: string;
+  value: string;
 }
 
 export interface ReturnConnectedCheck {
@@ -98,7 +103,7 @@ export const ChatDetails = {
 };
 
 function createBaseTutorResponse(): TutorResponse {
-  return { responsePart: "" };
+  return { responsePart: "", chatMetaData: {} };
 }
 
 export const TutorResponse = {
@@ -109,6 +114,12 @@ export const TutorResponse = {
     if (message.responsePart !== "") {
       writer.uint32(10).string(message.responsePart);
     }
+    Object.entries(message.chatMetaData).forEach(([key, value]) => {
+      TutorResponse_ChatMetaDataEntry.encode(
+        { key: key as any, value },
+        writer.uint32(18).fork()
+      ).ldelim();
+    });
     return writer;
   },
 
@@ -127,6 +138,19 @@ export const TutorResponse = {
 
           message.responsePart = reader.string();
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          const entry2 = TutorResponse_ChatMetaDataEntry.decode(
+            reader,
+            reader.uint32()
+          );
+          if (entry2.value !== undefined) {
+            message.chatMetaData[entry2.key] = entry2.value;
+          }
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -141,6 +165,15 @@ export const TutorResponse = {
       responsePart: isSet(object.responsePart)
         ? String(object.responsePart)
         : "",
+      chatMetaData: isObject(object.chatMetaData)
+        ? Object.entries(object.chatMetaData).reduce<{ [key: string]: string }>(
+            (acc, [key, value]) => {
+              acc[key] = String(value);
+              return acc;
+            },
+            {}
+          )
+        : {},
     };
   },
 
@@ -148,6 +181,15 @@ export const TutorResponse = {
     const obj: any = {};
     if (message.responsePart !== "") {
       obj.responsePart = message.responsePart;
+    }
+    if (message.chatMetaData) {
+      const entries = Object.entries(message.chatMetaData);
+      if (entries.length > 0) {
+        obj.chatMetaData = {};
+        entries.forEach(([k, v]) => {
+          obj.chatMetaData[k] = v;
+        });
+      }
     }
     return obj;
   },
@@ -162,6 +204,99 @@ export const TutorResponse = {
   ): TutorResponse {
     const message = createBaseTutorResponse();
     message.responsePart = object.responsePart ?? "";
+    message.chatMetaData = Object.entries(object.chatMetaData ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
+    return message;
+  },
+};
+
+function createBaseTutorResponse_ChatMetaDataEntry(): TutorResponse_ChatMetaDataEntry {
+  return { key: "", value: "" };
+}
+
+export const TutorResponse_ChatMetaDataEntry = {
+  encode(
+    message: TutorResponse_ChatMetaDataEntry,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): TutorResponse_ChatMetaDataEntry {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTutorResponse_ChatMetaDataEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TutorResponse_ChatMetaDataEntry {
+    return {
+      key: isSet(object.key) ? String(object.key) : "",
+      value: isSet(object.value) ? String(object.value) : "",
+    };
+  },
+
+  toJSON(message: TutorResponse_ChatMetaDataEntry): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<TutorResponse_ChatMetaDataEntry>, I>>(
+    base?: I
+  ): TutorResponse_ChatMetaDataEntry {
+    return TutorResponse_ChatMetaDataEntry.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<TutorResponse_ChatMetaDataEntry>, I>>(
+    object: I
+  ): TutorResponse_ChatMetaDataEntry {
+    const message = createBaseTutorResponse_ChatMetaDataEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
     return message;
   },
 };
@@ -416,6 +551,10 @@ export type Exact<P, I extends P> = P extends Builtin
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
       [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
     };
+
+function isObject(value: any): boolean {
+  return typeof value === "object" && value !== null;
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

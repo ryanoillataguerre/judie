@@ -1,16 +1,14 @@
 import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
-import Chat from "@judie/components/Chat/Chat";
-import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
-import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 import { ChatProvider } from "@judie/hooks/useChat";
+import { useRouter } from "next/router";
+import Folder from "@judie/components/Folder";
 
-interface ChatPageProps {
-  query?: string;
-}
-export default function ChatPage({ query }: ChatPageProps) {
+export default function ChatPage() {
   useAuth();
+  const router = useRouter();
+  const folderId = router.query.folderId as string;
 
   return (
     <>
@@ -25,10 +23,8 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <ChatProvider>
-          <SidebarPageContainer scroll={false}>
-            <ChatNavbar />
-            <Chat initialQuery={query} />
-            <ChatFooter />
+          <SidebarPageContainer>
+            <Folder id={folderId} />
           </SidebarPageContainer>
         </ChatProvider>
       </main>

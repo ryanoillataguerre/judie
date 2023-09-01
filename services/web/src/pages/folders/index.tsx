@@ -1,15 +1,10 @@
 import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
-import Chat from "@judie/components/Chat/Chat";
-import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
-import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 import { ChatProvider } from "@judie/hooks/useChat";
+import Folders from "@judie/components/Folders";
 
-interface ChatPageProps {
-  query?: string;
-}
-export default function ChatPage({ query }: ChatPageProps) {
+export default function ChatPage() {
   useAuth();
 
   return (
@@ -25,10 +20,8 @@ export default function ChatPage({ query }: ChatPageProps) {
       </Head>
       <main>
         <ChatProvider>
-          <SidebarPageContainer scroll={false}>
-            <ChatNavbar />
-            <Chat initialQuery={query} />
-            <ChatFooter />
+          <SidebarPageContainer>
+            <Folders />
           </SidebarPageContainer>
         </ChatProvider>
       </main>

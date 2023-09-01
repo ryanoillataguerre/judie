@@ -56,7 +56,7 @@ const adminUserRouter = Router();
 adminUserRouter.get(
   "/:userId",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     // TODO Ryan: Validate current user can view this user
     const session = req.session;

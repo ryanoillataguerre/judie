@@ -8,6 +8,7 @@ import {
   forgotPassword,
   resetPassword,
   setUserSessionId,
+  changePassword,
 } from "./service.js";
 
 export const signupValidation = [
@@ -73,6 +74,29 @@ router.post(
     await setUserSessionId({
       userId: user.id,
       sessionId: session.id,
+    });
+    res.status(200).send({ user });
+  })
+);
+
+router.put(
+  "/change-password",
+  [
+    body("oldPassword").isString().exists(),
+    body("newPassword").isString().exists(),
+    body("passwordConfirm").isString().exists(),
+  ],
+  handleValidationErrors,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    const { newPassword, passwordConfirm, oldPassword } = req.body;
+
+    // Change user password if they both match
+    const user = await changePassword({
+      userId: session.userId as string,
+      oldPassword,
+      newPassword,
+      passwordConfirm,
     });
     res.status(200).send({ user });
   })

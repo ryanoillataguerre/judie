@@ -112,14 +112,17 @@ export const signupMutation = async ({
 
 export const createChatMutation = async ({
   subject,
+  folderId,
 }: {
   subject?: string | undefined;
+  folderId?: string | undefined;
 }): Promise<Chat> => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",
     body: {
       subject: subject || undefined,
+      folderId: folderId || undefined,
     },
   });
   return response.data;
@@ -409,6 +412,45 @@ export const putRoomMutation = async ({
     url: `/admin/rooms/${roomId}`,
     method: "PUT",
     body: { name },
+  });
+  return response.data;
+};
+
+export const putUserMutation = async ({
+  firstName,
+  lastName,
+}: {
+  firstName?: string;
+  lastName?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/user/me`,
+    method: "PUT",
+    body: {
+      firstName,
+      lastName,
+    },
+  });
+  return response.data;
+};
+
+export const changePasswordMutation = async ({
+  oldPassword,
+  newPassword,
+  passwordConfirm,
+}: {
+  oldPassword: string;
+  newPassword: string;
+  passwordConfirm: string;
+}) => {
+  const response = await baseFetch({
+    url: `/auth/change-password`,
+    method: "PUT",
+    body: {
+      oldPassword,
+      newPassword,
+      passwordConfirm,
+    },
   });
   return response.data;
 };
