@@ -4,7 +4,7 @@ import { useMutation } from "react-query";
 import { signinMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Button from "@judie/components/Button/Button";
+// import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Flex,
@@ -20,7 +20,8 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useToast,
-  Spinner
+  Spinner,
+  Button,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
@@ -45,7 +46,7 @@ const SigninForm = () => {
     mutationFn: signinMutation,
     onSuccess: () => {
       router.push({
-        pathname: "/chat",
+        pathname: "/dashboard",
         query: router.query,
       });
     },
@@ -80,14 +81,19 @@ const SigninForm = () => {
   };
 
   // Styles
-  const formWidth = useBreakpointValue({
-    base: "100%",
-    md: "60%",
-    lg: "40%",
-  }, { fallback: "60%" });
+  const formWidth = useBreakpointValue(
+    {
+      base: "100%",
+      md: "60%",
+      lg: "40%",
+    },
+    { fallback: "60%" }
+  );
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return (typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
+  return typeof window === "undefined" ? (
+    <Spinner colorScheme="blue" />
+  ) : (
     <Flex
       style={{
         width: formWidth,
@@ -221,15 +227,16 @@ const SigninForm = () => {
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
-          variant={"solid"}
-          loading={isLoading}
-          label="Sign In"
+          // colorScheme="blue"
+          variant={"purp"}
+          isLoading={isLoading}
           type="submit"
-        />
+          size={"md"}
+        >
+          Sign In
+        </Button>
       </form>
     </Flex>
-  )
   );
 };
 
@@ -282,15 +289,12 @@ const SigninPage = () => {
           >
             Welcome back!
           </Text>
-          {router.isReady && (
-            <SigninForm />
-          )}
+          {router.isReady && <SigninForm />}
         </Flex>
       </main>
     </>
   );
 };
-
 
 SigninPage.displayName = "Sign In";
 

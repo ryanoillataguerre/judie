@@ -14,6 +14,7 @@ import {
 import {
   sendUserForgotPasswordEmail,
   sendVerificationEmail,
+  sendWelcomeEmail,
 } from "../cio/service.js";
 import { sessionStore } from "../utils/express.js";
 import { Environment, getEnv } from "../utils/env.js";
@@ -106,6 +107,7 @@ export const signup = async ({
     traits: transformUserForSegment(newUser, districtOrSchool),
   });
 
+  await sendWelcomeEmail({ user: newUser });
   await sendVerificationEmail({ user: newUser });
 
   return newUser;
@@ -265,4 +267,44 @@ export const destroyUserSession = async ({ userId }: { userId: string }) => {
       console.error("Error destroying session", err);
     }
   });
+};
+
+export const changePassword = async ({
+  userId,
+  oldPassword,
+  newPassword,
+  passwordConfirm,
+}: {
+  userId: string;
+  oldPassword: string;
+  newPassword: string;
+  passwordConfirm: string;
+}) => {
+  if (newPassword !== passwordConfirm) {
+    throw new BadRequestError("Passwords do not match");
+  }
+  // Test old password is accurate
+  const user = await dbClient.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  if (!user) {
+    throw new UnauthorizedError("No user id found in session");
+  }
+  const match = await bcrypt.compare(oldPassword, user.password);
+  if (!match) {
+    throw new BadRequestError("Old password is incorrect");
+  }
+  // Update password
+  const _password = await bcrypt.hash(newPassword, 10);
+  const newUser = await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      password: _password,
+    },
+  });
+  return newUser;
 };

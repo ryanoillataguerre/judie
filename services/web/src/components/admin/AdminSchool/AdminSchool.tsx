@@ -79,15 +79,20 @@ const AdminSchool = ({ id }: { id: string }) => {
         paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        <EditableTitle
-          title={schoolData?.name as string}
-          onChange={(value) => {
-            editSchoolMutation.mutate({
-              schoolId: schoolData?.id as string,
-              name: value,
-            });
-          }}
-        />
+        {schoolData && (
+          <EditableTitle
+            title={schoolData?.name as string}
+            onChange={(value) => {
+              value = value.trim();
+              if (!value || value.length < 1) return;
+              if (value === schoolData?.name) return;
+              editSchoolMutation.mutate({
+                schoolId: schoolData?.id as string,
+                name: value,
+              });
+            }}
+          />
+        )}
 
         <Button
           size={"sm"}

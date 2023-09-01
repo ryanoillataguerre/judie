@@ -3,7 +3,11 @@ import invitesRouter from "../invites/routes.js";
 import organizationsRouter from "../organizations/routes.js";
 import schoolsRouter from "../schools/routes.js";
 import roomsRouter from "../rooms/routes.js";
-import { errorPassthrough, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import {
   getEntitiesForUser,
   getUserAdmin,
@@ -52,6 +56,7 @@ const adminUserRouter = Router();
 adminUserRouter.get(
   "/:userId",
   requireAuth,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     // TODO Ryan: Validate current user can view this user
     const session = req.session;

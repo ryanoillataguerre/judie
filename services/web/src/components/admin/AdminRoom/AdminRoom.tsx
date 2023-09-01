@@ -63,15 +63,20 @@ const AdminRoom = ({ id }: { id: string }) => {
         justifyContent={"space-between"}
         width={"100%"}
       >
-        <EditableTitle
-          title={roomData?.name as string}
-          onChange={(value) => {
-            editRoomMutation.mutate({
-              roomId: roomData?.id as string,
-              name: value,
-            });
-          }}
-        />
+        {roomData && (
+          <EditableTitle
+            title={roomData?.name as string}
+            onChange={(value) => {
+              value = value.trim();
+              if (!value || value.length < 1) return;
+              if (value === roomData?.name) return;
+              editRoomMutation.mutate({
+                roomId: roomData?.id as string,
+                name: value,
+              });
+            }}
+          />
+        )}
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

@@ -1,12 +1,22 @@
 import { Router, Request, Response } from "express";
-import { errorPassthrough, requireAuth } from "../utils/express.js";
+import {
+  errorPassthrough,
+  handleValidationErrors,
+  requireAuth,
+} from "../utils/express.js";
 import {
   getUser,
   getUserPermissions,
   updateUser,
   verifyUserEmail,
 } from "./service.js";
-import { Chat, Message, Subscription, User } from "@prisma/client";
+import {
+  Chat,
+  Message,
+  Subscription,
+  SubscriptionStatus,
+  User,
+} from "@prisma/client";
 import { body } from "express-validator";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import { createStripeBillingPortalSession } from "../payments/stripe.js";
@@ -48,6 +58,30 @@ const transformUser = (
   return user;
 };
 
+router.put(
+  "/me",
+  [body("firstName").optional()],
+  [body("lastName").optional()],
+  [body("receivePromotions").isBoolean().optional()],
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const user = await updateUser(session.userId, {
+      ...(req.body.firstName ? { firstName: req.body.firstName } : {}),
+      ...(req.body.lastName ? { lastName: req.body.lastName } : {}),
+      ...(req.body.receivePromotions !== undefined
+        ? { receivePromotions: req.body.receivePromotions }
+        : {}),
+    });
+    res.status(200).send({
+      data: transformUser(user),
+    });
+  })
+);
+
 router.get(
   "/me",
   requireAuth,
@@ -70,34 +104,30 @@ router.get(
           subscription: true,
         }
       );
+      // TODO: Create a job to turn subs with a canceledAt in the past into canceled subs
+      if (
+        user?.subscription?.canceledAt &&
+        new Date(user?.subscription?.canceledAt).getTime() <
+          new Date().getTime() &&
+        user?.subscription?.status !== SubscriptionStatus.CANCELED
+      ) {
+        const newUser = await updateUser(user.id, {
+          subscription: {
+            update: {
+              status: SubscriptionStatus.CANCELED,
+            },
+          },
+        });
+        return res.status(200).send({
+          data: transformUser(newUser),
+        });
+      }
       res.status(200).send({
         data: transformUser(user),
       });
     } catch (err) {
       throw new UnauthorizedError("No user id found in session");
     }
-  })
-);
-
-router.put(
-  "/",
-  [body("firstName").optional()],
-  [body("lastName").optional()],
-  [body("receivePromotions").isBoolean().optional()],
-  requireAuth,
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    if (!session.userId) {
-      throw new UnauthorizedError("No user id found in session");
-    }
-    const user = await updateUser(session.userId, {
-      firstName: req.body.firstName ?? undefined,
-      lastName: req.body.lastName ?? undefined,
-      receivePromotions: req.body.receivePromotions ?? undefined,
-    });
-    res.status(200).send({
-      data: transformUser(user),
-    });
   })
 );
 

@@ -50,6 +50,7 @@ const EditableTitle = ({ title, onChange }: EditableTitleProps) => {
         fontSize: "2rem",
       }}
       isPreviewFocusable={false}
+      submitOnBlur={false}
       onSubmit={onChange}
     >
       <HStack alignItems={"center"}>
