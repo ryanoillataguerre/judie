@@ -1,6 +1,8 @@
 from typing import Optional
 import prisma
 from typing import List, Dict
+from collections import deque
+from inference_service.server.judie_data import History, ChatTurn, Role
 
 
 def get_chat(
@@ -21,22 +23,54 @@ def get_chat(
     return chats
 
 
+def get_chat_history(
+    chat_id: str,
+    app_db: Optional[prisma.Prisma] = None,
+) -> History:
+    chats = get_chat(chat_id=chat_id, app_db=app_db)
+
+    hist = History()
+
+    for chat in chats:
+        if chat.type == "USER":
+            turn = ChatTurn(role=Role.USER, content=chat.content)
+        elif chat.type == "BOT":
+            turn = ChatTurn(role=Role.ASSISTANT, content=chat.content)
+        else:
+            continue
+
+        hist.add_turn(turn)
+    return hist
+
+
 def get_chat_openai_fmt(
-    chat_id: str, app_db: Optional[prisma.Prisma] = None
+    chat_id: str,
+    app_db: Optional[prisma.Prisma] = None,
+    length_limit: Optional[int] = None,
 ) -> List[Dict]:
     chats = get_chat(chat_id=chat_id, app_db=app_db)
 
-    chats_fmtd = []
+    chats_fmtd = deque()
 
-    for chat in chats:
+    if length_limit is not None:
+        running_length = 0
+
+    for chat in reversed(chats):
+        if length_limit is not None:
+            print(chat.content)
+            running_length += len(chat.content)
+            if running_length > length_limit:
+                break
+
         if chat.type == "USER":
             role = "user"
         elif chat.type == "BOT":
             role = "assistant"
         else:
             continue
-        chats_fmtd.append({"role": role, "content": chat.content})
-    return chats_fmtd
+
+        chats_fmtd.appendleft({"role": role, "content": chat.content})
+    return list(chats_fmtd)
 
 
 def get_chat_local():

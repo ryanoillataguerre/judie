@@ -1,5 +1,6 @@
-import { HTTPResponseError, baseFetch } from "./baseFetch";
-import { Chat, Message, UserRole } from "./types/api";
+import { InviteSheetRole } from "@judie/components/admin/InviteModal";
+import { HTTPResponseError, baseFetch, baseFetchFormData } from "./baseFetch";
+import { GradeYear, Message, PermissionType, UserRole } from "./types/api";
 
 export interface ChatResponse {
   id: string;
@@ -16,7 +17,7 @@ export const completionFromQueryMutation = async ({
   setChatValue,
   onStreamEnd,
   onError,
-  abortController
+  abortController,
 }: {
   query: string;
   chatId: string;
@@ -53,11 +54,7 @@ export const signinMutation = async ({
   return response.data;
 };
 
-export const forgotPasswordMutation = async ({
-  email,
-}: {
-  email: string;
-}) => {
+export const forgotPasswordMutation = async ({ email }: { email: string }) => {
   const response = await baseFetch({
     url: "/auth/forgot-password",
     method: "POST",
@@ -67,9 +64,11 @@ export const forgotPasswordMutation = async ({
 };
 
 export const resetPasswordMutation = async ({
-  password, token,
+  password,
+  token,
 }: {
-  password: string, token: string;
+  password: string;
+  token: string;
 }) => {
   const response = await baseFetch({
     url: "/auth/reset-password",
@@ -88,8 +87,8 @@ export const signupMutation = async ({
   role,
   districtOrSchool,
 }: {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   password: string;
   receivePromotions: boolean;
@@ -185,6 +184,230 @@ export const waitlistMutation = async ({ email }: { email: string }) => {
     url: "/auth/waitlist",
     method: "POST",
     body: { email },
+  });
+  return response.data;
+};
+
+// Invite
+export const redeemInviteMutation = async ({
+  firstName,
+  lastName,
+  password,
+  receivePromotions,
+  inviteId,
+}: {
+  firstName: string;
+  lastName: string;
+  password: string;
+  receivePromotions: boolean;
+  inviteId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/invites/${inviteId}/redeem`,
+    method: "POST",
+    body: { password, firstName, lastName, receivePromotions },
+  });
+  return response.data;
+};
+
+export const createOrgMutation = async ({
+  name,
+  primaryContactEmail,
+  primaryContactFirstName,
+  primaryContactLastName,
+}: {
+  name: string;
+  primaryContactEmail: string;
+  primaryContactFirstName: string;
+  primaryContactLastName: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/organizations/`,
+    method: "POST",
+    body: {
+      name,
+      primaryContactEmail,
+      primaryContactFirstName,
+      primaryContactLastName,
+    },
+  });
+  return response.data;
+};
+
+export const createSchoolMutation = async ({
+  organizationId,
+  name,
+  address,
+}: {
+  organizationId: string;
+  name: string;
+  address?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/`,
+    method: "POST",
+    body: { organizationId, name, address },
+  });
+  return response.data;
+};
+
+export const createRoomMutation = async ({
+  organizationId,
+  name,
+  schoolId,
+}: {
+  organizationId: string;
+  name: string;
+  schoolId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/`,
+    method: "POST",
+    body: { organizationId, name, schoolId },
+  });
+  return response.data;
+};
+
+export interface CreatePermissionType {
+  type: PermissionType;
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
+}
+export const createInviteMutation = async ({
+  gradeYear,
+  email,
+  permissions,
+}: {
+  gradeYear?: GradeYear;
+  email: string;
+  permissions: CreatePermissionType[];
+}) => {
+  const response = await baseFetch({
+    url: `/admin/invites`,
+    method: "POST",
+    body: { gradeYear, email, permissions },
+  });
+  return response.data;
+};
+
+export const verifyEmailMutation = async (id: string) => {
+  const response = await baseFetch({
+    url: `/user/${id}/verify`,
+    method: "POST",
+  });
+  return response.data;
+};
+
+interface BEInviteRow {
+  email: string;
+  role: InviteSheetRole;
+  school?: string;
+  classroom?: string;
+}
+export const bulkInviteMutation = async ({
+  organizationId,
+  invites,
+}: {
+  organizationId: string;
+  invites: BEInviteRow[];
+}) => {
+  const response = await baseFetch({
+    url: `/admin/invites/bulk`,
+    method: "POST",
+    body: { organizationId, invites },
+  });
+  return response.data;
+};
+
+interface TranscribeResponse {
+  transcript: string;
+}
+export const whisperTranscribeMutation = async ({
+  data,
+}: {
+  data: FormData;
+}): Promise<TranscribeResponse> => {
+  const response = await baseFetchFormData({
+    url: `/chat/whisper/transcribe`,
+    form: data,
+  });
+  return response.data;
+};
+
+export const createMessageNarration = async ({
+  messageId,
+}: {
+  messageId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/messages/${messageId}/narrate`,
+    method: "POST",
+  });
+  return response.data;
+};
+
+export const deleteRoomMutation = async ({ roomId }: { roomId: string }) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${roomId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
+export const deleteSchoolMutation = async ({
+  schoolId,
+}: {
+  schoolId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/${schoolId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
+export const putOrgMutation = async ({
+  organizationId,
+  name,
+}: {
+  organizationId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/organizations/${organizationId}`,
+    method: "PUT",
+    body: { name },
+  });
+  return response.data;
+};
+
+export const putSchoolMutation = async ({
+  schoolId,
+  name,
+}: {
+  schoolId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/schools/${schoolId}`,
+    method: "PUT",
+    body: { name },
+  });
+  return response.data;
+};
+
+export const putRoomMutation = async ({
+  roomId,
+  name,
+}: {
+  roomId: string;
+  name?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/rooms/${roomId}`,
+    method: "PUT",
+    body: { name },
   });
   return response.data;
 };

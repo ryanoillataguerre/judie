@@ -5,13 +5,13 @@ terraform {
       source = "hashicorp/google"
     }
     google-beta = {
-      source  = "hashicorp/google-beta"
+      source = "hashicorp/google-beta"
     }
   }
- backend "gcs" {
-   bucket  = "b09bcadeb5f255f1-bucket-tfstate"
-   prefix  = "terraform/state"
- }
+  backend "gcs" {
+    bucket = "judie-tfstate-sandbox"
+    prefix = "terraform/state"
+  }
 }
 
 provider "google" {

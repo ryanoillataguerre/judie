@@ -1,7 +1,18 @@
 import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
-import { GET_ME, getMeQuery } from "@judie/data/queries";
-import { SubscriptionStatus, User } from "@judie/data/types/api";
+import {
+  GET_ME,
+  GET_USER_ENTITIES,
+  getMeQuery,
+  getUserEntitiesQuery,
+} from "@judie/data/queries";
+import {
+  EntitiesResponse,
+  PermissionType,
+  SubscriptionStatus,
+  User,
+  UserRole,
+} from "@judie/data/types/api";
 import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
@@ -16,6 +27,14 @@ import { ChatContext } from "./useChat";
 
 const DO_NOT_REDIRECT_PATHS = ["/signin", "/signup"];
 export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
+
+export const isPermissionTypeAdmin = (type: PermissionType) => {
+  return (
+    type === PermissionType.ORG_ADMIN ||
+    type === PermissionType.SCHOOL_ADMIN ||
+    type === PermissionType.ROOM_ADMIN
+  );
+};
 
 export default function useAuth({
   allowUnauth = false,
@@ -59,7 +78,10 @@ export default function useAuth({
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(
     [GET_ME, sessionCookie],
-    () => getMeQuery(),
+    () =>
+      getMeQuery({
+        isAdmin,
+      }),
     {
       staleTime: 1000 * 60,
       // retryDelay(failureCount, error) {
@@ -76,6 +98,33 @@ export default function useAuth({
       refetchOnWindowFocus: true,
     }
   );
+
+  const isAdmin = useMemo(() => {
+    return (
+      !!userData?.permissions?.find((permission) =>
+        isPermissionTypeAdmin(permission.type)
+      ) ||
+      userData?.role === UserRole.JUDIE ||
+      false
+    );
+  }, [userData]);
+
+  const {
+    data: entitiesData,
+    isLoading: entitiesLoading,
+    refetch: refreshEntities,
+  } = useQuery({
+    queryKey: [GET_USER_ENTITIES, userData?.id],
+    queryFn: getUserEntitiesQuery,
+    enabled: !!isAdmin,
+    retry(failureCount, error) {
+      if (failureCount > 2) {
+        return false;
+      }
+      return true;
+    },
+    staleTime: 1000 * 60,
+  });
 
   useEffect(() => {
     if (
@@ -132,7 +181,16 @@ export default function useAuth({
     }
   }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
-  return { userData, isPaid, isLoading, refresh: refetch, logout };
+  return {
+    userData,
+    isPaid,
+    isLoading: isLoading || entitiesLoading,
+    refresh: refetch,
+    logout,
+    isAdmin,
+    entities: entitiesData,
+    refreshEntities,
+  };
 }
 
 export interface AuthData {
@@ -140,7 +198,8 @@ export interface AuthData {
   isLoading: boolean;
   isPaid: boolean;
   logout: () => void;
-  refresh: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<User, HTTPResponseError>>;
+  isAdmin: boolean;
+  entities?: EntitiesResponse;
+  refreshEntities: () => void;
+  refresh: () => void;
 }

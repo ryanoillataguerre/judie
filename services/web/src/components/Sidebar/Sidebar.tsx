@@ -1,13 +1,12 @@
-import { useMemo, useState, useEffect, CSSProperties, useContext } from "react";
-import { SubscriptionStatus, User } from "@judie/data/types/api";
 import {
-  BsChevronRight,
-  BsClockHistory,
-  BsPlusSquareDotted,
-} from "react-icons/bs";
-import {
-  BiHelpCircle
-} from "react-icons/bi";
+  useMemo,
+  useState,
+  useEffect,
+  CSSProperties,
+  useContext,
+  useCallback,
+} from "react";
+import { PermissionType, SubscriptionStatus } from "@judie/data/types/api";
 import {
   Box,
   Button,
@@ -19,27 +18,25 @@ import {
   IconButton,
   Image,
   Input,
-  Slide,
   Spinner,
   Stack,
   Text,
-  Tooltip,
   Modal,
   ModalBody,
   ModalOverlay,
   ModalContent,
   useColorModeValue,
-  useDisclosure,
   useEditableControls,
   useToast,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { TfiTrash } from "react-icons/tfi";
-import { FiServer, FiSettings } from "react-icons/fi";
+import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
-import useAuth from "@judie/hooks/useAuth";
-import {ChatContext} from "@judie/hooks/useChat";
+import { MdAdminPanelSettings } from "react-icons/md";
+import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
+import { ChatContext } from "@judie/hooks/useChat";
 import { useMutation, useQuery } from "react-query";
 import {
   ChatResponse,
@@ -55,12 +52,13 @@ import { AiOutlineCheck } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 import UpgradeButton from "../UpgradeButton/UpgradeButton";
+import { BiHelpCircle } from "react-icons/bi";
 
 interface SidebarButtonProps {
-  icon?: JSX.Element;
-  label?: string | JSX.Element;
-  key?: string;
-  onClick?: () => void;
+  icon?: JSX.Element | undefined;
+  label?: string | JSX.Element | undefined;
+  key?: string | undefined;
+  onClick?: () => void | undefined;
 }
 const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   return (
@@ -86,16 +84,12 @@ const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
     }
     return result;
   }
-  if (chat.messages?.[0]?.readableContent) {
-    if (chat.messages?.[0]?.type !== MessageType.SYSTEM) {
-      if (sliced) {
-        const result = chat.messages?.[0]?.readableContent.slice(0, 20);
-        if (result.length >= 20) {
-          return result + "...";
-        }
-      }
-      return chat.messages?.[0]?.readableContent;
+  if (chat.subject) {
+    const result = chat.subject.slice(0, 20);
+    if (result.length === 20) {
+      return result + "...";
     }
+    return result;
   }
   return "Untitled";
 };
@@ -261,7 +255,8 @@ const SidebarChat = ({
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
-  const chatContext = useContext(ChatContext)
+  const toast = useToast();
+  const chatContext = useContext(ChatContext);
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
   const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
     null
@@ -312,6 +307,38 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
   });
 
+  const onAdminClick = useCallback(() => {
+    const filteredAdminPermissions = auth.userData?.permissions?.filter(
+      (permission) => isPermissionTypeAdmin(permission.type)
+    );
+    if (filteredAdminPermissions?.length === 1) {
+      const permission = filteredAdminPermissions[0];
+      switch (permission.type) {
+        case PermissionType.ORG_ADMIN:
+          router.push(`/admin/organizations/${permission.organizationId}`);
+          break;
+        case PermissionType.SCHOOL_ADMIN:
+          router.push(`/admin/schools/${permission.schoolId}`);
+          break;
+        case PermissionType.ROOM_ADMIN:
+          router.push(`/admin/rooms/${permission.roomId}`);
+          break;
+        default:
+          router.push("/admin");
+          break;
+      }
+      return;
+    } else if ((filteredAdminPermissions?.length || 0) > 1 || auth.isAdmin) {
+      router.push("/admin");
+      return;
+    } else {
+      toast({
+        status: "warning",
+        title: "No admin orgs",
+      });
+    }
+  }, [auth.userData?.permissions, auth.isAdmin, router, toast]);
+
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
       {
@@ -346,31 +373,48 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           auth.logout();
         },
       },
+      ...(auth.isAdmin
+        ? [
+            {
+              icon: <MdAdminPanelSettings />,
+              key: "admin",
+              label: "Admin",
+              onClick: onAdminClick,
+            },
+          ]
+        : []),
+      ...(!(
+        auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE
+      ) &&
+      !auth.isLoading &&
+      router.isReady &&
+      auth.userData &&
+      !auth.isAdmin
+        ? [
+            {
+              key: "upgrade",
+              icon: (
+                <Box
+                  style={{
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    padding: "1rem 0",
+                  }}
+                >
+                  <UpgradeButton />
+                </Box>
+              ),
+            },
+          ]
+        : []),
       {
         icon: <ColorModeSwitcher />,
         key: "color-mode-switcher",
       },
     ];
-    if (!(auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE) && !auth.isLoading && router.isReady && auth.userData) {
-      options.push({
-        key: "upgrade",
-        icon: (
-          <Box
-            style={{
-              display: "flex",
-              width: "100%",
-              alignItems: "center",
-              padding: "1rem 0",
-            }}
-          >
-            <UpgradeButton />
-          </Box>
-        ),
-      });
-    }
     return options;
-  }, [auth, router, setIsClearConversationsModalOpen]);
-  const toast = useToast();
+  }, [auth, router, setIsClearConversationsModalOpen, onAdminClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
@@ -428,7 +472,10 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
                     await deleteChat.mutateAsync();
                     setBeingDeletedChatId(null);
                     refetch();
-                    if (router.pathname === "/chat" && router.query.id === beingDeletedChatId) {
+                    if (
+                      router.pathname === "/chat" &&
+                      router.query.id === beingDeletedChatId
+                    ) {
                       router.push("/chat");
                     }
                   } else {
@@ -525,7 +572,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           alignItems: "flex-start",
           justifyContent: "space-between",
           padding: "1rem",
-          ...sidebarRelativeOrAbsoluteProps as CSSProperties,
+          ...(sidebarRelativeOrAbsoluteProps as CSSProperties),
         }}
         boxShadow={"lg"}
       >
@@ -535,6 +582,14 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+          }}
+          cursor={"pointer"}
+          onClick={() => {
+            if (router.pathname.includes("/admin")) {
+              router.push("/admin");
+            } else {
+              router.push("/chat");
+            }
           }}
         >
           <Flex
@@ -562,6 +617,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             </Text>
           </Flex>
         </Flex>
+
         <Button
           variant={"outline"}
           colorScheme="white"
@@ -572,11 +628,15 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             borderColor: "#565555",
             padding: "1.5rem",
           }}
-      onClick={() => {
-        if (((chatContext?.chat?.messages?.length || 0) > 0 && chatContext?.chat?.subject) || !chatContext.chat) {
-          createChat.mutate({})
-        }
-      }}
+          onClick={() => {
+            if (
+              ((chatContext?.chat?.messages?.length || 0) > 0 &&
+                chatContext?.chat?.subject) ||
+              !chatContext.chat
+            ) {
+              createChat.mutate({});
+            }
+          }}
         >
           + New Chat
         </Button>
@@ -639,7 +699,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           {footerIcons.map((iconData) => {
             return iconData.label ? (
               <SidebarButton key={iconData.key} {...iconData} />
-              ) : (
+            ) : (
               iconData.icon
             );
           })}
@@ -655,7 +715,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        ...sidebarRelativeOrAbsoluteProps as CSSProperties,
+        ...(sidebarRelativeOrAbsoluteProps as CSSProperties),
       }}
       boxShadow={"lg"}
     ></Flex>

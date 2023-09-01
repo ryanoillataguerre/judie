@@ -1,7 +1,7 @@
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { signupMutation } from "@judie/data/mutations";
+import { redeemInviteMutation, signupMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "@judie/components/Button/Button";
@@ -29,20 +29,26 @@ import { HiEye, HiEyeOff } from "react-icons/hi";
 import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 import { UserRole } from "@judie/data/types/api";
 
-interface SubmitData {
+export interface SignupSubmitData {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   role: UserRole;
   receivePromotions: boolean;
   districtOrSchool?: string;
 }
 
-const SignupForm = () => {
+export const SignupForm = ({
+  inviteEmail,
+  inviteId,
+}: {
+  inviteEmail?: string;
+  inviteId?: string;
+}) => {
   const router = useRouter();
   const toast = useToast();
-  const { handleSubmit, register } = useForm<SubmitData>({
+  const { handleSubmit, register } = useForm<SignupSubmitData>({
     defaultValues: {
       email: "",
       password: "",
@@ -74,21 +80,42 @@ const SignupForm = () => {
     },
   });
 
+  const { mutateAsync: mutateAsyncInvite, isLoading: inviteSignupLoading } =
+    useMutation({
+      mutationFn: redeemInviteMutation,
+      onSuccess: () => {
+        router.push({
+          pathname: "/chat",
+          query: router.query,
+        });
+      },
+      onError: (err: HTTPResponseError) => {
+        console.error("Error signing up", err);
+        toast({
+          title: "Error signing up",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+    });
+
   const [receivePromotions, setReceivePromotions] = useState(true);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>(UserRole.STUDENT);
 
-  const onSubmit: SubmitHandler<SubmitData> = async ({
+  const onSubmit: SubmitHandler<SignupSubmitData> = async ({
     email,
     password,
     firstName,
     lastName,
     receivePromotions,
     role,
-    districtOrSchool
-  }: SubmitData) => {
+    districtOrSchool,
+  }: SignupSubmitData) => {
     try {
       setHasSubmitted(true);
       if (!termsAndConditions) {
@@ -102,15 +129,26 @@ const SignupForm = () => {
         return;
       }
 
-      await mutateAsync({
-        email,
-        password,
-        receivePromotions,
-        firstName,
-        lastName,
-        role,
-        districtOrSchool
-      });
+      if (inviteEmail) {
+        await mutateAsyncInvite({
+          password,
+          receivePromotions,
+          firstName: firstName as string,
+          lastName: lastName as string,
+          inviteId: inviteId as string,
+        });
+        return;
+      } else {
+        await mutateAsync({
+          email,
+          password,
+          receivePromotions,
+          firstName,
+          lastName,
+          role,
+          districtOrSchool,
+        });
+      }
     } catch (err) {}
   };
 
@@ -121,6 +159,8 @@ const SignupForm = () => {
     lg: "40%",
   });
   const formBgColor = useColorModeValue("white", "#2a3448");
+
+  const isInvite = !!inviteEmail;
 
   return typeof window === "undefined" ? (
     <Spinner colorScheme="blue" />
@@ -171,6 +211,13 @@ const SignupForm = () => {
               required
               placeholder="judie@judie.io"
               {...register("email", {})}
+              isReadOnly={isInvite}
+              {...(isInvite
+                ? {
+                    value: inviteEmail,
+                  }
+                : {})}
+              disabled={isInvite}
             />
           </FormControl>
           <FormControl
@@ -207,13 +254,13 @@ const SignupForm = () => {
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
-            isRequired
+            isRequired={!isInvite}
           >
             <FormLabel htmlFor="firstName">First Name</FormLabel>
             <Input
               id="firstName"
               autoComplete="given-name"
-              required
+              required={!isInvite}
               placeholder="Judie"
               {...register("firstName", {})}
             />
@@ -223,41 +270,44 @@ const SignupForm = () => {
               marginTop: "0.5rem",
               marginBottom: "0.5rem",
             }}
-            isRequired
+            isRequired={!isInvite}
           >
             <FormLabel htmlFor="lastName">Last Name</FormLabel>
             <Input
               id="lastName"
               autoComplete="family-name"
-              required
+              required={!isInvite}
               placeholder="Thebot"
               {...register("lastName")}
             />
           </FormControl>
-          <FormControl paddingTop={2}>
-            <FormLabel htmlFor="districtOrSchool">Role</FormLabel>
-            <Select
-              {...register("role")}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              marginBottom={6}
-            >
-              <option value={UserRole.STUDENT}>Student</option>
-              <option value={UserRole.TEACHER}>Teacher</option>
-              <option value={UserRole.ADMINISTRATOR}>Administrator</option>
-            </Select>
-            {(role === UserRole.ADMINISTRATOR || role === UserRole.TEACHER) && (
-              <FormControl marginBottom={6} isRequired>
-                <FormLabel htmlFor="districtOrSchool">
-                  {role === UserRole.ADMINISTRATOR ? "District" : "School"}
-                </FormLabel>
-                <Input
-                  id="districtOrSchool"
-                  required
-                  {...register("districtOrSchool", {})}
-                />
-              </FormControl>
-            )}
-          </FormControl>
+          {!inviteEmail && (
+            <FormControl paddingTop={2}>
+              <FormLabel htmlFor="districtOrSchool">Role</FormLabel>
+              <Select
+                {...register("role")}
+                onChange={(e) => setRole(e.target.value as UserRole)}
+                marginBottom={6}
+              >
+                <option value={UserRole.STUDENT}>Student</option>
+                <option value={UserRole.TEACHER}>Teacher</option>
+                <option value={UserRole.ADMINISTRATOR}>Administrator</option>
+              </Select>
+              {(role === UserRole.ADMINISTRATOR ||
+                role === UserRole.TEACHER) && (
+                <FormControl marginBottom={6} isRequired>
+                  <FormLabel htmlFor="districtOrSchool">
+                    {role === UserRole.ADMINISTRATOR ? "District" : "School"}
+                  </FormLabel>
+                  <Input
+                    id="districtOrSchool"
+                    required
+                    {...register("districtOrSchool", {})}
+                  />
+                </FormControl>
+              )}
+            </FormControl>
+          )}
           <Checkbox
             onChange={(e) => setReceivePromotions(e.target.checked)}
             defaultChecked

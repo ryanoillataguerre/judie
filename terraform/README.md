@@ -5,7 +5,7 @@
 - Access to GCP
 - Locally authenticated with GCP. Run: `gcloud auth application-default login`
 - A downloaded Service Account JSON file for the corresponding environment's `terraform` Service Account
-  - These should be named `prod-sa-key.json` and `sandbox-sa-key.json`, and should be in the corresponding environment's folder
+  - These should be named `production-sa-key.json` and `sandbox-sa-key.json`, and should be in the corresponding environment's folder
 
 ### How to make changes
 
@@ -20,12 +20,4 @@
 
 ### What has been manually created?
 
-#### Sandbox
-
-- Custom Cloud Run domain mappings for Cloud Run services `web` and `app-service`
-- DNS rules
-
-#### Prod
-
-- DNS rules
-- Everything, as of now
+Nothing, woo!

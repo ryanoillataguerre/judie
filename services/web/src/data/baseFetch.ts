@@ -87,7 +87,7 @@ export async function baseFetch({
   onChunkReceived,
   onStreamEnd,
   onError,
-  abortController
+  abortController,
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
@@ -109,7 +109,18 @@ export async function baseFetch({
         signal: abortController?.signal || null,
       }).then(async (res) => {
         if (res.status === 429) {
-          onError?.(new HTTPResponseError({ error: "No messages remaining today" }, 429));
+          onError?.(
+            new HTTPResponseError({ error: "No messages remaining today" }, 429)
+          );
+          return;
+        }
+        if (res.status > 300) {
+          onError?.(
+            new HTTPResponseError(
+              { error: "Something went wrong. Please try again." },
+              500
+            )
+          );
           return;
         }
         const reader = res.body?.getReader();
@@ -139,3 +150,28 @@ export async function baseFetch({
     throw err;
   }
 }
+
+export const baseFetchFormData = async ({
+  url,
+  form,
+}: {
+  url: string;
+  form: FormData;
+}) => {
+  const reqHeaders: any = {
+    // "Content-Type": "multipart/form-data",
+  };
+  const apiUri = getApiUri();
+  const sessionCookie = getCookie(SESSION_COOKIE);
+  if (sessionCookie) {
+    reqHeaders.Cookie = `judie_sid=${sessionCookie};`;
+  }
+  const response = await fetch(`${apiUri}${url}`, {
+    headers: reqHeaders,
+    credentials: "include",
+    method: "POST",
+    body: form,
+  });
+  await checkStatus(response);
+  return response.json();
+};

@@ -13,21 +13,25 @@ _sym_db = _symbol_database.Default()
 
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x17inference_service.proto\x12\x16inferenceServiceServer"\x1e\n\x0b\x43hatDetails\x12\x0f\n\x07\x63hat_id\x18\x01 \x01(\t"%\n\rTutorResponse\x12\x14\n\x0cresponsePart\x18\x01 \x01(\t"+\n\x14ReturnConnectedCheck\x12\x13\n\x0breturnCheck\x18\x01 \x01(\x08"+\n\x16\x43onnectedCheckResponse\x12\x11\n\tconnected\x18\x01 \x01(\x08\x32\xee\x01\n\x10InferenceService\x12\x61\n\x0fGetChatResponse\x12#.inferenceServiceServer.ChatDetails\x1a%.inferenceServiceServer.TutorResponse"\x00\x30\x01\x12w\n\x15ServerConnectionCheck\x12,.inferenceServiceServer.ReturnConnectedCheck\x1a..inferenceServiceServer.ConnectedCheckResponse"\x00\x62\x06proto3'
+    b'\n\x17inference_service.proto\x12\x16inferenceServiceServer"\x1e\n\x0b\x43hatDetails\x12\x0f\n\x07\x63hat_id\x18\x01 \x01(\t"\xa9\x01\n\rTutorResponse\x12\x14\n\x0cresponsePart\x18\x01 \x01(\t\x12M\n\x0c\x63hatMetaData\x18\x02 \x03(\x0b\x32\x37.inferenceServiceServer.TutorResponse.ChatMetaDataEntry\x1a\x33\n\x11\x43hatMetaDataEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01"+\n\x14ReturnConnectedCheck\x12\x13\n\x0breturnCheck\x18\x01 \x01(\x08"+\n\x16\x43onnectedCheckResponse\x12\x11\n\tconnected\x18\x01 \x01(\x08\x32\xee\x01\n\x10InferenceService\x12\x61\n\x0fGetChatResponse\x12#.inferenceServiceServer.ChatDetails\x1a%.inferenceServiceServer.TutorResponse"\x00\x30\x01\x12w\n\x15ServerConnectionCheck\x12,.inferenceServiceServer.ReturnConnectedCheck\x1a..inferenceServiceServer.ConnectedCheckResponse"\x00\x62\x06proto3'
 )
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "inference_service_pb2", globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
     DESCRIPTOR._options = None
+    _TUTORRESPONSE_CHATMETADATAENTRY._options = None
+    _TUTORRESPONSE_CHATMETADATAENTRY._serialized_options = b"8\001"
     _CHATDETAILS._serialized_start = 51
     _CHATDETAILS._serialized_end = 81
-    _TUTORRESPONSE._serialized_start = 83
-    _TUTORRESPONSE._serialized_end = 120
-    _RETURNCONNECTEDCHECK._serialized_start = 122
-    _RETURNCONNECTEDCHECK._serialized_end = 165
-    _CONNECTEDCHECKRESPONSE._serialized_start = 167
-    _CONNECTEDCHECKRESPONSE._serialized_end = 210
-    _INFERENCESERVICE._serialized_start = 213
-    _INFERENCESERVICE._serialized_end = 451
+    _TUTORRESPONSE._serialized_start = 84
+    _TUTORRESPONSE._serialized_end = 253
+    _TUTORRESPONSE_CHATMETADATAENTRY._serialized_start = 202
+    _TUTORRESPONSE_CHATMETADATAENTRY._serialized_end = 253
+    _RETURNCONNECTEDCHECK._serialized_start = 255
+    _RETURNCONNECTEDCHECK._serialized_end = 298
+    _CONNECTEDCHECKRESPONSE._serialized_start = 300
+    _CONNECTEDCHECKRESPONSE._serialized_end = 343
+    _INFERENCESERVICE._serialized_start = 346
+    _INFERENCESERVICE._serialized_end = 584
 # @@protoc_insertion_point(module_scope)
