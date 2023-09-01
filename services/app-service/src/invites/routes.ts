@@ -10,6 +10,7 @@ import { BulkInviteBody, bulkInvite, invite, redeemInvite } from "./service.js";
 import dbClient from "../utils/prisma.js";
 import { signupValidation } from "../auth/routes.js";
 import { setUserSessionId } from "../auth/service.js";
+import { sendInviteEmail } from "../cio/service.js";
 
 const router = Router();
 
@@ -35,7 +36,7 @@ router.post(
     body("permissions.*.schoolId").isString().optional(),
     body("permissions.*.roomId").isString().optional(),
   ],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const body = req.body as CreateInviteBody;
@@ -105,7 +106,7 @@ router.post(
     body("lastName").isString().optional(),
     body("password").isString().exists(),
   ],
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     // Get invite
     const newUser = await redeemInvite({
@@ -141,7 +142,8 @@ const bulkInviteValidation = [
 router.post(
   "/bulk",
   bulkInviteValidation,
-  handleValidationErrors,
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const body = req.body as BulkInviteBody;
@@ -153,6 +155,34 @@ router.post(
 
     res.status(201).send({
       data: invites,
+    });
+  })
+);
+
+router.post(
+  "/:inviteId/resend",
+  [param("inviteId").isString()],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    // Get invite by ID
+    const invite = await dbClient.invite.findUnique({
+      where: {
+        id: req.params.inviteId,
+      },
+    });
+    if (!invite) {
+      res.status(404).send({
+        error: "Invite not found",
+      });
+      return;
+    }
+    // Resend invite
+    await sendInviteEmail({
+      invite,
+    });
+    res.status(200).send({
+      data: invite,
     });
   })
 );

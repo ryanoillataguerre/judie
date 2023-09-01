@@ -5,6 +5,10 @@ import { Chat, Message, MessageType, Prisma } from "@prisma/client";
 import { Response } from "express";
 import { getChatCompletion } from "../inference/service.js";
 
+export enum CHAT_TAGS {
+  ASSIGNMENT = "assignment",
+}
+
 // Chat Service
 export const createChat = async (params: Prisma.ChatCreateInput) => {
   const newChat = await dbClient.chat.create({
@@ -129,6 +133,7 @@ export const getUserChats = async (userId: string) => {
           },
         },
       },
+      folder: true,
     },
     orderBy: {
       updatedAt: "desc",
@@ -140,11 +145,13 @@ export const getUserChats = async (userId: string) => {
 export const getCompletion = async ({
   chatId,
   query,
+  readableContent,
   userId,
   response,
 }: {
   chatId?: string;
   query: string;
+  readableContent?: string;
   userId: string;
   response: Response;
 }) => {
@@ -166,7 +173,7 @@ export const getCompletion = async ({
 
   // Add message to chat
   await createMessage({
-    readableContent: query,
+    readableContent: readableContent || query,
     content: query,
     type: MessageType.USER,
     chat: {
@@ -239,4 +246,19 @@ export const deleteMostRecentChatMessage = async ({
       id: message.id,
     },
   });
+};
+
+export const getPDFTextPrompt = ({ text }: { text: string }) => {
+  const basePrompt =
+    "I need help with the following assignment. Please help me with my questions with this context in mind.";
+  return {
+    readableContent: `${basePrompt}\n[...]`,
+    query: basePrompt,
+  };
+};
+
+export const validateMaxAssignmentLength = (message: string) => {
+  if (message.length > 15000) {
+    throw new InternalError("Assignment content too long");
+  }
 };

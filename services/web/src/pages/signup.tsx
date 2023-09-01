@@ -64,7 +64,7 @@ export const SignupForm = ({
     mutationFn: signupMutation,
     onSuccess: () => {
       router.push({
-        pathname: "/chat",
+        pathname: "/dashboard",
         query: router.query,
       });
     },
@@ -85,7 +85,7 @@ export const SignupForm = ({
       mutationFn: redeemInviteMutation,
       onSuccess: () => {
         router.push({
-          pathname: "/chat",
+          pathname: "/dashboard",
           query: router.query,
         });
       },
@@ -368,8 +368,7 @@ export const SignupForm = ({
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
-          variant={"solid"}
+          variant={"purp"}
           loading={isLoading}
           label="Sign Up"
           type="submit"

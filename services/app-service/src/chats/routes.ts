@@ -14,8 +14,10 @@ import {
   getUserChats,
   updateChat,
   deleteChatsForUser,
+  getPDFTextPrompt,
+  validateMaxAssignmentLength,
 } from "./service.js";
-import { Chat, Message } from "@prisma/client";
+import { Chat, ChatFolder, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import NotFoundError from "../utils/errors/NotFoundError.js";
 import { incrementQuestionCountEntry } from "../utils/redis.js";
@@ -24,10 +26,15 @@ import multer from "multer";
 import { transcribeAudio } from "../openai/service.js";
 import { Readable } from "stream";
 import { temporaryDirectory } from "tempy";
+import { extractTextFromPdf } from "../pdf/service.js";
+import BadRequestError from "../utils/errors/BadRequestError.js";
+import { createChatAssignment } from "../assignments/service.js";
 
 const router = Router();
 
-const transformChat = (chat: Chat & { messages: Message[] }) => {
+const transformChat = (
+  chat: Chat & { messages: Message[]; folder?: ChatFolder }
+) => {
   return {
     id: chat.id,
     userTitle: chat.userTitle,
@@ -36,7 +43,8 @@ const transformChat = (chat: Chat & { messages: Message[] }) => {
     updatedAt: chat.updatedAt,
     userId: chat.userId,
     messages: chat.messages?.length ? chat.messages.reverse() : [],
-  } as Chat & { messages: Message[] };
+    folder: chat.folder,
+  } as Chat & { messages: Message[]; folder?: ChatFolder };
 };
 
 router.post(
@@ -44,7 +52,7 @@ router.post(
   [body("query").exists()],
   [query("chatId").optional()],
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(messageRateLimit),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
@@ -82,6 +90,7 @@ router.get(
     // Typecasting to transform - need to better define transformChat type
     const chats = (await getUserChats(session.userId)) as (Chat & {
       messages: Message[];
+      folder?: ChatFolder;
     })[];
 
     res.status(200).json({
@@ -93,6 +102,7 @@ router.get(
 router.get(
   "/:chatId",
   requireAuth,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {
@@ -113,8 +123,9 @@ router.get(
 
 router.post(
   "/",
-  [body("subject").optional()],
+  [body("subject").optional(), body("folderId").optional()],
   requireAuth,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {
@@ -126,6 +137,15 @@ router.post(
           id: session.userId,
         },
       },
+      ...(req.body?.folderId
+        ? {
+            folder: {
+              connect: {
+                id: req.body.folderId,
+              },
+            },
+          }
+        : {}),
       subject: req.body?.subject || undefined,
     });
 
@@ -143,6 +163,7 @@ router.put(
     param("chatId").exists(),
     body("userTitle").optional(),
   ],
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {
@@ -219,6 +240,47 @@ router.post(
       res.status(200).json({
         data: { transcript },
       });
+    }
+  })
+);
+
+router.post(
+  "/:chatId/context/pdf",
+  requireAuth,
+  upload.single("file"),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const file = req.file;
+    if (file) {
+      // Get transcript of file
+      const text = await extractTextFromPdf(file);
+      if (text) {
+        // Ensure length of message isn't going to bankrupt us in tokens
+        validateMaxAssignmentLength(text);
+        const { readableContent, query } = getPDFTextPrompt({ text });
+        // Save to DB as Assignment
+        await createChatAssignment({
+          chatId: req.params.chatId,
+          text,
+        });
+
+        // Get completion from inference service
+        await getCompletion({
+          chatId: req.params.chatId,
+          userId: session.userId,
+          response: res,
+          query,
+          readableContent,
+        });
+        res.status(200).end();
+      } else {
+        throw new BadRequestError("Could not read PDF");
+      }
+    } else {
+      throw new BadRequestError("No file provided");
     }
   })
 );

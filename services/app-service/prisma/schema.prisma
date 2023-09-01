@@ -68,7 +68,7 @@ model Subscription {
   userId                     String             @unique @map("user_id")
   status                     SubscriptionStatus
   type                       SubscriptionType
-  stripeId                   String?            @map("stripe_id")
+  stripeId                   String?            @unique @map("stripe_id")
   appleTransactionId         String?            @map("apple_transaction_id")
   originalAppleTransactionId String?            @map("original_apple_transaction_id")
   canceledAt                 DateTime?          @map("canceled_at")
@@ -108,25 +108,58 @@ model User {
   rooms                Room[]
   permissions          Permission[]
   createdOrganizations Organization[] @relation("creator")
+  ChatFolder           ChatFolder[]
 
   @@index([id, email])
   @@map("users")
 }
 
 model Chat {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  subject      String?
+  userTitle    String?   @map("user_title")
+  chatFolderId String?   @map("chat_folder_id")
+  tags         String[]
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime? @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  user        User             @relation(fields: [userId], references: [id])
+  messages    Message[]
+  folder      ChatFolder?      @relation(fields: [chatFolderId], references: [id])
+  assignments ChatAssignment[]
+
+  @@index([id, userId])
+  @@map("chats")
+}
+
+model ChatAssignment {
+  id        String    @id @default(uuid())
+  chatId    String    @map("chat_id")
+  text      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  chat      Chat      @relation(fields: [chatId], references: [id])
+
+  @@index([id, chatId])
+  @@map("assignments")
+}
+
+model ChatFolder {
   id        String    @id @default(uuid())
   userId    String    @map("user_id")
-  subject   String?
   userTitle String?   @map("user_title")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  user     User      @relation(fields: [userId], references: [id])
-  messages Message[]
+  user  User   @relation(fields: [userId], references: [id])
+  chats Chat[]
 
   @@index([id, userId])
-  @@map("chats")
+  @@map("chat_folders")
 }
 
 enum MessageType {
