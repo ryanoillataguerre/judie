@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
+import { sendParentalConsentEmail } from "../cio/service.js";
 
 export const getUser = async (
   params: Prisma.UserWhereInput,
@@ -72,4 +73,39 @@ export const verifyUserEmail = async (userId: string) => {
       emailVerified: true,
     },
   });
+};
+
+export const userAgeConsent = async ({
+  userId,
+  dateOfBirth,
+  parentEmail,
+}: {
+  userId: string;
+  dateOfBirth: Date;
+  parentEmail?: string;
+}) => {
+  const birthdayDate = new Date(dateOfBirth);
+  // If DOB is >13 years ago, then ignore parent email but still update
+  const thirteenYearsAgo = new Date();
+  thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
+  const isOverThirteen = dateOfBirth < thirteenYearsAgo;
+
+  const newUser = await updateUser(userId, {
+    dateOfBirth: birthdayDate,
+    parentalConsent: isOverThirteen,
+    parentalConsentEmail: isOverThirteen ? undefined : parentEmail,
+  });
+  if (isOverThirteen) {
+    return newUser;
+  }
+  // Send parental consent email if user is under 13
+  await sendParentalConsentEmail({ user: newUser });
+  return newUser;
+};
+
+export const parentalConsentUser = async (userId: string) => {
+  const newUser = await updateUser(userId, {
+    parentalConsent: true,
+  });
+  return newUser;
 };

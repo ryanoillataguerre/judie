@@ -504,3 +504,30 @@ export const createFolderMutation = async ({ title }: { title: string }) => {
   });
   return response.data;
 };
+
+export const ageAndConsentMutation = async ({
+  dateOfBirth,
+  parentEmail,
+}: {
+  dateOfBirth: string;
+  parentEmail?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/user/dob-consent`,
+    method: "POST",
+    body: { dateOfBirth, parentEmail },
+  });
+  return response.data;
+};
+
+export const parentalConsentMutation = async ({
+  userId,
+}: {
+  userId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/user/${userId}/parental-consent`,
+    method: "POST",
+  });
+  return response.data;
+};

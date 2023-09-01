@@ -135,7 +135,7 @@ export const signin = async ({
   }
 
   // Verify password
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, user.password || "");
   if (!match) {
     throw new UnauthorizedError("Invalid email or password");
   }
@@ -292,7 +292,7 @@ export const changePassword = async ({
   if (!user) {
     throw new UnauthorizedError("No user id found in session");
   }
-  const match = await bcrypt.compare(oldPassword, user.password);
+  const match = await bcrypt.compare(oldPassword, user.password || "");
   if (!match) {
     throw new BadRequestError("Old password is incorrect");
   }

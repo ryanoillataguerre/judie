@@ -118,6 +118,9 @@ export interface User {
   questionsAsked: number;
   subscription?: Subscription;
   lastMessageAt?: Date;
+  dateOfBirth?: Date;
+  parentalConsent?: boolean;
+  parentalConsentEmail?: string;
   chats?: Chat[];
   permissions?: Permission[];
   organizations?: Organization[];
