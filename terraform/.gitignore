@@ -3,3 +3,4 @@ sandbox-sa-key.json
 .terraform/
 sandbox.tfvars
 production.tfvars
+prod-sa-key.json

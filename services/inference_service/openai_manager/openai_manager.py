@@ -1,5 +1,5 @@
 import openai
-from typing import List, Dict
+from typing import List, Dict, Optional
 import logging
 from dataclasses import dataclass
 from inference_service.server.judie_data import SessionConfig
@@ -65,13 +65,26 @@ def identify_math_exp(message: str) -> str:
     return response_return
 
 
-"""
-def comprehension_score(session_config: SessionConfig) -> int:
+def comprehension_score(session_config: SessionConfig) -> Optional[int]:
+    print(session_config.history.get_openai_format()[-5:])
     prompt = [
         {
             "role": "system",
-            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversation given their last response or question.",
+            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversationand subject material given the context of the conversation and the last user response or question after the tutor.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
         },
-    ].extend(SessionConfig.history.get_openai_format()[-5:])
+    ] + session_config.history.get_openai_format()[-5:]
     # arbitrarily use last five messages as conversation window
-"""
+    print(prompt)
+
+    comp_score = get_gpt_response(
+        messages=prompt,
+        openai_config=OpenAiConfig(temperature=0.3, stream=False, max_tokens=10),
+    )
+    score_str = next(comp_score)
+    print(score_str)
+    logger.info(f"Comprehension score: {score_str}")
+
+    if score_str.isnumeric():
+        return int(score_str)
+    else:
+        return None

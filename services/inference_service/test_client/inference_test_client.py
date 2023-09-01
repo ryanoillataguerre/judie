@@ -1,7 +1,7 @@
 import grpc
 from inference_service.server import inference_service_pb2_grpc, inference_service_pb2
 from inference_service.test_client.test_chats_config import (
-    TEST_CHAT_ID_2,
+    SANDBOX_ID_1,
 )
 from grpc_health.v1 import health_pb2, health_pb2_grpc
 
@@ -26,7 +26,11 @@ if __name__ == "__main__":
 
         print("Chat response stream")
         response = stub.GetChatResponse(
-            inference_service_pb2.ChatDetails(chat_id=TEST_CHAT_ID_2)
+            inference_service_pb2.ChatDetails(chat_id=SANDBOX_ID_1)
         )
+        first = True
         for part in response:
+            if first:
+                print(part.chatMetaData)
+                first = False
             print(str(part.responsePart), end="", flush=True)

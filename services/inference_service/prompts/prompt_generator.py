@@ -3,8 +3,6 @@ from inference_service.context import context_retriever
 from inference_service.wolfram_manager import math_api_handler
 from inference_service.openai_manager import openai_manager
 
-TOTAL_PROMPT_LIMIT = 8000
-
 
 def generate_question_answer_prompt(question: str, subject: str = None) -> str:
     special_context = None
