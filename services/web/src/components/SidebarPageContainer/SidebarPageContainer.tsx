@@ -2,6 +2,7 @@ import { Box, Flex, useBreakpointValue } from "@chakra-ui/react";
 import Sidebar from "../Sidebar/Sidebar";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import useStorageState from "@judie/hooks/useStorageState";
+import SidebarChatNav from "../SidebarChatNav/SidebarChatNav";
 
 interface SidebarPageContainerProps {
   children: React.ReactNode;
@@ -67,6 +68,7 @@ const SidebarPageContainer = ({
       }}
     >
       <Sidebar isOpen={isOpen} />
+
       <Box
         overflow={scroll ? "scroll" : "hidden"}
         style={{
@@ -75,6 +77,7 @@ const SidebarPageContainer = ({
           maxHeight: "100vh",
           position: "relative",
         }}
+        marginLeft={"0px"}
       >
         <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />
         {children}
