@@ -1,5 +1,4 @@
 import {
-  FormEvent,
   memo,
   use,
   useContext,
@@ -9,14 +8,11 @@ import {
   useState,
 } from "react";
 import {
-  Button,
   Flex,
-  Input,
   Spinner,
   Text,
   VStack,
   useBreakpointValue,
-  useToast,
 } from "@chakra-ui/react";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
@@ -27,8 +23,7 @@ import Paywall from "../Paywall/Paywall";
 import { useRouter } from "next/router";
 import Loading from "../lottie/Loading/Loading";
 import { GET_CHAT_BY_ID, getChatByIdQuery } from "@judie/data/queries";
-import { useMutation, useQuery } from "react-query";
-import { uploadAssignmentMutation } from "@judie/data/mutations";
+import { useQuery } from "react-query";
 
 const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   const {
@@ -137,7 +132,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
               padding: "2rem",
               border: "#565555 0.5px solid",
               borderRadius: "0.8rem",
-              alignItems: "flex-start",
             }}
             boxShadow={"sm"}
           >

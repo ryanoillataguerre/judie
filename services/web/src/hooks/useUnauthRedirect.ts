@@ -8,14 +8,14 @@ const useUnauthRedirect = () => {
   const auth = useAuth();
   useEffect(() => {
     if (auth.userData && REDIRECT_FROM_PATHS.includes(router.pathname)) {
-      router.push("/dashboard");
+      router.push("/chat");
     }
     if (router.pathname === "/") {
       if (!auth.userData && !auth.isLoading) {
         router.push("/signin");
       }
       if (auth.userData) {
-        router.push("/dashboard");
+        router.push("/chat");
       }
     }
   }, [auth, router]);

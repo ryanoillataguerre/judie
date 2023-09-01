@@ -66,7 +66,6 @@ const CreateOrgModal = ({
       });
       refreshEntities();
       onClose();
-      reset();
     } catch (err) {
       toast({
         title: "Error creating organization",

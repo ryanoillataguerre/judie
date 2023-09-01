@@ -34,7 +34,7 @@ router.post(
   "/checkout-session",
   [body("currentUrl").exists().isString()],
   requireAuth,
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     if (!session.userId) {

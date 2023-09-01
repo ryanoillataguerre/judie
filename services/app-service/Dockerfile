@@ -2,6 +2,7 @@ FROM node:20 AS builder
 WORKDIR /app
 COPY ./build_protos.sh /opt/build_protos.sh
 COPY app-service .
+# COPY protos/inference_service/server/inference_service.proto ./protos/inference_service.proto
 RUN yarn install
 RUN yarn run generate
 RUN /opt/build_protos.sh

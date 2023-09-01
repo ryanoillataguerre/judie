@@ -8,7 +8,6 @@ import {
   UserRole,
 } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
-import { sendSubscribedEmail } from "../cio/service.js";
 
 export const createCustomer = async (userId: string): Promise<string> => {
   const user = await getUser({ id: userId });
@@ -259,25 +258,4 @@ export const handleSubscriptionCreated = async (
     },
   };
   await createSubscription(subscriptionData);
-  // Send thanks for subscribing email
-  await sendSubscribedEmail({
-    user,
-  });
-};
-
-export const handleSubscriptionCancelled = async (
-  subscription: Stripe.Subscription
-) => {
-  if (subscription.cancel_at) {
-    const subscriptionId = subscription.id;
-    const subscriptionData: Prisma.SubscriptionUpdateInput = {
-      canceledAt: new Date(subscription.cancel_at),
-    };
-    await dbClient.subscription.update({
-      where: {
-        stripeId: subscriptionId,
-      },
-      data: subscriptionData,
-    });
-  }
 };

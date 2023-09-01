@@ -27,7 +27,7 @@ router.post(
     body("organizationId").isString().exists(),
     body("schoolId").isString().optional(),
   ],
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { name, schoolId, organizationId } = req.body;
     // Validate user has organization-level privileges
@@ -90,7 +90,7 @@ router.post(
 router.get(
   "/:roomId/users",
   requireAuth,
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
@@ -110,7 +110,7 @@ router.get(
 router.get(
   "/:roomId",
   requireAuth,
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
@@ -130,7 +130,7 @@ router.get(
 router.get(
   "/:roomId/invites",
   requireAuth,
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
@@ -150,7 +150,7 @@ router.get(
 router.delete(
   "/:roomId",
   requireAuth,
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const roomId = req.params.roomId;
@@ -180,8 +180,8 @@ router.put(
   "/:roomId",
   [body("name").isString().exists()],
   requireAuth,
-  errorPassthrough(handleValidationErrors),
-  errorPassthrough(async (req: Request, res: Response) => {
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
     const { name } = req.body;
     const { userId } = req.session;
 
@@ -197,7 +197,7 @@ router.put(
     res.status(201).json({
       data: school,
     });
-  })
+  }
 );
 
 export default router;

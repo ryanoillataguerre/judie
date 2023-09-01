@@ -14,8 +14,6 @@ import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import dbClient from "../utils/prisma.js";
 import { getUser } from "../users/service.js";
 
-const USER_PAGE_SIZE = 20;
-
 export const isPermissionTypeAdmin = (type: PermissionType) => {
   return (
     type === PermissionType.ORG_ADMIN ||
@@ -396,8 +394,6 @@ export const getUsersForAdminUser = async ({ id }: { id: string }) => {
         },
       },
     },
-    // skip: page * USER_PAGE_SIZE,
-    // take: USER_PAGE_SIZE,
   });
 
   return userQueryResult;

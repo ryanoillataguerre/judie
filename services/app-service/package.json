@@ -17,8 +17,6 @@
     "migrate:prod": "prisma migrate deploy"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.5.0",
-    "@types/adobe__pdfservices-node-sdk": "^2.2.0",
     "@types/body-parser": "^1.19.2",
     "@types/connect-redis": "^0.0.20",
     "@types/cookie-parser": "^1.4.3",
@@ -37,7 +35,6 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@adobe/pdfservices-node-sdk": "^3.4.2",
     "@google-cloud/storage": "^7.0.1",
     "@grpc/grpc-js": "^1.8.14",
     "@grpc/proto-loader": "^0.7.6",
@@ -45,7 +42,6 @@
     "@prisma/client": "4.10.1",
     "@segment/analytics-node": "^1.0.0-beta.26",
     "@types/bcryptjs": "^2.4.2",
-    "adm-zip": "^0.5.10",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "connect-redis": "^6.1.3",

@@ -37,7 +37,6 @@ export interface BaseFetchOptions {
   onChunkReceived?: (chunk: string) => void;
   onStreamEnd?: () => void;
   onError?: (error: HTTPResponseError) => void;
-  form?: boolean;
   abortController?: AbortController;
 }
 
@@ -89,13 +88,12 @@ export async function baseFetch({
   onStreamEnd,
   onError,
   abortController,
-  form,
 }: BaseFetchOptions): Promise<any> {
   const apiUri = getApiUri();
   // Will resolve on client side
   try {
     const reqHeaders: any = {
-      ...(form ? {} : { "Content-Type": "application/json" }),
+      "Content-Type": "application/json",
       ...headers,
     };
     const sessionCookie = getCookie(SESSION_COOKIE);
@@ -107,7 +105,7 @@ export async function baseFetch({
         headers: reqHeaders,
         credentials: "include",
         method,
-        body: body ? (form ? body : JSON.stringify(body)) : null,
+        body: body ? JSON.stringify(body) : null,
         signal: abortController?.signal || null,
       }).then(async (res) => {
         if (res.status === 429) {
@@ -143,7 +141,7 @@ export async function baseFetch({
         headers: reqHeaders,
         credentials: "include",
         method,
-        body: body ? (form ? body : JSON.stringify(body)) : null,
+        body: body ? JSON.stringify(body) : null,
       });
       await checkStatus(response);
       return response.json();
@@ -152,3 +150,28 @@ export async function baseFetch({
     throw err;
   }
 }
+
+export const baseFetchFormData = async ({
+  url,
+  form,
+}: {
+  url: string;
+  form: FormData;
+}) => {
+  const reqHeaders: any = {
+    // "Content-Type": "multipart/form-data",
+  };
+  const apiUri = getApiUri();
+  const sessionCookie = getCookie(SESSION_COOKIE);
+  if (sessionCookie) {
+    reqHeaders.Cookie = `judie_sid=${sessionCookie};`;
+  }
+  const response = await fetch(`${apiUri}${url}`, {
+    headers: reqHeaders,
+    credentials: "include",
+    method: "POST",
+    body: form,
+  });
+  await checkStatus(response);
+  return response.json();
+};

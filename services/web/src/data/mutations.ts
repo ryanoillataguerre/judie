@@ -1,14 +1,15 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
-import { HTTPResponseError, baseFetch } from "./baseFetch";
-import {
-  Chat,
-  ChatFolder,
-  GradeYear,
-  Message,
-  PermissionType,
-  UserRole,
-} from "./types/api";
+import { HTTPResponseError, baseFetch, baseFetchFormData } from "./baseFetch";
+import { GradeYear, Message, PermissionType, UserRole } from "./types/api";
 
+export interface ChatResponse {
+  id: string;
+  userTitle?: string;
+  subject?: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: Message[];
+}
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
   query,
@@ -112,17 +113,14 @@ export const signupMutation = async ({
 
 export const createChatMutation = async ({
   subject,
-  folderId,
 }: {
   subject?: string | undefined;
-  folderId?: string | undefined;
-}): Promise<Chat> => {
+}): Promise<ChatResponse> => {
   const response = await baseFetch({
     url: "/chat",
     method: "POST",
     body: {
       subject: subject || undefined,
-      folderId: folderId || undefined,
     },
   });
   return response.data;
@@ -136,7 +134,7 @@ export const putChatMutation = async ({
   chatId: string;
   subject?: string;
   userTitle?: string;
-}): Promise<Chat> => {
+}): Promise<ChatResponse> => {
   const response = await baseFetch({
     url: `/chat/${chatId}`,
     method: "PUT",
@@ -330,11 +328,9 @@ export const whisperTranscribeMutation = async ({
 }: {
   data: FormData;
 }): Promise<TranscribeResponse> => {
-  const response = await baseFetch({
+  const response = await baseFetchFormData({
     url: `/chat/whisper/transcribe`,
-    body: data,
-    method: "POST",
-    form: true,
+    form: data,
   });
   return response.data;
 };
@@ -412,95 +408,6 @@ export const putRoomMutation = async ({
     url: `/admin/rooms/${roomId}`,
     method: "PUT",
     body: { name },
-  });
-  return response.data;
-};
-
-export const putUserMutation = async ({
-  firstName,
-  lastName,
-}: {
-  firstName?: string;
-  lastName?: string;
-}) => {
-  const response = await baseFetch({
-    url: `/user/me`,
-    method: "PUT",
-    body: {
-      firstName,
-      lastName,
-    },
-  });
-  return response.data;
-};
-
-export const changePasswordMutation = async ({
-  oldPassword,
-  newPassword,
-  passwordConfirm,
-}: {
-  oldPassword: string;
-  newPassword: string;
-  passwordConfirm: string;
-}) => {
-  const response = await baseFetch({
-    url: `/auth/change-password`,
-    method: "PUT",
-    body: {
-      oldPassword,
-      newPassword,
-      passwordConfirm,
-    },
-  });
-  return response.data;
-};
-
-export const resendInviteMutation = async ({
-  inviteId,
-}: {
-  inviteId: string;
-}) => {
-  const response = await baseFetch({
-    url: `/admin/invites/${inviteId}/resend`,
-    method: "POST",
-  });
-  return response.data;
-};
-
-export const uploadAssignmentMutation = async ({
-  chatId,
-  data,
-  setChatValue,
-  onStreamEnd,
-  onError,
-  abortController,
-}: {
-  chatId: string;
-  data: FormData;
-  setChatValue: (chat: string) => void;
-  onStreamEnd?: () => void;
-  onError?: (error: HTTPResponseError) => void;
-  abortController?: AbortController;
-}): Promise<string> => {
-  const response = await baseFetch({
-    url: `/chat/${chatId}/context/pdf`,
-    body: data,
-    method: "POST",
-    stream: true,
-    onChunkReceived: setChatValue,
-    onStreamEnd,
-    onError,
-    abortController,
-    form: true,
-  });
-  return response;
-};
-
-export const createFolderMutation = async ({ title }: { title: string }) => {
-  const response = await baseFetch({
-    url: `/folders`,
-    method: "POST",
-    body: { title },
   });
   return response.data;
 };

@@ -65,7 +65,6 @@ const CreateSchoolModal = ({
       refetchOrg();
       refreshEntities();
       onClose();
-      reset();
     } catch (err) {}
   };
 

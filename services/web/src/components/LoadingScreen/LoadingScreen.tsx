@@ -16,6 +16,7 @@ const LoadingScreen = () => {
         style={{
           height: "30%",
           marginRight: "5%",
+          marginTop: "5%",
         }}
       >
         <Lottie animationData={loadingAnimationData} loop />

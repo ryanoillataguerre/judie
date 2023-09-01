@@ -8,7 +8,6 @@ import {
   forgotPassword,
   resetPassword,
   setUserSessionId,
-  changePassword,
 } from "./service.js";
 
 export const signupValidation = [
@@ -26,7 +25,7 @@ const router = Router();
 router.post(
   "/signup",
   signupValidation,
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const {
@@ -62,7 +61,7 @@ router.post(
 router.post(
   "/signin",
   [body("email").exists().isEmail(), body("password").isString().exists()],
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const { email, password } = req.body;
@@ -79,33 +78,10 @@ router.post(
   })
 );
 
-router.put(
-  "/change-password",
-  [
-    body("oldPassword").isString().exists(),
-    body("newPassword").isString().exists(),
-    body("passwordConfirm").isString().exists(),
-  ],
-  handleValidationErrors,
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    const { newPassword, passwordConfirm, oldPassword } = req.body;
-
-    // Change user password if they both match
-    const user = await changePassword({
-      userId: session.userId as string,
-      oldPassword,
-      newPassword,
-      passwordConfirm,
-    });
-    res.status(200).send({ user });
-  })
-);
-
 router.post(
   "/waitlist",
   [body("email").exists().isEmail()],
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { email } = req.body;
     await addToWaitlist({ email });
@@ -116,7 +92,7 @@ router.post(
 router.post(
   "/forgot-password",
   [body("email").exists().isEmail()],
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { email } = req.body;
     const origin = req.headers.origin;
@@ -132,7 +108,7 @@ router.post(
 router.post(
   "/reset-password",
   [body("password").exists(), body("token").exists()],
-  errorPassthrough(handleValidationErrors),
+  handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
     const { password, token } = req.body;
     await resetPassword({ password, token });

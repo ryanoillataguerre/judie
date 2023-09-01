@@ -6,7 +6,6 @@ import paymentsRouter from "./payments/routes.js";
 import adminRoutes from "./admin/routes.js";
 import invitesRouter from "./invites/routes.js";
 import messagesRouter from "./messages/routes.js";
-import foldersRouter from "./folders/routes.js";
 
 const router = Router();
 
@@ -18,6 +17,5 @@ router.use("/invites", invitesRouter);
 router.use("/messages", messagesRouter);
 // Admin - can be migrated to a new service?
 router.use("/admin", adminRoutes);
-router.use("/folders", foldersRouter);
 
 export default router;

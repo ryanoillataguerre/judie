@@ -1,10 +1,6 @@
 import { Request, Response, Router } from "express";
 import { body } from "express-validator";
-import {
-  errorPassthrough,
-  handleValidationErrors,
-  requireJudieAuth,
-} from "../utils/express.js";
+import { handleValidationErrors, requireJudieAuth } from "../utils/express.js";
 import {
   validateOrganizationAdmin,
   validateSchoolAdmin,
@@ -22,8 +18,8 @@ router.put(
   ],
   // Only Judie employees can edit seats
   requireJudieAuth,
-  errorPassthrough(handleValidationErrors),
-  errorPassthrough(async (req: Request, res: Response) => {
+  handleValidationErrors,
+  async (req: Request, res: Response) => {
     const { count } = req.body;
     const { userId } = req.session;
 
@@ -47,7 +43,7 @@ router.put(
     });
 
     res.status(200).json({ data: schoolOrOrganization });
-  })
+  }
 );
 
 export default router;
