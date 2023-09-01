@@ -40,13 +40,18 @@ const SendButton = () => {
   return (
     <Button
       type="submit"
-      colorScheme="teal"
       style={{
         padding: "0 0",
         height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+      }}
+      _hover={{
+        backgroundColor: "brand.secondary",
+        svg: {
+          fill: "white",
+        },
       }}
       border={"none"}
       bg={"transparent"}
@@ -147,7 +152,7 @@ const RecordButton = ({
     <Button
       type="button"
       // variant="outline"
-      colorScheme="teal"
+      // colorScheme="teal"
       bg={"transparent"}
       style={{
         padding: "0 0rem",
@@ -155,6 +160,12 @@ const RecordButton = ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+      }}
+      _hover={{
+        backgroundColor: "brand.secondary",
+        svg: {
+          fill: "white",
+        },
       }}
       border={"none"}
       onClick={() => {
@@ -290,7 +301,7 @@ const ChatInput = () => {
           display={"flex"}
           width={"100%"}
           h={"auto"}
-          mb={"20px"}
+          mb={"40px"}
           alignItems={"center"}
         >
           <Textarea
@@ -299,7 +310,7 @@ const ChatInput = () => {
             ref={ref}
             value={chatValue}
             _hover={{
-              borderColor: "teal",
+              borderColor: "brand.primary",
             }}
             disabled={isRecording}
             onChange={(e) => setChatValue(e.target.value)}
@@ -317,7 +328,7 @@ const ChatInput = () => {
           />
           <HStack
             position={"absolute"}
-            bottom={"9px"}
+            bottom={"10px"}
             right={"16px"}
             height={"30px"}
             zIndex={2}
@@ -351,8 +362,10 @@ const ChatFooter = () => {
   });
 
   const gradientColor = useColorModeValue(
-    "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)",
-    "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)"
+    // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)",
+    "linear-gradient(#F6F6F600 0%, #F6F6F6DD 60%, #F6F6F6FF 90%)",
+    // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)"
+    "linear-gradient(#25252500 0%, #252525DD 60%, #252525FF 90%)"
   );
 
   return (
@@ -363,13 +376,14 @@ const ChatFooter = () => {
         flexDirection: "column",
         justifyContent: "flex-end",
         alignItems: "center",
-        position: "absolute",
-        bottom: 0,
+        position: "sticky",
+        bottom: "0px",
         left: 0,
-        paddingTop: "4rem",
         backgroundImage: gradientColor,
       }}
-      minH={"10rem"}
+      pb={"0px"}
+      mt={6}
+      pt={0}
     >
       <Box
         style={{
