@@ -40,6 +40,7 @@ export const signup = async ({
   role,
   districtOrSchool,
   gradeYear,
+  isB2B,
 }: {
   firstName: string;
   lastName: string;
@@ -49,6 +50,7 @@ export const signup = async ({
   role?: UserRole;
   districtOrSchool?: string;
   gradeYear?: GradeYear;
+  isB2B?: boolean;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -79,6 +81,11 @@ export const signup = async ({
       receivePromotions,
       role: role || UserRole.STUDENT,
       gradeYear,
+      ...(isB2B
+        ? {
+            parentalConsent: true,
+          }
+        : {}),
     },
     include: {
       subscription: true,

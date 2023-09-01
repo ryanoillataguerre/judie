@@ -34,6 +34,7 @@ export interface Subscription {
   userId: string;
   status: SubscriptionStatus;
   type: SubscriptionType;
+  organizationId?: string;
   stripeId: string;
   user: User;
 }

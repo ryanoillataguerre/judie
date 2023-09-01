@@ -178,6 +178,7 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
     password: params.password,
     gradeYear: invite.gradeYear as GradeYear | undefined,
     receivePromotions: params.receivePromotions,
+    isB2B: true,
   });
 
   // Set userId on all permissions from invite

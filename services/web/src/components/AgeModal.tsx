@@ -28,6 +28,9 @@ const AgeModal = () => {
   const toast = useToast();
 
   const isOpen = useMemo(() => {
+    if (auth.isB2B || !auth.userData?.parentalConsent) {
+      return false;
+    }
     const dobDate = new Date(auth.userData?.dateOfBirth || "");
     if (isNaN(dobDate.getTime())) {
       return true;
@@ -41,8 +44,7 @@ const AgeModal = () => {
       // User is under 13 and has not entered parental consent email
       (auth.userData?.dateOfBirth &&
         age < 13 &&
-        !auth.userData?.parentalConsentEmail) ||
-      (age < 13 && !auth.userData?.parentalConsent)
+        !auth.userData?.parentalConsent)
     ) {
       return true;
     }
@@ -152,11 +154,22 @@ const AgeModal = () => {
             variant={"subtitle"}
             style={{
               marginTop: "0.5rem",
-              marginBottom: "1rem",
+              marginBottom: "0.5rem",
             }}
           >
             We need to know your date of birth to verify whether or not you need
             parental consent to use Judie.
+          </Text>
+
+          <Text
+            variant={"subtitle"}
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "1rem",
+            }}
+          >
+            If you've already sent them an email, please ask them to check their
+            inbox or spam folder.
           </Text>
           <form
             onSubmit={handleSubmit(onSubmit)}
