@@ -5,7 +5,7 @@ from collections import deque
 from inference_service.server.judie_data import History, ChatTurn, Role
 
 
-def get_chat(
+def get_messages(
     chat_id: str, app_db: Optional[prisma.Prisma] = None
 ) -> List[prisma.models.Message]:
     if not app_db:
@@ -27,11 +27,11 @@ def get_chat_history(
     chat_id: str,
     app_db: Optional[prisma.Prisma] = None,
 ) -> History:
-    chats = get_chat(chat_id=chat_id, app_db=app_db)
+    messages = get_messages(chat_id=chat_id, app_db=app_db)
 
     hist = History()
 
-    for chat in chats:
+    for chat in messages:
         if chat.type == "USER":
             turn = ChatTurn(role=Role.USER, content=chat.content)
         elif chat.type == "BOT":
@@ -48,7 +48,7 @@ def get_chat_openai_fmt(
     app_db: Optional[prisma.Prisma] = None,
     length_limit: Optional[int] = None,
 ) -> List[Dict]:
-    chats = get_chat(chat_id=chat_id, app_db=app_db)
+    chats = get_messages(chat_id=chat_id, app_db=app_db)
 
     chats_fmtd = deque()
 
@@ -74,10 +74,13 @@ def get_chat_openai_fmt(
 
 
 def get_chat_local():
+    """
+    Method to mock the DB storage functionality with local memory for local testing
+    """
     raise NotImplementedError
 
 
-def get_subject(chat_id: str, app_db: Optional[prisma.Prisma] = None):
+def get_chat(chat_id: str, app_db: Optional[prisma.Prisma] = None) -> prisma.models.Chat:
     if not app_db:
         app_db = prisma.Prisma()
 
@@ -88,4 +91,18 @@ def get_subject(chat_id: str, app_db: Optional[prisma.Prisma] = None):
             "id": chat_id,
         },
     )
+
+    return selected_chat
+
+
+def get_subject_from_db(chat_id: str, app_db: Optional[prisma.Prisma] = None) -> str:
+    selected_chat = get_chat(chat_id, app_db)
+
     return selected_chat.subject
+
+
+def get_subject_from_chat(chat: prisma.models.Chat) -> str:
+    return str(chat.subject)
+
+
+def get_special_context_from_chat(chat: prisma.models.Chat)

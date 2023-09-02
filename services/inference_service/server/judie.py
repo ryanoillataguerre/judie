@@ -50,9 +50,11 @@ def yield_judie_response(
 
 
 def grab_chat_config(chat_id: Optional[str]) -> SessionConfig:
+    chat_obj = prisma_manager.get_chat(chat_id)
     return SessionConfig(
         history=prisma_manager.get_chat_history(chat_id=chat_id),
-        subject=prisma_manager.get_subject(chat_id=chat_id),
+        subject=prisma_manager.get_subject_from_chat(chat_obj),
+        special_context=prisma_manager.get_special_context_from_chat(chat_obj)
     )
 
 

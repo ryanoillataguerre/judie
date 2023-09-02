@@ -10,7 +10,7 @@ def env_setup():
 
 
 def test_get_chat(env_setup):
-    chats = prisma_manager.get_chat(chat_id=TEST_CHAT_ID_1)
+    chats = prisma_manager.get_messages(chat_id=TEST_CHAT_ID_1)
     for i in chats:
         print(i)
         print()
@@ -34,5 +34,5 @@ def test_get_chat_length_limit(env_setup):
 
 
 def test_get_subject(env_setup):
-    subject = prisma_manager.get_subject(chat_id=TEST_CHAT_ID_1)
+    subject = prisma_manager.get_subject_from_db(chat_id=TEST_CHAT_ID_1)
     assert subject == "AP Art History"
