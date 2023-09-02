@@ -77,14 +77,6 @@ const ScrollContainerBubbles = ({
       display={"flex"}
       flexDirection={"row"}
     >
-      {/* <Divider
-        orientation="vertical"
-        mt={"40px"}
-        mx={"10px"}
-        height={"75%"}
-        w={"1px"}
-        backgroundColor={"#8E8E8E"}
-      /> */}
       <Box
         ref={outerDiv}
         style={{
@@ -131,6 +123,7 @@ const ScrollContainerBubbles = ({
               <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
             </Tag>
           )}
+
           {children}
         </Box>
       </Box>
