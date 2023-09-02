@@ -34,6 +34,7 @@ export interface Subscription {
   userId: string;
   status: SubscriptionStatus;
   type: SubscriptionType;
+  organizationId?: string;
   stripeId: string;
   user: User;
 }
@@ -118,6 +119,9 @@ export interface User {
   questionsAsked: number;
   subscription?: Subscription;
   lastMessageAt?: Date;
+  dateOfBirth?: Date;
+  parentalConsent?: boolean;
+  parentalConsentEmail?: string;
   chats?: Chat[];
   permissions?: Permission[];
   organizations?: Organization[];

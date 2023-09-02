@@ -10,6 +10,7 @@ import {
   EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
+  SubscriptionType,
   User,
   UserRole,
 } from "@judie/data/types/api";
@@ -36,6 +37,18 @@ export const isPermissionTypeAdmin = (type: PermissionType) => {
   );
 };
 
+export interface AuthData {
+  userData: User | undefined;
+  isLoading: boolean;
+  isPaid: boolean;
+  isB2B: boolean;
+  logout: () => void;
+  isAdmin: boolean;
+  entities?: EntitiesResponse;
+  refreshEntities: () => void;
+  refresh: () => void;
+}
+
 export default function useAuth({
   allowUnauth = false,
 }: {
@@ -46,6 +59,10 @@ export default function useAuth({
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
+
+  const isB2B = useMemo(() => {
+    return !!userData?.subscription?.organizationId;
+  }, [userData]);
 
   const isPaid = useMemo(() => {
     return (
@@ -184,6 +201,7 @@ export default function useAuth({
   return {
     userData,
     isPaid,
+    isB2B,
     isLoading: isLoading || entitiesLoading,
     refresh: refetch,
     logout,
@@ -191,15 +209,4 @@ export default function useAuth({
     entities: entitiesData,
     refreshEntities,
   };
-}
-
-export interface AuthData {
-  userData: User | undefined;
-  isLoading: boolean;
-  isPaid: boolean;
-  logout: () => void;
-  isAdmin: boolean;
-  entities?: EntitiesResponse;
-  refreshEntities: () => void;
-  refresh: () => void;
 }

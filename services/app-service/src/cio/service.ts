@@ -86,3 +86,19 @@ export const sendWelcomeEmail = async ({ user }: { user: User }) => {
   });
   return await apiClient.sendEmail(newEmail);
 };
+
+export const sendParentalConsentEmail = async ({ user }: { user: User }) => {
+  const parentalConsentUrl = `${getOrigin()}/parental-consent/${user.id}`;
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: user.email,
+    transactional_message_id: "7",
+    message_data: {
+      url: parentalConsentUrl,
+    },
+    identifiers: {
+      email: user.email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};

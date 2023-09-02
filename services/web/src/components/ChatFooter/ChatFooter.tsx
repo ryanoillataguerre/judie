@@ -3,7 +3,6 @@ import {
   Box,
   Flex,
   InputGroup,
-  LightMode,
   useBreakpointValue,
   useColorModeValue,
   Textarea,
@@ -11,7 +10,6 @@ import {
   Text,
   ToastPosition,
   HStack,
-  VStack,
   chakra,
   shouldForwardProp,
   Spinner,
@@ -27,13 +25,14 @@ import {
   useMemo,
 } from "react";
 import { AiOutlineEnter } from "react-icons/ai";
-import { BiSolidMicrophone } from "react-icons/bi";
+import { BiMicrophone } from "react-icons/bi";
 import { BsSend } from "react-icons/bs";
 import { motion, isValidMotionProp } from "framer-motion";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { useMutation } from "react-query";
 import { whisperTranscribeMutation } from "@judie/data/mutations";
 import AssignmentUploader from "../AssignmentUploader";
+import useResizeTextArea from "@judie/hooks/useResizeTextArea";
 
 const SendButton = () => {
   const sendColor = useColorModeValue("black", "white");
@@ -41,17 +40,23 @@ const SendButton = () => {
   return (
     <Button
       type="submit"
-      colorScheme="teal"
       style={{
-        padding: "0 0.5rem",
-        height: "99%", // 100% extends a LITTLE over the bottom of the textArea
+        padding: "0 0",
+        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: "0.5rem",
       }}
+      _hover={{
+        backgroundColor: "brand.secondary",
+        svg: {
+          fill: "white",
+        },
+      }}
+      border={"none"}
+      bg={"transparent"}
     >
-      <BsSend fill={sendColor} size={18} />
+      <BsSend fill={sendColor} size={20} />
     </Button>
   );
 };
@@ -140,22 +145,29 @@ const RecordButton = ({
     if (transcribeMutation.isLoading) {
       return <Spinner color={"teal.300"} size={"sm"} />;
     }
-    return <BiSolidMicrophone fill={micColor} size={18} />;
+    return <BiMicrophone fill={micColor} size={20} />;
   }, [isRecording, transcribeMutation.isLoading, micColor]);
 
   return (
     <Button
       type="button"
-      variant="outline"
-      colorScheme="white"
+      // variant="outline"
+      // colorScheme="teal"
+      bg={"transparent"}
       style={{
-        padding: "0 0.5rem",
-        height: "99%", // 100% extends a LITTLE over the bottom of the textArea
+        padding: "0 0rem",
+        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: "0.5rem",
       }}
+      _hover={{
+        backgroundColor: "brand.secondary",
+        svg: {
+          fill: "white",
+        },
+      }}
+      border={"none"}
       onClick={() => {
         if (isRecording) {
           stopRecording();
@@ -187,6 +199,9 @@ const ChatInput = () => {
 
   // Autofocus the input once a user has set a subject
   const ref = useRef<HTMLTextAreaElement>(null);
+
+  useResizeTextArea(ref.current, chatValue);
+
   useEffect(() => {
     if (ref.current && chat?.subject) {
       ref.current.focus();
@@ -250,7 +265,7 @@ const ChatInput = () => {
       <InputGroup>
         {/* <LightMode> */}
         {!messages.length && <AssignmentUploader />}
-        <HStack spacing={4} width={"100%"}>
+        {/* <HStack spacing={4} width={"100%"}>
           <Textarea
             onKeyUp={onKeyUp}
             autoFocus={chat?.subject ? true : false}
@@ -280,7 +295,57 @@ const ChatInput = () => {
               }
             />
           </VStack>
-        </HStack>
+        </HStack> */}
+        <Box
+          position={"relative"}
+          display={"flex"}
+          width={"100%"}
+          h={"auto"}
+          mb={"40px"}
+          alignItems={"center"}
+        >
+          <Textarea
+            onKeyUp={onKeyUp}
+            autoFocus={chat?.subject ? true : false}
+            ref={ref}
+            value={chatValue}
+            _hover={{
+              borderColor: "brand.primary",
+            }}
+            disabled={isRecording}
+            onChange={(e) => setChatValue(e.target.value)}
+            placeholder="Ask Judie anything..."
+            pr={"7rem"}
+            py={"12px"}
+            resize={"none"}
+            bg={bgColor}
+            w={"100%"}
+            minH={"100%"}
+            maxH={"10rem"}
+            borderRadius={"24px"}
+            rows={1}
+            fontSize={"18px"}
+          />
+          <HStack
+            position={"absolute"}
+            bottom={"10px"}
+            right={"16px"}
+            height={"30px"}
+            zIndex={2}
+            display={"flex"}
+            justifyContent={"center"}
+          >
+            <RecordButton
+              setIsRecording={setIsRecording}
+              onFinishRecording={(text) =>
+                setChatValue((prev) =>
+                  prev.length ? [prev, text].join("\n") : text
+                )
+              }
+            />
+            <SendButton />
+          </HStack>
+        </Box>
         {/* </LightMode> */}
         {/* <InputRightElement style={{ height: "100%" }}>
           
@@ -297,25 +362,28 @@ const ChatFooter = () => {
   });
 
   const gradientColor = useColorModeValue(
-    "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)",
-    "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)"
+    // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)",
+    "linear-gradient(#F6F6F600 0%, #F6F6F6DD 60%, #F6F6F6FF 90%)",
+    // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)"
+    "linear-gradient(#25252500 0%, #252525DD 60%, #252525FF 90%)"
   );
 
   return (
     <Flex
       style={{
         width: "100%",
-        height: "100%",
-        maxHeight: "10rem",
+        height: "auto",
         flexDirection: "column",
-        justifyContent: "flex-start",
+        justifyContent: "flex-end",
         alignItems: "center",
-        position: "absolute",
-        bottom: 0,
+        position: "sticky",
+        bottom: "0px",
         left: 0,
-        paddingTop: "4rem",
         backgroundImage: gradientColor,
       }}
+      pb={"0px"}
+      mt={6}
+      pt={0}
     >
       <Box
         style={{

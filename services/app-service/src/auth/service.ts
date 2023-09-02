@@ -40,6 +40,7 @@ export const signup = async ({
   role,
   districtOrSchool,
   gradeYear,
+  isB2B,
 }: {
   firstName: string;
   lastName: string;
@@ -49,6 +50,7 @@ export const signup = async ({
   role?: UserRole;
   districtOrSchool?: string;
   gradeYear?: GradeYear;
+  isB2B?: boolean;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -79,6 +81,11 @@ export const signup = async ({
       receivePromotions,
       role: role || UserRole.STUDENT,
       gradeYear,
+      ...(isB2B
+        ? {
+            parentalConsent: true,
+          }
+        : {}),
     },
     include: {
       subscription: true,
@@ -135,7 +142,7 @@ export const signin = async ({
   }
 
   // Verify password
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, user.password || "");
   if (!match) {
     throw new UnauthorizedError("Invalid email or password");
   }
@@ -292,7 +299,7 @@ export const changePassword = async ({
   if (!user) {
     throw new UnauthorizedError("No user id found in session");
   }
-  const match = await bcrypt.compare(oldPassword, user.password);
+  const match = await bcrypt.compare(oldPassword, user.password || "");
   if (!match) {
     throw new BadRequestError("Old password is incorrect");
   }
