@@ -26,9 +26,9 @@ const FolderCard = ({
       padding={"1rem"}
       alignItems={"flex-start"}
       _hover={{
-        bg: colorMode.colorMode === "dark" ? "#676767" : "#D3D3D3",
+        bg: colorMode.colorMode === "dark" ? "gray.700" : "gray.200",
         cursor: "pointer",
-        transition: "all 0.2s ease-in-out",
+        transition: "all 0.3s ease-in-out",
       }}
       onClick={() => {
         router.push(`/folders/${id}`);
