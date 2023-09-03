@@ -5,11 +5,7 @@ import {
   useContext,
   useCallback,
 } from "react";
-import {
-  Chat,
-  PermissionType,
-  SubscriptionStatus,
-} from "@judie/data/types/api";
+import { PermissionType, SubscriptionStatus } from "@judie/data/types/api";
 import {
   Box,
   Button,
@@ -17,12 +13,7 @@ import {
   Flex,
   Image,
   Spinner,
-  Stack,
   Text,
-  Modal,
-  ModalBody,
-  ModalOverlay,
-  ModalContent,
   useColorModeValue,
   useToast,
   useBreakpointValue,
@@ -34,7 +25,6 @@ import {
   shouldForwardProp,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { TfiTrash } from "react-icons/tfi";
 import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -46,12 +36,7 @@ import {
   clearConversationsMutation,
   createChatMutation,
 } from "@judie/data/mutations";
-import {
-  GET_USER_CHATS,
-  GET_USER_FOLDERS,
-  getUserChatsQuery,
-  getUserFoldersQuery,
-} from "@judie/data/queries";
+import { GET_USER_FOLDERS, getUserFoldersQuery } from "@judie/data/queries";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 import UpgradeButton from "../UpgradeButton/UpgradeButton";
 import {
@@ -60,11 +45,7 @@ import {
   BiHelpCircle,
   BiHomeAlt,
 } from "react-icons/bi";
-import SidebarChatItem from "@judie/components/SidebarChatItem/SidebarChatItem";
-import { getTitleForChat } from "@judie/utils/chat/getTitleForChat";
 import { HiMiniFolderOpen } from "react-icons/hi2";
-import useStorageState from "@judie/hooks/useStorageState";
-import { BsChevronDoubleLeft, BsChevronDoubleRight } from "react-icons/bs";
 import { isValidMotionProp, motion } from "framer-motion";
 
 interface SidebarButtonProps {
@@ -153,60 +134,20 @@ const Sidebar = ({
   const router = useRouter();
   const auth = useAuth();
   const toast = useToast();
-  const chatContext = useContext(ChatContext);
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
-  const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
-    null
-  );
-  const [beingDeletedChatId, setBeingDeletedChatId] = useState<string | null>(
-    null
-  );
-  const [isClearConversationsModalOpen, setIsClearConversationsModalOpen] =
-    useState<boolean>(false);
 
   const colorMode = useColorMode();
   const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
   const purpleHexCode = useToken("colors", colorKey);
   // Existing user chats
-  const {
-    data,
-    refetch,
-    isLoading: isGetChatsLoading,
-  } = useQuery([GET_USER_FOLDERS, auth?.userData?.id], {
-    queryFn: getUserFoldersQuery,
-    staleTime: 60000,
-    enabled: !!auth?.userData?.id,
-  });
-
-  // Clear all conversations mutation
-  const clearConversations = useMutation({
-    mutationFn: clearConversationsMutation,
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
-  // Delete single chat mutation
-  const deleteChat = useMutation({
-    mutationFn: () => deleteChatMutation(beingDeletedChatId || ""),
-    onSuccess: () => {
-      setBeingDeletedChatId(null);
-      refetch();
-    },
-  });
-  const createChat = useMutation({
-    mutationFn: createChatMutation,
-    onSuccess: (data) => {
-      // setTimeout(() => {refetch() }, 1000)
-      refetch();
-      router.push({
-        query: {
-          id: data.id,
-        },
-        pathname: "/chat",
-      });
-    },
-  });
+  const { data, isLoading: isGetChatsLoading } = useQuery(
+    [GET_USER_FOLDERS, auth?.userData?.id],
+    {
+      queryFn: getUserFoldersQuery,
+      staleTime: 60000,
+      enabled: !!auth?.userData?.id,
+    }
+  );
 
   const onAdminClick = useCallback(() => {
     const filteredAdminPermissions = auth.userData?.permissions?.filter(
@@ -242,14 +183,6 @@ const Sidebar = ({
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
-      // {
-      //   icon: <TfiTrash />,
-      //   key: "delete-chats",
-      //   label: "Clear Conversations",
-      //   onClick: () => {
-      //     setIsClearConversationsModalOpen(true);
-      //   },
-      // },
       {
         icon: <BiHelpCircle />,
         key: "help",
@@ -307,7 +240,7 @@ const Sidebar = ({
       },
     ];
     return options;
-  }, [auth, router, setIsClearConversationsModalOpen, onAdminClick]);
+  }, [auth, router, onAdminClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
@@ -326,9 +259,6 @@ const Sidebar = ({
         opacity: isOpen ? 1 : 0.5,
       }}
       style={{
-        // width: "18rem",
-        // maxWidth: "18rem",
-        // minWidth: "18rem",
         display: "flex",
         height: "calc(100vh - 2rem)",
         borderRadius: "1.375rem",
@@ -353,19 +283,6 @@ const Sidebar = ({
         ...(sidebarRelativeOrAbsoluteProps as CSSProperties),
       }}
     >
-      {/* width: "2rem",
-        height: "calc(100vh - 2rem)",
-        borderRadius: "1rem",
-        marginTop: "1rem",
-        marginLeft: "1rem",
-        marginBottom: "1rem",
-        paddingTop: "1.5rem",
-        paddingRight: "0.15rem",
-        paddingLeft: "0.15rem",
-        backgroundColor: bgColor,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "flex-start", */}
       {isOpen ? (
         <>
           <Flex
