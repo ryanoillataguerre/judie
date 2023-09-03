@@ -47,6 +47,11 @@ const textComponentStyle: ComponentStyleConfig = {
       fontWeight: 400,
       fontSize: "0.875rem",
     },
+    tinyDetail: {
+      color: "gray.500",
+      fontWeight: 400,
+      fontSize: "0.875rem",
+    },
   },
 };
 
@@ -59,9 +64,16 @@ const buttonComponentStyle: ComponentStyleConfig = {
       height: "2rem",
       borderRadius: "1rem",
     },
-    md: {
+    md: (props: StyleFunctionProps) => ({
       height: "3rem",
       borderRadius: "1.5rem",
+    }),
+    squareSm: {
+      height: "2rem",
+      borderRadius: "0.5rem",
+      padding: "1.5rem",
+      fontSize: "1.125rem",
+      fontWeight: 500,
     },
   },
   // styles for different visual variants ("outline", "solid")
