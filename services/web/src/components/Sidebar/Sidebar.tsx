@@ -95,7 +95,7 @@ const FolderButton = ({
   return (
     <Button
       variant={"solid"}
-      width={"100%"}
+      width={"16rem"}
       borderRadius={"0.5rem"}
       height={"100%"}
       bgColor={buttonBgColor}
