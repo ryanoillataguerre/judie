@@ -243,7 +243,7 @@ const Sidebar = ({
     return options;
   }, [auth, router, onAdminClick]);
 
-  const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
+  const bgColor = useColorModeValue("#FFFFFF", "gray.900");
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
     base: {
       position: "absolute",
@@ -259,6 +259,7 @@ const Sidebar = ({
         width: isOpen ? "18rem" : "2rem",
         opacity: isOpen ? 1 : 0.5,
       }}
+      bgColor={bgColor}
       style={{
         display: "flex",
         height: "calc(100vh - 2rem)",
@@ -266,7 +267,6 @@ const Sidebar = ({
         marginTop: "1rem",
         marginLeft: "1rem",
         marginBottom: "1rem",
-        backgroundColor: bgColor,
         ...(isOpen
           ? {
               padding: "1rem",
@@ -322,6 +322,7 @@ const Sidebar = ({
                   fontSize: "1.3rem",
                   fontWeight: "semibold",
                   marginLeft: "0.5rem",
+                  display: isOpen ? "block" : "none",
                 }}
               >
                 Judie AI

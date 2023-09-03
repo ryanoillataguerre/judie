@@ -138,14 +138,13 @@ const theme = extendTheme({
     brand: {
       900: "#202123",
       700: "#2a3448",
-
       primary: "#3C1478",
       secondary: "#6D4B9F",
       lightGray: "#A3A3A3",
       lightGray2: "#E2E8F0",
       lightPrimary: "#C31478",
       backgroundLight: "#F6F6F6",
-      backgroundDark: "#252525",
+      backgroundDark: "gray.800",
     },
     // Customized at https://themera.vercel.app/
     purple: {
@@ -164,7 +163,7 @@ const theme = extendTheme({
   styles: {
     global: (props: StyleFunctionProps) => ({
       body: {
-        bg: mode("#F6F6F6", "#252525")(props),
+        bg: mode("#F6F6F6", "gray.800")(props),
       },
     }),
   },
