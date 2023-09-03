@@ -104,6 +104,7 @@ const FolderButton = ({
       onClick={() => {
         router.push(`/folders/${id}`);
       }}
+      minW={"15rem"}
       marginY={"0.25rem"}
       h={"4rem"}
       p={"0.5rem"}
