@@ -12,6 +12,7 @@ import {
   Button,
   Flex,
   Input,
+  Spacer,
   Spinner,
   Text,
   VStack,
@@ -190,21 +191,30 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           </Flex>
         ) : (
           <ScrollContainerBubbles>
-            {renderedMessages}
-            {(streaming ||
-              (beingStreamedChatId === chatId && beingStreamedMessage)) && (
-              <MessageRowBubble
-                key={`${MessageType.BOT}-mostRecent`}
-                beingStreamed={true}
-                message={{
-                  type: MessageType.BOT,
-                  readableContent:
-                    beingStreamedMessage?.slice(9, -1) ||
-                    animatedEllipsisStringValue,
-                  createdAt: new Date(),
-                }}
-              />
-            )}
+            <Flex
+              id="FFF"
+              direction={"column"}
+              justify={"flex-start"}
+              justifySelf={"flex-start"}
+            >
+              {renderedMessages}
+
+              {(streaming ||
+                (beingStreamedChatId === chatId && beingStreamedMessage)) && (
+                <MessageRowBubble
+                  key={`${MessageType.BOT}-mostRecent`}
+                  beingStreamed={true}
+                  message={{
+                    type: MessageType.BOT,
+                    readableContent:
+                      beingStreamedMessage?.slice(9, -1) ||
+                      animatedEllipsisStringValue,
+                    createdAt: new Date(),
+                  }}
+                />
+              )}
+            </Flex>
+            <Spacer />
             <ChatFooter />
           </ScrollContainerBubbles>
         )}

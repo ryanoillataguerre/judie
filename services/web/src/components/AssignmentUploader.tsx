@@ -32,10 +32,18 @@ const AssignmentUploader = ({}: {}) => {
         isDisabled={streaming}
       >
         <Button
-          // h={"100%"}
+          h={"fit-content"}
+          w={"unset"}
+          minW={"unset"}
+          py={"12px"}
+          px={"12px"}
+          mr={"12px"}
           type={"button"}
           size={"sm"}
+          fontSize={"16px"}
+          borderRadius={"24px"}
           variant={"purp"}
+          lineHeight={"1.375rem"}
           onClick={() => {
             inputRef.current?.click();
           }}
@@ -47,6 +55,7 @@ const AssignmentUploader = ({}: {}) => {
         {/* TODO: Get this to only accept PDFs */}
       </Tooltip>
       <Input
+        p={0}
         ref={inputRef}
         type="file"
         top="0"
