@@ -25,7 +25,6 @@ import useAuth from "@judie/hooks/useAuth";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useContext } from "react";
 import { useRouter } from "next/router";
-
 import SidebarChatItem from "@judie/components/SidebarChatItem/SidebarChatItem";
 
 const SidebarChatNav = () => {
@@ -43,7 +42,6 @@ const SidebarChatNav = () => {
   const toast = useToast();
 
   const chatContext = useContext(ChatContext);
-  const subject = chatContext.chat?.subject;
 
   const router = useRouter();
   const auth = useAuth();
@@ -194,7 +192,7 @@ const SidebarChatNav = () => {
       </Modal>
 
       <Flex
-        display={{ sm: "none", md: "unset" }}
+        display={{ base: "none", md: "unset" }}
         direction={"column"}
         w={"300px"}
         minW={"300px"}
