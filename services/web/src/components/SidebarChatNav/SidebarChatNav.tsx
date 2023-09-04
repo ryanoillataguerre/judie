@@ -26,7 +26,6 @@ import useAuth from "@judie/hooks/useAuth";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useContext } from "react";
 import { useRouter } from "next/router";
-
 import SidebarChatItem from "@judie/components/SidebarChatItem/SidebarChatItem";
 
 const SidebarChatNav = () => {

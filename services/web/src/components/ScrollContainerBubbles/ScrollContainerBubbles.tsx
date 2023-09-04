@@ -11,9 +11,6 @@ import { ChatContext } from "@judie/hooks/useChat";
 import { useContext } from "react";
 import { getTopicEmoji } from "@judie/utils/topicEmoji";
 
-import SidebarChatNav from "@judie/components/SidebarChatNav/SidebarChatNav";
-import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
-
 const ScrollContainerBubbles = ({
   children,
 }: {
@@ -25,8 +22,12 @@ const ScrollContainerBubbles = ({
 
   const chatContext = useContext(ChatContext);
   const subject = chatContext.chat?.subject;
-  const bgColor = useColorModeValue("#FFF", "#333");
+  const bgColor = useColorModeValue("#FFF", "whiteAlpha.300");
   const fontColor = useColorModeValue("#000", "#FFF");
+  const subjectBorderColor = useColorModeValue(
+    "rgba(60, 20, 120, 0.80)",
+    "whiteAlpha.300"
+  );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({});
@@ -69,7 +70,7 @@ const ScrollContainerBubbles = ({
             px={"20px"}
             py={"10px"}
             border={"1px solid"}
-            borderColor={"rgba(60, 20, 120, 0.80)"}
+            borderColor={subjectBorderColor}
             my={"30px"}
             position={"sticky"}
             top={0}

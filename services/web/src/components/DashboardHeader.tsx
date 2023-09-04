@@ -51,6 +51,11 @@ const DashboardHeader = () => {
       });
     },
   });
+
+  const isMobile = useBreakpointValue({
+    base: true,
+    md: false,
+  });
   return (
     <HStack
       alignItems={"center"}
@@ -70,16 +75,19 @@ const DashboardHeader = () => {
         >
           <Text variant={"button"}>+ Create a new chat</Text>
         </Button>
-        <Button
-          size={buttonSize}
-          variant={"purp"}
-          type={"button"}
-          onClick={() => {
-            setIsCreateOpen(true);
-          }}
-        >
-          <Text variant={"button"}>New Folder</Text>
-        </Button>
+
+        {!isMobile && (
+          <Button
+            size={buttonSize}
+            variant={"purp"}
+            type={"button"}
+            onClick={() => {
+              setIsCreateOpen(true);
+            }}
+          >
+            <Text variant={"button"}>New Folder</Text>
+          </Button>
+        )}
       </HStack>
     </HStack>
   );

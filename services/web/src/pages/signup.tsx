@@ -171,10 +171,9 @@ export const SignupForm = ({
         flexDirection: "column",
         alignItems: "flex-start",
         backgroundColor: formBgColor,
-        padding: "2rem",
-        borderRadius: "0.8rem",
+        padding: "1.5rem",
+        borderRadius: "0.5rem",
       }}
-      boxShadow={"lg"}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -415,15 +414,7 @@ const SignupPage = () => {
               marginTop: "1rem",
             }}
           />
-          <Text
-            style={{
-              alignSelf: "center",
-              fontSize: "2rem",
-              fontWeight: "semibold",
-              marginBottom: "1rem",
-              marginTop: "1rem",
-            }}
-          >
+          <Text variant={"headerLight"} marginBottom={"1rem"}>
             Welcome to Judie
           </Text>
           <SignupForm />
