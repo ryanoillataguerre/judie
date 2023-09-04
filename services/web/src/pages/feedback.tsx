@@ -1,23 +1,38 @@
 import Head from "next/head";
 
 import {
+  Button,
   Flex,
+  FormControl,
+  FormLabel,
   Image,
+  Input,
   Spinner,
   Text,
+  Textarea,
   VStack,
   useBreakpointValue,
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { useRouter } from "next/router";
 import { GET_INVITE_BY_ID, getInviteByIdQuery } from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { feedbackMutation } from "@judie/data/mutations";
+import { HTTPResponseError } from "@judie/data/baseFetch";
+
+export interface FeedbackSubmitData {
+  email?: string;
+  feedback: string;
+}
 
 const Feedback = () => {
   const toast = useToast();
-  const auth = useAuth();
+  const auth = useAuth({ allowUnauth: true });
+
+  const isAuthed = !!auth.userData?.id;
   const router = useRouter();
   const inviteId = router.query.inviteId as string;
 
@@ -38,10 +53,52 @@ const Feedback = () => {
     lg: "40%",
   });
   const formBgColor = useColorModeValue("white", "#2a3448");
+
+  const { handleSubmit, register } = useForm<FeedbackSubmitData>({
+    defaultValues: {
+      email: "",
+      feedback: "",
+    },
+    reValidateMode: "onBlur",
+  });
+  const { mutateAsync, isLoading } = useMutation({
+    mutationFn: feedbackMutation,
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description:
+          "Your feedback has been submitted. Thank you for taking the time!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      router.push(isAuthed ? "/dashboard" : "/");
+    },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error submitting feedback", err);
+      toast({
+        title: "Error submitting feedback",
+        description: err.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const onSubmit: SubmitHandler<FeedbackSubmitData> = async ({
+    email,
+    feedback,
+  }: FeedbackSubmitData) => {
+    return await mutateAsync({
+      email,
+      feedback,
+    });
+  };
   return (
     <>
       <Head>
-        <title>Judie - Redeem Invite</title>
+        <title>Judie - Feedback</title>
         <meta
           name="description"
           content="Welcome to Judie! We're here to help with your classes, from elementary english to college level maths."
@@ -89,12 +146,88 @@ const Feedback = () => {
               fontWeight: 400,
               marginBottom: "1.5rem",
               marginTop: "0.5rem",
+              width: "50%",
             }}
           >
             Thank you for providing any feedback you can. We love to hear from
             our users and will do our best to address any concerns you may have.
           </Text>
-          {/* TODO: Form with email, feedback, and submit button */}
+          <Flex
+            style={{
+              width: formWidth,
+              flexDirection: "column",
+              alignItems: "flex-start",
+              backgroundColor: formBgColor,
+              padding: "2rem",
+              borderRadius: "0.8rem",
+            }}
+            boxShadow={"lg"}
+          >
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              style={{
+                width: "100%",
+              }}
+            >
+              <Flex
+                style={{
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  paddingBottom: "1rem",
+                }}
+              >
+                <FormControl
+                  style={{
+                    marginTop: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                  isRequired={!isAuthed}
+                >
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <Input
+                    id="email"
+                    type={"email"}
+                    autoComplete="email"
+                    required
+                    placeholder="judie@judie.io"
+                    {...register("email", {})}
+                    isReadOnly={isAuthed}
+                    {...(isAuthed
+                      ? {
+                          value: auth.userData?.email,
+                        }
+                      : {})}
+                    disabled={isAuthed}
+                  />
+                </FormControl>
+                <FormControl
+                  style={{
+                    marginTop: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                  isRequired
+                >
+                  <FormLabel htmlFor="feedback">Notes</FormLabel>
+                  <Textarea
+                    id="feedback"
+                    required
+                    placeholder="I wish that Judie could..."
+                    {...register("feedback", {})}
+                  />
+                </FormControl>
+              </Flex>
+              <Button
+                style={{
+                  width: "100%",
+                }}
+                variant={"purp"}
+                isLoading={isLoading}
+                type="submit"
+              >
+                Submit
+              </Button>
+            </form>
+          </Flex>
         </Flex>
       </main>
     </>

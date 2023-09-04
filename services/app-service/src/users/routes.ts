@@ -22,6 +22,7 @@ import {
 import { body } from "express-validator";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import { createStripeBillingPortalSession } from "../payments/stripe.js";
+import { sendFeedbackEmail } from "../cio/service.js";
 
 const router = Router();
 
@@ -206,6 +207,41 @@ router.post(
   "/:userId/parental-consent",
   errorPassthrough(async (req: Request, res: Response) => {
     await parentalConsentUser(req.params.userId as string);
+    res.status(200).send({
+      data: {
+        success: true,
+      },
+    });
+  })
+);
+
+router.post(
+  "/feedback",
+  [
+    body("feedback")
+      .isString()
+      .exists()
+      .withMessage("Feedback must be a string"),
+    body("email").isEmail().optional().withMessage("Invalid email"),
+  ],
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    const feedback = req.body.feedback;
+    const email = req.body.email;
+    if (session.userId) {
+      const user = await getUser({ id: session.userId });
+      if (user) {
+        await sendFeedbackEmail({
+          email: user.email,
+          feedback,
+        });
+      }
+    } else {
+      await sendFeedbackEmail({
+        email,
+        feedback,
+      });
+    }
     res.status(200).send({
       data: {
         success: true,
