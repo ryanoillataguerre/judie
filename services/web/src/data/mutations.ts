@@ -531,3 +531,18 @@ export const parentalConsentMutation = async ({
   });
   return response.data;
 };
+
+export const feedbackMutation = async ({
+  email,
+  feedback,
+}: {
+  email?: string;
+  feedback: string;
+}) => {
+  const response = await baseFetch({
+    url: `/user/feedback`,
+    method: "POST",
+    body: { email, feedback },
+  });
+  return response.data;
+};

@@ -102,3 +102,25 @@ export const sendParentalConsentEmail = async ({ user }: { user: User }) => {
   });
   return await apiClient.sendEmail(newEmail);
 };
+
+export const sendFeedbackEmail = async ({
+  email,
+  feedback,
+}: {
+  email: string;
+  feedback: string;
+}) => {
+  const body = `Email:\n${email}\nFeedback:\n${feedback}`;
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: "feedback@judie.io",
+    transactional_message_id: "8",
+    message_data: {
+      body,
+    },
+    identifiers: {
+      email: email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};
