@@ -407,7 +407,6 @@ const Sidebar = ({
             >
               {data?.map((folder) => (
                 <FolderButton
-                  key={folder.id}
                   id={folder.id}
                   title={folder.userTitle}
                   numChats={folder?._count?.chats || 0}

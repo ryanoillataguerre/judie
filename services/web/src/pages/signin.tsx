@@ -84,7 +84,8 @@ const SigninForm = () => {
   const formWidth = useBreakpointValue(
     {
       base: "100%",
-      md: "60%",
+      sm: "70%",
+      md: "50%",
       lg: "40%",
     },
     { fallback: "60%" }
@@ -100,10 +101,9 @@ const SigninForm = () => {
         flexDirection: "column",
         alignItems: "flex-start",
         backgroundColor: formBgColor,
-        padding: "2rem",
-        borderRadius: "0.8rem",
+        padding: "1.5rem",
+        borderRadius: "0.5rem",
       }}
-      boxShadow={"lg"}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -175,7 +175,7 @@ const SigninForm = () => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            marginBottom: "1rem",
+            marginBottom: "0.5rem",
           }}
         >
           <Text
@@ -220,7 +220,7 @@ const SigninForm = () => {
               });
             }}
           >
-            Forgot Password
+            Forgot Password?
           </Link>
         </Flex>
         <Button
@@ -278,15 +278,7 @@ const SigninPage = () => {
               marginTop: "3rem",
             }}
           />
-          <Text
-            style={{
-              alignSelf: "center",
-              fontSize: "2rem",
-              fontWeight: "semibold",
-              marginBottom: "1rem",
-              marginTop: "1rem",
-            }}
-          >
+          <Text variant={"headerLight"} marginBottom={"1rem"}>
             Welcome back!
           </Text>
           {router.isReady && <SigninForm />}
