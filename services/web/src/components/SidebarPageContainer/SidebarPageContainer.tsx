@@ -76,11 +76,9 @@ const SidebarPageContainer = ({
         style={{
           width: "100%",
           height: "100%",
-          maxHeight: "100vh",
           position: "relative",
           paddingLeft: containerPaddingLeft,
         }}
-        marginLeft={"0px"}
       >
         {/* <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} /> */}
         {children}

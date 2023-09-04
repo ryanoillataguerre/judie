@@ -10,6 +10,7 @@ import {
   ModalContent,
   Stack,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import React, { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
@@ -43,7 +44,6 @@ const SidebarChatNav = () => {
   const toast = useToast();
 
   const chatContext = useContext(ChatContext);
-  const subject = chatContext.chat?.subject;
 
   const router = useRouter();
   const auth = useAuth();
@@ -52,6 +52,11 @@ const SidebarChatNav = () => {
   const yesterday = useRef<Date>(new Date(today.current));
   const beforeYesterday = useRef<Date>(new Date(today.current));
   const recently = useRef<Date>(new Date(today.current));
+
+  const borderColor = useColorModeValue(
+    "1px solid rgba(0, 0, 0, 0.10)",
+    "1px solid rgba(255, 255, 255, 0.20)"
+  );
 
   useEffect(() => {
     yesterday.current.setDate(yesterday.current.getDate() - 1);
@@ -194,23 +199,20 @@ const SidebarChatNav = () => {
       </Modal>
 
       <Flex
-        display={{ sm: "none", md: "unset" }}
+        display={{ base: "none", lg: "flex" }}
         direction={"column"}
         w={"300px"}
         minW={"300px"}
         py={"30px"}
         pr={"20px"}
         gap={"40px"}
-        ml={"30px"}
-        borderRight={"1px solid rgba(0, 0, 0, 0.10)"}
+        borderRight={borderColor}
       >
         <Button
           variant={"outline"}
           colorScheme="white"
           style={{
             width: "100%",
-            marginTop: "1rem",
-            marginBottom: "1rem",
             borderColor: "#565555",
             padding: "1.5rem",
           }}
@@ -226,158 +228,162 @@ const SidebarChatNav = () => {
         >
           + Create a new chat
         </Button>
-        <Flex
-          gap={"40px"}
-          h={"100%"}
-          maxH={"100%"}
-          direction={"column"}
-          overflow={"scroll"}
-        >
-          {todayChats.length > 0 && (
-            <Box>
-              <Text color={"#8F8F8F"}>Today</Text>
-              {isGetChatsLoading || !auth?.userData?.id ? (
-                <Flex
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Spinner />
-                </Flex>
-              ) : (
-                <Flex
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    overflowY: "scroll",
-                    marginTop: "20px",
-                  }}
-                  gap={"10px"}
-                >
-                  {todayChats.map((chat) => (
-                    <SidebarChatItem
-                      chat={chat}
-                      key={chat.id}
-                      beingEditedChatId={beingEditedChatId}
-                      setBeingEditedChatId={(chatId) =>
-                        setBeingEditedChatId(chatId)
-                      }
-                      setBeingDeletedChatId={(chatId) =>
-                        setBeingDeletedChatId(chatId)
-                      }
-                    />
-                  ))}
-                </Flex>
-              )}
-            </Box>
-          )}
+        <Box position={"relative"} w={"100%"} h={"100%"}>
+          <Flex
+            gap={"40px"}
+            h={"100%"}
+            w={"100%"}
+            maxH={"100%"}
+            direction={"column"}
+            overflow={"scroll"}
+            position={"absolute"}
+          >
+            {todayChats.length > 0 && (
+              <Box>
+                <Text color={"#8F8F8F"}>Today</Text>
+                {isGetChatsLoading || !auth?.userData?.id ? (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Spinner />
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      overflowY: "scroll",
+                      marginTop: "20px",
+                    }}
+                    gap={"10px"}
+                  >
+                    {todayChats.map((chat) => (
+                      <SidebarChatItem
+                        chat={chat}
+                        key={chat.id}
+                        beingEditedChatId={beingEditedChatId}
+                        setBeingEditedChatId={(chatId) =>
+                          setBeingEditedChatId(chatId)
+                        }
+                        setBeingDeletedChatId={(chatId) =>
+                          setBeingDeletedChatId(chatId)
+                        }
+                      />
+                    ))}
+                  </Flex>
+                )}
+              </Box>
+            )}
 
-          {yesterdayChats.length > 0 && (
-            <Box>
-              <Text color={"#8F8F8F"}>Yesterday</Text>
-              {isGetChatsLoading || !auth?.userData?.id ? (
-                <Flex
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Spinner />
-                </Flex>
-              ) : (
-                <Flex
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    overflowY: "scroll",
-                    marginTop: "20px",
-                  }}
-                  gap={"10px"}
-                >
-                  {yesterdayChats.map((chat) => (
-                    <SidebarChatItem
-                      chat={chat}
-                      key={chat.id}
-                      beingEditedChatId={beingEditedChatId}
-                      setBeingEditedChatId={(chatId) =>
-                        setBeingEditedChatId(chatId)
-                      }
-                      setBeingDeletedChatId={(chatId) =>
-                        setBeingDeletedChatId(chatId)
-                      }
-                    />
-                  ))}
-                </Flex>
-              )}
-            </Box>
-          )}
+            {yesterdayChats.length > 0 && (
+              <Box>
+                <Text color={"#8F8F8F"}>Yesterday</Text>
+                {isGetChatsLoading || !auth?.userData?.id ? (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Spinner />
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      overflowY: "scroll",
+                      marginTop: "20px",
+                    }}
+                    gap={"10px"}
+                  >
+                    {yesterdayChats.map((chat) => (
+                      <SidebarChatItem
+                        chat={chat}
+                        key={chat.id}
+                        beingEditedChatId={beingEditedChatId}
+                        setBeingEditedChatId={(chatId) =>
+                          setBeingEditedChatId(chatId)
+                        }
+                        setBeingDeletedChatId={(chatId) =>
+                          setBeingDeletedChatId(chatId)
+                        }
+                      />
+                    ))}
+                  </Flex>
+                )}
+              </Box>
+            )}
 
-          {recentChats.length > 0 && (
-            <Box>
-              <Text color={"#8F8F8F"}>Recent</Text>
-              {isGetChatsLoading || !auth?.userData?.id ? (
-                <Flex
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Spinner />
-                </Flex>
-              ) : (
-                <Flex
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    overflowY: "scroll",
-                    marginTop: "20px",
-                    overflowX: "scroll",
-                  }}
-                  gap={"10px"}
-                >
-                  {recentChats.map((chat) => (
-                    <SidebarChatItem
-                      chat={chat}
-                      key={chat.id}
-                      beingEditedChatId={beingEditedChatId}
-                      setBeingEditedChatId={(chatId) =>
-                        setBeingEditedChatId(chatId)
-                      }
-                      setBeingDeletedChatId={(chatId) =>
-                        setBeingDeletedChatId(chatId)
-                      }
-                    />
-                  ))}
-                </Flex>
-              )}
-            </Box>
-          )}
-        </Flex>
+            {recentChats.length > 0 && (
+              <Box>
+                <Text color={"#8F8F8F"}>Recent</Text>
+                {isGetChatsLoading || !auth?.userData?.id ? (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Spinner />
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      overflowY: "scroll",
+                      marginTop: "20px",
+                      overflowX: "scroll",
+                    }}
+                    gap={"10px"}
+                  >
+                    {recentChats.map((chat) => (
+                      <SidebarChatItem
+                        chat={chat}
+                        key={chat.id}
+                        beingEditedChatId={beingEditedChatId}
+                        setBeingEditedChatId={(chatId) =>
+                          setBeingEditedChatId(chatId)
+                        }
+                        setBeingDeletedChatId={(chatId) =>
+                          setBeingDeletedChatId(chatId)
+                        }
+                      />
+                    ))}
+                  </Flex>
+                )}
+              </Box>
+            )}
+          </Flex>
+        </Box>
       </Flex>
     </>
   );

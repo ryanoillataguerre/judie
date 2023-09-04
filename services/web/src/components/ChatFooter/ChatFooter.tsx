@@ -301,7 +301,7 @@ const ChatInput = () => {
           display={"flex"}
           width={"100%"}
           h={"auto"}
-          mb={"40px"}
+          mb={"20px"}
           alignItems={"center"}
         >
           <Textarea
