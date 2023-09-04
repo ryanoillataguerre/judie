@@ -24,6 +24,10 @@ const textComponentStyle: ComponentStyleConfig = {
       fontSize: "2rem",
       fontWeight: "bold",
     },
+    headerLight: {
+      fontSize: "2rem",
+      fontWeight: 500,
+    },
     subheader: (props: StyleFunctionProps) => ({
       fontWeight: 500,
       fontSize: "1.375rem",
@@ -47,6 +51,10 @@ const textComponentStyle: ComponentStyleConfig = {
       fontWeight: 400,
       fontSize: "0.875rem",
     },
+    tinyTitle: {
+      fontWeight: 500,
+      fontSize: "0.875rem",
+    },
   },
 };
 
@@ -59,9 +67,16 @@ const buttonComponentStyle: ComponentStyleConfig = {
       height: "2rem",
       borderRadius: "1rem",
     },
-    md: {
+    md: (props: StyleFunctionProps) => ({
       height: "3rem",
       borderRadius: "1.5rem",
+    }),
+    squareSm: {
+      height: "2rem",
+      borderRadius: "0.5rem",
+      padding: "1.5rem",
+      fontSize: "1.125rem",
+      fontWeight: 500,
     },
   },
   // styles for different visual variants ("outline", "solid")
@@ -126,14 +141,13 @@ const theme = extendTheme({
     brand: {
       900: "#202123",
       700: "#2a3448",
-
       primary: "#3C1478",
       secondary: "#6D4B9F",
       lightGray: "#A3A3A3",
       lightGray2: "#E2E8F0",
       lightPrimary: "#C31478",
       backgroundLight: "#F6F6F6",
-      backgroundDark: "#252525",
+      backgroundDark: "gray.800",
     },
     // Customized at https://themera.vercel.app/
     purple: {
@@ -152,7 +166,7 @@ const theme = extendTheme({
   styles: {
     global: (props: StyleFunctionProps) => ({
       body: {
-        bg: mode("#F6F6F6", "#252525")(props),
+        bg: mode("#F6F6F6", "gray.800")(props),
       },
     }),
   },

@@ -326,10 +326,21 @@ const InviteModal = ({
     const data = defaultData as OnSubmitData;
     // Check for errors in rows
     if (data.invalidData?.length) {
+      // If errors, show errors
+      toast({
+        title: "Oops!",
+        description:
+          "There are errors in your spreadsheet. Please match the format displayed in the example row.",
+        status: "error",
+        duration: 6000,
+      });
       return;
     }
+    console.error(
+      "invalid spreadsheet data for " + organizationId,
+      data.invalidData
+    );
 
-    // If errors, show errors
     // Else: Bulk upload route mutation
     if (organizationId) {
       await bulkMutation.mutateAsync({

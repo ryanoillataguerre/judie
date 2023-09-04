@@ -103,8 +103,8 @@ const VerifyEmail = () => {
                 }}
               >
                 <Text variant={"title"}>
-                  Thanks for approving your student's access to Judie! They can
-                  get started now.
+                  Thanks for approving your student&apos;s access to Judie! They
+                  can get started now.
                 </Text>
               </VStack>
             )}

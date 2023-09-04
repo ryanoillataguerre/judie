@@ -71,6 +71,8 @@ const Folder = ({ id }: { id: string }) => {
             style={{
               margin: "0 1rem",
             }}
+            onClick={() => router.back()}
+            cursor={"pointer"}
           />
           <Center borderRadius={"0.5rem"} padding={"0.5rem"} bgColor={"white"}>
             <HiMiniFolderOpen size={24} color={purpleHexCode} />
@@ -95,7 +97,7 @@ const Folder = ({ id }: { id: string }) => {
             })
           }
         >
-          <Text variant={"button"}>+ Create a new chat</Text>
+          <Text variant={"button"}>+ Create a chat in folder</Text>
         </Button>
       </HStack>
       <ChatsTable

@@ -114,7 +114,7 @@ const SidebarChatItem = ({
 }) => {
   const router = useRouter();
   const iconColor = useColorModeValue("#333", "#FFF");
-  const itemHoverColor = useColorModeValue("rgba(60, 20, 120, 0.05)", "#333");
+  const itemHoverColor = useColorModeValue("gray.200", "whiteAlpha.300");
 
   const [editingValue, setEditingValue] = useState<string>();
 
@@ -134,8 +134,6 @@ const SidebarChatItem = ({
       }),
   });
 
-  // const isEditing = beingEditedChatId === chat.id;
-
   return (
     <Button
       variant={"ghost"}
@@ -144,9 +142,6 @@ const SidebarChatItem = ({
       py={"15px"}
       px={"20px"}
       borderRadius={"11px"}
-      _hover={{
-        backgroundColor: itemHoverColor,
-      }}
       bg={isSelected ? itemHoverColor : "transparent"}
       display={"flex"}
       gap={"10px"}

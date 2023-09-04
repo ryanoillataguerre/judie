@@ -168,8 +168,8 @@ const AgeModal = () => {
               marginBottom: "1rem",
             }}
           >
-            If you've already sent them an email, please ask them to check their
-            inbox or spam folder.
+            If you&apos;ve already sent them an email, please ask them to check
+            their inbox or spam folder.
           </Text>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -208,7 +208,7 @@ const AgeModal = () => {
                   isRequired
                 >
                   <FormLabel htmlFor="parentEmail">
-                    Parent's email address
+                    Parent&apos;s email address
                   </FormLabel>
                   <Input
                     type={"email"}

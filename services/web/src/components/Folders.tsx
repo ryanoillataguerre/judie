@@ -9,7 +9,7 @@ import {
 import { GET_USER_FOLDERS, getUserFoldersQuery } from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
 import { useQuery } from "react-query";
-import { FolderCard } from "./DashboardFoldersList";
+import FolderCard from "./FolderCard";
 
 const Folders = () => {
   const auth = useAuth();
@@ -35,7 +35,8 @@ const Folders = () => {
       <VStack width={"100%"} alignItems={"flex-start"}>
         <Text variant={"header"}>Your Folders</Text>
         <Text variant={"headerDetail"}>
-          Click into a folder to view all of the chats you've sorted into it
+          Click into a folder to view all of the chats you&apos;ve sorted into
+          it
         </Text>
       </VStack>
       <HStack

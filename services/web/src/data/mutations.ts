@@ -132,10 +132,12 @@ export const putChatMutation = async ({
   chatId,
   subject,
   userTitle,
+  folderId,
 }: {
   chatId: string;
   subject?: string;
   userTitle?: string;
+  folderId?: string;
 }): Promise<Chat> => {
   const response = await baseFetch({
     url: `/chat/${chatId}`,
@@ -143,6 +145,7 @@ export const putChatMutation = async ({
     body: {
       subject,
       userTitle,
+      folderId,
     },
   });
   return response.data;
@@ -528,6 +531,21 @@ export const parentalConsentMutation = async ({
   const response = await baseFetch({
     url: `/user/${userId}/parental-consent`,
     method: "POST",
+  });
+  return response.data;
+};
+
+export const feedbackMutation = async ({
+  email,
+  feedback,
+}: {
+  email?: string;
+  feedback: string;
+}) => {
+  const response = await baseFetch({
+    url: `/user/feedback`,
+    method: "POST",
+    body: { email, feedback },
   });
   return response.data;
 };
