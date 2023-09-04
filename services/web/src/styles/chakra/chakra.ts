@@ -24,6 +24,10 @@ const textComponentStyle: ComponentStyleConfig = {
       fontSize: "2rem",
       fontWeight: "bold",
     },
+    headerLight: {
+      fontSize: "2rem",
+      fontWeight: 500,
+    },
     subheader: (props: StyleFunctionProps) => ({
       fontWeight: 500,
       fontSize: "1.375rem",
