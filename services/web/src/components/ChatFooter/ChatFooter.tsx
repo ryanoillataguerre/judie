@@ -365,7 +365,7 @@ const ChatFooter = () => {
     // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)",
     "linear-gradient(#F6F6F600 0%, #F6F6F6DD 60%, #F6F6F6FF 90%)",
     // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)"
-    "linear-gradient(#25252500 0%, #252525DD 60%, #252525FF 90%)"
+    "linear-gradient(#1A202C00 0%, #1A202CDD 60%, #1A202CFF 90%)"
   );
 
   return (
