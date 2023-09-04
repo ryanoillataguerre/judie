@@ -27,7 +27,7 @@ import {
 import { useRouter } from "next/router";
 import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
-import { MdAdminPanelSettings } from "react-icons/md";
+import { MdAdminPanelSettings, MdFeedback } from "react-icons/md";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useMutation, useQuery } from "react-query";
@@ -197,6 +197,14 @@ const Sidebar = ({
         label: "Logout",
         onClick: () => {
           auth.logout();
+        },
+      },
+      {
+        icon: <MdFeedback />,
+        key: "feedback",
+        label: "Feedback",
+        onClick: () => {
+          router.push("/feedback");
         },
       },
       ...(auth.isAdmin
