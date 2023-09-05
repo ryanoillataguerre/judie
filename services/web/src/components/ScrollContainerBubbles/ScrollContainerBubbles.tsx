@@ -18,10 +18,7 @@ const ScrollContainerBubbles = ({
 }) => {
   const outerDiv = useRef<HTMLDivElement>(null);
   const innerDiv = useRef<HTMLDivElement>(null);
-
-  const [prevInnerDivHeight, setPrevInnerDivHeight] = useState<number | null>(
-    null
-  );
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const chatContext = useContext(ChatContext);
   const subject = chatContext.chat?.subject;
@@ -32,102 +29,60 @@ const ScrollContainerBubbles = ({
     "whiteAlpha.300"
   );
 
-  // const [showScrollButton, setShowScrollButton] = useState(false);
-
   useEffect(() => {
-    const outerDivHeight = outerDiv?.current?.clientHeight || 0;
-    const innerDivHeight = innerDiv?.current?.clientHeight || 0;
-    const outerDivScrollTop = outerDiv?.current?.scrollTop || 0;
-
-    if (
-      !prevInnerDivHeight ||
-      outerDivScrollTop === prevInnerDivHeight - outerDivHeight
-    ) {
-      outerDiv?.current?.scrollTo({
-        top: innerDivHeight! - outerDivHeight!,
-        left: 0,
-        behavior: prevInnerDivHeight ? "smooth" : "auto",
-      });
-    } else {
-      // setShowScrollButton(true);
-    }
-
-    setPrevInnerDivHeight(innerDivHeight);
-  }, [children, prevInnerDivHeight, outerDiv, innerDiv]);
-
-  const handleScrollButtonClick = useCallback(() => {
-    const outerDivHeight = outerDiv?.current?.clientHeight;
-    const innerDivHeight = innerDiv?.current?.clientHeight;
-
-    outerDiv?.current?.scrollTo({
-      top: innerDivHeight! - outerDivHeight!,
-      left: 0,
-      behavior: "smooth",
-    });
-
-    // setShowScrollButton(false);
-  }, []);
+    bottomRef.current?.scrollIntoView({});
+  }, [innerDiv.current?.scrollHeight]);
 
   return (
     <Box
+      ref={outerDiv}
       style={{
         position: "relative",
         height: "100%",
-        width: "100%",
+        overflow: "scroll",
       }}
       display={"flex"}
-      flexDirection={"row"}
+      flexGrow={1}
+      justifyContent={"center"}
+      alignItems={"center"}
     >
-      <Box
-        ref={outerDiv}
-        style={{
-          position: "relative",
-          height: "100%",
-          overflow: "scroll",
-        }}
-        flexGrow={1}
-        justifyContent={"center"}
-        alignItems={"center"}
+      <Flex
+        ref={innerDiv}
+        id="FFF"
+        direction={"column"}
+        justify={"flex-start"}
+        justifySelf={"flex-start"}
+        position={"absolute"}
+        h={"100%"}
+        w={"100%"}
+        maxW={"860px"}
+        m={"auto"}
       >
-        <Box
-          ref={innerDiv}
-          style={{
-            position: "relative",
-            paddingBottom: "0rem",
-          }}
-          mx={"auto"}
-          width={"100%"}
-          h={"100%"}
-          maxW={"860px"}
-          display={"flex"}
-          justifyContent={"space-between"}
-          flexDirection={"column"}
-        >
-          {subject && (
-            <Tag
-              size={"xl"}
-              variant={"solid"}
-              bg={bgColor}
-              borderRadius="full"
-              width={"fit-content"}
-              mx={"auto"}
-              px={"20px"}
-              py={"10px"}
-              border={"1px solid"}
-              borderColor={subjectBorderColor}
-              my={"30px"}
-              position={"sticky"}
-              top={0}
-              zIndex={1}
-              color={fontColor}
-            >
-              <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
-            </Tag>
-          )}
-
-          {children}
-        </Box>
-      </Box>
+        {subject && (
+          <Tag
+            as={"div"}
+            size={"xl"}
+            variant={"solid"}
+            bg={bgColor}
+            borderRadius="full"
+            width={"fit-content"}
+            mx={"auto"}
+            px={"20px"}
+            py={"10px"}
+            border={"1px solid"}
+            borderColor={subjectBorderColor}
+            my={"30px"}
+            position={"sticky"}
+            top={0}
+            zIndex={1}
+            color={fontColor}
+          >
+            <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
+          </Tag>
+        )}
+        {children}
+        <div ref={bottomRef} />
+      </Flex>
       {/* {showScrollButton && (
             <Box display={"flex"} w="100%" position={"absolute"} bottom="10rem" justifyContent={"center"} alignItems={"center"}>
                 <Button alignSelf={"center"} colorScheme="teal" onClick={handleScrollButtonClick}>Scroll to bottom</Button>
