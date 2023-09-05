@@ -86,7 +86,7 @@ export const getChat = async (params: Prisma.ChatWhereUniqueInput) => {
     include: {
       messages: {
         orderBy: {
-          updatedAt: "desc",
+          createdAt: "desc",
         },
         where: {
           type: {
