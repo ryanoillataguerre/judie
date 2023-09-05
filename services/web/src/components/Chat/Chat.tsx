@@ -26,6 +26,7 @@ import {
   VStack,
   useBreakpointValue,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
@@ -177,13 +178,17 @@ const ChatHeader = ({
   title?: string;
   folderId?: string;
 }) => {
+  const dividerColor = useColorModeValue(
+    "1px solid rgba(0, 0, 0, 0.10)",
+    "1px solid rgba(255, 255, 255, 0.20)"
+  );
   const router = useRouter();
   return (
     <VStack w={"100%"}>
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
-        padding={"2rem 2rem 1rem 2rem"}
+        py={5}
         width={"100%"}
       >
         <HStack paddingRight={"1rem"}>
@@ -199,7 +204,7 @@ const ChatHeader = ({
         </HStack>
         <AddToFolderButton chatId={id} existingFolderId={folderId} />
       </HStack>
-      <Box w={"95%"} borderBottom={"1px solid rgba(0, 0, 0, 0.10)"} />
+      <Box w={"95%"} borderBottom={dividerColor} />
     </VStack>
   );
 };
@@ -292,7 +297,13 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
 
   // console.log("title", chat?.userTitle);
   return (
-    <VStack h={"100%"} w={"100%"} spacing={0}>
+    <Flex
+      h={"100%"}
+      w={"100%"}
+      gap={0}
+      direction={"column"}
+      p={{ base: "4px 4px 4px 6px", md: "20px 20px 20px 30px" }}
+    >
       <ChatHeader
         id={chat?.id}
         title={chat?.userTitle || chat?.subject}
@@ -367,36 +378,29 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
             </Flex>
           ) : (
             <ScrollContainerBubbles>
-              <Flex
-                id="FFF"
-                direction={"column"}
-                justify={"flex-start"}
-                justifySelf={"flex-start"}
-              >
-                {renderedMessages}
+              {renderedMessages}
 
-                {(streaming ||
-                  (beingStreamedChatId === chatId && beingStreamedMessage)) && (
-                  <MessageRowBubble
-                    key={`${MessageType.BOT}-mostRecent`}
-                    beingStreamed={true}
-                    message={{
-                      type: MessageType.BOT,
-                      readableContent:
-                        beingStreamedMessage?.slice(9, -1) ||
-                        animatedEllipsisStringValue,
-                      createdAt: new Date(),
-                    }}
-                  />
-                )}
-              </Flex>
+              {(streaming ||
+                (beingStreamedChatId === chatId && beingStreamedMessage)) && (
+                <MessageRowBubble
+                  key={`${MessageType.BOT}-mostRecent`}
+                  beingStreamed={true}
+                  message={{
+                    type: MessageType.BOT,
+                    readableContent:
+                      beingStreamedMessage?.slice(9, -1) ||
+                      animatedEllipsisStringValue,
+                    createdAt: new Date(),
+                  }}
+                />
+              )}
               <Spacer />
               <ChatFooter />
             </ScrollContainerBubbles>
           )}
         </Flex>
       </Flex>
-    </VStack>
+    </Flex>
   );
 };
 
