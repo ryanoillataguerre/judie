@@ -186,7 +186,7 @@ const SubjectCloud = ({
   }, [userData]);
   const subjectSelectorWidth = useBreakpointValue({
     base: "80%",
-    md: "50%",
+    md: "70%",
   });
   const bgColor = useColorModeValue("#FFF", "whiteAlpha.300");
   const fontColor = useColorModeValue("#000", "#FFF");
@@ -195,15 +195,15 @@ const SubjectCloud = ({
     "whiteAlpha.300"
   );
   return (
-    <Box
-      // width: subjectSelectorWidth,
+    <Flex
+      width={subjectSelectorWidth}
       overflowY={"auto"}
       // flexDirection={"column"}
       alignItems={"center"}
       justifyContent={"center"}
       maxW={"100%"}
       height={"50%"}
-      // wrap={"wrap"}
+      wrap={"wrap"}
     >
       {subjectOptions.map((subject) => (
         <Tag
@@ -228,7 +228,7 @@ const SubjectCloud = ({
           <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
         </Tag>
       ))}
-    </Box>
+    </Flex>
   );
 };
 
@@ -355,11 +355,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const subjectSelectorWidth = useBreakpointValue({
-    base: "90%",
-    md: "80%",
-  });
-
   // console.log("title", chat?.userTitle);
   return (
     <Flex
@@ -402,7 +397,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                   <Text variant={"header"}>
                     It&apos;s a great time to learn!
                   </Text>
-                  <Text variant={"subheaderDetail"}>
+                  <Text variant={"subheaderDetail"} mb={"2rem"}>
                     Select a topic below to get started
                   </Text>
                   <SubjectCloud onSelectSubject={submitSubject} />
@@ -424,7 +419,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
           ) : (
             <ScrollContainerBubbles>
               {renderedMessages}
-
               {(streaming ||
                 (beingStreamedChatId === chatId && beingStreamedMessage)) && (
                 <MessageRowBubble
