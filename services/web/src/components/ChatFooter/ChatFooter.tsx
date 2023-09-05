@@ -9,10 +9,10 @@ import {
   useToast,
   Text,
   ToastPosition,
-  HStack,
   chakra,
   shouldForwardProp,
   Spinner,
+  ResponsiveValue,
 } from "@chakra-ui/react";
 import { ChatContext } from "@judie/hooks/useChat";
 import {
@@ -24,9 +24,10 @@ import {
   useContext,
   useMemo,
 } from "react";
+
 import { AiOutlineEnter } from "react-icons/ai";
-import { BiMicrophone } from "react-icons/bi";
-import { BsSend } from "react-icons/bs";
+import MicIcon from "@judie/components/icons/MicIcon";
+import SendIcon from "@judie/components/icons/SendIcon";
 import { motion, isValidMotionProp } from "framer-motion";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { useMutation } from "react-query";
@@ -35,14 +36,14 @@ import AssignmentUploader from "../AssignmentUploader";
 import useResizeTextArea from "@judie/hooks/useResizeTextArea";
 
 const SendButton = () => {
-  const sendColor = useColorModeValue("black", "white");
+  const sendColor = useColorModeValue("gray.800", "gray.300");
 
   return (
     <Button
       type="submit"
+      alignSelf={"flex-end"}
+      height={"fit-content"}
       style={{
-        padding: "0 0",
-        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -50,13 +51,15 @@ const SendButton = () => {
       _hover={{
         backgroundColor: "brand.secondary",
         svg: {
-          fill: "white",
+          fill: "gray.200",
         },
       }}
+      px={2.5}
+      py={3}
       border={"none"}
       bg={"transparent"}
     >
-      <BsSend fill={sendColor} size={20} />
+      <SendIcon color={sendColor} boxSize={6} />
     </Button>
   );
 };
@@ -115,7 +118,7 @@ const RecordButton = ({
     }
   }, [recordingTime]);
 
-  const micColor = useColorModeValue("black", "white");
+  const micColor = useColorModeValue("gray.800", "gray.300");
 
   const buttonContent = useMemo(() => {
     if (isRecording) {
@@ -124,13 +127,14 @@ const RecordButton = ({
           animate={{
             scale: [1, 1.3, 1],
           }}
-          // @ts-ignore no problem in operation, although type error appears.
-          transition={{
-            duration: 1.2,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "loop",
-          }}
+          transition={
+            {
+              duration: 1.2,
+              ease: "easeInOut",
+              repeat: Infinity,
+              repeatType: "loop",
+            } as ResponsiveValue<any> | undefined
+          }
           borderRadius={"50%"}
           padding="2"
           bg={"red.400"}
@@ -145,7 +149,7 @@ const RecordButton = ({
     if (transcribeMutation.isLoading) {
       return <Spinner color={"teal.300"} size={"sm"} />;
     }
-    return <BiMicrophone fill={micColor} size={20} />;
+    return <MicIcon color={micColor} boxSize={6} />;
   }, [isRecording, transcribeMutation.isLoading, micColor]);
 
   return (
@@ -155,18 +159,20 @@ const RecordButton = ({
       // colorScheme="teal"
       bg={"transparent"}
       style={{
-        padding: "0 0rem",
-        height: "100%",
+        height: "fit-content",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}
+      px={1.5}
+      py={3}
       _hover={{
         backgroundColor: "brand.secondary",
         svg: {
-          fill: "white",
+          stroke: "gray.200",
         },
       }}
+      borderRadius={"10px"}
       border={"none"}
       onClick={() => {
         if (isRecording) {
@@ -181,7 +187,7 @@ const RecordButton = ({
   );
 };
 
-const ChatInput = () => {
+const ChatFooter = () => {
   const { addMessage, chat, messages } = useContext(ChatContext);
   const [chatValue, setChatValue] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -209,6 +215,7 @@ const ChatInput = () => {
   }, [chat?.subject, ref]);
 
   const bgColor = useColorModeValue("#FFFFFF", "#202123");
+  const bgColorOuter = useColorModeValue("gray.200", "gray.700");
 
   const toastPosition = useBreakpointValue(
     {
@@ -261,49 +268,41 @@ const ChatInput = () => {
   );
 
   return (
-    <form onSubmit={onSubmit}>
+    <Box
+      as={"form"}
+      style={{
+        height: "auto",
+        position: "sticky",
+        bottom: "0px",
+        left: 0,
+      }}
+      w={{ base: "90%", md: "90%" }}
+      px={2.5}
+      py={3}
+      m={"auto"}
+      borderRadius={"10px"}
+      bg={bgColorOuter}
+      onSubmit={onSubmit}
+    >
       <InputGroup>
-        {/* <LightMode> */}
         {!messages.length && <AssignmentUploader />}
-        {/* <HStack spacing={4} width={"100%"}>
-          <Textarea
-            onKeyUp={onKeyUp}
-            autoFocus={chat?.subject ? true : false}
-            ref={ref}
-            value={chatValue}
-            _hover={{
-              borderColor: "teal",
-            }}
-            disabled={isRecording}
-            onChange={(e) => setChatValue(e.target.value)}
-            placeholder="Ask Judie anything..."
-            style={{
-              width: "100%",
-              padding: "auto 6rem auto 0",
-              backgroundColor: bgColor,
-              resize: "none",
-            }}
-          />
-          <VStack height={"100%"}>
-            <SendButton />
-            <RecordButton
-              setIsRecording={setIsRecording}
-              onFinishRecording={(text) =>
-                setChatValue((prev) =>
-                  prev.length ? [prev, text].join("\n") : text
-                )
-              }
-            />
-          </VStack>
-        </HStack> */}
         <Box
           position={"relative"}
           display={"flex"}
           width={"100%"}
           h={"auto"}
-          mb={"20px"}
-          alignItems={"center"}
+          alignItems={"flex-end"}
+          justifyContent={"center"}
+          gap={{ base: 1.5, md: 2.5 }}
         >
+          <RecordButton
+            setIsRecording={setIsRecording}
+            onFinishRecording={(text) =>
+              setChatValue((prev) =>
+                prev.length ? [prev, text].join("\n") : text
+              )
+            }
+          />
           <Textarea
             onKeyUp={onKeyUp}
             autoFocus={chat?.subject ? true : false}
@@ -315,8 +314,8 @@ const ChatInput = () => {
             disabled={isRecording}
             onChange={(e) => setChatValue(e.target.value)}
             placeholder="Ask Judie anything..."
-            pr={"7rem"}
-            py={"12px"}
+            py={{ base: "10px", md: "12px" }}
+            px={{ base: "12px", md: "16px" }}
             resize={"none"}
             bg={bgColor}
             w={"100%"}
@@ -324,77 +323,15 @@ const ChatInput = () => {
             maxH={"10rem"}
             borderRadius={"24px"}
             rows={1}
-            fontSize={"18px"}
+            fontSize={{ base: "16px", md: "18px" }}
+            flex={1}
+            whiteSpace={"nowrap"}
+            lineHeight={{ base: "25px", md: "23px" }}
           />
-          <HStack
-            position={"absolute"}
-            bottom={"10px"}
-            right={"16px"}
-            height={"30px"}
-            zIndex={2}
-            display={"flex"}
-            justifyContent={"center"}
-          >
-            <RecordButton
-              setIsRecording={setIsRecording}
-              onFinishRecording={(text) =>
-                setChatValue((prev) =>
-                  prev.length ? [prev, text].join("\n") : text
-                )
-              }
-            />
-            <SendButton />
-          </HStack>
+          <SendButton />
         </Box>
-        {/* </LightMode> */}
-        {/* <InputRightElement style={{ height: "100%" }}>
-          
-        </InputRightElement> */}
       </InputGroup>
-    </form>
-  );
-};
-
-const ChatFooter = () => {
-  const inputWidth = useBreakpointValue({
-    base: "90%",
-    md: "70%",
-  });
-
-  const gradientColor = useColorModeValue(
-    // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.2) 30%, rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.8) 80%, rgba(255, 255, 255, 1.0) 90%)",
-    "linear-gradient(#F6F6F600 0%, #F6F6F6DD 60%, #F6F6F6FF 90%)",
-    // "linear-gradient(rgba(0, 0, 0, 0) 0%, rgba(52, 53, 65, 0.1) 20%, rgba(52, 53, 65, 0.2) 30%, rgba(52, 53, 65, 0.6) 40%, rgba(52, 53, 65, 0.8) 80%, rgba(52, 53, 65, 1.0) 90%)"
-    "linear-gradient(#1A202C00 0%, #1A202CDD 60%, #1A202CFF 90%)"
-  );
-
-  return (
-    <Flex
-      style={{
-        width: "100%",
-        height: "auto",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        position: "sticky",
-        bottom: "0px",
-        left: 0,
-        backgroundImage: gradientColor,
-      }}
-      pb={"0px"}
-      mt={6}
-      pt={0}
-    >
-      <Box
-        style={{
-          width: inputWidth,
-          // height: '100%',
-          // padding: "1rem"
-        }}
-      >
-        <ChatInput />
-      </Box>
-    </Flex>
+    </Box>
   );
 };
 

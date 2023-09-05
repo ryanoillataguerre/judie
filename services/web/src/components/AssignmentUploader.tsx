@@ -1,7 +1,14 @@
-import { Button, Input, Tooltip, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Input,
+  Tooltip,
+  useColorModeValue,
+  useToast,
+} from "@chakra-ui/react";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useRouter } from "next/router";
 import { FormEvent, useContext, useRef } from "react";
+import { AttachmentIcon } from "@chakra-ui/icons";
 
 const AssignmentUploader = ({}: {}) => {
   const toast = useToast();
@@ -22,6 +29,8 @@ const AssignmentUploader = ({}: {}) => {
     uploadAssignment(formData);
   };
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const paperClipColor = useColorModeValue("gray.800", "gray.300");
   return (
     <>
       <Tooltip
@@ -32,25 +41,34 @@ const AssignmentUploader = ({}: {}) => {
         isDisabled={streaming}
       >
         <Button
-          h={"fit-content"}
-          w={"unset"}
-          minW={"unset"}
-          py={"12px"}
-          px={"12px"}
-          mr={"12px"}
-          type={"button"}
-          size={"sm"}
-          fontSize={"16px"}
-          borderRadius={"24px"}
-          variant={"purp"}
-          lineHeight={"1.375rem"}
+          type="button"
+          alignSelf={"flex-end"}
+          // variant="outline"
+          // colorScheme="teal"
+          bg={"transparent"}
+          style={{
+            height: "fit-content",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          px={1.5}
+          py={4}
+          _hover={{
+            backgroundColor: "brand.secondary",
+            svg: {
+              stroke: "gray.200",
+            },
+          }}
+          borderRadius={"10px"}
+          border={"none"}
           onClick={() => {
             inputRef.current?.click();
           }}
           isLoading={streaming}
           isDisabled={streaming}
         >
-          Upload
+          <AttachmentIcon color={paperClipColor} />
         </Button>
         {/* TODO: Get this to only accept PDFs */}
       </Tooltip>
