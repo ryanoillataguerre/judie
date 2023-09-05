@@ -41,9 +41,9 @@ const SendButton = () => {
   return (
     <Button
       type="submit"
+      alignSelf={"flex-end"}
+      height={"fit-content"}
       style={{
-        padding: "0 0",
-        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -54,6 +54,8 @@ const SendButton = () => {
           fill: "gray.200",
         },
       }}
+      px={2.5}
+      py={3}
       border={"none"}
       bg={"transparent"}
     >
@@ -291,7 +293,7 @@ const ChatFooter = () => {
           h={"auto"}
           alignItems={"flex-end"}
           justifyContent={"center"}
-          gap={2.5}
+          gap={{ base: 1.5, md: 2.5 }}
         >
           <RecordButton
             setIsRecording={setIsRecording}
@@ -312,7 +314,8 @@ const ChatFooter = () => {
             disabled={isRecording}
             onChange={(e) => setChatValue(e.target.value)}
             placeholder="Ask Judie anything..."
-            py={"12px"}
+            py={{ base: "10px", md: "12px" }}
+            px={{ base: "12px", md: "16px" }}
             resize={"none"}
             bg={bgColor}
             w={"100%"}
@@ -322,6 +325,8 @@ const ChatFooter = () => {
             rows={1}
             fontSize={{ base: "16px", md: "18px" }}
             flex={1}
+            whiteSpace={"nowrap"}
+            lineHeight={{ base: "25px", md: "23px" }}
           />
           <SendButton />
         </Box>
