@@ -2,34 +2,37 @@ import { Box, Flex } from "@chakra-ui/react";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
 import useStorageState from "@judie/hooks/useStorageState";
 import AdminSidebar from "../AdminSidebar/AdminSidebar";
+import { useSidebarOpenClose } from "@judie/context/sidebarOpenCloseProvider";
 
 interface AdminSidebarPageContainerProps {
   children: React.ReactNode;
 }
 
+type OpenCloseButtonProps = {
+  isAdminSidebarOpen: boolean;
+  toggleAdminSidebar: () => void;
+};
+
 const OpenCloseButton = ({
-  isOpen,
-  setIsOpen,
-}: {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}) => {
+  isAdminSidebarOpen,
+  toggleAdminSidebar,
+}: OpenCloseButtonProps) => {
   return (
     <Box
       style={{
         position: "fixed",
         top: "0.4rem",
-        left: isOpen ? "18.5rem" : "1.5rem",
+        left: isAdminSidebarOpen ? "18.5rem" : "1.5rem",
         padding: "0.5rem",
       }}
     >
-      {isOpen ? (
+      {isAdminSidebarOpen ? (
         <LuChevronLeftSquare
           style={{
             zIndex: 1000,
           }}
           cursor={"pointer"}
-          onClick={() => setIsOpen(false)}
+          onClick={toggleAdminSidebar}
           size={20}
         />
       ) : (
@@ -38,7 +41,7 @@ const OpenCloseButton = ({
             zIndex: 1000,
           }}
           cursor={"pointer"}
-          onClick={() => setIsOpen(true)}
+          onClick={toggleAdminSidebar}
           size={20}
         />
       )}
@@ -49,10 +52,8 @@ const OpenCloseButton = ({
 const AdminSidebarPageContainer = ({
   children,
 }: AdminSidebarPageContainerProps) => {
-  const [isOpen, setIsOpen] = useStorageState<boolean>(
-    true,
-    "adminSidebarOpen"
-  );
+  const { isAdminSidebarOpen, toggleAdminSidebar } = useSidebarOpenClose();
+
   return (
     <Flex
       style={{
@@ -61,7 +62,7 @@ const AdminSidebarPageContainer = ({
         width: "100vw",
       }}
     >
-      <AdminSidebar isOpen={isOpen} />
+      <AdminSidebar isOpen={isAdminSidebarOpen} />
       <Box
         style={{
           width: "100%",
@@ -73,7 +74,10 @@ const AdminSidebarPageContainer = ({
           padding: "2rem 2rem",
         }}
       >
-        <OpenCloseButton isOpen={isOpen} setIsOpen={setIsOpen} />
+        <OpenCloseButton
+          isAdminSidebarOpen={isAdminSidebarOpen}
+          toggleAdminSidebar={toggleAdminSidebar}
+        />
         {children}
       </Box>
     </Flex>
