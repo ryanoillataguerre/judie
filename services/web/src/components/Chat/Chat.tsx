@@ -22,12 +22,15 @@ import {
   Select,
   Spacer,
   Spinner,
+  Tag,
+  TagLabel,
   Text,
   VStack,
   useBreakpointValue,
-  useToast,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
+import { adminSubjects, subjects } from "../../data/static/subjects";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRowBubble from "../MessageRowBubble/MessageRowBubble";
@@ -53,6 +56,7 @@ import AgeModal from "../AgeModal";
 import { BsArrowLeft } from "react-icons/bs";
 import { FiFolderPlus } from "react-icons/fi";
 import useAuth from "@judie/hooks/useAuth";
+import { getTopicEmoji } from "@judie/utils/topicEmoji";
 
 const AddToFolderModal = ({
   chatId,
@@ -105,7 +109,6 @@ const AddToFolderModal = ({
             my={"1rem"}
             placeholder={existingFolder?.userTitle || "Select a folder"}
             onChange={(e: FormEvent<HTMLSelectElement>) => {
-              console.log("folderId", e.currentTarget.value);
               if (chatId) {
                 setChatFolder.mutate({
                   chatId,
@@ -166,6 +169,65 @@ const AddToFolderButton = ({
         </Text>
       </Button>
     </>
+  );
+};
+
+const SubjectCloud = ({
+  onSelectSubject,
+}: {
+  onSelectSubject: (subject: string) => void;
+}) => {
+  const { userData } = useAuth();
+  const subjectOptions = useMemo(() => {
+    if (userData?.email?.includes("@judie.io")) {
+      return [...subjects, ...adminSubjects];
+    }
+    return subjects;
+  }, [userData]);
+  const subjectSelectorWidth = useBreakpointValue({
+    base: "80%",
+    md: "50%",
+  });
+  const bgColor = useColorModeValue("#FFF", "whiteAlpha.300");
+  const fontColor = useColorModeValue("#000", "#FFF");
+  const subjectBorderColor = useColorModeValue(
+    "rgba(60, 20, 120, 0.80)",
+    "whiteAlpha.300"
+  );
+  return (
+    <Box
+      // width: subjectSelectorWidth,
+      overflowY={"auto"}
+      // flexDirection={"column"}
+      alignItems={"center"}
+      justifyContent={"center"}
+      maxW={"100%"}
+      height={"50%"}
+      // wrap={"wrap"}
+    >
+      {subjectOptions.map((subject) => (
+        <Tag
+          onClick={() => onSelectSubject(subject)}
+          position={"relative"}
+          size={"lg"}
+          variant={"solid"}
+          cursor={"pointer"}
+          bg={bgColor}
+          borderRadius="full"
+          width={"fit-content"}
+          m={"0.25rem"}
+          px={"20px"}
+          py={"10px"}
+          border={"1px solid #d3d3d3"}
+          borderColor={subjectBorderColor}
+          top={0}
+          zIndex={1}
+          color={fontColor}
+        >
+          <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
+        </Tag>
+      ))}
+    </Box>
   );
 };
 
@@ -237,10 +299,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       scrollContainerRef.current?.scrollTo(0, scrollHeight);
     }
   };
-  const subjectSelectorWidth = useBreakpointValue({
-    base: "80%",
-    md: "50%",
-  });
+
   useEffect(() => {
     scroll();
     setTempUserMessage(undefined);
@@ -295,6 +354,11 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const subjectSelectorWidth = useBreakpointValue({
+    base: "90%",
+    md: "80%",
+  });
+
   // console.log("title", chat?.userTitle);
   return (
     <Flex
@@ -325,44 +389,22 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
             existingChatQuery?.isLoading ? (
               <Spinner color={"blue.300"} size={"lg"} />
             ) : (
-              <VStack
-                style={{
-                  width: subjectSelectorWidth,
-                  padding: "2rem",
-                  border: "#565555 0.5px solid",
-                  borderRadius: "0.8rem",
-                  alignItems: "flex-start",
-                }}
-                boxShadow={"sm"}
+              <Flex
+                position={"relative"}
+                overflowY={"scroll"}
+                alignItems={"center"}
+                justifyContent={"center"}
+                h={"100%"}
+                w={"80%"}
               >
-                {!chat?.subject ? (
-                  <Flex flexGrow={1} width={"100%"}>
-                    <Text
-                      style={{
-                        fontSize: "1.2rem",
-                        fontWeight: 600,
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      What would you like to chat about?
-                    </Text>
-                  </Flex>
-                ) : (
-                  <Flex width={"100%"}>
-                    <Text
-                      style={{
-                        fontSize: "0.8rem",
-                        fontWeight: 400,
-                        marginBottom: "0.5rem",
-                      }}
-                    >
-                      You can change your subject until you send your first
-                      message
-                    </Text>
-                  </Flex>
-                )}
-                <SubjectSelector width={"100%"} selectSubject={submitSubject} />
-              </VStack>
+                <VStack w={"100%"} alignItems={"center"} h={"100%"} pt={"5rem"}>
+                  <Text variant={"header"}>It's a great time to learn!</Text>
+                  <Text variant={"subheaderDetail"}>
+                    Select a topic below to get started
+                  </Text>
+                  <SubjectCloud onSelectSubject={submitSubject} />
+                </VStack>
+              </Flex>
             )
           ) : existingChatQuery.isLoading ? (
             <Flex
