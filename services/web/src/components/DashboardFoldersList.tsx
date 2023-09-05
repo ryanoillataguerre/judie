@@ -35,7 +35,7 @@ const DashboardFoldersList = () => {
   });
   const renderedFolders = foldersQuery.data?.slice(0, numFoldersShown);
 
-  return (
+  return renderedFolders?.length ? (
     <VStack w={"100%"}>
       <HStack
         justifyContent={"space-between"}
@@ -82,6 +82,8 @@ const DashboardFoldersList = () => {
         })}
       </HStack>
     </VStack>
+  ) : (
+    <></>
   );
 };
 
