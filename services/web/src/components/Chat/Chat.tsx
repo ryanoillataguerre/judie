@@ -207,6 +207,7 @@ const SubjectCloud = ({
     >
       {subjectOptions.map((subject) => (
         <Tag
+          key={subject}
           onClick={() => onSelectSubject(subject)}
           position={"relative"}
           size={"lg"}
@@ -398,7 +399,9 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                 w={"80%"}
               >
                 <VStack w={"100%"} alignItems={"center"} h={"100%"} pt={"5rem"}>
-                  <Text variant={"header"}>It's a great time to learn!</Text>
+                  <Text variant={"header"}>
+                    It&apos;s a great time to learn!
+                  </Text>
                   <Text variant={"subheaderDetail"}>
                     Select a topic below to get started
                   </Text>
