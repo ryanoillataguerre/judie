@@ -362,7 +362,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       w={"100%"}
       gap={0}
       direction={"column"}
-      p={{ base: "4px 4px 4px 6px", md: "20px 20px 20px 30px" }}
+      p={{ base: 1, md: "20px 20px 20px 30px" }}
     >
       <ChatHeader
         id={chat?.id}

@@ -255,20 +255,31 @@ const Sidebar = () => {
     },
     md: {},
   });
+  const mobileVsDesktopClosedMenuHeight = useBreakpointValue({
+    base: {
+      height: "4.5",
+    },
+    md: { height: "calc(100vh - 2rem)" },
+  });
   return (
     <ChakraMotionBox
       initial={false}
       animate={{
         width: isSidebarOpen ? "18rem" : "2rem",
+        height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
         opacity: isSidebarOpen ? 1 : 0.5,
       }}
       bgColor={bgColor}
+      height={
+        isSidebarOpen
+          ? { base: "calc(100vh - 2rem)", md: "calc(100vh - 2rem)" }
+          : { base: "5rem", md: "calc(100vh - 2rem)" }
+      }
+      marginLeft={{ base: 1, md: "1rem" }}
       style={{
         display: "flex",
-        height: "calc(100vh - 2rem)",
         borderRadius: "1.375rem",
         marginTop: "1rem",
-        marginLeft: "1rem",
         marginBottom: "1rem",
         ...(isSidebarOpen
           ? {

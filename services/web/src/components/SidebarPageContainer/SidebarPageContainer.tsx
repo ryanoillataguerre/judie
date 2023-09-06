@@ -49,7 +49,7 @@ const SidebarPageContainer = ({
   scroll = true,
 }: SidebarPageContainerProps) => {
   const containerPaddingLeft = useBreakpointValue({
-    base: "2rem",
+    base: "0rem",
     md: "0",
   });
   return (
