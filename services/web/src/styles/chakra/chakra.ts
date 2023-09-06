@@ -112,6 +112,7 @@ const buttonComponentStyle: ComponentStyleConfig = {
     // colorScheme: '',
   },
 };
+
 const formLabelStyle = defineStyleConfig({
   // The styles all button have in common
   baseStyle: {
