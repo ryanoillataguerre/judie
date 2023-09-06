@@ -98,6 +98,7 @@ export async function baseFetch({
       ...(form ? {} : { "Content-Type": "application/json" }),
       ...headers,
     };
+
     const sessionCookie = getCookie(SESSION_COOKIE);
     if (sessionCookie) {
       reqHeaders.Cookie = `judie_sid=${sessionCookie};`;

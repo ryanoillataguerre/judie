@@ -49,7 +49,7 @@ jobs:
             us-west1-docker.pkg.dev/sandbox-382905/web/web:${{ github.sha }}
             us-west1-docker.pkg.dev/sandbox-382905/web/web:latest
           build-args: |
-            NEXT_PUBLIC_API_URI=https:/web.sandbox.judie.io
+            NEXT_PUBLIC_API_URI=https://app-service.sandbox.judie.io
             NEXT_PUBLIC_NODE_ENV=sandbox
 
       - name: Deploy to Cloud Run
