@@ -1,0 +1,51 @@
+name: web Deployment
+
+on:
+  push:
+    branches:
+    - sandbox
+    paths:
+    - "services/web/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: sandbox-382905
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          project_id: sandbox-382905
+      - name: 'Docker auth'
+        run: |-
+          gcloud auth configure-docker us-west1-docker.pkg.dev
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: services/web
+          push: true
+          tags: gcr.io/sandbox-382905/web:${{ github.sha }}
+          # Need to pass in build args for Next.js build happening - no runtime ENV vars in Next.js
+          build-args: |
+            NEXT_PUBLIC_API_URI=https://app-service.sandbox.judie.io
+            NEXT_PUBLIC_NODE_ENV=sandbox
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@main
+        with:
+          image: gcr.io/sandbox-382905/web:${{ github.sha }}
+          service: web
+          region: us-west1
+          platform: managed
+          project: sandbox-382905
+          allow-unauthenticated: true
