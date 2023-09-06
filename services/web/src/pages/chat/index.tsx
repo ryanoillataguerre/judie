@@ -2,10 +2,7 @@ import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";
 import Chat from "@judie/components/Chat/Chat";
-import ChatNavbar from "@judie/components/ChatNavbar/ChatNavbar";
-import ChatFooter from "@judie/components/ChatFooter/ChatFooter";
 import { ChatProvider } from "@judie/hooks/useChat";
-import SidebarChatNav from "@judie/components/SidebarChatNav/SidebarChatNav";
 
 interface ChatPageProps {
   query?: string;

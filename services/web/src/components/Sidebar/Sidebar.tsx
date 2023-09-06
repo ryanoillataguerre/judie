@@ -29,8 +29,7 @@ import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { MdAdminPanelSettings, MdFeedback } from "react-icons/md";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
-import { ChatContext } from "@judie/hooks/useChat";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import {
   deleteChatMutation,
   clearConversationsMutation,
@@ -47,6 +46,7 @@ import {
 } from "react-icons/bi";
 import { HiMiniFolderOpen } from "react-icons/hi2";
 import { isValidMotionProp, motion } from "framer-motion";
+import { useSidebarOpenClose } from "@judie/context/sidebarOpenCloseProvider";
 
 interface SidebarButtonProps {
   icon?: JSX.Element | undefined;
@@ -124,17 +124,13 @@ const FolderButton = ({
   );
 };
 
-const Sidebar = ({
-  isOpen,
-  setIsOpen,
-}: {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}) => {
+const Sidebar = () => {
   const router = useRouter();
   const auth = useAuth();
   const toast = useToast();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+
+  const { toggleSidebar, isSidebarOpen } = useSidebarOpenClose();
 
   const colorMode = useColorMode();
   const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
@@ -263,8 +259,8 @@ const Sidebar = ({
     <ChakraMotionBox
       initial={false}
       animate={{
-        width: isOpen ? "18rem" : "2rem",
-        opacity: isOpen ? 1 : 0.5,
+        width: isSidebarOpen ? "18rem" : "2rem",
+        opacity: isSidebarOpen ? 1 : 0.5,
       }}
       bgColor={bgColor}
       style={{
@@ -274,7 +270,7 @@ const Sidebar = ({
         marginTop: "1rem",
         marginLeft: "1rem",
         marginBottom: "1rem",
-        ...(isOpen
+        ...(isSidebarOpen
           ? {
               padding: "1rem",
             }
@@ -291,7 +287,7 @@ const Sidebar = ({
         ...(sidebarRelativeOrAbsoluteProps as CSSProperties),
       }}
     >
-      {isOpen ? (
+      {isSidebarOpen ? (
         <>
           <Flex
             style={{
@@ -329,7 +325,7 @@ const Sidebar = ({
                   fontSize: "1.3rem",
                   fontWeight: "semibold",
                   marginLeft: "0.5rem",
-                  display: isOpen ? "block" : "none",
+                  display: isSidebarOpen ? "block" : "none",
                 }}
               >
                 Judie AI
@@ -339,7 +335,7 @@ const Sidebar = ({
               size={24}
               color={purpleHexCode}
               onClick={() => {
-                setIsOpen(!isOpen);
+                toggleSidebar();
               }}
             />
           </Flex>
@@ -445,7 +441,7 @@ const Sidebar = ({
           color={purpleHexCode}
           cursor={"pointer"}
           onClick={() => {
-            setIsOpen(!isOpen);
+            toggleSidebar();
           }}
         />
       )}
