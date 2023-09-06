@@ -28,20 +28,20 @@ const textComponentStyle: ComponentStyleConfig = {
       fontSize: "2rem",
       fontWeight: 500,
     },
-    subheader: (props: StyleFunctionProps) => ({
+    subheader: {
       fontWeight: 500,
       fontSize: "1.375rem",
-    }),
-    subheaderDetail: (props: StyleFunctionProps) => ({
+    },
+    subheaderDetail: {
       color: "gray.500",
       fontWeight: 500,
       fontSize: "1.375rem",
-    }),
-    headerDetail: (props: StyleFunctionProps) => ({
+    },
+    headerDetail: {
       color: "gray.500",
       fontWeight: 500,
       fontSize: "1.125rem",
-    }),
+    },
     title: {
       fontWeight: 500,
       fontSize: "1.125rem",
