@@ -27,3 +27,9 @@ gcloud iam service-accounts add-iam-policy-binding "terraform@sandbox-382905.iam
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/617839389948/locations/global/workloadIdentityPools/github-actions/attribute.repository/judie/judie"
 ```
+
+```
+gcloud projects add-iam-policy-binding sandbox-382905 \
+    --member="serviceAccount:terraform@sandbox-382905.iam.gserviceaccount.com" \
+    --role="roles/artifactregistry.admin"
+```

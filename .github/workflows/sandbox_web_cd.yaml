@@ -23,14 +23,24 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
+          token_format: access_token
           workload_identity_provider: 'projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
           service_account: 'terraform@sandbox-382905.iam.gserviceaccount.com'
+          access_token_lifetime: 300s
+
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: us-west2-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: services/web
           push: true
+          platform: linux/amd64
           tags: us-west1-docker.pkg.dev/sandbox-382905/web/web:${{ github.sha }}
           build-args: |
             NEXT_PUBLIC_API_URI=https:/web.sandbox.judie.io
