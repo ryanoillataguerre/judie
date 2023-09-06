@@ -26,6 +26,16 @@ jobs:
           workload_identity_provider: 'projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
           service_account: 'terraform@sandbox-382905.iam.gserviceaccount.com'
 
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: services/app-service
+          push: true
+          tags: gcr.io/sandbox-382905/app-service:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_API_URI=https://app-service.sandbox.judie.io
+            NEXT_PUBLIC_NODE_ENV=sandbox
+
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
