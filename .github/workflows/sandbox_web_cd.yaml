@@ -15,16 +15,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: sandbox-382905
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-        with:
-          project_id: sandbox-382905
       - name: 'Docker auth'
         run: |-
           gcloud auth configure-docker us-west1-docker.pkg.dev
