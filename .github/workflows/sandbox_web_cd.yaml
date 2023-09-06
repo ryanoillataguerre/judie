@@ -21,7 +21,7 @@ jobs:
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v0.4.0'
+        uses: 'google-github-actions/auth@v1'
         with:
           workload_identity_provider: 'projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
           service_account: 'terraform@sandbox-382905.iam.gserviceaccount.com'
