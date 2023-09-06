@@ -54,7 +54,7 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
           image: us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:${{ github.sha }}
-          service: web
+          service: app-service
           region: us-west1
           platform: managed
           project: sandbox-382905
