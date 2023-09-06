@@ -322,12 +322,12 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
         newMessages = [...newMessages, tempUserMessage];
       }
     }
-    return newMessages.map((message) => {
+    return newMessages.map((message, idx) => {
       const key = `${message.type}-${
         message.readableContent?.slice(0, 9).includes("undefined")
           ? message.readableContent?.slice(9, 50)
           : message.readableContent?.slice(0, 50)
-      }`;
+      }-${idx}`;
       return <MessageRowBubble key={key} message={message} />;
     });
   }, [
