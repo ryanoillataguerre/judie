@@ -13,6 +13,7 @@ const config = {
   initialColorMode: "dark",
   useSystemColorMode: false,
 };
+
 const textComponentStyle: ComponentStyleConfig = {
   baseStyle: {
     fontSize: "1rem",
