@@ -10,33 +10,51 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    permissions:
+     contents: 'read'
+     id-token: 'write'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
         with:
-          project_id: sandbox-382905
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+          token_format: access_token
+          workload_identity_provider: 'projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
+          service_account: 'terraform@sandbox-382905.iam.gserviceaccount.com'
+          access_token_lifetime: 600s
 
-      - name: 'Docker auth'
-        run: |-
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: us-west2-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Authenticate Docker
+        run: |
           gcloud auth configure-docker us-west1-docker.pkg.dev
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: services/app-service
+          context: services/
+          file: services/app-service/Dockerfile
           push: true
-          tags: gcr.io/sandbox-382905/app-service:${{ github.sha }}
+          platform: linux/amd64
+          tags: |
+            us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:${{ github.sha }}
+            us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:latest
 
       - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@main
+        uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
-          image: gcr.io/sandbox-382905/app-service:${{ github.sha }}
-          service: app-service
+          image: us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:${{ github.sha }}
+          service: web
           region: us-west1
           platform: managed
           project: sandbox-382905
