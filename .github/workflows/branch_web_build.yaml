@@ -1,4 +1,4 @@
-name: Services Build
+name: Web Branch Build
 
 on:
   push:

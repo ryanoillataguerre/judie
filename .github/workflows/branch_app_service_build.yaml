@@ -1,4 +1,4 @@
-name: Services Build
+name: App Service Branch Build
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
     - production
     paths:
     - "services/app-service/**"
-    # - "services/web/**"
 
 jobs:
   build-app-service:
