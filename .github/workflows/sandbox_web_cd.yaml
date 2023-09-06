@@ -31,7 +31,7 @@ jobs:
         with:
           context: services/web
           push: true
-          tags: gcr.io/sandbox-382905/web:${{ github.sha }}
+          tags: us-west1-docker.pkg.dev/sandbox-382905/web/web:${{ github.sha }}
           build-args: |
             NEXT_PUBLIC_API_URI=https:/web.sandbox.judie.io
             NEXT_PUBLIC_NODE_ENV=sandbox
