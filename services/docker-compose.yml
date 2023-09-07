@@ -38,7 +38,7 @@ services:
     build:
       context: ./app-service
       dockerfile: ./Dockerfile.local
-    command: yarn test
+    command: yarn dev
     ports:
       - 8080:8080
     restart: on-failure
