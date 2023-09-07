@@ -33,11 +33,12 @@ services:
       - dev
     privileged: true
     volumes:
-      - ./app-service:/app
+      - ./app-service/src:/app/src
     working_dir: /app
     build:
       context: ./app-service
       dockerfile: ./Dockerfile.local
+    command: yarn dev
     ports:
       - 8080:8080
     restart: on-failure
@@ -72,7 +73,7 @@ services:
     depends_on:
       - app-service
     volumes:
-      - ./web:/app
+      - ./web/src:/app/src
       - /app/web/node_modules
     working_dir: /app
     build:
