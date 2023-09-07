@@ -39,7 +39,7 @@ services:
         yarn db:seed
         yarn test
     depends_on:
-      - postgres_test
+      - postgrestest
       - redis_test
     ports:
       - 8001:8001
