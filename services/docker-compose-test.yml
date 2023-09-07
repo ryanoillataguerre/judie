@@ -1,0 +1,72 @@
+version: "3.8"
+services:
+  postgrestest:
+    image: postgres:13
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # logging:
+    #   driver: none
+    ports:
+      - 5439:5432
+    networks:
+      - dev_test
+
+  redis_test:
+    image: redis:latest
+    command: redis-server
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    ports:
+      - 6379:6379
+    networks:
+      - dev_test
+
+  app-service-test:
+    networks:
+      - dev_test
+    working_dir: /app
+    build:
+      context: ./app-service
+      dockerfile: ./Dockerfile.test
+    command:
+      - /bin/sh
+      - -c
+      - |
+        yarn setup
+        yarn db:seed
+        yarn test
+    depends_on:
+      - postgres_test
+      - redis_test
+    ports:
+      - 8001:8001
+    # TODO: Address env vars in test
+    environment:
+      NODE_ENV: test
+      PORT: 8001
+      REDIS_HOST: redis
+      INFERENCE_SERVICE_URL: dns:///inference-service:443
+      DATABASE_URL: postgres://postgres:postgres@postgrestest:5432/postgres
+      # OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # PINECONE_API_KEY: ${PINECONE_API_KEY}
+      # PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
+      # STRIPE_SK: ${STRIPE_SK}
+      # STRIPE_MONTHLY_PRICE_ID: ${STRIPE_MONTHLY_PRICE_ID}
+      # STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      # SEGMENT_WRITE_KEY: ${SEGMENT_WRITE_KEY}
+      # CUSTOMERIO_SITE_ID: ${CUSTOMERIO_SITE_ID}
+      # CUSTOMERIO_API_KEY: ${CUSTOMERIO_API_KEY}
+      # CUSTOMERIO_APP_API_KEY: ${CUSTOMERIO_APP_API_KEY}
+      # ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
+      # GCLOUD_PROJECT_ID: ${GCLOUD_PROJECT_ID}
+      # GCLOUD_PRIVATE_KEY: ${GCLOUD_PRIVATE_KEY}
+      # GCLOUD_CLIENT_EMAIL: ${GCLOUD_CLIENT_EMAIL}
+      # GCLOUD_BUCKET_NAME: ${GCLOUD_BUCKET_NAME}
+      # PDF_SERVICES_CLIENT_ID: ${PDF_SERVICES_CLIENT_ID}
+      # PDF_SERVICES_CLIENT_SECRET: ${PDF_SERVICES_CLIENT_SECRET}
+networks:
+  dev_test:
+    driver: bridge

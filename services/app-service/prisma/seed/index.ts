@@ -1,5 +1,5 @@
-import dbClient from "../../src/utils/prisma";
-import seedUsers from "./users";
+import dbClient from "../../src/utils/prisma.js";
+import seedUsers from "./users.js";
 
 const seed = async () => {
   await seedUsers(dbClient);
@@ -12,9 +12,13 @@ const seed = async () => {
   // Rooms
   // Permissions
 };
-
-seed().catch((e) => {
-  console.error(e);
-  // @ts-ignore
-  process.exit(1);
-});
+seed()
+  .then(async () => {
+    await dbClient.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await dbClient.$disconnect();
+    // @ts-ignore
+    process.exit(1);
+  });

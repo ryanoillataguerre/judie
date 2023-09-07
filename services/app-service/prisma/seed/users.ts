@@ -22,8 +22,12 @@ const users = [
 const seed = async (prismaClient: PrismaClient) => {
   return await Promise.all(
     users.map((user) =>
-      prismaClient.user.create({
-        data: user,
+      prismaClient.user.upsert({
+        where: {
+          email: user.email,
+        },
+        update: user,
+        create: user,
       })
     )
   );

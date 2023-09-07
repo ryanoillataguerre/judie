@@ -413,11 +413,11 @@ export const bulkInvite = async (
   );
   // Send invite emails
   await Promise.all(
-    invites.map(async (invite) => {
-      await sendInviteEmail({
+    invites.map((invite) =>
+      sendInviteEmail({
         invite,
-      });
-    })
+      })
+    )
   );
   return invites;
 };
