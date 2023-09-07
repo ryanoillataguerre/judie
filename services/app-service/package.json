@@ -7,14 +7,13 @@
   "type": "module",
   "exports": "./dist/index.js",
   "scripts": {
-    "setup": "yarn run migrate && yarn run generate",
     "start": "node dist/index.js",
     "build": "tsc",
     "dev:test": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/test-server.ts",
     "dev": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.ts",
-    "test": "yarn run setup && yarn run db:seed && jest",
+    "test": "jest",
     "db:seed": "node --experimental-specifier-resolution=node --loader ts-node/esm ./prisma/seed/index.ts",
-    "generate": "prisma generate --schema prisma/schema.prisma --generator client --skip-generate",
+    "generate": "prisma generate --schema prisma/schema.prisma --skip-generate",
     "migrate": "prisma migrate dev",
     "migrate:soft": "prisma migrate dev --create-only",
     "migrate:prod": "prisma migrate deploy"

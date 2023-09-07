@@ -35,8 +35,9 @@ services:
       - /bin/sh
       - -c
       - |
-        yarn setup
-        yarn db:seed
+        yarn run migrate
+        (yarn run generate || true)
+        yarn run db:seed
         yarn test
     depends_on:
       - postgrestest
