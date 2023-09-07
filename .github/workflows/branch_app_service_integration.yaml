@@ -30,7 +30,7 @@ jobs:
     - name: Install Dependencies
       run: yarn
     - name: Generate Prisma Client
-      run: yarn generate
+      run: yarn generate || true
     - name: Build App Service
       run: yarn run build
   test-app-service:

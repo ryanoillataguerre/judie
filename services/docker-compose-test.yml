@@ -31,6 +31,8 @@ services:
     build:
       context: ./app-service
       dockerfile: ./Dockerfile.test
+    volumes:
+      - ./app-service/src:/app/src
     command:
       - /bin/sh
       - -c
