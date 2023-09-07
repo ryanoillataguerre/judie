@@ -20,7 +20,6 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(sessionLayer());
 app.use(morganLogger());
-
 // Webhooks
 app.use(
   "/webhooks",
