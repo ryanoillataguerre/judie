@@ -1,4 +1,4 @@
-name: App Service Branch Build
+name: App Service Branch Integration
 
 on:
   push:
@@ -30,3 +30,18 @@ jobs:
     - name: Build App Service
       run: yarn run build
       working-directory: services/app-service
+  test-app-service:
+    name: Test App Service
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: Run app-service Test Suite
+      run: make test
