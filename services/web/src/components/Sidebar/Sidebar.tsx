@@ -92,13 +92,15 @@ const FolderButton = ({
   const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
   const purpleHexCode = useToken("colors", colorKey);
   const buttonBgColor = useColorModeValue("#F6F6F6", "gray.800");
+  const activeBGColor = useColorModeValue("blackAlpha.200", "gray.700");
+
   return (
     <Button
       variant={"solid"}
       width={"16rem"}
       borderRadius={"0.5rem"}
       height={"100%"}
-      bgColor={buttonBgColor}
+      bgColor={router.query.folderId === id ? activeBGColor : buttonBgColor}
       alignItems={"center"}
       justifyContent={"flex-start"}
       onClick={() => {
@@ -249,6 +251,8 @@ const Sidebar = () => {
   const bgColor = useColorModeValue("#FFFFFF", "gray.900");
   const bgColorMobile = useColorModeValue("#FFFFFF", "gray.900");
 
+  const activeBGColor = useColorModeValue("#F6F6F6", "gray.700");
+
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
     base: {
       position: "absolute",
@@ -269,7 +273,7 @@ const Sidebar = () => {
       animate={{
         width: isSidebarOpen ? "18rem" : "2.5rem",
         // height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
-        opacity: isSidebarOpen ? 1 : 0.5,
+        // opacity: isSidebarOpen ? 1 : 0.5,
       }}
       bgColor={{ base: bgColorMobile, md: bgColor }}
       height={
@@ -364,6 +368,7 @@ const Sidebar = () => {
             onClick={() => {
               router.push("/dashboard");
             }}
+            bg={router.route === "/dashboard" ? activeBGColor : "transparent"}
           >
             <BiHomeAlt size={18} style={{ marginRight: "0.6rem" }} />
             Dashboard
@@ -379,6 +384,7 @@ const Sidebar = () => {
             onClick={() => {
               router.push("/settings");
             }}
+            bg={router.route === "/settings" ? activeBGColor : "transparent"}
           >
             <FiSettings size={18} style={{ marginRight: "0.6rem" }} />
             Settings
