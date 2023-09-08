@@ -247,6 +247,8 @@ const Sidebar = () => {
   }, [auth, router, onAdminClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "gray.900");
+  const bgColorMobile = useColorModeValue("#FFFFFF", "gray.900");
+
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
     base: {
       position: "absolute",
@@ -265,15 +267,15 @@ const Sidebar = () => {
     <ChakraMotionBox
       initial={false}
       animate={{
-        width: isSidebarOpen ? "18rem" : "2rem",
-        height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
+        width: isSidebarOpen ? "18rem" : "2.5rem",
+        // height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
         opacity: isSidebarOpen ? 1 : 0.5,
       }}
-      bgColor={bgColor}
+      bgColor={{ base: bgColorMobile, md: bgColor }}
       height={
         isSidebarOpen
           ? { base: "calc(100vh - 2rem)", md: "calc(100vh - 2rem)" }
-          : { base: "5rem", md: "calc(100vh - 2rem)" }
+          : { base: "4.5rem", md: "calc(100vh - 2rem)" }
       }
       marginLeft={{ base: 1, md: "1rem" }}
       style={{
@@ -447,14 +449,16 @@ const Sidebar = () => {
           </Flex>
         </>
       ) : (
-        <BiChevronsRight
-          size={24}
-          color={purpleHexCode}
-          cursor={"pointer"}
-          onClick={() => {
-            toggleSidebar();
-          }}
-        />
+        <Box ml={1}>
+          <BiChevronsRight
+            size={24}
+            color={purpleHexCode}
+            cursor={"pointer"}
+            onClick={() => {
+              toggleSidebar();
+            }}
+          />
+        </Box>
       )}
     </ChakraMotionBox>
   );
