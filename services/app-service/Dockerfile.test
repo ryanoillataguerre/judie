@@ -1,0 +1,11 @@
+FROM node:20
+
+WORKDIR /app
+COPY package.json package.json
+COPY yarn.lock yarn.lock
+COPY prisma/ prisma/
+COPY . .
+
+RUN yarn
+
+CMD ["yarn", "dev:test"]
