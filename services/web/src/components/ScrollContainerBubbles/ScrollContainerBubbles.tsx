@@ -22,7 +22,7 @@ const ScrollContainerBubbles = ({
 
   const chatContext = useContext(ChatContext);
   const subject = chatContext.chat?.subject;
-  const bgColor = useColorModeValue("#FFF", "whiteAlpha.300");
+  const bgColor = useColorModeValue("gray.200", "gray.700");
   const fontColor = useColorModeValue("#000", "#FFF");
   const subjectBorderColor = useColorModeValue(
     "rgba(60, 20, 120, 0.80)",
