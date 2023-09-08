@@ -33,3 +33,37 @@ gcloud projects add-iam-policy-binding sandbox-382905 \
     --member="serviceAccount:terraform@sandbox-382905.iam.gserviceaccount.com" \
     --role="roles/artifactregistry.admin"
 ```
+
+I also had to add certain roles to the terraform service account
+
+And in production:
+
+```
+gcloud iam workload-identity-pools create "github-actions" \
+  --project="production-382518" \
+  --location="global" \
+  --display-name="Github Action Pool"
+```
+
+```
+gcloud iam workload-identity-pools providers create-oidc "gha-provider" \
+  --project="production-382518" \
+  --location="global" \
+  --workload-identity-pool="github-actions" \
+  --display-name="Github Action Provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+```
+
+```
+gcloud iam service-accounts add-iam-policy-binding "terraform@production-382518.iam.gserviceaccount.com" \
+  --project="production-382518" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/617839389948/locations/global/workloadIdentityPools/github-actions/attribute.repository/judie/judie"
+```
+
+```
+gcloud projects add-iam-policy-binding production-382518 \
+    --member="serviceAccount:terraform@production-382518.iam.gserviceaccount.com" \
+    --role="roles/artifactregistry.admin"
+```

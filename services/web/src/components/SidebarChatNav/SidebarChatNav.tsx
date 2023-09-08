@@ -27,6 +27,7 @@ import { ChatContext } from "@judie/hooks/useChat";
 import { useContext } from "react";
 import { useRouter } from "next/router";
 import SidebarChatItem from "@judie/components/SidebarChatItem/SidebarChatItem";
+import { useSidebarOpenClose } from "@judie/context/sidebarOpenCloseProvider";
 
 const SidebarChatNav = () => {
   const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
@@ -43,6 +44,7 @@ const SidebarChatNav = () => {
   const toast = useToast();
 
   const chatContext = useContext(ChatContext);
+  const { isSidebarOpen } = useSidebarOpenClose();
 
   const router = useRouter();
   const auth = useAuth();
@@ -198,7 +200,11 @@ const SidebarChatNav = () => {
       </Modal>
 
       <Flex
-        display={{ base: "none", lg: "flex" }}
+        display={
+          isSidebarOpen
+            ? { base: "none", xl: "flex" }
+            : { base: "none", lg: "flex" }
+        }
         direction={"column"}
         w={"300px"}
         minW={"300px"}

@@ -189,6 +189,14 @@ const SubjectCloud = ({
     md: "70%",
   });
   const bgColor = useColorModeValue("#FFF", "whiteAlpha.300");
+  const tagColor = useColorModeValue(
+    {
+      bg: "gray.100",
+    },
+    {
+      bg: "whiteAlpha.200",
+    }
+  );
   const fontColor = useColorModeValue("#000", "#FFF");
   const subjectBorderColor = useColorModeValue(
     "rgba(60, 20, 120, 0.80)",
@@ -221,6 +229,7 @@ const SubjectCloud = ({
           py={"10px"}
           border={"1px solid #d3d3d3"}
           borderColor={subjectBorderColor}
+          _hover={tagColor}
           top={0}
           zIndex={1}
           color={fontColor}
@@ -398,10 +407,17 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                 w={"80%"}
               >
                 <VStack w={"100%"} alignItems={"center"} h={"100%"} pt={"5rem"}>
-                  <Text variant={"header"}>
+                  <Text
+                    variant={"header"}
+                    textAlign={{ base: "center", md: "unset" }}
+                  >
                     It&apos;s a great time to learn!
                   </Text>
-                  <Text variant={"subheaderDetail"} mb={"2rem"}>
+                  <Text
+                    variant={"subheaderDetail"}
+                    mb={"2rem"}
+                    textAlign={{ base: "center", md: "unset" }}
+                  >
                     Select a topic below to get started
                   </Text>
                   <SubjectCloud onSelectSubject={submitSubject} />
