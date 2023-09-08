@@ -133,6 +133,7 @@ const SigninForm = () => {
           >
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
+              tabIndex={1}
               id="email"
               type={"email"}
               autoComplete="email"
@@ -160,6 +161,7 @@ const SigninForm = () => {
                 />
               </InputRightElement>
               <Input
+                tabIndex={2}
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"

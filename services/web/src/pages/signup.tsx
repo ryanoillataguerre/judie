@@ -204,6 +204,7 @@ export const SignupForm = ({
           >
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
+              tabIndex={1}
               id="email"
               type={"email"}
               autoComplete="email"
@@ -239,6 +240,7 @@ export const SignupForm = ({
                 />
               </InputRightElement>
               <Input
+                tabIndex={2}
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
