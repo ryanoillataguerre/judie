@@ -45,6 +45,10 @@ resource "google_sql_database_instance" "default" {
       zone = "us-west1-a"
     }
   }
+
+  lifecycle {
+    ignore_changes = [settings[0].ip_configuration]
+  }
 }
 
 resource "random_password" "password" {

@@ -260,8 +260,15 @@ module "app-service" {
     {
       key   = "GCLOUD_BUCKET_NAME"
       value = local.bucket_name
+    },
+    {
+      key   = "PDF_SERVICES_CLIENT_ID"
+      value = var.env_pdf_services_client_id
+    },
+    {
+      key   = "PDF_SERVICES_CLIENT_SECRET"
+      value = var.env_pdf_services_client_secret
     }
-
   ]
   execution_environment          = "gen1"
   http2                          = false

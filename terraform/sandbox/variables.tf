@@ -79,3 +79,13 @@ variable "wolfram_app_id" {
   type        = string
   description = "Application ID for Wolfram API access"
 }
+
+variable "env_pdf_services_client_id" {
+  type        = string
+  description = "PDF Services client ID"
+}
+
+variable "env_pdf_services_client_secret" {
+  type        = string
+  description = "PDF Services client secret"
+}
