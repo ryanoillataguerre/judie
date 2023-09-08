@@ -195,7 +195,7 @@ export const forgotPassword = async ({
   const url = `${
     `${
       env === Environment.Local ? origin.slice(0, 7) : origin.slice(0, 8)
-    }app.${origin.slice(8, origin.length)}` || "https://app.judie.io"
+    }${origin.slice(8, origin.length)}` || "https://app.judie.io"
   }/reset-password?token=${token}`;
   // Send email with link to reset password
   return await sendUserForgotPasswordEmail({
