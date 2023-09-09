@@ -5,7 +5,7 @@ from inference_service.openai_manager import openai_manager
 
 
 def generate_question_answer_prompt(question: str, subject: str = None) -> str:
-    special_context = None
+    special_context = []
 
     try:
         if subject:
@@ -15,8 +15,8 @@ def generate_question_answer_prompt(question: str, subject: str = None) -> str:
             if subject in prompt_chunks.MATH_SUBJECTS:
                 math_expr = openai_manager.identify_math_exp(question)
                 if "none" != str.lower(math_expr):
-                    special_context = math_api_handler.pull_show_steps(
-                        math_expresion=math_expr
+                    special_context.append(
+                        math_api_handler.pull_show_steps(math_expresion=math_expr)
                     )
 
         else:

@@ -54,7 +54,7 @@ def grab_chat_config(chat_id: Optional[str]) -> SessionConfig:
     return SessionConfig(
         history=prisma_manager.get_chat_history(chat_id=chat_id),
         subject=prisma_manager.get_subject_from_chat(chat_obj),
-        special_context=prisma_manager.get_special_context_from_chat(chat_obj)
+        special_context=prisma_manager.get_special_context_from_chat(chat_obj),
     )
 
 

@@ -80,7 +80,9 @@ def get_chat_local():
     raise NotImplementedError
 
 
-def get_chat(chat_id: str, app_db: Optional[prisma.Prisma] = None) -> prisma.models.Chat:
+def get_chat(
+    chat_id: str, app_db: Optional[prisma.Prisma] = None
+) -> prisma.models.Chat:
     if not app_db:
         app_db = prisma.Prisma()
 
@@ -105,7 +107,9 @@ def get_subject_from_chat(chat: prisma.models.Chat) -> str:
     return str(chat.subject)
 
 
-def get_assignment_from_db(chat_id:str, app_db: Optional[prisma.Prisma] = None) -> Optional[str]:
+def get_assignment_from_db(
+    chat_id: str, app_db: Optional[prisma.Prisma] = None
+) -> Optional[str]:
     if not app_db:
         app_db = prisma.Prisma()
 
@@ -125,7 +129,7 @@ def get_assignment_from_db(chat_id:str, app_db: Optional[prisma.Prisma] = None) 
 def get_special_context_from_chat(chat: prisma.models.Chat) -> List[str]:
     context = []
     for tag in chat.tags:
-        if tag == 'assignment':
+        if tag == "assignment":
             special_content = get_assignment_from_db(chat_id=chat.id)
         else:
             continue

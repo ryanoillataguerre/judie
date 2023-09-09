@@ -37,10 +37,12 @@ def test_get_subject_db(env_setup):
     subject = prisma_manager.get_subject_from_db(chat_id=TEST_CHAT_ID_1)
     assert subject == "AP Art History"
 
+
 def test_get_subject_chat(env_setup):
     chat = prisma_manager.get_chat(chat_id=TEST_CHAT_ID_1)
     subject = prisma_manager.get_subject_from_chat(chat)
     assert subject == "AP Art History"
+
 
 def test_get_special_context(env_setup):
     chat = prisma_manager.get_chat(chat_id=LOCAL_ID_1)
