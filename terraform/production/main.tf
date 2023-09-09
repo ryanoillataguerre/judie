@@ -61,6 +61,7 @@ module "sql_db" {
   disk_size            = 100
   backups_enabled      = true
   private_network_link = module.vpc.private_network_link
+  max_connections      = 1000
 
   depends_on = [module.vpc]
 }
