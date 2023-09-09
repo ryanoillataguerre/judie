@@ -99,6 +99,19 @@ router.post(
           },
         },
       });
+      await createPermission({
+        type: PermissionType.ORG_ADMIN,
+        organization: {
+          connect: {
+            id: organization.id,
+          },
+        },
+        invite: {
+          connect: {
+            id: newInvite.id,
+          },
+        },
+      });
       await sendInviteEmail({ invite: newInvite });
     }
 
