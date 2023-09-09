@@ -263,16 +263,20 @@ const ChatHeader = ({
         py={5}
         width={"100%"}
       >
-        <HStack paddingRight={"1rem"}>
-          <BsArrowLeft
-            size={20}
-            style={{
-              margin: "0 1rem",
-            }}
-            onClick={() => router.back()}
-            cursor={"pointer"}
-          />
-          <Text variant={"subheader"}>{title}</Text>
+        <HStack paddingRight={"1rem"} ml={8}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
+          <Text fontSize={{ base: "18px", md: "22px" }} variant={"subheader"}>
+            {title}
+          </Text>
         </HStack>
         <AddToFolderButton chatId={id} existingFolderId={folderId} />
       </HStack>
@@ -371,7 +375,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       w={"100%"}
       gap={0}
       direction={"column"}
-      p={{ base: "4px 4px 4px 6px", md: "20px 20px 20px 30px" }}
+      p={{ base: 1, md: "20px 20px 20px 30px" }}
     >
       <ChatHeader
         id={chat?.id}

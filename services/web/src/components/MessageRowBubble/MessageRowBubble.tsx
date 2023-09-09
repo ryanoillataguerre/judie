@@ -102,6 +102,7 @@ const NarrateButton = ({ message }: { message: Message }) => {
     <Button
       variant={"ghost"}
       size={"sm"}
+      pr={{ base: 2, md: "12px" }}
       onClick={() =>
         hasAudio
           ? isPlaying
@@ -181,12 +182,12 @@ const MessageRow = ({
           message.type === MessageType.USER ? "flex-start" : "flex-end"
         }
         paddingLeft={{
-          base: message.type === MessageType.USER ? "9px" : "16px",
+          base: message.type === MessageType.USER ? "9px" : "4px",
           md: message.type === MessageType.USER ? "9px" : "25px",
           lg: message.type === MessageType.USER ? "9px" : "50px",
         }}
         paddingRight={{
-          base: message.type === MessageType.USER ? "9px" : "9px",
+          base: message.type === MessageType.USER ? "4px" : "9px",
           md: message.type === MessageType.USER ? "25px" : "9px",
           lg: message.type === MessageType.USER ? "50px" : "9px",
         }}

@@ -1,4 +1,4 @@
-name: Web Branch Build
+name: Branch Web Integration
 
 on:
   push:
