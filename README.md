@@ -4,20 +4,22 @@ Judie monorepo
 
 The repo is structured as follows
 
-```
-services
-- {service}
--- service code
-terraform
-- modules
--- common modules we use across ENVs that were made reusable
-- {environment}
--- {environment} infrastructure
-infrastructure
-- Random utils
-notebooks
-- Jupyter Notebooks for ML team
-```
+`services/`
+  - `{service}`
+    - `{service}` specific application code
+
+`terraform/`
+  - `modules`
+    - common modules we use across ENVs that were made reusable
+  - `{environment}`
+    - `{environment}` specific infrastructure
+
+`infrastructure/`
+  - Local utils
+
+`notebooks/`
+  - Jupyter Notebooks for ML team
+
 
 # To Start Up Services Locally
 
