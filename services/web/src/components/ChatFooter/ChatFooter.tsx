@@ -369,7 +369,6 @@ const ChatFooter = () => {
               rows={1}
               fontSize={{ base: "16px", md: "18px" }}
               flex={1}
-              whiteSpace={"nowrap"}
               lineHeight={{ base: "25px", md: "23px" }}
             />
           )}
