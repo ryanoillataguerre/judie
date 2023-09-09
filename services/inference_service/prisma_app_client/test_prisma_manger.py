@@ -1,7 +1,11 @@
 from dotenv import load_dotenv
 import pytest
 from inference_service.prisma_app_client import prisma_manager
-from inference_service.test_client.test_chats_config import TEST_CHAT_ID_1, LOCAL_ID_1
+from inference_service.test_client.test_chats_config import (
+    TEST_CHAT_ID_1,
+    LOCAL_ID_1,
+    LOCAL_ID_2,
+)
 
 
 @pytest.fixture
@@ -49,3 +53,8 @@ def test_get_special_context(env_setup):
     context = prisma_manager.get_special_context_from_chat(chat)
     print(context)
     assert "This is a closed book exam." in context[0]
+
+    chat = prisma_manager.get_chat(chat_id=LOCAL_ID_2)
+    context = prisma_manager.get_special_context_from_chat(chat)
+    print(context)
+    assert context == []

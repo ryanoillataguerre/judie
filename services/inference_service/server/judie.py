@@ -24,7 +24,9 @@ def yield_judie_response(
 
     if history.last_msg_is_user():
         sys_prompt = prompt_generator.generate_question_answer_prompt(
-            question=history.get_last_user_message(), subject=config.subject
+            question=history.get_last_user_message(),
+            subject=config.subject,
+            extra_context=config.special_context,
         )
         logger.info(f"Full prompt: {sys_prompt}")
 
