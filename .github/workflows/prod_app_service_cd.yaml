@@ -1,4 +1,4 @@
-name: Prod app-service CD
+name: Production app-service CD
 
 on:
   push:
