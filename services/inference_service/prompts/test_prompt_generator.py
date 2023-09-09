@@ -47,7 +47,7 @@ def test_special_context_block(env_setup):
     context = pull_context_block(
         query="What is photosynthesis?",
         subject="AP Biology",
-        special_context="Is the Pope Catholic?",
+        special_context=["Is the Pope Catholic?"],
     )
     assert "the Pope" in context
 

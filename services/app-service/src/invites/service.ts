@@ -340,9 +340,30 @@ export const bulkInvite = async (
 ) => {
   const schoolNameToIdMap = new Map<string, string>();
   const roomNameToIdMap = new Map<string, string>();
-  // Validate the admin can invite for every row
+
   const validatePermissionsPromises = [];
+  const validInvitesToCreate = [];
+  // Ensure the invite to this email doesn't exist already
   for (const invite of params.invites) {
+    const sameEmailInvite = await dbClient.invite.findFirst({
+      where: {
+        email: invite.email,
+      },
+    });
+    if (sameEmailInvite) {
+      console.info(
+        "Skipping creating invite for email",
+        invite.email,
+        "because they already have an invite"
+      );
+      await sendInviteEmail({
+        invite: sameEmailInvite,
+      });
+      // Remove this invite from the list
+      continue;
+    }
+    validInvitesToCreate.push(invite);
+    // Validate the admin can invite for every row
     validatePermissionsPromises.push(async () => {
       let schoolId = undefined;
       let roomId = undefined;
@@ -390,7 +411,7 @@ export const bulkInvite = async (
   // Permissions validated! Create invites and send them out
   // Create invites
   const invites = await dbClient.$transaction(
-    params.invites.map((invite) =>
+    validInvitesToCreate.map((invite) =>
       dbClient.invite.create({
         data: {
           email: invite.email,
@@ -412,12 +433,18 @@ export const bulkInvite = async (
     )
   );
   // Send invite emails
-  await Promise.all(
-    invites.map((invite) =>
-      sendInviteEmail({
-        invite,
-      })
-    )
-  );
+
+  // Chunk promises into batches of 50
+  let emailChunks = [];
+  const emailChunkSize = 200;
+  for (let i = 0; i < validatePermissionsPromises.length; i += emailChunkSize) {
+    emailChunks.push(validatePermissionsPromises.slice(i, i + emailChunkSize));
+  }
+
+  // Run chunks in sequence
+  for (const chunk of chunks) {
+    await Promise.all(chunk);
+  }
+
   return invites;
 };

@@ -67,3 +67,4 @@ class History:
 class SessionConfig:
     history: History
     subject: Optional[str] = None
+    special_context: Optional[List[str]] = None
