@@ -1,4 +1,4 @@
-name: App Service Branch Integration
+name: Branch App Service Integration
 
 on:
   push:
