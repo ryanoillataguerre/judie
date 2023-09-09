@@ -30,3 +30,9 @@ variable "private_network_link" {
   type        = string
   description = "Private network link"
 }
+
+variable "max_connections" {
+  type        = number
+  default     = 100
+  description = "Max connections"
+}
