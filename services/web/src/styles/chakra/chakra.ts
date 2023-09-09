@@ -148,7 +148,6 @@ const theme = extendTheme({
       lightGray2: "#E2E8F0",
       lightPrimary: "#C31478",
       backgroundLight: "#F6F6F6",
-      backgroundDark: "gray.800",
     },
     // Customized at https://themera.vercel.app/
     purple: {

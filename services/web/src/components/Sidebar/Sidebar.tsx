@@ -92,13 +92,15 @@ const FolderButton = ({
   const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
   const purpleHexCode = useToken("colors", colorKey);
   const buttonBgColor = useColorModeValue("#F6F6F6", "gray.800");
+  const activeBGColor = useColorModeValue("blackAlpha.200", "gray.700");
+
   return (
     <Button
       variant={"solid"}
       width={"16rem"}
       borderRadius={"0.5rem"}
       height={"100%"}
-      bgColor={buttonBgColor}
+      bgColor={router.query.folderId === id ? activeBGColor : buttonBgColor}
       alignItems={"center"}
       justifyContent={"flex-start"}
       onClick={() => {
@@ -247,6 +249,10 @@ const Sidebar = () => {
   }, [auth, router, onAdminClick]);
 
   const bgColor = useColorModeValue("#FFFFFF", "gray.900");
+  const bgColorMobile = useColorModeValue("#FFFFFF", "gray.900");
+
+  const activeBGColor = useColorModeValue("#F6F6F6", "gray.700");
+
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
     base: {
       position: "absolute",
@@ -255,20 +261,31 @@ const Sidebar = () => {
     },
     md: {},
   });
+  const mobileVsDesktopClosedMenuHeight = useBreakpointValue({
+    base: {
+      height: "4.5",
+    },
+    md: { height: "calc(100vh - 2rem)" },
+  });
   return (
     <ChakraMotionBox
       initial={false}
       animate={{
-        width: isSidebarOpen ? "18rem" : "2rem",
-        opacity: isSidebarOpen ? 1 : 0.5,
+        width: isSidebarOpen ? "18rem" : "2.5rem",
+        // height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
+        // opacity: isSidebarOpen ? 1 : 0.5,
       }}
-      bgColor={bgColor}
+      bgColor={{ base: bgColorMobile, md: bgColor }}
+      height={
+        isSidebarOpen
+          ? { base: "calc(100vh - 2rem)", md: "calc(100vh - 2rem)" }
+          : { base: "4.5rem", md: "calc(100vh - 2rem)" }
+      }
+      marginLeft={{ base: 1, md: "1rem" }}
       style={{
         display: "flex",
-        height: "calc(100vh - 2rem)",
         borderRadius: "1.375rem",
         marginTop: "1rem",
-        marginLeft: "1rem",
         marginBottom: "1rem",
         ...(isSidebarOpen
           ? {
@@ -351,6 +368,7 @@ const Sidebar = () => {
             onClick={() => {
               router.push("/dashboard");
             }}
+            bg={router.route === "/dashboard" ? activeBGColor : "transparent"}
           >
             <BiHomeAlt size={18} style={{ marginRight: "0.6rem" }} />
             Dashboard
@@ -366,6 +384,7 @@ const Sidebar = () => {
             onClick={() => {
               router.push("/settings");
             }}
+            bg={router.route === "/settings" ? activeBGColor : "transparent"}
           >
             <FiSettings size={18} style={{ marginRight: "0.6rem" }} />
             Settings
@@ -436,14 +455,16 @@ const Sidebar = () => {
           </Flex>
         </>
       ) : (
-        <BiChevronsRight
-          size={24}
-          color={purpleHexCode}
-          cursor={"pointer"}
-          onClick={() => {
-            toggleSidebar();
-          }}
-        />
+        <Box ml={1}>
+          <BiChevronsRight
+            size={24}
+            color={purpleHexCode}
+            cursor={"pointer"}
+            onClick={() => {
+              toggleSidebar();
+            }}
+          />
+        </Box>
       )}
     </ChakraMotionBox>
   );

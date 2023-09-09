@@ -26,10 +26,7 @@ const ChatsTable = ({
 }) => {
   const router = useRouter();
 
-  const headerBgColor = useColorModeValue(
-    "brand.backgroundLight",
-    "brand.backgroundDark"
-  );
+  const headerBgColor = useColorModeValue("brand.backgroundLight", "gray.800");
   const rowHoverBgColor = useColorModeValue("gray.100", "gray.700");
   return (
     <TableContainer
