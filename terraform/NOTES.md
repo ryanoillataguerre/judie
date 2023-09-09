@@ -34,7 +34,7 @@ gcloud projects add-iam-policy-binding sandbox-382905 \
     --role="roles/artifactregistry.admin"
 ```
 
-I also had to add certain roles to the terraform service account
+I also had to add certain roles to the terraform service account, but these were one-offs for sandbox and prod service accounts
 
 And in production:
 
