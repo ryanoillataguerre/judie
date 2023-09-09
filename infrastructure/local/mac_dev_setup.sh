@@ -29,6 +29,8 @@ pip install -r $ROOT_DIR/infrastructure/python/dev_requirements.txt
 cd $(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
 echo $ROOT_DIR/services > services.pth
 
+prisma generate --schema $ROOT_DIR/services/app-service/prisma/schema.prisma --generator client-py
+
 cd $ROOT_DIR/services/app-service
 yarn
 
