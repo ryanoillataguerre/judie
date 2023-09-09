@@ -105,4 +105,29 @@ def get_subject_from_chat(chat: prisma.models.Chat) -> str:
     return str(chat.subject)
 
 
-def get_special_context_from_chat(chat: prisma.models.Chat)
+def get_assignment_from_db(chat_id:str, app_db: Optional[prisma.Prisma] = None) -> Optional[str]:
+    if not app_db:
+        app_db = prisma.Prisma()
+
+    app_db.connect()
+
+    assignment = app_db.chatassignment.find_first(
+        where={
+            "chatId": chat_id,
+        },
+    )
+
+    if assignment is not None:
+        return assignment.text
+    return None
+
+
+def get_special_context_from_chat(chat: prisma.models.Chat) -> List[str]:
+    context = []
+    for tag in chat.tags:
+        if tag == 'assignment':
+            special_content = get_assignment_from_db(chat_id=chat.id)
+        else:
+            continue
+        context.append(special_content)
+    return context
