@@ -31,13 +31,9 @@ const SearchBar = ({ title, searchText, setSearchText }: SearchBarProps) => {
   return (
     <Flex flexGrow={1} alignItems={"center"} mb={2}>
       <InputGroup>
-        <InputLeftElement
-          py={15}
-          h={54}
-          pl={4}
-          pointerEvents="none"
-          children={<Search2Icon color="gray.300" />}
-        />
+        <InputLeftElement py={15} h={54} pl={4} pointerEvents="none">
+          <Search2Icon color="gray.300" />
+        </InputLeftElement>
         <Input
           borderRadius={"100px"}
           py={15}
