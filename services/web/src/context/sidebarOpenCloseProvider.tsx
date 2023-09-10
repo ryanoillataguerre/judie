@@ -15,7 +15,7 @@ const getInitalSidebarState = () => {
       return JSON.parse(sidebarOpen);
     }
 
-    return false;
+    return undefined;
   }
 };
 
@@ -27,7 +27,7 @@ const getInitalAdminSidebarState = () => {
       return JSON.parse(sidebarOpen);
     }
 
-    return false;
+    return undefined;
   }
 };
 
@@ -39,9 +39,11 @@ export const SidebarOpenCloseProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isSidebarOpen, setSidebarIsOpen] = useState(getInitalSidebarState);
+  const [isSidebarOpen, setSidebarIsOpen] = useState(
+    getInitalSidebarState ?? true
+  );
   const [isAdminSidebarOpen, setAdminSidebarIsOpen] = useState(
-    getInitalAdminSidebarState
+    getInitalAdminSidebarState ?? true
   );
 
   const toggleSidebar = () => {
