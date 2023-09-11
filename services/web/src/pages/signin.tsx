@@ -1,9 +1,9 @@
-import { HTTPResponseError } from "@judie/data/baseFetch";
+import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import Head from "next/head";
 import { useMutation } from "react-query";
 import { signinMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -26,6 +26,7 @@ import {
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
+import { getCookie } from "cookies-next";
 
 interface SubmitData {
   email: string;
@@ -35,6 +36,7 @@ interface SubmitData {
 const SigninForm = () => {
   const router = useRouter();
   const toast = useToast();
+
   const { handleSubmit, register } = useForm<SubmitData>({
     defaultValues: {
       email: "",
@@ -246,7 +248,17 @@ const SigninPage = () => {
   const router = useRouter();
   useUnauthRedirect();
   useAuth({ allowUnauth: true });
+  const { logout } = useAuth();
+  const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+
+  // clear session cookie on signin page if still present
+  useEffect(() => {
+    if (sessionCookie) {
+      logout();
+    }
+  }, []);
+
   return (
     <>
       <Head>

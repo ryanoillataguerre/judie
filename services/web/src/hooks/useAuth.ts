@@ -90,6 +90,7 @@ export default function useAuth({
     });
     setSessionCookie(undefined);
     setUserData(undefined);
+    router.push("/signin");
   }, [setUserData, setSessionCookie, reset]);
 
   // GET /users/me
