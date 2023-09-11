@@ -449,7 +449,7 @@ const Sidebar = () => {
               return iconData.label ? (
                 <SidebarButton key={iconData.key} {...iconData} />
               ) : (
-                iconData.icon
+                <Box key={iconData.key}>{iconData.icon}</Box>
               );
             })}
           </Flex>
