@@ -14,6 +14,13 @@ const config = {
   moduleNameMapper: {
     "@/Judie/components/(.*)": "<rootDir>/components/$1",
     "@/Judie/pages/(.*)": "<rootDir>/pages/$1",
+    "^.+\\.svg$": "jest-svg-transformer",
+    // "@/Judie/web/node_modules/(.*)": "<rootDir>/web/node_modules/$1",
+  },
+
+  transform: {
+    // "^.+\\.jsx?$": "babel-jest",
+    // "^.+\\.svg$": "jest-svg-transformer",
   },
 
   testEnvironment: "jest-environment-jsdom",
