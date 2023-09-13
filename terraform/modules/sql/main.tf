@@ -15,6 +15,12 @@ resource "google_sql_database_instance" "default" {
       value = var.max_connections
     }
 
+    # necessary for change logs
+    database_flags {
+      name  = "cloudsql.logical_decoding"
+      value = var.logical_decoding
+    }
+
     backup_configuration {
       enabled = var.backups_enabled
     }
@@ -35,11 +41,31 @@ resource "google_sql_database_instance" "default" {
       }
       authorized_networks {
         name  = "brody-cupertino"
-        value = "24.7.118.219"
+        value = "174.160.87.132"
       }
       authorized_networks {
         name  = "brody-oc"
         value = "72.196.69.192"
+      }
+      authorized_networks {
+        name  = "datastream_1"
+        value = "34.82.254.46"
+      }
+      authorized_networks {
+        name  = "datastream_2"
+        value = "35.247.10.221"
+      }
+      authorized_networks {
+        name  = "datastream_3"
+        value = "34.82.253.59"
+      }
+      authorized_networks {
+        name  = "datastream_4"
+        value = "35.233.208.195"
+      }
+      authorized_networks {
+        name  = "datastream_5"
+        value = "35.247.95.52"
       }
 
       ipv4_enabled    = true
