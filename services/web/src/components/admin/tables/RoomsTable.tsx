@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import DeleteRoomModal from "../DeleteRoomModal";
+import SearchBar from "@judie/components/SearchBar/SearchBar";
 
 const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
 
   const [deleteRoomId, setDeleteRoomId] = useState<string | null>();
   const [deleteRoomName, setDeleteRoomName] = useState<string | null>();
+  const [searchText, setSearchText] = useState("");
 
   const openDeleteModal = (roomId: string, roomName: string) => {
     setDeleteRoomId(roomId);
@@ -39,6 +41,11 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
           }}
         />
       )}
+      <SearchBar
+        title="Rooms"
+        searchText={searchText}
+        setSearchText={setSearchText}
+      />
       <Table variant={"simple"} size="md">
         <Thead>
           <Tr>
@@ -47,37 +54,48 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
           </Tr>
         </Thead>
         <Tbody>
-          {rooms?.map((room) => (
-            <Tr
-              key={room.id}
-              _hover={{
-                backgroundColor: rowBackgroundColor,
-                transition: "ease-in-out 0.3s",
-              }}
-            >
-              <Td
-                onClick={() => {
-                  router.push(`/admin/rooms/${room.id}`);
+          {rooms
+            ?.filter((room) => {
+              if (searchText.trim() == "") {
+                return true;
+              }
+              const searchString = `${room.name}`;
+
+              return searchString
+                .toLowerCase()
+                .includes(searchText.toLowerCase());
+            })
+            .map((room) => (
+              <Tr
+                key={room.id}
+                _hover={{
+                  backgroundColor: rowBackgroundColor,
+                  transition: "ease-in-out 0.3s",
                 }}
-                cursor={"pointer"}
               >
-                {room.name}
-              </Td>
-              <Td>
-                <Button
-                  size="sm"
-                  variant={"ghost"}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    openDeleteModal(room.id, room.name);
+                <Td
+                  onClick={() => {
+                    router.push(`/admin/rooms/${room.id}`);
                   }}
+                  cursor={"pointer"}
                 >
-                  <FaTrashAlt size={16} color={"red"} />
-                </Button>
-              </Td>
-            </Tr>
-          ))}
+                  {room.name}
+                </Td>
+                <Td>
+                  <Button
+                    size="sm"
+                    variant={"ghost"}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openDeleteModal(room.id, room.name);
+                    }}
+                  >
+                    <FaTrashAlt size={16} color={"red"} />
+                  </Button>
+                </Td>
+              </Tr>
+            ))}
         </Tbody>
       </Table>
     </TableContainer>

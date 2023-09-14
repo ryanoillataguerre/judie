@@ -26,6 +26,8 @@ import PermissionsWidget from "./PermissionsWidget";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import { ReactSpreadsheetImport } from "react-spreadsheet-import";
 import useAdminActiveOrganization from "@judie/hooks/useAdminActiveOrganization";
+import { uploadThemeOverride } from "@judie/styles/chakra/chakra";
+import { useColorModeValue } from "@chakra-ui/react";
 
 interface SubmitData {
   gradeYear?: GradeYear;
@@ -367,6 +369,8 @@ const InviteModal = ({
     };
   }, []);
 
+  const theme = useColorModeValue({}, uploadThemeOverride);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
@@ -385,6 +389,7 @@ const InviteModal = ({
             onSubmit={onSubmit}
             fields={fields}
             // rowHook={rowHookValidator}
+            customTheme={theme}
           />
           <Flex
             style={{

@@ -14,12 +14,14 @@ import { useRouter } from "next/router";
 import DeleteSchoolModal from "../DeleteSchoolModal";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
+import SearchBar from "@judie/components/SearchBar/SearchBar";
 
 const SchoolsTable = ({ schools }: { schools: School[] }) => {
   const router = useRouter();
   const rowBackgroundColor = useColorModeValue("gray.100", "gray.700");
   const [deleteSchoolId, setDeleteSchoolId] = useState<string | null>();
   const [deleteSchoolName, setDeleteSchoolName] = useState<string | null>();
+  const [searchText, setSearchText] = useState("");
 
   const openDeleteModal = (roomId: string, schoolName: string) => {
     setDeleteSchoolId(roomId);
@@ -39,6 +41,11 @@ const SchoolsTable = ({ schools }: { schools: School[] }) => {
           }}
         />
       )}
+      <SearchBar
+        title="Schools"
+        searchText={searchText}
+        setSearchText={setSearchText}
+      />
       <Table variant={"simple"} size="md">
         <Thead>
           <Tr>
@@ -47,37 +54,48 @@ const SchoolsTable = ({ schools }: { schools: School[] }) => {
           </Tr>
         </Thead>
         <Tbody>
-          {schools?.map((school) => (
-            <Tr
-              key={school.id}
-              _hover={{
-                backgroundColor: rowBackgroundColor,
-                transition: "ease-in-out 0.3s",
-              }}
-            >
-              <Td
-                onClick={() => {
-                  router.push(`/admin/schools/${school.id}`);
+          {schools
+            ?.filter((school) => {
+              if (searchText.trim() == "") {
+                return true;
+              }
+              const searchString = `${school.name}`;
+
+              return searchString
+                .toLowerCase()
+                .includes(searchText.toLowerCase());
+            })
+            .map((school) => (
+              <Tr
+                key={school.id}
+                _hover={{
+                  backgroundColor: rowBackgroundColor,
+                  transition: "ease-in-out 0.3s",
                 }}
-                cursor={"pointer"}
               >
-                {school.name}
-              </Td>
-              <Td>
-                <Button
-                  size="sm"
-                  variant={"ghost"}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    openDeleteModal(school.id, school.name);
+                <Td
+                  onClick={() => {
+                    router.push(`/admin/schools/${school.id}`);
                   }}
+                  cursor={"pointer"}
                 >
-                  <FaTrashAlt size={16} color={"red"} />
-                </Button>
-              </Td>
-            </Tr>
-          ))}
+                  {school.name}
+                </Td>
+                <Td>
+                  <Button
+                    size="sm"
+                    variant={"ghost"}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openDeleteModal(school.id, school.name);
+                    }}
+                  >
+                    <FaTrashAlt size={16} color={"red"} />
+                  </Button>
+                </Td>
+              </Tr>
+            ))}
         </Tbody>
       </Table>
     </TableContainer>

@@ -80,16 +80,10 @@ export default function useAuth({
 
   const logout = useCallback(() => {
     reset();
-    deleteCookie(SESSION_COOKIE, {
-      path: "/",
-      domain: !isLocal()
-        ? isSandbox()
-          ? "sandbox.judie.io"
-          : "judie.io"
-        : undefined,
-    });
+    deleteCookie(SESSION_COOKIE);
     setSessionCookie(undefined);
     setUserData(undefined);
+    router.push("/signin");
   }, [setUserData, setSessionCookie, reset]);
 
   // GET /users/me

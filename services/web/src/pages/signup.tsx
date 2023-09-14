@@ -1,9 +1,9 @@
-import { HTTPResponseError } from "@judie/data/baseFetch";
+import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import Head from "next/head";
 import { useMutation } from "react-query";
 import { redeemInviteMutation, signupMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -28,6 +28,7 @@ import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 import { UserRole } from "@judie/data/types/api";
+import { getCookie } from "cookies-next";
 
 export interface SignupSubmitData {
   email: string;
@@ -382,7 +383,18 @@ export const SignupForm = ({
 const SignupPage = () => {
   useAuth({ allowUnauth: true });
   useUnauthRedirect();
+  const { logout } = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+
+  const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
+
+  // clear session cookie if still present
+  useEffect(() => {
+    if (sessionCookie) {
+      logout();
+    }
+  }, []);
+
   return (
     <>
       <Head>
