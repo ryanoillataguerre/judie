@@ -4,7 +4,7 @@ from inference_service.prisma_app_client import prisma_manager
 from inference_service.test_client.test_chats_config import (
     TEST_CHAT_ID_1,
     LOCAL_ID_1,
-    LOCAL_ID_2,
+    LOCAL_ID_2, LOCAL_USER_ID
 )
 
 
@@ -58,3 +58,9 @@ def test_get_special_context(env_setup):
     context = prisma_manager.get_special_context_from_chat(chat)
     print(context)
     assert context == []
+
+def test_get_user(env_setup):
+    user = prisma_manager.get_user_from_db(LOCAL_USER_ID)
+    print(user)
+    print(user.role)
+    assert False
