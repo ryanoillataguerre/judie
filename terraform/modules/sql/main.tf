@@ -10,6 +10,11 @@ resource "google_sql_database_instance" "default" {
     pricing_plan      = "PER_USE"
     tier              = var.db_tier
 
+    database_flags {
+      name  = "max_connections"
+      value = var.max_connections
+    }
+
     backup_configuration {
       enabled = var.backups_enabled
     }
@@ -44,6 +49,10 @@ resource "google_sql_database_instance" "default" {
     location_preference {
       zone = "us-west1-a"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [settings[0].ip_configuration]
   }
 }
 

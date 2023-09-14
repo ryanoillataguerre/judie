@@ -14,6 +14,7 @@ import {
 import {
   sendUserForgotPasswordEmail,
   sendVerificationEmail,
+  sendWelcomeEmail,
 } from "../cio/service.js";
 import { sessionStore } from "../utils/express.js";
 import { Environment, getEnv } from "../utils/env.js";
@@ -39,6 +40,7 @@ export const signup = async ({
   role,
   districtOrSchool,
   gradeYear,
+  isB2B,
 }: {
   firstName: string;
   lastName: string;
@@ -48,6 +50,7 @@ export const signup = async ({
   role?: UserRole;
   districtOrSchool?: string;
   gradeYear?: GradeYear;
+  isB2B?: boolean;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -78,6 +81,11 @@ export const signup = async ({
       receivePromotions,
       role: role || UserRole.STUDENT,
       gradeYear,
+      ...(isB2B
+        ? {
+            parentalConsent: true,
+          }
+        : {}),
     },
     include: {
       subscription: true,
@@ -106,6 +114,7 @@ export const signup = async ({
     traits: transformUserForSegment(newUser, districtOrSchool),
   });
 
+  await sendWelcomeEmail({ user: newUser });
   await sendVerificationEmail({ user: newUser });
 
   return newUser;
@@ -133,7 +142,7 @@ export const signin = async ({
   }
 
   // Verify password
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, user.password || "");
   if (!match) {
     throw new UnauthorizedError("Invalid email or password");
   }
@@ -265,4 +274,44 @@ export const destroyUserSession = async ({ userId }: { userId: string }) => {
       console.error("Error destroying session", err);
     }
   });
+};
+
+export const changePassword = async ({
+  userId,
+  oldPassword,
+  newPassword,
+  passwordConfirm,
+}: {
+  userId: string;
+  oldPassword: string;
+  newPassword: string;
+  passwordConfirm: string;
+}) => {
+  if (newPassword !== passwordConfirm) {
+    throw new BadRequestError("Passwords do not match");
+  }
+  // Test old password is accurate
+  const user = await dbClient.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+  if (!user) {
+    throw new UnauthorizedError("No user id found in session");
+  }
+  const match = await bcrypt.compare(oldPassword, user.password || "");
+  if (!match) {
+    throw new BadRequestError("Old password is incorrect");
+  }
+  // Update password
+  const _password = await bcrypt.hash(newPassword, 10);
+  const newUser = await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      password: _password,
+    },
+  });
+  return newUser;
 };

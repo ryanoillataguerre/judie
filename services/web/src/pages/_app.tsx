@@ -8,6 +8,7 @@ import LoadingScreen from "@judie/components/LoadingScreen/LoadingScreen";
 import { useEffect } from "react";
 import theme from "@judie/styles/chakra/chakra";
 import { isProduction } from "@judie/utils/env";
+import SidebarOpenCloseProvider from "@judie/context/sidebarOpenCloseProvider";
 
 const openSans = Open_Sans({
   weight: ["300", "400", "600", "700"],
@@ -40,7 +41,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
+          <SidebarOpenCloseProvider>
+            <Component {...pageProps} />
+          </SidebarOpenCloseProvider>
         </ChakraProvider>
       </QueryClientProvider>
     </>

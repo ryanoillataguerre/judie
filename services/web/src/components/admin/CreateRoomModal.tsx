@@ -67,6 +67,7 @@ const CreateRoomModal = ({
       refetch();
       refreshEntities();
       onClose();
+      reset();
     } catch (err) {}
   };
 

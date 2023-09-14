@@ -20,18 +20,22 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
   const rowBackgroundColor = useColorModeValue("gray.100", "gray.700");
 
   const [deleteRoomId, setDeleteRoomId] = useState<string | null>();
+  const [deleteRoomName, setDeleteRoomName] = useState<string | null>();
 
-  const openDeleteModal = (roomId: string) => {
+  const openDeleteModal = (roomId: string, roomName: string) => {
     setDeleteRoomId(roomId);
+    setDeleteRoomName(roomName);
   };
   return (
     <TableContainer>
       {deleteRoomId && (
         <DeleteRoomModal
           roomId={deleteRoomId}
+          roomName={deleteRoomName}
           isOpen={!!deleteRoomId}
           onClose={() => {
             setDeleteRoomId(null);
+            setDeleteRoomName(null);
           }}
         />
       )}
@@ -66,7 +70,7 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
-                    openDeleteModal(room.id);
+                    openDeleteModal(room.id, room.name);
                   }}
                 >
                   <FaTrashAlt size={16} color={"red"} />

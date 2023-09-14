@@ -1,7 +1,6 @@
 import {
   useMemo,
   useState,
-  useEffect,
   CSSProperties,
   useContext,
   useCallback,
@@ -11,48 +10,43 @@ import {
   Box,
   Button,
   Divider,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Flex,
-  IconButton,
   Image,
-  Input,
   Spinner,
-  Stack,
   Text,
-  Modal,
-  ModalBody,
-  ModalOverlay,
-  ModalContent,
   useColorModeValue,
-  useEditableControls,
   useToast,
   useBreakpointValue,
+  Center,
+  useColorMode,
+  useToken,
+  VStack,
+  chakra,
+  shouldForwardProp,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { TfiTrash } from "react-icons/tfi";
 import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
-import { MdAdminPanelSettings } from "react-icons/md";
+import { MdAdminPanelSettings, MdFeedback } from "react-icons/md";
 import useAuth, { isPermissionTypeAdmin } from "@judie/hooks/useAuth";
-import { ChatContext } from "@judie/hooks/useChat";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import {
-  ChatResponse,
   deleteChatMutation,
   clearConversationsMutation,
-  putChatMutation,
   createChatMutation,
 } from "@judie/data/mutations";
-import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
-import { MessageType } from "@judie/data/types/api";
-import { TbPencil } from "react-icons/tb";
-import { AiOutlineCheck } from "react-icons/ai";
-import { RxCross2 } from "react-icons/rx";
+import { GET_USER_FOLDERS, getUserFoldersQuery } from "@judie/data/queries";
 import ColorModeSwitcher from "../ColorModeSwitcher/ColorModeSwitcher";
 import UpgradeButton from "../UpgradeButton/UpgradeButton";
-import { BiHelpCircle } from "react-icons/bi";
+import {
+  BiChevronsLeft,
+  BiChevronsRight,
+  BiHelpCircle,
+  BiHomeAlt,
+} from "react-icons/bi";
+import { HiMiniFolderOpen } from "react-icons/hi2";
+import { isValidMotionProp, motion } from "framer-motion";
+import { useSidebarOpenClose } from "@judie/context/sidebarOpenCloseProvider";
 
 interface SidebarButtonProps {
   icon?: JSX.Element | undefined;
@@ -76,236 +70,82 @@ const SidebarButton = ({ icon, label, onClick }: SidebarButtonProps) => {
   );
 };
 
-const getTitleForChat = (chat: ChatResponse, sliced?: boolean) => {
-  if (chat.userTitle) {
-    const result = chat.userTitle.slice(0, 20);
-    if (result.length === 20) {
-      return result + "...";
-    }
-    return result;
-  }
-  if (chat.subject) {
-    const result = chat.subject.slice(0, 20);
-    if (result.length === 20) {
-      return result + "...";
-    }
-    return result;
-  }
-  return "Untitled";
-};
+const ChakraMotionBox = chakra(motion.div, {
+  /**
+   * Allow motion props and non-Chakra props to be forwarded.
+   */
+  shouldForwardProp: (prop) =>
+    isValidMotionProp(prop) || shouldForwardProp(prop),
+});
 
-const SidebarChat = ({
-  chat,
-  setBeingDeletedChatId,
-  setBeingEditedChatId,
-  beingEditedChatId,
+const FolderButton = ({
+  id,
+  title,
+  numChats,
 }: {
-  chat: ChatResponse;
-  setBeingDeletedChatId: (chatId: string) => void;
-  setBeingEditedChatId: (chatId: string | null) => void;
-  beingEditedChatId?: string | null;
+  id: string;
+  title?: string | null;
+  numChats?: number;
 }) => {
   const router = useRouter();
-
-  const [editingValue, setEditingValue] = useState<string>();
-
-  const selectedChatId = useMemo(() => {
-    if (router.query.id) {
-      return router.query.id;
-    }
-  }, [router]);
-  const isSelected = selectedChatId === chat.id;
-
-  // Edit single chat title mutation
-  const editTitleMutation = useMutation({
-    mutationFn: ({ title }: { title: string }) =>
-      putChatMutation({
-        chatId: beingEditedChatId || "",
-        userTitle: title,
-      }),
-  });
-
-  // const isEditing = beingEditedChatId === chat.id;
-
-  const EditableControls = () => {
-    const {
-      isEditing,
-      getSubmitButtonProps,
-      getCancelButtonProps,
-      getEditButtonProps,
-    } = useEditableControls();
-    // No other good way to set the being edited chat ID other than this unfortunately
-    // onClicks are reserved for submitbuttonprops etc.
-    useEffect(() => {
-      if (isEditing) {
-        setBeingEditedChatId(chat.id);
-      }
-    }, [isEditing]);
-    return (
-      <Flex
-        style={{
-          flexDirection: "row",
-          height: "90%",
-        }}
-      >
-        <IconButton
-          aria-label="Edit Chat Title"
-          variant="ghost"
-          size="xs"
-          zIndex={100}
-          // onClick={isEditing ? null : () => setIsBeingEditedChatId(chat.id)}
-          {...(isEditing ? getSubmitButtonProps() : getEditButtonProps())}
-          icon={
-            isEditing ? (
-              <AiOutlineCheck size={18} color={"#A3A3A3"} />
-            ) : (
-              <TbPencil size={18} color="#A3A3A3" />
-            )
-          }
-        />
-        <IconButton
-          aria-label="Delete Chat"
-          variant="ghost"
-          size="xs"
-          zIndex={100}
-          {...(isEditing
-            ? getCancelButtonProps()
-            : {
-                onClick: () => setBeingDeletedChatId(chat.id),
-              })}
-          icon={
-            isEditing ? (
-              <RxCross2 size={18} color={"#A3A3A3"} />
-            ) : (
-              <TfiTrash size={18} color="#A3A3A3" />
-            )
-          }
-        />
-      </Flex>
-    );
-  };
+  const colorMode = useColorMode();
+  const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
+  const purpleHexCode = useToken("colors", colorKey);
+  const buttonBgColor = useColorModeValue("#F6F6F6", "gray.800");
+  const activeBGColor = useColorModeValue("blackAlpha.200", "gray.700");
 
   return (
     <Button
-      variant={isSelected ? "solid" : "ghost"}
-      style={{ width: "100%", marginTop: "0.3rem", marginBottom: "0.3rem" }}
-      zIndex={10}
+      variant={"solid"}
+      width={"16rem"}
+      borderRadius={"0.5rem"}
+      height={"100%"}
+      bgColor={router.query.folderId === id ? activeBGColor : buttonBgColor}
+      alignItems={"center"}
+      justifyContent={"flex-start"}
+      onClick={() => {
+        router.push(`/folders/${id}`);
+      }}
+      marginY={"0.25rem"}
+      h={"4rem"}
+      p={"0.5rem"}
     >
-      <Editable
-        onClick={() => {
-          if (!editingValue) {
-            router.push({
-              query: {
-                id: chat.id,
-              },
-              pathname: "/chat",
-            });
-          }
-        }}
-        defaultValue={getTitleForChat(chat, true)}
-        placeholder={getTitleForChat(chat, true)}
-        style={{
-          fontSize: 14,
-          fontWeight: 500,
-          width: "100%",
-        }}
-        isPreviewFocusable={false}
-        onChange={(value) => {
-          setEditingValue(value);
-        }}
-        onSubmit={async () => {
-          if (editingValue !== getTitleForChat(chat, true)) {
-            await editTitleMutation.mutateAsync({
-              title: editingValue as string,
-            });
-          }
-          setEditingValue("");
-          setBeingEditedChatId(null);
-        }}
-        onAbort={() => {
-          setEditingValue("");
-        }}
+      <Center
+        borderRadius={"0.5rem"}
+        padding={"0.5rem"}
+        marginRight={"0.5rem"}
+        bgColor={"white"}
       >
-        <Flex
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            padding: "0.5rem 0",
-          }}
-        >
-          <Flex
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <EditablePreview cursor="pointer" />
-            <Input textAlign={"start"} as={EditableInput} />
-          </Flex>
-          <EditableControls />
-        </Flex>
-      </Editable>
+        <HiMiniFolderOpen size={24} color={purpleHexCode} />
+      </Center>
+      <VStack alignItems={"flex-start"}>
+        <Text variant={"title"}>{title}</Text>
+        <Text variant={"detail"}>{numChats} chats</Text>
+      </VStack>
     </Button>
   );
 };
 
-const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
+const Sidebar = () => {
   const router = useRouter();
   const auth = useAuth();
   const toast = useToast();
-  const chatContext = useContext(ChatContext);
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
-  const [beingEditedChatId, setBeingEditedChatId] = useState<string | null>(
-    null
-  );
-  const [beingDeletedChatId, setBeingDeletedChatId] = useState<string | null>(
-    null
-  );
-  const [isClearConversationsModalOpen, setIsClearConversationsModalOpen] =
-    useState<boolean>(false);
+
+  const { toggleSidebar, isSidebarOpen } = useSidebarOpenClose();
+
+  const colorMode = useColorMode();
+  const colorKey = colorMode.colorMode === "dark" ? "purple.300" : "purple.500";
+  const purpleHexCode = useToken("colors", colorKey);
   // Existing user chats
-  const {
-    data,
-    refetch,
-    isLoading: isGetChatsLoading,
-  } = useQuery([GET_USER_CHATS, auth?.userData?.id], {
-    queryFn: getUserChatsQuery,
-    staleTime: 60000,
-    enabled: !!auth?.userData?.id,
-  });
-
-  // Clear all conversations mutation
-  const clearConversations = useMutation({
-    mutationFn: clearConversationsMutation,
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
-  // Delete single chat mutation
-  const deleteChat = useMutation({
-    mutationFn: () => deleteChatMutation(beingDeletedChatId || ""),
-    onSuccess: () => {
-      setBeingDeletedChatId(null);
-      refetch();
-    },
-  });
-  const createChat = useMutation({
-    mutationFn: createChatMutation,
-    onSuccess: (data) => {
-      // setTimeout(() => {refetch() }, 1000)
-      refetch();
-      router.push({
-        query: {
-          id: data.id,
-        },
-        pathname: "/chat",
-      });
-    },
-  });
+  const { data, isLoading: isGetChatsLoading } = useQuery(
+    [GET_USER_FOLDERS, auth?.userData?.id],
+    {
+      queryFn: getUserFoldersQuery,
+      staleTime: 60000,
+      enabled: !!auth?.userData?.id,
+    }
+  );
 
   const onAdminClick = useCallback(() => {
     const filteredAdminPermissions = auth.userData?.permissions?.filter(
@@ -342,22 +182,6 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
       {
-        icon: <TfiTrash />,
-        key: "delete-chats",
-        label: "Clear Conversations",
-        onClick: () => {
-          setIsClearConversationsModalOpen(true);
-        },
-      },
-      {
-        icon: <FiSettings />,
-        key: "settings",
-        label: "Settings",
-        onClick: () => {
-          router.push("/settings", undefined, { shallow: true });
-        },
-      },
-      {
         icon: <BiHelpCircle />,
         key: "help",
         label: "Help",
@@ -371,6 +195,14 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
         label: "Logout",
         onClick: () => {
           auth.logout();
+        },
+      },
+      {
+        icon: <MdFeedback />,
+        key: "feedback",
+        label: "Feedback",
+        onClick: () => {
+          router.push("/feedback");
         },
       },
       ...(auth.isAdmin
@@ -414,9 +246,13 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
       },
     ];
     return options;
-  }, [auth, router, setIsClearConversationsModalOpen, onAdminClick]);
+  }, [auth, router, onAdminClick]);
 
-  const bgColor = useColorModeValue("#FFFFFF", "#2a3448");
+  const bgColor = useColorModeValue("#FFFFFF", "gray.900");
+  const bgColorMobile = useColorModeValue("#FFFFFF", "gray.900");
+
+  const activeBGColor = useColorModeValue("#F6F6F6", "gray.700");
+
   const sidebarRelativeOrAbsoluteProps = useBreakpointValue({
     base: {
       position: "absolute",
@@ -425,300 +261,212 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
     },
     md: {},
   });
-  return isOpen ? (
-    <>
-      {/* Modals */}
-      {/* Deletion Modal */}
-      <Modal
-        isOpen={!!beingDeletedChatId}
-        onClose={() => setBeingDeletedChatId(null)}
-        size={"md"}
-        autoFocus={true}
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(5px)"
-          px={"5%"}
-        />
-        <ModalContent py={8}>
-          <ModalBody
-            alignItems={"center"}
-            textAlign={"center"}
-            flexDirection="column"
-            justifyContent={"center"}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                marginBottom: "2rem",
-              }}
-            >
-              Are you sure you want to delete this chat?
-            </Text>
-            <Stack
-              direction={{ base: "column-reverse", md: "row" }}
-              spacing={8}
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Button type="button" onClick={() => setBeingDeletedChatId(null)}>
-                <Text>Cancel</Text>
-              </Button>
-              <Button
-                bgColor="red"
-                type="button"
-                onClick={async () => {
-                  if (beingDeletedChatId) {
-                    await deleteChat.mutateAsync();
-                    setBeingDeletedChatId(null);
-                    refetch();
-                    if (
-                      router.pathname === "/chat" &&
-                      router.query.id === beingDeletedChatId
-                    ) {
-                      router.push("/chat");
-                    }
-                  } else {
-                    toast({
-                      title: "Error deleting chat",
-                      description: "Please try again",
-                      status: "error",
-                      duration: 3000,
-                      isClosable: true,
-                    });
-                  }
-                }}
-              >
-                <Text color="white">Yes, delete it</Text>
-              </Button>
-            </Stack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      {/* Clear Chat Modal */}
-      <Modal
-        isOpen={isClearConversationsModalOpen}
-        onClose={() => setIsClearConversationsModalOpen(false)}
-        size={"md"}
-        autoFocus={true}
-      >
-        <ModalOverlay
-          bg="blackAlpha.300"
-          backdropFilter="blur(5px)"
-          px={"5%"}
-        />
-        <ModalContent py={8}>
-          <ModalBody
-            alignItems={"center"}
-            textAlign={"center"}
-            flexDirection="column"
-            justifyContent={"center"}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                marginBottom: "1rem",
-              }}
-            >
-              Are you sure you want to delete all of your chats?
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                marginBottom: "2rem",
-              }}
-            >
-              This action is not reversible.
-            </Text>
-            <Stack
-              direction={{ base: "column-reverse", md: "row" }}
-              spacing={8}
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Button
-                type="button"
-                onClick={() => setIsClearConversationsModalOpen(false)}
-              >
-                <Text>Cancel</Text>
-              </Button>
-              <Button
-                bgColor="red"
-                type="button"
-                onClick={async () => {
-                  await clearConversations.mutateAsync();
-                  setIsClearConversationsModalOpen(false);
-                  refetch();
-                  if (router.pathname === "/chat") {
-                    router.push("/chat");
-                  }
-                }}
-              >
-                <Text color="white">Yes, delete all chats</Text>
-              </Button>
-            </Stack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      {/* Sidebar content */}
-      <Flex
-        style={{
-          width: "18rem",
-          maxWidth: "18rem",
-          minWidth: "18rem",
-          height: "100vh",
-          backgroundColor: bgColor,
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          padding: "1rem",
-          ...(sidebarRelativeOrAbsoluteProps as CSSProperties),
-        }}
-        boxShadow={"lg"}
-      >
-        <Flex
-          style={{
-            width: "100%",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-          cursor={"pointer"}
-          onClick={() => {
-            if (router.pathname.includes("/admin")) {
-              router.push("/admin");
-            } else {
-              router.push("/chat");
-            }
-          }}
-        >
-          <Flex
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src={logoPath}
-              alt="logo"
-              style={{
-                height: "3rem",
-                width: "3rem",
-              }}
-            />
-            <Text
-              style={{
-                fontSize: "1.3rem",
-                fontWeight: "semibold",
-                marginLeft: "0.5rem",
-              }}
-            >
-              Judie AI
-            </Text>
-          </Flex>
-        </Flex>
-
-        <Button
-          variant={"outline"}
-          colorScheme="white"
-          style={{
-            width: "100%",
-            marginTop: "1rem",
-            marginBottom: "1rem",
-            borderColor: "#565555",
-            padding: "1.5rem",
-          }}
-          onClick={() => {
-            if (
-              ((chatContext?.chat?.messages?.length || 0) > 0 &&
-                chatContext?.chat?.subject) ||
-              !chatContext.chat
-            ) {
-              createChat.mutate({});
-            }
-          }}
-        >
-          + New Chat
-        </Button>
-        <Divider backgroundColor="#565555" />
-        {/* Chats container - scrollable */}
-        {isGetChatsLoading || !auth?.userData?.id ? (
-          <Flex
-            style={{
-              width: "100%",
-              height: "100%",
-              flexDirection: "column",
-              flexGrow: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Spinner />
-          </Flex>
-        ) : (
-          <Flex
-            style={{
-              width: "100%",
-              height: "100%",
-              flexDirection: "column",
-              flexGrow: 1,
-              alignItems: "center",
-              justifyContent: "flex-start",
-              overflowY: "scroll",
-              marginTop: "1rem",
-            }}
-          >
-            {data?.map((chat) => (
-              <SidebarChat
-                chat={chat}
-                key={chat.id}
-                beingEditedChatId={beingEditedChatId}
-                setBeingEditedChatId={(chatId) => setBeingEditedChatId(chatId)}
-                setBeingDeletedChatId={(chatId) =>
-                  setBeingDeletedChatId(chatId)
-                }
-              />
-            ))}
-          </Flex>
-        )}
-        {/* Bottom container - fixed to bottom */}
-        <Flex
-          style={{
-            width: "100%",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            paddingBottom: "1rem",
-          }}
-        >
-          <Divider
-            backgroundColor={"#565555"}
-            style={{
-              marginBottom: "1rem",
-            }}
-          />
-          {footerIcons.map((iconData) => {
-            return iconData.label ? (
-              <SidebarButton key={iconData.key} {...iconData} />
-            ) : (
-              iconData.icon
-            );
-          })}
-        </Flex>
-      </Flex>
-    </>
-  ) : (
-    <Flex
+  const mobileVsDesktopClosedMenuHeight = useBreakpointValue({
+    base: {
+      height: "4.5",
+    },
+    md: { height: "calc(100vh - 2rem)" },
+  });
+  return (
+    <ChakraMotionBox
+      initial={false}
+      animate={{
+        width: isSidebarOpen ? "18rem" : "2.5rem",
+        // height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
+        // opacity: isSidebarOpen ? 1 : 0.5,
+      }}
+      bgColor={{ base: bgColorMobile, md: bgColor }}
+      height={
+        isSidebarOpen
+          ? { base: "calc(100vh - 2rem)", md: "calc(100vh - 2rem)" }
+          : { base: "4.5rem", md: "calc(100vh - 2rem)" }
+      }
+      marginLeft={{ base: 1, md: "1rem" }}
       style={{
-        width: "1rem",
-        height: "100vh",
-        backgroundColor: bgColor,
+        display: "flex",
+        borderRadius: "1.375rem",
+        marginTop: "1rem",
+        marginBottom: "1rem",
+        ...(isSidebarOpen
+          ? {
+              padding: "1rem",
+            }
+          : {
+              paddingTop: "1.5rem",
+              paddingRight: "0.25rem",
+              paddingLeft: "0.25rem",
+              justifyContent: "flex-start",
+            }),
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "space-between",
+
         ...(sidebarRelativeOrAbsoluteProps as CSSProperties),
       }}
-      boxShadow={"lg"}
-    ></Flex>
+    >
+      {isSidebarOpen ? (
+        <>
+          <Flex
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+            cursor={"pointer"}
+            justifyContent={"space-between"}
+          >
+            <Flex
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+              onClick={() => {
+                if (router.pathname.includes("/admin")) {
+                  router.push("/admin");
+                } else {
+                  router.push("/dashboard");
+                }
+              }}
+            >
+              <Image
+                src={logoPath}
+                alt="logo"
+                style={{
+                  height: "3rem",
+                  width: "3rem",
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: "1.3rem",
+                  fontWeight: "semibold",
+                  marginLeft: "0.5rem",
+                  display: isSidebarOpen ? "block" : "none",
+                }}
+              >
+                Judie AI
+              </Text>
+            </Flex>
+            <BiChevronsLeft
+              size={24}
+              color={purpleHexCode}
+              onClick={() => {
+                toggleSidebar();
+              }}
+            />
+          </Flex>
+
+          <Button
+            variant={"ghost"}
+            size={"squareSm"}
+            width={"100%"}
+            marginTop={"2rem"}
+            marginBottom={"0.3rem"}
+            alignItems={"center"}
+            justifyContent={"flex-start"}
+            onClick={() => {
+              router.push("/dashboard");
+            }}
+            bg={router.route === "/dashboard" ? activeBGColor : "transparent"}
+          >
+            <BiHomeAlt size={18} style={{ marginRight: "0.6rem" }} />
+            Dashboard
+          </Button>
+          <Button
+            variant={"ghost"}
+            size={"squareSm"}
+            width={"100%"}
+            marginTop={"0.3rem"}
+            marginBottom={"1rem"}
+            alignItems={"center"}
+            justifyContent={"flex-start"}
+            onClick={() => {
+              router.push("/settings");
+            }}
+            bg={router.route === "/settings" ? activeBGColor : "transparent"}
+          >
+            <FiSettings size={18} style={{ marginRight: "0.6rem" }} />
+            Settings
+          </Button>
+          <Divider backgroundColor="#565555" />
+          {/* Chats container - scrollable */}
+          <Text marginTop={"1rem"} variant={"detail"}>
+            Folders
+          </Text>
+          {isGetChatsLoading || !auth?.userData?.id ? (
+            <Flex
+              style={{
+                width: "100%",
+                height: "100%",
+                flexDirection: "column",
+                flexGrow: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Spinner />
+            </Flex>
+          ) : (
+            <Flex
+              style={{
+                width: "100%",
+                height: "100%",
+                flexDirection: "column",
+                flexGrow: 1,
+                alignItems: "center",
+                justifyContent: "flex-start",
+                overflowY: "scroll",
+                marginTop: "1rem",
+              }}
+            >
+              {data?.map((folder) => (
+                <FolderButton
+                  key={folder.id}
+                  id={folder.id}
+                  title={folder.userTitle}
+                  numChats={folder?._count?.chats || 0}
+                />
+              ))}
+            </Flex>
+          )}
+          {/* Bottom container - fixed to bottom */}
+          <Flex
+            style={{
+              width: "100%",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              paddingBottom: "1rem",
+            }}
+          >
+            <Divider
+              backgroundColor={"#565555"}
+              style={{
+                marginBottom: "1rem",
+              }}
+            />
+            {footerIcons.map((iconData) => {
+              return iconData.label ? (
+                <SidebarButton key={iconData.key} {...iconData} />
+              ) : (
+                iconData.icon
+              );
+            })}
+          </Flex>
+        </>
+      ) : (
+        <Box ml={1}>
+          <BiChevronsRight
+            size={24}
+            color={purpleHexCode}
+            cursor={"pointer"}
+            onClick={() => {
+              toggleSidebar();
+            }}
+          />
+        </Box>
+      )}
+    </ChakraMotionBox>
   );
 };
 

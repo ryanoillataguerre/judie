@@ -64,7 +64,7 @@ export const SignupForm = ({
     mutationFn: signupMutation,
     onSuccess: () => {
       router.push({
-        pathname: "/chat",
+        pathname: "/dashboard",
         query: router.query,
       });
     },
@@ -85,7 +85,7 @@ export const SignupForm = ({
       mutationFn: redeemInviteMutation,
       onSuccess: () => {
         router.push({
-          pathname: "/chat",
+          pathname: "/dashboard",
           query: router.query,
         });
       },
@@ -171,10 +171,9 @@ export const SignupForm = ({
         flexDirection: "column",
         alignItems: "flex-start",
         backgroundColor: formBgColor,
-        padding: "2rem",
-        borderRadius: "0.8rem",
+        padding: "1.5rem",
+        borderRadius: "0.5rem",
       }}
-      boxShadow={"lg"}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -205,6 +204,7 @@ export const SignupForm = ({
           >
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
+              tabIndex={1}
               id="email"
               type={"email"}
               autoComplete="email"
@@ -240,6 +240,7 @@ export const SignupForm = ({
                 />
               </InputRightElement>
               <Input
+                tabIndex={2}
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
@@ -368,8 +369,7 @@ export const SignupForm = ({
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
-          variant={"solid"}
+          variant={"purp"}
           loading={isLoading}
           label="Sign Up"
           type="submit"
@@ -416,15 +416,7 @@ const SignupPage = () => {
               marginTop: "1rem",
             }}
           />
-          <Text
-            style={{
-              alignSelf: "center",
-              fontSize: "2rem",
-              fontWeight: "semibold",
-              marginBottom: "1rem",
-              marginTop: "1rem",
-            }}
-          >
+          <Text variant={"headerLight"} marginBottom={"1rem"}>
             Welcome to Judie
           </Text>
           <SignupForm />

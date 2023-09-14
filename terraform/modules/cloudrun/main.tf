@@ -107,6 +107,8 @@ resource "google_cloud_run_service" "default" {
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["run.googleapis.com/sandbox"],
       template[0].metadata[0].labels["run.googleapis.com/startupProbeType"],
+      template[0].metadata[0].labels["commit-sha"],
+      template[0].metadata[0].labels["managed-by"],
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],

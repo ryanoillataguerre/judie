@@ -33,11 +33,12 @@ services:
       - dev
     privileged: true
     volumes:
-      - ./app-service:/app
+      - ./app-service/src:/app/src
     working_dir: /app
     build:
       context: ./app-service
       dockerfile: ./Dockerfile.local
+    command: yarn dev
     ports:
       - 8080:8080
     restart: on-failure
@@ -62,6 +63,8 @@ services:
       GCLOUD_PRIVATE_KEY: ${GCLOUD_PRIVATE_KEY}
       GCLOUD_CLIENT_EMAIL: ${GCLOUD_CLIENT_EMAIL}
       GCLOUD_BUCKET_NAME: ${GCLOUD_BUCKET_NAME}
+      PDF_SERVICES_CLIENT_ID: ${PDF_SERVICES_CLIENT_ID}
+      PDF_SERVICES_CLIENT_SECRET: ${PDF_SERVICES_CLIENT_SECRET}
 
   web:
     networks:
@@ -70,7 +73,7 @@ services:
     depends_on:
       - app-service
     volumes:
-      - ./web:/app
+      - ./web/src:/app/src
       - /app/web/node_modules
     working_dir: /app
     build:

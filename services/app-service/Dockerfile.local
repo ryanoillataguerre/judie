@@ -1,7 +1,6 @@
 FROM node:20
 
 WORKDIR /app
-# COPY ./build_protos.sh /opt/build_protos.sh
 COPY . .
 
 RUN yarn

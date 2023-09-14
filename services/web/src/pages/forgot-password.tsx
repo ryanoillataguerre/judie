@@ -4,9 +4,9 @@ import { useMutation } from "react-query";
 import { forgotPasswordMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
+  Button,
   Flex,
   FormControl,
   FormLabel,
@@ -37,7 +37,7 @@ const ForgotPasswordForm = () => {
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: forgotPasswordMutation,
     onSuccess: () => {
-        setSuccess(true);
+      setSuccess(true);
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error sending forgot password email in", err);
@@ -51,10 +51,7 @@ const ForgotPasswordForm = () => {
     },
   });
 
-
-  const onSubmit: SubmitHandler<SubmitData> = async ({
-    email,
-  }: SubmitData) => {
+  const onSubmit: SubmitHandler<SubmitData> = async ({ email }: SubmitData) => {
     try {
       await mutateAsync({
         email,
@@ -100,7 +97,8 @@ const ForgotPasswordForm = () => {
               fontSize: "1rem",
             }}
           >
-            Enter your email address and we&apos;ll send you a link to reset your password.
+            Enter your email address and we&apos;ll send you a link to reset
+            your password.
           </Text>
           <FormControl
             style={{
@@ -129,7 +127,7 @@ const ForgotPasswordForm = () => {
         >
           <Text
             style={{
-              fontSize: "0.8rem",
+              fontSize: "1rem",
             }}
           >
             Remembered it?
@@ -153,12 +151,13 @@ const ForgotPasswordForm = () => {
           style={{
             width: "100%",
           }}
-          colorScheme={success ? "green" : "blue"}
-          variant={"solid"}
-          loading={isLoading}
-          label={success ? "Email Sent!" : "Send Email"}
+          variant={"purp"}
+          colorScheme={success ? "green" : undefined}
+          isLoading={isLoading}
           type="submit"
-        />
+        >
+          {success ? "Email Sent!" : "Send Email"}
+        </Button>
       </form>
     </Flex>
   );
@@ -200,15 +199,7 @@ const ForgotPassword = () => {
               marginTop: "3rem",
             }}
           />
-          <Text
-            style={{
-              alignSelf: "center",
-              fontSize: "2rem",
-              fontWeight: "semibold",
-              marginBottom: "1rem",
-              marginTop: "1rem",
-            }}
-          >
+          <Text variant={"headerLight"} marginBottom={"1rem"}>
             Forgot your password?
           </Text>
           <ForgotPasswordForm />
@@ -217,7 +208,6 @@ const ForgotPassword = () => {
     </>
   );
 };
-
 
 ForgotPassword.displayName = "Forgot Password";
 

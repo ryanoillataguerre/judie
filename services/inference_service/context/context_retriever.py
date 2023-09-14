@@ -11,12 +11,15 @@ EMBEDDING_MODEL = "text-embedding-ada-002"
 
 
 def pull_context_block(
-    query, subject=None, special_context: Optional[str] = None
+    query, subject=None, special_context: Optional[List[str]] = None
 ) -> str:
     contexts = pull_context(query, subject)
 
-    running_len_contexts = len(special_context) if special_context else 0
-    context_block = special_context + "\n" if special_context else ""
+    if special_context:
+        contexts = special_context + contexts
+
+    running_len_contexts = 0
+    context_block = ""
     over_limit = False
 
     if contexts:

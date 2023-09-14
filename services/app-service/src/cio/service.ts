@@ -56,3 +56,71 @@ export const sendVerificationEmail = async ({ user }: { user: User }) => {
   });
   return await apiClient.sendEmail(newEmail);
 };
+
+export const sendSubscribedEmail = async ({ user }: { user: User }) => {
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: user.email,
+    transactional_message_id: "6",
+    message_data: {
+      first_name: user.firstName,
+    },
+    identifiers: {
+      email: user.email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};
+
+export const sendWelcomeEmail = async ({ user }: { user: User }) => {
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: user.email,
+    transactional_message_id: "5",
+    message_data: {
+      first_name: user.firstName,
+    },
+    identifiers: {
+      email: user.email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};
+
+export const sendParentalConsentEmail = async ({ user }: { user: User }) => {
+  const parentalConsentUrl = `${getOrigin()}/parental-consent/${user.id}`;
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: user.email,
+    transactional_message_id: "7",
+    message_data: {
+      url: parentalConsentUrl,
+    },
+    identifiers: {
+      email: user.email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};
+
+export const sendFeedbackEmail = async ({
+  email,
+  feedback,
+}: {
+  email: string;
+  feedback: string;
+}) => {
+  const body = `Email:\n${email}\nFeedback:\n${feedback}`;
+  // Send email
+  const newEmail = new SendEmailRequest({
+    to: "feedback@judie.io",
+    transactional_message_id: "8",
+    message_data: {
+      body,
+    },
+    identifiers: {
+      email: email,
+    },
+  });
+  return await apiClient.sendEmail(newEmail);
+};

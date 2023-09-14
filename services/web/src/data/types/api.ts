@@ -34,6 +34,7 @@ export interface Subscription {
   userId: string;
   status: SubscriptionStatus;
   type: SubscriptionType;
+  organizationId?: string;
   stripeId: string;
   user: User;
 }
@@ -118,6 +119,9 @@ export interface User {
   questionsAsked: number;
   subscription?: Subscription;
   lastMessageAt?: Date;
+  dateOfBirth?: Date;
+  parentalConsent?: boolean;
+  parentalConsentEmail?: string;
   chats?: Chat[];
   permissions?: Permission[];
   organizations?: Organization[];
@@ -142,13 +146,28 @@ export interface Message {
   updatedAt: Date | null;
 }
 
+export interface ChatFolder {
+  id: string;
+  userId: string;
+  userTitle: string | null;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  chats?: Chat[];
+  _count?: {
+    chats: number;
+  };
+}
+
 export interface Chat {
   id: string;
   userId: string;
-  usertitle?: string;
+  userTitle?: string;
+  subject?: string;
   createdAt: Date;
   updatedAt: Date | null;
   messages: Message[];
+  folder?: ChatFolder;
 }
 
 export enum UserRole {

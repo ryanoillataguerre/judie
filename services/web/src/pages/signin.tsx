@@ -4,7 +4,7 @@ import { useMutation } from "react-query";
 import { signinMutation } from "@judie/data/mutations";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Button from "@judie/components/Button/Button";
+// import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Flex,
@@ -20,7 +20,8 @@ import {
   useBreakpointValue,
   useColorModeValue,
   useToast,
-  Spinner
+  Spinner,
+  Button,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
@@ -45,7 +46,7 @@ const SigninForm = () => {
     mutationFn: signinMutation,
     onSuccess: () => {
       router.push({
-        pathname: "/chat",
+        pathname: "/dashboard",
         query: router.query,
       });
     },
@@ -80,24 +81,29 @@ const SigninForm = () => {
   };
 
   // Styles
-  const formWidth = useBreakpointValue({
-    base: "100%",
-    md: "60%",
-    lg: "40%",
-  }, { fallback: "60%" });
+  const formWidth = useBreakpointValue(
+    {
+      base: "100%",
+      sm: "70%",
+      md: "50%",
+      lg: "40%",
+    },
+    { fallback: "60%" }
+  );
   const formBgColor = useColorModeValue("white", "#2a3448");
 
-  return (typeof window === "undefined" ? (<Spinner colorScheme="blue" />) : (
+  return typeof window === "undefined" ? (
+    <Spinner colorScheme="blue" />
+  ) : (
     <Flex
       style={{
         width: formWidth,
         flexDirection: "column",
         alignItems: "flex-start",
         backgroundColor: formBgColor,
-        padding: "2rem",
-        borderRadius: "0.8rem",
+        padding: "1.5rem",
+        borderRadius: "0.5rem",
       }}
-      boxShadow={"lg"}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -127,6 +133,7 @@ const SigninForm = () => {
           >
             <FormLabel htmlFor="email">Email</FormLabel>
             <Input
+              tabIndex={1}
               id="email"
               type={"email"}
               autoComplete="email"
@@ -154,6 +161,7 @@ const SigninForm = () => {
                 />
               </InputRightElement>
               <Input
+                tabIndex={2}
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
@@ -169,7 +177,7 @@ const SigninForm = () => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            marginBottom: "1rem",
+            marginBottom: "0.5rem",
           }}
         >
           <Text
@@ -214,22 +222,23 @@ const SigninForm = () => {
               });
             }}
           >
-            Forgot Password
+            Forgot Password?
           </Link>
         </Flex>
         <Button
           style={{
             width: "100%",
           }}
-          colorScheme="blue"
-          variant={"solid"}
-          loading={isLoading}
-          label="Sign In"
+          // colorScheme="blue"
+          variant={"purp"}
+          isLoading={isLoading}
           type="submit"
-        />
+          size={"md"}
+        >
+          Sign In
+        </Button>
       </form>
     </Flex>
-  )
   );
 };
 
@@ -271,26 +280,15 @@ const SigninPage = () => {
               marginTop: "3rem",
             }}
           />
-          <Text
-            style={{
-              alignSelf: "center",
-              fontSize: "2rem",
-              fontWeight: "semibold",
-              marginBottom: "1rem",
-              marginTop: "1rem",
-            }}
-          >
+          <Text variant={"headerLight"} marginBottom={"1rem"}>
             Welcome back!
           </Text>
-          {router.isReady && (
-            <SigninForm />
-          )}
+          {router.isReady && <SigninForm />}
         </Flex>
       </main>
     </>
   );
 };
-
 
 SigninPage.displayName = "Sign In";
 

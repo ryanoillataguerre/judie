@@ -6,7 +6,6 @@ const LoadingScreen = () => {
   return (
     <Flex
       style={{
-        height: "100%",
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
@@ -16,7 +15,6 @@ const LoadingScreen = () => {
         style={{
           height: "30%",
           marginRight: "5%",
-          marginTop: "5%",
         }}
       >
         <Lottie animationData={loadingAnimationData} loop />

@@ -31,9 +31,9 @@ router.post(
     body("organizationId").isString().exists(),
   ],
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { name, organizationId } = req.body;
+    const { name, organizationId, address } = req.body;
     // Validate user has organization-level privileges
     await validateOrganizationAdmin({
       userId: req.session.userId as string,
@@ -41,6 +41,7 @@ router.post(
     });
     const school = await createSchool({
       name,
+      ...(address && { address }),
       organization: {
         connect: {
           id: organizationId,
@@ -77,7 +78,7 @@ router.post(
 router.get(
   "/:schoolId/users",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
@@ -97,7 +98,7 @@ router.get(
 router.get(
   "/:schoolId",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
@@ -117,7 +118,7 @@ router.get(
 router.get(
   "/:schoolId/invites",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
@@ -137,7 +138,7 @@ router.get(
 router.delete(
   "/:schoolId",
   requireAuth,
-  handleValidationErrors,
+  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const schoolId = req.params.schoolId;
@@ -169,8 +170,8 @@ router.put(
   "/:schoolId",
   [body("name").isString().exists()],
   requireAuth,
-  handleValidationErrors,
-  async (req: Request, res: Response) => {
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
     const { userId } = req.session;
 
@@ -186,7 +187,7 @@ router.put(
     res.status(201).json({
       data: school,
     });
-  }
+  })
 );
 
 export default router;
