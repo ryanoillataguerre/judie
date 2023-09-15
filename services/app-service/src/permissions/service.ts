@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Permission, Prisma } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createPermission = async (
@@ -8,4 +8,23 @@ export const createPermission = async (
     data: params,
   });
   return permission;
+};
+
+export const getPermissionsById = async ({ id }: { id: string }) => {
+  return await dbClient.permission.findMany({
+    where: {
+      id,
+    },
+  });
+};
+
+export const deletePermissionById = async ({ id }: { id: string }) => {
+  return await dbClient.permission.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
 };

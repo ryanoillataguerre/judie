@@ -7,6 +7,7 @@ import {
 import {
   getUser,
   getUserPermissions,
+  getUserPermissionsRoomsSchools,
   parentalConsentUser,
   updateUser,
   userAgeConsent,
@@ -183,6 +184,20 @@ router.get(
     const session = req.session;
     const user = await getUserPermissions({
       id: session.userId as string,
+    });
+
+    res.status(200).send({
+      data: user,
+    });
+  })
+);
+
+router.get(
+  "/permissions/:userId",
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const user = await getUserPermissionsRoomsSchools({
+      id: req.params.userId as string,
     });
 
     res.status(200).send({

@@ -374,6 +374,18 @@ export const deleteSchoolMutation = async ({
   return response.data;
 };
 
+export const deletePermissionMutation = async ({
+  permissionId,
+}: {
+  permissionId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/permissions/${permissionId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
 export const putOrgMutation = async ({
   organizationId,
   name,

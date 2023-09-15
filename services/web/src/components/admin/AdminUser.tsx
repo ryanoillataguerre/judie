@@ -7,10 +7,18 @@ import {
   Tabs,
   Text,
   VStack,
+  Flex,
+  Box,
 } from "@chakra-ui/react";
-import { GET_USER_BY_ID, getUserByIdQuery } from "@judie/data/queries";
+import {
+  GET_PERMISSIONS_BY_ID,
+  GET_USER_BY_ID,
+  getPermissionsByIdQuery,
+  getUserByIdQuery,
+} from "@judie/data/queries";
 import { useQuery } from "react-query";
 import UserUsage from "./UserUsage";
+import PermissionsTable from "./tables/PermissionsTable";
 
 const AdminUser = ({ id }: { id: string }) => {
   const { data: userData } = useQuery({
@@ -18,6 +26,14 @@ const AdminUser = ({ id }: { id: string }) => {
     queryFn: () => getUserByIdQuery(id),
     enabled: !!id,
   });
+
+  const { data: permissionData } = useQuery({
+    queryKey: [GET_PERMISSIONS_BY_ID, id],
+    queryFn: () => getPermissionsByIdQuery(id),
+    enabled: !!id,
+  });
+
+  console.log(permissionData);
 
   return (
     <VStack
@@ -30,21 +46,41 @@ const AdminUser = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
-      <Text
-        style={{
-          marginTop: "2rem",
-          fontSize: "2rem",
-        }}
-      >
-        {userData?.email}
-      </Text>
+      <Flex direction={"column"}>
+        <Text
+          style={{
+            marginTop: "2rem",
+            fontSize: "2rem",
+          }}
+        >
+          {userData?.email}
+        </Text>
+        <Text>
+          Name:{" "}
+          <Box fontSize={"20px"} as={"span"}>
+            {userData?.firstName} {userData?.lastName}
+          </Box>
+        </Text>
+        <Text>
+          Role:{" "}
+          <Box fontSize={"20px"} as={"span"}>
+            {userData?.role}
+          </Box>
+        </Text>
+      </Flex>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           <Tab>Usage</Tab>
+          <Tab>Permissions</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
             <UserUsage id={id} />
+          </TabPanel>
+          <TabPanel>
+            {permissionData && (
+              <PermissionsTable permissions={permissionData} />
+            )}
           </TabPanel>
         </TabPanels>
         <TabIndicator />

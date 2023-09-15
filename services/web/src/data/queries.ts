@@ -5,6 +5,7 @@ import {
   EntitiesResponse,
   Invite,
   Organization,
+  Permission,
   Room,
   School,
   User,
@@ -54,6 +55,17 @@ export const GET_INVITE_BY_ID = "GET_INVITE_BY_ID";
 export const getInviteByIdQuery = async (id: string): Promise<Invite> => {
   const response = await baseFetch({
     url: `/invites/${id}`,
+    method: "GET",
+  });
+  return response.data;
+};
+
+export const GET_PERMISSIONS_BY_ID = "GET_PERMISSIONS_BY_ID";
+export const getPermissionsByIdQuery = async (
+  user_id: string
+): Promise<Permission[]> => {
+  const response = await baseFetch({
+    url: `/user/permissions/${user_id}`,
     method: "GET",
   });
   return response.data;
