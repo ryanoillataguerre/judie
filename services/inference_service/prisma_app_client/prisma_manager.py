@@ -7,11 +7,12 @@ from inference_service.server.judie_data import History, ChatTurn, Role
 
 
 class UserType(Enum):
-    STUDENT='USER'
-    PARENT='PARENT'
-    TEACHER='TEACHER'
-    ADMINISTRATOR='ADMINISTRATOR'
-    JUDIE="JUDIE"
+    STUDENT = "USER"
+    PARENT = "PARENT"
+    TEACHER = "TEACHER"
+    ADMINISTRATOR = "ADMINISTRATOR"
+    JUDIE = "JUDIE"
+
 
 def get_messages(
     chat_id: str, app_db: Optional[prisma.Prisma] = None
@@ -145,7 +146,9 @@ def get_special_context_from_chat(chat: prisma.models.Chat) -> List[str]:
     return context
 
 
-def get_user_from_db(user_id: str, app_db: Optional[prisma.Prisma] = None) -> Optional[prisma.models.User]:
+def get_user_from_db(
+    user_id: str, app_db: Optional[prisma.Prisma] = None
+) -> Optional[prisma.models.User]:
     if not app_db:
         app_db = prisma.Prisma()
 
@@ -160,6 +163,7 @@ def get_user_from_db(user_id: str, app_db: Optional[prisma.Prisma] = None) -> Op
     if user is not None:
         return user
     return None
+
 
 def get_user_type_from_user(user: prisma.models.User) -> str:
     return user.role

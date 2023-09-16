@@ -5,12 +5,12 @@ from inference_service.openai_manager import openai_manager
 from typing import List, Optional
 
 
-def assemble_prompt_chunks(subject: str, user_type: Optional[str]):
+def assemble_prompt_chunks(subject: str, user_type: Optional[str] = None):
     user_chunk = prompt_chunks.DEFAULT_PROMPT
     if user_type:
-        if user_type == 'STUDENT':
+        if user_type == "STUDENT":
             user_chunk = prompt_chunks.STUDENT_TUTOR_CHUNK
-        elif user_type == 'PARENT':
+        elif user_type == "PARENT":
             user_chunk = prompt_chunks.PARENT_TUTOR_CHUNK
 
     chunks = user_chunk
