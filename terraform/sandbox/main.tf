@@ -328,3 +328,13 @@ module "web" {
 
   depends_on = [module.vpc, module.sql_db, module.inference-service, module.app-service]
 }
+
+
+# Secrets
+resource "google_secret_manager_secret" "tf-vars_secret" {
+  secret_id = "sandbox_tf_vars"
+
+  replication{
+    automatic = true
+  }
+}
