@@ -17,7 +17,7 @@ gcloud iam workload-identity-pools providers create-oidc "gha-provider" \
   --location="global" \
   --workload-identity-pool="github-actions" \
   --display-name="Github Action Provider" \
-  --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository"  \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 ```
 
