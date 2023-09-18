@@ -6,6 +6,13 @@ import {
   ModalContent,
   ModalOverlay,
   Text,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
 } from "@chakra-ui/react";
 import { deletePermissionMutation } from "@judie/data/mutations";
 import { useState } from "react";
@@ -14,8 +21,6 @@ import {
   GET_PERMISSIONS_BY_ID,
   getPermissionsByIdQuery,
 } from "@judie/data/queries";
-import { useRouter } from "next/router";
-import useAuth from "@judie/hooks/useAuth";
 import { Permission } from "@judie/data/types/api";
 
 type DeletePermissionModalProps = {
@@ -33,10 +38,6 @@ const DeletePermissionModal = ({
   permission,
   selectedUserId,
 }: DeletePermissionModalProps) => {
-  const { userData } = useAuth();
-  const [success, setSuccess] = useState(false);
-  // const permissionId = useRouter().query?.PermissionId as string;
-
   const { refetch } = useQuery({
     queryKey: [GET_PERMISSIONS_BY_ID, selectedUserId],
     queryFn: () => getPermissionsByIdQuery(selectedUserId),
@@ -46,7 +47,6 @@ const DeletePermissionModal = ({
   const deletePermission = useMutation({
     mutationFn: deletePermissionMutation,
     onSuccess: () => {
-      setSuccess(true);
       refetch();
       onClose();
     },
@@ -72,19 +72,51 @@ const DeletePermissionModal = ({
             Are you sure you want to delete this Permission?
           </Text>
           {permission && (
-            <Text
-              style={{
-                fontSize: "1.4rem",
-                fontWeight: 800,
-                color: "#E53e3e",
-                textAlign: "center",
-                width: "100%",
-              }}
-            >
-              {permission?.organization?.name ?? "N/A"} ::{" "}
-              {permission?.school?.name ?? "N/A"} ::{" "}
-              {permission?.room?.name ?? "N/A"}
-            </Text>
+            <TableContainer w={"100%"} p={"24px 0"}>
+              <Table variant="simple">
+                <Thead>
+                  <Tr
+                    sx={{
+                      th: {
+                        padding: "0.5rem",
+                      },
+                    }}
+                  >
+                    <Th>Type</Th>
+                    <Th>Organization</Th>
+                    <Th>School</Th>
+                    <Th>Room</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr
+                    sx={{
+                      td: {
+                        padding: "0.5rem",
+                      },
+                    }}
+                  >
+                    <Td>{permission.type}</Td>
+                    <Td>{permission?.organization?.name ?? "None"}</Td>
+                    <Td>{permission?.school?.name ?? "None"}</Td>
+                    <Td>{permission?.room?.name ?? "None"}</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </TableContainer>
+            // <Text
+            //   style={{
+            //     fontSize: "1.4rem",
+            //     fontWeight: 800,
+            //     color: "#E53e3e",
+            //     textAlign: "center",
+            //     width: "100%",
+            //   }}
+            // >
+            //   {permission?.organization?.name ?? "N/A"} ::{" "}
+            //   {permission?.school?.name ?? "N/A"} ::{" "}
+            //   {permission?.room?.name ?? "N/A"}
+            // </Text>
           )}
 
           <HStack
