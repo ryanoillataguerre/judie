@@ -67,3 +67,7 @@ gcloud projects add-iam-policy-binding production-382518 \
     --member="serviceAccount:terraform@production-382518.iam.gserviceaccount.com" \
     --role="roles/artifactregistry.admin"
 ```
+
+```
+gcloud iam service-accounts add-iam-policy-binding "terraform@production-382518.iam.gserviceaccount.com" --project="production-382518" --role="roles/iam.serviceAccountTokenCreator" --member=serviceAccount:terraform@production-382518.iam.gserviceaccount.com
+```
