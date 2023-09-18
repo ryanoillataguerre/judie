@@ -72,10 +72,13 @@ const AdminUser = ({ id }: { id: string }) => {
           <Tab>Permissions</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
+          <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>
             <UserUsage id={id} />
           </TabPanel>
-          <TabPanel>
+          <TabPanel
+            p={{ base: "16px 0", md: "16px 16px" }}
+            position={"relative"}
+          >
             {permissionData && userData && (
               <PermissionsTable
                 permissions={permissionData}

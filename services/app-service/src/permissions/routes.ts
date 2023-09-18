@@ -101,10 +101,7 @@ router.delete(
 
 router.put(
   "/:permissionId",
-  [
-    body("type").isString().exists(),
-    body("organizationId").isString().exists(),
-  ],
+  [body("type").isString().exists()],
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -113,31 +110,36 @@ router.put(
 
     const permission = await updatePermissionById(permissionId, {
       type: type as PermissionType,
-      ...(organizationId &&
-        organizationId != "None" && {
-          organization: {
+
+      organization: organizationId
+        ? {
             connect: {
               id: organizationId,
             },
+          }
+        : {
+            disconnect: true,
           },
-        }),
-      ...(schoolId &&
-        schoolId != "None" && {
-          school: {
+
+      school: schoolId
+        ? {
             connect: {
               id: schoolId,
             },
+          }
+        : {
+            disconnect: true,
           },
-        }),
 
-      ...(roomId &&
-        roomId != "None" && {
-          room: {
+      room: roomId
+        ? {
             connect: {
               id: roomId,
             },
+          }
+        : {
+            disconnect: true,
           },
-        }),
 
       user: {
         connect: {
