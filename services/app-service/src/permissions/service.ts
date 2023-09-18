@@ -28,3 +28,15 @@ export const deletePermissionById = async ({ id }: { id: string }) => {
     },
   });
 };
+
+export const updatePermissionById = async (
+  permissionId: string,
+  params: Prisma.PermissionUpdateInput
+) => {
+  return await dbClient.permission.update({
+    where: {
+      id: permissionId,
+    },
+    data: params,
+  });
+};

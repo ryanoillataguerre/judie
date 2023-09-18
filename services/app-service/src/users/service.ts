@@ -77,6 +77,9 @@ export const getUserPermissionsRoomsSchools = async (
           school: true,
           organization: true,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       },
     },
   });

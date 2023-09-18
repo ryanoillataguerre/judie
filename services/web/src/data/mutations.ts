@@ -408,23 +408,37 @@ export const createPermissionMutation = async ({
 };
 
 export const putPermissionMutation = async ({
+  selectedUserId,
   permissionId,
-  subject,
-  userTitle,
-  folderId,
+  type,
+  schoolId,
+  organizationId,
+  roomId,
 }: {
+  selectedUserId: string;
   permissionId: string;
-  subject?: string;
-  userTitle?: string;
-  folderId?: string;
+  type?: PermissionType;
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
 }): Promise<Chat> => {
+  console.log("post: ", {
+    selectedUserId,
+    type,
+    organizationId,
+    schoolId,
+    roomId,
+  });
+
   const response = await baseFetch({
     url: `/admin/permissions/${permissionId}`,
     method: "PUT",
     body: {
-      subject,
-      userTitle,
-      folderId,
+      selectedUserId,
+      type,
+      organizationId,
+      schoolId,
+      roomId,
     },
   });
   return response.data;

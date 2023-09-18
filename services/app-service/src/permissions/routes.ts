@@ -5,7 +5,7 @@ import {
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
-import { deletePermissionById } from "./service.js";
+import { deletePermissionById, updatePermissionById } from "./service.js";
 import {
   validateOrganizationAdmin,
   validateSchoolAdmin,
@@ -74,7 +74,6 @@ router.delete(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
     const permissionId = req.params.permissionId;
     // const permission = await getPermissionById({
     //   id: permissionId,
@@ -96,6 +95,59 @@ router.delete(
       data: {
         success: true,
       },
+    });
+  })
+);
+
+router.put(
+  "/:permissionId",
+  [
+    body("type").isString().exists(),
+    body("organizationId").isString().exists(),
+  ],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const permissionId = req.params.permissionId;
+    const { selectedUserId, type, organizationId, schoolId, roomId } = req.body;
+
+    const permission = await updatePermissionById(permissionId, {
+      type: type as PermissionType,
+      ...(organizationId &&
+        organizationId != "None" && {
+          organization: {
+            connect: {
+              id: organizationId,
+            },
+          },
+        }),
+      ...(schoolId &&
+        schoolId != "None" && {
+          school: {
+            connect: {
+              id: schoolId,
+            },
+          },
+        }),
+
+      ...(roomId &&
+        roomId != "None" && {
+          room: {
+            connect: {
+              id: roomId,
+            },
+          },
+        }),
+
+      user: {
+        connect: {
+          id: selectedUserId,
+        },
+      },
+    });
+
+    res.status(201).json({
+      data: permission,
     });
   })
 );

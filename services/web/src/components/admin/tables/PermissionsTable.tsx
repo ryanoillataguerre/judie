@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableContainer,
@@ -66,13 +66,14 @@ const PermissionsTable = ({
         />
       )}
 
-      {editPermissionId && (
+      {editPermissionId && selectedPermission && (
         <EditPermissionModal
           permissionId={editPermissionId}
-          permission={permissions.find((p) => p.id === editPermissionId)}
+          permission={selectedPermission}
           isOpen={!!editPermissionId}
           onClose={() => {
             setEditPermissionId(null);
+            setSelectedPermission(undefined);
           }}
           selectedUserId={userId}
           userName={userName}
@@ -143,6 +144,7 @@ const PermissionsTable = ({
                     colorScheme="green"
                     onClick={(e) => {
                       e.preventDefault();
+                      setSelectedPermission(permission);
                       openEditModal(permission.id);
                     }}
                   >

@@ -48,7 +48,7 @@ type CreatePermissionModalProps = {
   isOpen: boolean;
   onClose: () => void;
   permissionId: string;
-  permission: Permission | undefined | null;
+  permission: Permission;
   selectedUserId: string;
   userName: string;
 };
@@ -61,10 +61,13 @@ const EditPermissionModal = ({
   selectedUserId,
   userName,
 }: CreatePermissionModalProps) => {
-  const [type, setType] = useState<PermissionType>(PermissionType.STUDENT);
-  const [organizationId, setOrganizationId] = useState<string>();
-  const [schoolId, setSchoolId] = useState<string>();
-  const [roomId, setRoomId] = useState<string>();
+  const [type, setType] = useState<PermissionType>(permission.type);
+  const [organizationId, setOrganizationId] = useState<string>(
+    permission.organizationId
+  );
+  const [schoolId, setSchoolId] = useState<string>(permission.schoolId);
+  const [roomId, setRoomId] = useState<string>(permission.roomId);
+
   const { refreshEntities } = useAuth();
   const [success, setSuccess] = useState(false);
   const editPermission = useMutation({
@@ -73,7 +76,9 @@ const EditPermissionModal = ({
       setSuccess(true);
     },
   });
-  const [organization, setOrganization] = useState<Organization>();
+  const [organization, setOrganization] = useState<Organization | undefined>(
+    permission.organization
+  );
   const [school, setSchool] = useState<School>();
   const [room, setRoom] = useState<Room>();
   const { organizations, schools, rooms } = useFlatAllEntities();
@@ -84,6 +89,37 @@ const EditPermissionModal = ({
     queryFn: () => getPermissionsByIdQuery(selectedUserId),
     enabled: !!selectedUserId,
   });
+
+  const { handleSubmit, register, reset } = useForm<SubmitData>({
+    defaultValues: {
+      type: permission.type,
+      organizationId: permission.organizationId,
+      schoolId: permission.schoolId ?? "None",
+      roomId: permission.roomId ?? "None",
+    },
+    reValidateMode: "onBlur",
+  });
+
+  const onSubmit: SubmitHandler<SubmitData> = async ({
+    type,
+    organizationId,
+    schoolId,
+    roomId,
+  }: SubmitData) => {
+    try {
+      await editPermission.mutateAsync({
+        selectedUserId,
+        permissionId,
+        type,
+        schoolId,
+        organizationId,
+        roomId,
+      });
+      onClose();
+      refetch();
+      reset();
+    } catch (err) {}
+  };
 
   useEffect(() => {
     if (organizationId) {
@@ -109,56 +145,10 @@ const EditPermissionModal = ({
       setRoom(undefined);
     }
   }, [roomId, setRoom, rooms]);
-
-  const { handleSubmit, register, reset } = useForm<SubmitData>({
-    defaultValues: {
-      type: undefined,
-      organizationId: undefined,
-      schoolId: undefined,
-      roomId: undefined,
-    },
-    reValidateMode: "onBlur",
-  });
-
-  const clearSelections = useCallback(() => {
-    setOrganizationId(undefined);
-    setSchoolId(undefined);
-    setRoomId(undefined);
-    setOrganization(undefined);
-    reset();
-  }, [setOrganizationId, setSchoolId, setRoomId, setOrganization]);
-
-  const onSubmit: SubmitHandler<SubmitData> = async ({
-    type,
-    organizationId,
-    schoolId,
-    roomId,
-  }: SubmitData) => {
-    try {
-      await editPermission.mutateAsync({
-        permissionId,
-        type,
-        schoolId,
-        organizationId,
-        roomId,
-      });
-
-      onClose();
-      refetch();
-      reset();
-    } catch (err) {}
-  };
-
-  useEffect(() => {
-    return () => {
-      reset();
-    };
-  }, [reset]);
   return (
     <Modal
       isOpen={isOpen}
       onClose={() => {
-        clearSelections();
         onClose();
       }}
     >
@@ -212,7 +202,7 @@ const EditPermissionModal = ({
                 <FormLabel htmlFor="permissionType">Permission Type</FormLabel>
                 <Select
                   id="type"
-                  {...register("type", {})}
+                  {...register("type")}
                   value={type}
                   onChange={(e) => setType(e.target.value as PermissionType)}
                 >
@@ -264,7 +254,7 @@ const EditPermissionModal = ({
                 <FormLabel htmlFor="school">School</FormLabel>
                 <Select
                   id="schoolId"
-                  {...register("schoolId", {})}
+                  {...register("schoolId")}
                   value={schoolId}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                     setSchoolId(e.target.value);
@@ -294,7 +284,7 @@ const EditPermissionModal = ({
                 <FormLabel htmlFor="room">Room</FormLabel>
                 <Select
                   id="roomId"
-                  {...register("roomId", {})}
+                  {...register("roomId")}
                   value={roomId}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                     setRoomId(e.target.value);
