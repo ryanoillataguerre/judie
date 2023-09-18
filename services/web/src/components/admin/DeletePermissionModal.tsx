@@ -18,24 +18,29 @@ import { useRouter } from "next/router";
 import useAuth from "@judie/hooks/useAuth";
 import { Permission } from "@judie/data/types/api";
 
+type DeletePermissionModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  permissionId: string;
+  permission: Permission | undefined | null;
+  selectedUserId: string;
+};
+
 const DeletePermissionModal = ({
   isOpen,
   onClose,
   permissionId,
   permission,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  permissionId: string;
-  permission: Permission | undefined | null;
-}) => {
+  selectedUserId,
+}: DeletePermissionModalProps) => {
   const { userData } = useAuth();
   const [success, setSuccess] = useState(false);
   // const permissionId = useRouter().query?.PermissionId as string;
+
   const { refetch } = useQuery({
-    queryKey: [GET_PERMISSIONS_BY_ID, permissionId],
-    queryFn: () => getPermissionsByIdQuery(permissionId),
-    enabled: !!permissionId,
+    queryKey: [GET_PERMISSIONS_BY_ID, selectedUserId],
+    queryFn: () => getPermissionsByIdQuery(selectedUserId),
+    enabled: !!selectedUserId,
   });
 
   const deletePermission = useMutation({

@@ -386,6 +386,50 @@ export const deletePermissionMutation = async ({
   return response.data;
 };
 
+export const createPermissionMutation = async ({
+  userId,
+  type,
+  organizationId,
+  schoolId,
+  roomId,
+}: {
+  userId: string;
+  type: PermissionType;
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/permissions/`,
+    method: "POST",
+    body: { userId, type, organizationId, schoolId, roomId },
+  });
+  return response.data;
+};
+
+export const putPermissionMutation = async ({
+  permissionId,
+  subject,
+  userTitle,
+  folderId,
+}: {
+  permissionId: string;
+  subject?: string;
+  userTitle?: string;
+  folderId?: string;
+}): Promise<Chat> => {
+  const response = await baseFetch({
+    url: `/admin/permissions/${permissionId}`,
+    method: "PUT",
+    body: {
+      subject,
+      userTitle,
+      folderId,
+    },
+  });
+  return response.data;
+};
+
 export const putOrgMutation = async ({
   organizationId,
   name,

@@ -16,6 +16,59 @@ import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const router = Router();
 
+router.post(
+  "/",
+  [
+    body("userId").isString().exists(),
+    body("organizationId").isString().exists(),
+  ],
+  // Only Judie employees can create organizations
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { userId, type, roomId, organizationId, schoolId } = req.body;
+
+    const permissonObj = {
+      type: type as PermissionType,
+      ...(organizationId &&
+        organizationId != "None" && {
+          organization: {
+            connect: {
+              id: organizationId,
+            },
+          },
+        }),
+      ...(schoolId &&
+        schoolId != "None" && {
+          school: {
+            connect: {
+              id: schoolId,
+            },
+          },
+        }),
+      ...(roomId &&
+        roomId != "None" && {
+          room: {
+            connect: {
+              id: roomId,
+            },
+          },
+        }),
+
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+    };
+
+    let newPermission = await createPermission(permissonObj);
+
+    res.status(201).json({
+      data: newPermission,
+    });
+  })
+);
+
 router.delete(
   "/:permissionId",
   requireAuth,

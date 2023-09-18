@@ -62,7 +62,7 @@ export const getInviteByIdQuery = async (id: string): Promise<Invite> => {
 
 export const GET_PERMISSIONS_BY_ID = "GET_PERMISSIONS_BY_ID";
 export const getPermissionsByIdQuery = async (
-  user_id: string
+  user_id?: string
 ): Promise<Permission[]> => {
   const response = await baseFetch({
     url: `/user/permissions/${user_id}`,

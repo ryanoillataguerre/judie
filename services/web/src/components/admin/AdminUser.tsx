@@ -27,13 +27,11 @@ const AdminUser = ({ id }: { id: string }) => {
     enabled: !!id,
   });
 
-  const { data: permissionData } = useQuery({
+  const { data: permissionData, refetch } = useQuery({
     queryKey: [GET_PERMISSIONS_BY_ID, id],
     queryFn: () => getPermissionsByIdQuery(id),
     enabled: !!id,
   });
-
-  console.log(permissionData);
 
   return (
     <VStack
@@ -78,8 +76,12 @@ const AdminUser = ({ id }: { id: string }) => {
             <UserUsage id={id} />
           </TabPanel>
           <TabPanel>
-            {permissionData && (
-              <PermissionsTable permissions={permissionData} />
+            {permissionData && userData && (
+              <PermissionsTable
+                permissions={permissionData}
+                userName={`${userData?.firstName} ${userData?.lastName}`}
+                userId={userData?.id}
+              />
             )}
           </TabPanel>
         </TabPanels>
