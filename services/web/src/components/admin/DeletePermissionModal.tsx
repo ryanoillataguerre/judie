@@ -13,9 +13,9 @@ import {
   Th,
   Td,
   TableContainer,
+  useToast,
 } from "@chakra-ui/react";
 import { deletePermissionMutation } from "@judie/data/mutations";
-import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import {
   GET_PERMISSIONS_BY_ID,
@@ -44,9 +44,18 @@ const DeletePermissionModal = ({
     enabled: !!selectedUserId,
   });
 
+  const toast = useToast();
+
   const deletePermission = useMutation({
     mutationFn: deletePermissionMutation,
     onSuccess: () => {
+      toast({
+        title: "Permission deleted",
+        description: "Permission deleted successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
       refetch();
       onClose();
     },
@@ -104,19 +113,6 @@ const DeletePermissionModal = ({
                 </Tbody>
               </Table>
             </TableContainer>
-            // <Text
-            //   style={{
-            //     fontSize: "1.4rem",
-            //     fontWeight: 800,
-            //     color: "#E53e3e",
-            //     textAlign: "center",
-            //     width: "100%",
-            //   }}
-            // >
-            //   {permission?.organization?.name ?? "N/A"} ::{" "}
-            //   {permission?.school?.name ?? "N/A"} ::{" "}
-            //   {permission?.room?.name ?? "N/A"}
-            // </Text>
           )}
 
           <HStack

@@ -2,7 +2,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -17,13 +16,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import Button from "../Button/Button";
 import {
-  GET_ORG_BY_ID,
   GET_PERMISSIONS_BY_ID,
-  getOrgByIdQuery,
   getPermissionsByIdQuery,
-  getSchoolByIdQuery,
 } from "@judie/data/queries";
-import useAuth from "@judie/hooks/useAuth";
 import {
   Organization,
   PermissionType,
@@ -31,7 +26,6 @@ import {
   School,
 } from "@judie/data/types/api";
 import useFlatAllEntities from "@judie/hooks/useFlatAllEntities";
-import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface SubmitData {
   type: PermissionType;
@@ -57,19 +51,24 @@ const CreatePermissionModal = ({
   const [organizationId, setOrganizationId] = useState<string>();
   const [schoolId, setSchoolId] = useState<string>();
   const [roomId, setRoomId] = useState<string>();
-  const { refreshEntities } = useAuth();
-  const [success, setSuccess] = useState(false);
+
+  const toast = useToast();
   const createPermission = useMutation({
     mutationFn: createPermissionMutation,
     onSuccess: () => {
-      setSuccess(true);
+      toast({
+        title: "Permission created",
+        description: `Permission created for ${userName}`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     },
   });
   const [organization, setOrganization] = useState<Organization>();
   const [school, setSchool] = useState<School>();
   const [room, setRoom] = useState<Room>();
   const { organizations, schools, rooms } = useFlatAllEntities();
-  const toast = useToast();
 
   const { refetch } = useQuery({
     queryKey: [GET_PERMISSIONS_BY_ID, userId],
