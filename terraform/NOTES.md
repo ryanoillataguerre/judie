@@ -59,7 +59,7 @@ gcloud iam workload-identity-pools providers create-oidc "gha-provider" \
 gcloud iam service-accounts add-iam-policy-binding "terraform@production-382518.iam.gserviceaccount.com" \
   --project="production-382518" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/617839389948/locations/global/workloadIdentityPools/github-actions/attribute.repository/judie/judie"
+  --member="principalSet://iam.googleapis.com/projects/467740700781/locations/global/workloadIdentityPools/github-actions/attribute.repository/judie/judie"
 ```
 
 ```

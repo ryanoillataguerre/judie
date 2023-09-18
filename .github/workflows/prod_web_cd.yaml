@@ -50,8 +50,8 @@ jobs:
             us-west1-docker.pkg.dev/production-382518/web/web:latest
           build-args: |
             NEXT_PUBLIC_API_URI=https://app-service.judie.io
-            NEXT_PUBLIC_NODE_ENV=sandbox
-            SEGMENT_WRITE_KEY={{ secrets.SEGMENT_WRITE_KEY }}
+            NEXT_PUBLIC_NODE_ENV=production
+            NEXT_PUBLIC_SEGMENT_WRITE_KEY={{ secrets.SEGMENT_WRITE_KEY }}
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v1'
