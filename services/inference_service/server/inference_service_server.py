@@ -29,7 +29,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     Class to define the behavior of the Inference Service
     """
 
-    def GetChatResponse(self, request, context):
+    def getChatResponse(self, request, context):
         logger.info(f"Get chat response request: \n{request}")
 
         chat_id = request.chat_id
