@@ -170,6 +170,10 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
     throw new UnauthorizedError("Invite not found - it may have expired.");
   }
 
+  if (!invite.permissions?.length) {
+    throw new UnauthorizedError("Invite has no permissions");
+  }
+
   // Create user
   const newUser = await signup({
     firstName: params.firstName,
