@@ -9,9 +9,6 @@ type SearchBarProps = {
   setSearchText: (searchText: string) => void;
 };
 
-// submit on press enter
-// clear on esc
-
 const SearchBar = ({ title, searchText, setSearchText }: SearchBarProps) => {
   const toast = useToast();
 
@@ -29,7 +26,7 @@ const SearchBar = ({ title, searchText, setSearchText }: SearchBarProps) => {
   };
 
   return (
-    <Flex flexGrow={1} alignItems={"center"} justify={"center"}>
+    <Flex flexGrow={1} alignItems={"center"} width={"100%"} justify={"center"}>
       <InputGroup>
         <InputLeftElement py={15} h={54} pl={4} pointerEvents="none">
           <Search2Icon color="gray.300" />

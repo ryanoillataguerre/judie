@@ -91,18 +91,18 @@ const AdminRoot = () => {
           <Tab>Your Users</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
+          <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>
             <OrganizationsTable
               organizations={organizations as Organization[]}
             />
           </TabPanel>
-          <TabPanel>
+          <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>
             <SchoolsTable schools={schools} />
           </TabPanel>
-          <TabPanel>
+          <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>
             <RoomsTable rooms={rooms} />
           </TabPanel>
-          <TabPanel>
+          <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>
             <UsersTable users={users as User[]} loading={isLoading} />
           </TabPanel>
         </TabPanels>

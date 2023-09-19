@@ -2,7 +2,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -11,22 +10,15 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import {
-  createPermissionMutation,
-  putPermissionMutation as editPermissionMutation,
-} from "@judie/data/mutations";
-import { useCallback, useEffect, useState } from "react";
+import { putPermissionMutation as editPermissionMutation } from "@judie/data/mutations";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import Button from "../Button/Button";
 import {
-  GET_ORG_BY_ID,
   GET_PERMISSIONS_BY_ID,
-  getOrgByIdQuery,
   getPermissionsByIdQuery,
-  getSchoolByIdQuery,
 } from "@judie/data/queries";
-import useAuth from "@judie/hooks/useAuth";
 import {
   Organization,
   Permission,
@@ -35,7 +27,6 @@ import {
   School,
 } from "@judie/data/types/api";
 import useFlatAllEntities from "@judie/hooks/useFlatAllEntities";
-import { HTTPResponseError } from "@judie/data/baseFetch";
 
 interface SubmitData {
   type: PermissionType;
@@ -68,12 +59,18 @@ const EditPermissionModal = ({
   const [schoolId, setSchoolId] = useState<string>(permission.schoolId);
   const [roomId, setRoomId] = useState<string>(permission.roomId);
 
-  const { refreshEntities } = useAuth();
-  const [success, setSuccess] = useState(false);
+  const toast = useToast();
+
   const editPermission = useMutation({
     mutationFn: editPermissionMutation,
     onSuccess: () => {
-      setSuccess(true);
+      toast({
+        title: "Permission Updated",
+        description: `The permission for ${userName} has been updated.`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     },
   });
   const [organization, setOrganization] = useState<Organization | undefined>(
@@ -82,7 +79,6 @@ const EditPermissionModal = ({
   const [school, setSchool] = useState<School>();
   const [room, setRoom] = useState<Room>();
   const { organizations, schools, rooms } = useFlatAllEntities();
-  const toast = useToast();
 
   const { refetch } = useQuery({
     queryKey: [GET_PERMISSIONS_BY_ID, selectedUserId],

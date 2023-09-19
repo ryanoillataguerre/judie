@@ -422,23 +422,15 @@ export const putPermissionMutation = async ({
   schoolId?: string;
   roomId?: string;
 }): Promise<Chat> => {
-  console.log("post: ", {
-    selectedUserId,
-    type,
-    organizationId,
-    schoolId,
-    roomId,
-  });
-
   const response = await baseFetch({
     url: `/admin/permissions/${permissionId}`,
     method: "PUT",
     body: {
       selectedUserId,
       type,
-      organizationId,
-      schoolId,
-      roomId,
+      ...(organizationId && organizationId != "None" && { organizationId }),
+      ...(schoolId && schoolId != "None" && { schoolId }),
+      ...(roomId && roomId != "None" && { roomId }),
     },
   });
   return response.data;

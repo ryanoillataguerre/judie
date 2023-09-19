@@ -87,7 +87,15 @@ const PermissionsTable = ({
         userId={userId}
       />
 
-      <Flex justify={"center"} align={"center"} gap={"20px"} mb={2}>
+      <Flex
+        justify={"center"}
+        align={"center"}
+        gap={"20px"}
+        mb={2}
+        flexDirection={{ base: "column", md: "row" }}
+        position={{ base: "sticky", md: "inherit" }}
+        left={{ base: "0", md: "auto" }}
+      >
         <SearchBar
           title="Permissions"
           searchText={searchText}
@@ -98,6 +106,8 @@ const PermissionsTable = ({
           colorScheme="green"
           variant={"solid"}
           type="submit"
+          width={{ base: "100%", md: "auto" }}
+          p={"0 32px"}
         >
           + Add Permission
         </Button>
@@ -105,6 +115,7 @@ const PermissionsTable = ({
       <Table variant={"simple"} size="md">
         <Thead>
           <Tr>
+            <Th>Type</Th>
             <Th>Organization</Th>
             <Th>School</Th>
             <Th>Room</Th>
@@ -116,7 +127,13 @@ const PermissionsTable = ({
               if (permission.deletedAt) {
                 return false;
               } else {
-                return true;
+                if (searchText.trim() == "") {
+                  return true;
+                }
+                const searchString = `${permission?.organization?.name} ${permission?.school?.name} ${permission?.room?.name}`;
+                return searchString
+                  .toLowerCase()
+                  .includes(searchText.toLowerCase());
               }
             })
             .map((permission) => (
@@ -127,6 +144,9 @@ const PermissionsTable = ({
                   transition: "ease-in-out 0.3s",
                 }}
               >
+                <Td>
+                  <Text>{permission.type ?? "N/A"}</Text>
+                </Td>
                 <Td>
                   <Text>{permission.organization?.name ?? "N/A"}</Text>
                 </Td>
