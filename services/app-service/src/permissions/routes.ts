@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import {
   errorPassthrough,
   handleValidationErrors,
@@ -12,7 +12,6 @@ import {
 } from "../admin/service.js";
 import { createPermission } from "../permissions/service.js";
 import { PermissionType } from "@prisma/client";
-import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 
 const router = Router();
 
@@ -20,7 +19,10 @@ router.post(
   "/",
   [
     body("userId").isString().exists(),
+    body("type").isString().exists(),
     body("organizationId").isString().exists(),
+    body("schoolId").isString().exists(),
+    body("roomId").isString().exists(),
   ],
   // Only Judie employees can create organizations
   errorPassthrough(handleValidationErrors),
@@ -29,30 +31,27 @@ router.post(
 
     const permissonObj = {
       type: type as PermissionType,
-      ...(organizationId &&
-        organizationId != "None" && {
-          organization: {
-            connect: {
-              id: organizationId,
-            },
+      ...(organizationId != "None" && {
+        organization: {
+          connect: {
+            id: organizationId,
           },
-        }),
-      ...(schoolId &&
-        schoolId != "None" && {
-          school: {
-            connect: {
-              id: schoolId,
-            },
+        },
+      }),
+      ...(schoolId != "None" && {
+        school: {
+          connect: {
+            id: schoolId,
           },
-        }),
-      ...(roomId &&
-        roomId != "None" && {
-          room: {
-            connect: {
-              id: roomId,
-            },
+        },
+      }),
+      ...(roomId != "None" && {
+        room: {
+          connect: {
+            id: roomId,
           },
-        }),
+        },
+      }),
 
       user: {
         connect: {
@@ -71,6 +70,7 @@ router.post(
 
 router.delete(
   "/:permissionId",
+  [param("permissionId").exists()],
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -101,7 +101,14 @@ router.delete(
 
 router.put(
   "/:permissionId",
-  [body("type").isString().exists()],
+  [
+    param("permissionId").exists(),
+    body("type").isString().exists(),
+    body("organizationId").isString().exists(),
+    body("schoolId").isString().exists(),
+    body("roomId").isString().exists(),
+    body("selectedUserId").isString().exists(),
+  ],
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -111,35 +118,38 @@ router.put(
     const permission = await updatePermissionById(permissionId, {
       type: type as PermissionType,
 
-      organization: organizationId
-        ? {
-            connect: {
-              id: organizationId,
+      organization:
+        organizationId != "None"
+          ? {
+              connect: {
+                id: organizationId,
+              },
+            }
+          : {
+              disconnect: true,
             },
-          }
-        : {
-            disconnect: true,
-          },
 
-      school: schoolId
-        ? {
-            connect: {
-              id: schoolId,
+      school:
+        schoolId != "None"
+          ? {
+              connect: {
+                id: schoolId,
+              },
+            }
+          : {
+              disconnect: true,
             },
-          }
-        : {
-            disconnect: true,
-          },
 
-      room: roomId
-        ? {
-            connect: {
-              id: roomId,
+      room:
+        roomId != "None"
+          ? {
+              connect: {
+                id: roomId,
+              },
+            }
+          : {
+              disconnect: true,
             },
-          }
-        : {
-            disconnect: true,
-          },
 
       user: {
         connect: {

@@ -65,7 +65,7 @@ export const getPermissionsByIdQuery = async (
   user_id?: string
 ): Promise<Permission[]> => {
   const response = await baseFetch({
-    url: `/user/permissions/${user_id}`,
+    url: `/user/${user_id}/permissions`,
     method: "GET",
   });
   return response.data;

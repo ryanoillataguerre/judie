@@ -193,7 +193,7 @@ router.get(
 );
 
 router.get(
-  "/permissions/:userId",
+  "/:userId/permissions",
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const user = await getUserPermissionsRoomsSchools({

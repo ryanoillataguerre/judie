@@ -89,7 +89,7 @@ const EditPermissionModal = ({
   const { handleSubmit, register, reset } = useForm<SubmitData>({
     defaultValues: {
       type: permission.type,
-      organizationId: permission.organizationId,
+      organizationId: permission.organizationId ?? "None",
       schoolId: permission.schoolId ?? "None",
       roomId: permission.roomId ?? "None",
     },
@@ -98,9 +98,9 @@ const EditPermissionModal = ({
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
     type,
-    organizationId,
-    schoolId,
-    roomId,
+    organizationId = "None",
+    schoolId = "None",
+    roomId = "None",
   }: SubmitData) => {
     try {
       await editPermission.mutateAsync({
@@ -227,7 +227,7 @@ const EditPermissionModal = ({
                   }}
                 >
                   {type !== PermissionType.ORG_ADMIN && (
-                    <option key="none" defaultChecked value={undefined}>
+                    <option key="none" value={"None"}>
                       None
                     </option>
                   )}
@@ -257,7 +257,7 @@ const EditPermissionModal = ({
                   }}
                 >
                   {type !== PermissionType.SCHOOL_ADMIN && (
-                    <option key="none" value={undefined}>
+                    <option key="none" value={"None"}>
                       None
                     </option>
                   )}
@@ -287,7 +287,7 @@ const EditPermissionModal = ({
                   }}
                 >
                   {type !== PermissionType.ROOM_ADMIN && (
-                    <option key="none" value={undefined}>
+                    <option key="none" value={"None"}>
                       None
                     </option>
                   )}

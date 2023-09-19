@@ -103,18 +103,18 @@ const CreatePermissionModal = ({
 
   const { handleSubmit, register, reset } = useForm<SubmitData>({
     defaultValues: {
-      type: undefined,
-      organizationId: undefined,
-      schoolId: undefined,
-      roomId: undefined,
+      type: PermissionType.STUDENT,
+      organizationId: "None",
+      schoolId: "None",
+      roomId: "None",
     },
     reValidateMode: "onBlur",
   });
 
   const clearSelections = useCallback(() => {
-    setOrganizationId(undefined);
-    setSchoolId(undefined);
-    setRoomId(undefined);
+    setOrganizationId("None");
+    setSchoolId("None");
+    setRoomId("None");
     setOrganization(undefined);
     reset();
   }, [setOrganizationId, setSchoolId, setRoomId, setOrganization]);
@@ -122,8 +122,8 @@ const CreatePermissionModal = ({
   const onSubmit: SubmitHandler<SubmitData> = async ({
     type,
     organizationId,
-    schoolId,
-    roomId,
+    schoolId = "None",
+    roomId = "None",
   }: SubmitData) => {
     try {
       await createPermission.mutateAsync({
@@ -140,11 +140,6 @@ const CreatePermissionModal = ({
     } catch (err) {}
   };
 
-  useEffect(() => {
-    return () => {
-      reset();
-    };
-  }, [reset]);
   return (
     <Modal
       isOpen={isOpen}
@@ -232,7 +227,7 @@ const CreatePermissionModal = ({
                   }}
                 >
                   {type !== PermissionType.ORG_ADMIN && (
-                    <option key="none" defaultChecked value={undefined}>
+                    <option key="none" defaultChecked value={"None"}>
                       None
                     </option>
                   )}
@@ -265,7 +260,7 @@ const CreatePermissionModal = ({
                     }}
                   >
                     {type !== PermissionType.SCHOOL_ADMIN && (
-                      <option key="none" value={undefined}>
+                      <option key="none" value={"None"}>
                         None
                       </option>
                     )}
@@ -299,7 +294,7 @@ const CreatePermissionModal = ({
                     }}
                   >
                     {type !== PermissionType.ROOM_ADMIN && (
-                      <option key="none" value={undefined}>
+                      <option key="none" value={"None"}>
                         None
                       </option>
                     )}

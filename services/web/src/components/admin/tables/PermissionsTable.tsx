@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Table,
   TableContainer,
@@ -13,11 +13,7 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { resendInviteMutation } from "@judie/data/mutations";
-import { Invite, Permission } from "@judie/data/types/api";
-import { FiRefreshCcw } from "react-icons/fi";
-import { HiRefresh } from "react-icons/hi";
-import { useMutation } from "react-query";
+import { Permission } from "@judie/data/types/api";
 import SearchBar from "@judie/components/SearchBar/SearchBar";
 import { FaTrashAlt } from "react-icons/fa";
 import DeletePermissionModal from "../DeletePermissionModal";
@@ -114,11 +110,19 @@ const PermissionsTable = ({
       </Flex>
       <Table variant={"simple"} size="md">
         <Thead>
-          <Tr>
+          <Tr
+            sx={{
+              th: {
+                padding: "1rem 0.5rem",
+              },
+            }}
+          >
             <Th>Type</Th>
             <Th>Organization</Th>
             <Th>School</Th>
             <Th>Room</Th>
+            <Th>Edit</Th>
+            <Th>Delete</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -130,7 +134,11 @@ const PermissionsTable = ({
                 if (searchText.trim() == "") {
                   return true;
                 }
-                const searchString = `${permission?.organization?.name} ${permission?.school?.name} ${permission?.room?.name}`;
+                const searchString = `${
+                  permission?.organization?.name ?? "N/A"
+                } ${permission?.school?.name ?? "N/A"} ${
+                  permission?.room?.name ?? "N/A"
+                }`;
                 return searchString
                   .toLowerCase()
                   .includes(searchText.toLowerCase());
@@ -142,6 +150,11 @@ const PermissionsTable = ({
                 _hover={{
                   backgroundColor: rowBackgroundColor,
                   transition: "ease-in-out 0.3s",
+                }}
+                sx={{
+                  td: {
+                    padding: "1rem 0.5rem",
+                  },
                 }}
               >
                 <Td>
