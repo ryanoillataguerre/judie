@@ -341,7 +341,7 @@ module "web" {
 resource "google_secret_manager_secret" "tf-vars_secret" {
   secret_id = "prod_tf_vars"
 
-  replication{
+  replication {
     automatic = true
   }
 }

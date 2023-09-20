@@ -39,7 +39,7 @@ I also had to add certain roles to the terraform service account, but these were
 And in production:
 
 ```
-gcloud iam workload-identity-pools create "github-actions" \
+gcloud iam workload-identity-pools create "gha-pool" \
   --project="production-382518" \
   --location="global" \
   --display-name="Github Action Pool"
@@ -49,9 +49,9 @@ gcloud iam workload-identity-pools create "github-actions" \
 gcloud iam workload-identity-pools providers create-oidc "gha-provider" \
   --project="production-382518" \
   --location="global" \
-  --workload-identity-pool="github-actions" \
+  --workload-identity-pool="gha-pool" \
   --display-name="Github Action Provider" \
-  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.aud=assertion.aud,attribute.repository=assertion.repository" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 ```
 
@@ -59,11 +59,15 @@ gcloud iam workload-identity-pools providers create-oidc "gha-provider" \
 gcloud iam service-accounts add-iam-policy-binding "terraform@production-382518.iam.gserviceaccount.com" \
   --project="production-382518" \
   --role="roles/iam.workloadIdentityUser" \
-  --member="principalSet://iam.googleapis.com/projects/467740700781/locations/global/workloadIdentityPools/github-actions/attribute.repository/judie/judie"
+  --member="principalSet://iam.googleapis.com/projects/467740700781/locations/global/workloadIdentityPools/gha-pool/attribute.repository/judie/judie"
 ```
 
 ```
 gcloud projects add-iam-policy-binding production-382518 \
     --member="serviceAccount:terraform@production-382518.iam.gserviceaccount.com" \
     --role="roles/artifactregistry.admin"
+```
+
+```
+gcloud iam service-accounts add-iam-policy-binding "terraform@production-382518.iam.gserviceaccount.com" --project="production-382518" --role="roles/iam.serviceAccountTokenCreator" --member=serviceAccount:terraform@production-382518.iam.gserviceaccount.com
 ```
