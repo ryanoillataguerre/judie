@@ -60,14 +60,15 @@ jobs:
             us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:latest
       
       # Migrate DB
-      - name: Install Dependencies
-        working-directory: services/app-service
-        run: yarn
-      - name: Migrate Database
-        working-directory: services/app-service
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: yarn run migrate:prod
+      # Removing for now because we need to whitelist GHA job runner IPs on our DB, and I don't want to do that yet
+      # - name: Install Dependencies
+      #   working-directory: services/app-service
+      #   run: yarn
+      # - name: Migrate Database
+      #   working-directory: services/app-service
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: yarn run migrate:prod
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v1'
