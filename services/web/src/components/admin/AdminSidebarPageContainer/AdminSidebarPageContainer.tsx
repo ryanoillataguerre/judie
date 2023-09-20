@@ -71,8 +71,8 @@ const AdminSidebarPageContainer = ({
           position: "relative",
           overflow: "scroll",
           maxWidth: "100%",
-          padding: "2rem 2rem",
         }}
+        p={{ base: "1rem 1rem 1rem 2rem", md: "2rem 2rem" }}
       >
         <OpenCloseButton
           isAdminSidebarOpen={isAdminSidebarOpen}
