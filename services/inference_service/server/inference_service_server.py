@@ -29,7 +29,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
     Class to define the behavior of the Inference Service
     """
 
-    def GetChatResponse(self, request, context):
+    def getChatResponse(self, request, context):
         logger.info(f"Get chat response request: \n{request}")
 
         chat_id = request.chat_id
@@ -52,7 +52,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
                 responsePart=part, chatMetaData={}
             )
 
-    def ServerConnectionCheck(self, request, context):
+    def serverConnectionCheck(self, request, context):
         logger.info(f"Server connection check request: {request}")
         return inference_service_pb2.ConnectedCheckResponse(connected=True)
 
