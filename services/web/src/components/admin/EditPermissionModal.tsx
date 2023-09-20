@@ -86,10 +86,10 @@ const EditPermissionModal = ({
     enabled: !!selectedUserId,
   });
 
-  const { handleSubmit, register, reset } = useForm<SubmitData>({
+  const { handleSubmit, register, reset, resetField } = useForm<SubmitData>({
     defaultValues: {
       type: permission.type,
-      organizationId: permission.organizationId,
+      organizationId: permission.organizationId ?? "None",
       schoolId: permission.schoolId ?? "None",
       roomId: permission.roomId ?? "None",
     },
@@ -98,9 +98,9 @@ const EditPermissionModal = ({
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
     type,
-    organizationId,
-    schoolId,
-    roomId,
+    organizationId = "None",
+    schoolId = "None",
+    roomId = "None",
   }: SubmitData) => {
     try {
       await editPermission.mutateAsync({
@@ -141,6 +141,20 @@ const EditPermissionModal = ({
       setRoom(undefined);
     }
   }, [roomId, setRoom, rooms]);
+
+  useEffect(() => {
+    if (organizationId === "None") {
+      resetField("schoolId", { defaultValue: "None" });
+      resetField("roomId", { defaultValue: "None" });
+    }
+  }, [organizationId]);
+
+  useEffect(() => {
+    if (schoolId === "None") {
+      resetField("roomId", { defaultValue: "None" });
+    }
+  }, [schoolId]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -227,7 +241,7 @@ const EditPermissionModal = ({
                   }}
                 >
                   {type !== PermissionType.ORG_ADMIN && (
-                    <option key="none" defaultChecked value={undefined}>
+                    <option key="none" value={"None"}>
                       None
                     </option>
                   )}
@@ -239,66 +253,74 @@ const EditPermissionModal = ({
                 </Select>
               </FormControl>
 
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                  width: "100%",
-                }}
-                isRequired={type === PermissionType.SCHOOL_ADMIN}
-              >
-                <FormLabel htmlFor="school">School</FormLabel>
-                <Select
-                  id="schoolId"
-                  {...register("schoolId")}
-                  value={schoolId}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                    setSchoolId(e.target.value);
+              {(type === PermissionType.ROOM_ADMIN ||
+                type === PermissionType.SCHOOL_ADMIN ||
+                type === PermissionType.STUDENT) &&
+              organization ? (
+                <FormControl
+                  style={{
+                    marginTop: "0.5rem",
+                    marginBottom: "0.5rem",
+                    width: "100%",
                   }}
+                  isRequired={type === PermissionType.SCHOOL_ADMIN}
                 >
-                  {type !== PermissionType.SCHOOL_ADMIN && (
-                    <option key="none" value={undefined}>
-                      None
-                    </option>
-                  )}
-                  {organization?.schools?.map((school) => (
-                    <option key={school.id} value={school.id}>
-                      {school.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl
-                style={{
-                  marginTop: "0.5rem",
-                  marginBottom: "0.5rem",
-                  width: "100%",
-                }}
-                isRequired={type === PermissionType.ROOM_ADMIN}
-              >
-                <FormLabel htmlFor="room">Room</FormLabel>
-                <Select
-                  id="roomId"
-                  {...register("roomId")}
-                  value={roomId}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                    setRoomId(e.target.value);
+                  <FormLabel htmlFor="school">School</FormLabel>
+                  <Select
+                    id="schoolId"
+                    {...register("schoolId")}
+                    value={schoolId}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                      setSchoolId(e.target.value);
+                    }}
+                  >
+                    {type !== PermissionType.SCHOOL_ADMIN && (
+                      <option key="none" value={"None"}>
+                        None
+                      </option>
+                    )}
+                    {organization?.schools?.map((school) => (
+                      <option key={school.id} value={school.id}>
+                        {school.name}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : null}
+              {(type === PermissionType.ROOM_ADMIN ||
+                type === PermissionType.STUDENT) &&
+              organization &&
+              school ? (
+                <FormControl
+                  style={{
+                    marginTop: "0.5rem",
+                    marginBottom: "0.5rem",
+                    width: "100%",
                   }}
+                  isRequired={type === PermissionType.ROOM_ADMIN}
                 >
-                  {type !== PermissionType.ROOM_ADMIN && (
-                    <option key="none" value={undefined}>
-                      None
-                    </option>
-                  )}
-                  {school?.rooms?.map((room) => (
-                    <option key={room.id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-
+                  <FormLabel htmlFor="room">Room</FormLabel>
+                  <Select
+                    id="roomId"
+                    {...register("roomId")}
+                    value={roomId}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                      setRoomId(e.target.value);
+                    }}
+                  >
+                    {type !== PermissionType.ROOM_ADMIN && (
+                      <option key="none" value={"None"}>
+                        None
+                      </option>
+                    )}
+                    {school?.rooms?.map((room) => (
+                      <option key={room.id} value={room.id}>
+                        {room.name}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : null}
               <Button
                 style={{
                   width: "100%",

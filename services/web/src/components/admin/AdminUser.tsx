@@ -27,7 +27,7 @@ const AdminUser = ({ id }: { id: string }) => {
     enabled: !!id,
   });
 
-  const { data: permissionData, refetch } = useQuery({
+  const { data: permissionData } = useQuery({
     queryKey: [GET_PERMISSIONS_BY_ID, id],
     queryFn: () => getPermissionsByIdQuery(id),
     enabled: !!id,
@@ -59,12 +59,6 @@ const AdminUser = ({ id }: { id: string }) => {
             {userData?.firstName} {userData?.lastName}
           </Box>
         </Text>
-        <Text>
-          Role:{" "}
-          <Box fontSize={"20px"} as={"span"}>
-            {userData?.role}
-          </Box>
-        </Text>
       </Flex>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
@@ -72,11 +66,11 @@ const AdminUser = ({ id }: { id: string }) => {
           <Tab>Permissions</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>
+          <TabPanel p={{ base: "16px 0", md: "16px 0px" }}>
             <UserUsage id={id} />
           </TabPanel>
           <TabPanel
-            p={{ base: "16px 0", md: "16px 16px" }}
+            p={{ base: "16px 0", md: "16px 0px" }}
             position={"relative"}
           >
             {permissionData && userData && (

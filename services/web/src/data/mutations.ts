@@ -428,9 +428,9 @@ export const putPermissionMutation = async ({
     body: {
       selectedUserId,
       type,
-      ...(organizationId && organizationId != "None" && { organizationId }),
-      ...(schoolId && schoolId != "None" && { schoolId }),
-      ...(roomId && roomId != "None" && { roomId }),
+      organizationId,
+      schoolId,
+      roomId,
     },
   });
   return response.data;
