@@ -76,6 +76,16 @@ const CreatePermissionModal = ({
     enabled: !!userId,
   });
 
+  const { handleSubmit, register, reset, resetField } = useForm<SubmitData>({
+    defaultValues: {
+      type: PermissionType.STUDENT,
+      organizationId: "None",
+      schoolId: "None",
+      roomId: "None",
+    },
+    reValidateMode: "onBlur",
+  });
+
   useEffect(() => {
     if (organizationId) {
       const newOrg = organizations?.find((org) => org.id === organizationId);
@@ -101,15 +111,18 @@ const CreatePermissionModal = ({
     }
   }, [roomId, setRoom, rooms]);
 
-  const { handleSubmit, register, reset } = useForm<SubmitData>({
-    defaultValues: {
-      type: PermissionType.STUDENT,
-      organizationId: "None",
-      schoolId: "None",
-      roomId: "None",
-    },
-    reValidateMode: "onBlur",
-  });
+  useEffect(() => {
+    if (organizationId === "None") {
+      resetField("schoolId", { defaultValue: "None" });
+      resetField("roomId", { defaultValue: "None" });
+    }
+  }, [organizationId]);
+
+  useEffect(() => {
+    if (schoolId === "None") {
+      resetField("roomId", { defaultValue: "None" });
+    }
+  }, [schoolId]);
 
   const clearSelections = useCallback(() => {
     setOrganizationId("None");
@@ -134,6 +147,7 @@ const CreatePermissionModal = ({
         roomId,
       });
 
+      clearSelections();
       onClose();
       refetch();
       reset();
