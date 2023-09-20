@@ -93,6 +93,7 @@ const FolderButton = ({
   const purpleHexCode = useToken("colors", colorKey);
   const buttonBgColor = useColorModeValue("#F6F6F6", "gray.800");
   const activeBGColor = useColorModeValue("blackAlpha.200", "gray.700");
+  const folderBtnBGColor = useColorModeValue("whiteAlpha.900", "gray.700");
 
   return (
     <Button
@@ -114,7 +115,7 @@ const FolderButton = ({
         borderRadius={"0.5rem"}
         padding={"0.5rem"}
         marginRight={"0.5rem"}
-        bgColor={"white"}
+        bgColor={folderBtnBGColor}
       >
         <HiMiniFolderOpen size={24} color={purpleHexCode} />
       </Center>
@@ -449,7 +450,7 @@ const Sidebar = () => {
               return iconData.label ? (
                 <SidebarButton key={iconData.key} {...iconData} />
               ) : (
-                iconData.icon
+                <Box key={iconData.key}>{iconData.icon}</Box>
               );
             })}
           </Flex>

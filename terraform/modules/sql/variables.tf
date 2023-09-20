@@ -36,3 +36,9 @@ variable "max_connections" {
   default     = 100
   description = "Max connections"
 }
+
+variable "logical_decoding" {
+  type        = bool
+  default     = true
+  description = "Decoding to enable external replicas of DB"
+}

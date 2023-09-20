@@ -3,6 +3,7 @@ import invitesRouter from "../invites/routes.js";
 import organizationsRouter from "../organizations/routes.js";
 import schoolsRouter from "../schools/routes.js";
 import roomsRouter from "../rooms/routes.js";
+import permissionsRouter from "../permissions/routes.js";
 import {
   errorPassthrough,
   handleValidationErrors,
@@ -21,6 +22,7 @@ router.use("/invites", invitesRouter);
 router.use("/organizations", organizationsRouter);
 router.use("/schools", schoolsRouter);
 router.use("/rooms", roomsRouter);
+router.use("/permissions", permissionsRouter);
 
 // Root /admin routes
 // Get all entities for admin user (orgs, schools, rooms)

@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import TableFooter from "./TableFooter";
+import SearchBar from "@judie/components/SearchBar/SearchBar";
 
 const USER_PAGE_SIZE = 20;
 
@@ -35,6 +36,8 @@ const UsersTable = ({
   const [page, setPage] = useState<number>(1);
   const router = useRouter();
   const rowBackgroundColor = useColorModeValue("gray.100", "gray.700");
+  const [searchText, setSearchText] = useState("");
+
   const totalPageCount = useMemo(() => {
     if (!users) {
       return 0;
@@ -52,6 +55,11 @@ const UsersTable = ({
   }, [users, page]);
   return (
     <TableContainer>
+      <SearchBar
+        title="Users"
+        searchText={searchText}
+        setSearchText={setSearchText}
+      />
       <Table variant={"simple"} size="md">
         <Thead>
           <Tr>
@@ -63,42 +71,52 @@ const UsersTable = ({
           </Tr>
         </Thead>
         <Tbody>
-          {renderedUsers?.map((user) => (
-            <Tr
-              key={user.id}
-              onClick={() => {
-                router.push(`/admin/users/${user.id}`);
-              }}
-              cursor={"pointer"}
-              _hover={{
-                backgroundColor: rowBackgroundColor,
-                transition: "ease-in-out 0.3s",
-              }}
-            >
-              <Td>{user.email}</Td>
-              <Td>{user.firstName || "n/a"}</Td>
-              <Td>{user.lastName || "n/a"}</Td>
-              <Td>
-                {user.createdAt
-                  ? new Date(user.createdAt)?.toLocaleDateString()
-                  : "n/a"}
-              </Td>
-              <Td>
-                {user.permissions?.find((p) => {
-                  if (roomId) {
-                    return p.roomId === roomId;
-                  }
-                  if (schoolId) {
-                    return p.schoolId === schoolId;
-                  }
-                  if (organizationId) {
-                    return p.organizationId === organizationId;
-                  }
-                  return false;
-                })?.type || "n/a"}
-              </Td>
-            </Tr>
-          ))}
+          {renderedUsers
+            ?.filter((user) => {
+              if (searchText.trim() == "") {
+                return true;
+              }
+              const searchString = `${user.email} ${user.firstName} ${user.lastName}`;
+              return searchString
+                .toLowerCase()
+                .includes(searchText.toLowerCase());
+            })
+            .map((user) => (
+              <Tr
+                key={user.id}
+                onClick={() => {
+                  router.push(`/admin/users/${user.id}`);
+                }}
+                cursor={"pointer"}
+                _hover={{
+                  backgroundColor: rowBackgroundColor,
+                  transition: "ease-in-out 0.3s",
+                }}
+              >
+                <Td>{user.email}</Td>
+                <Td>{user.firstName || "n/a"}</Td>
+                <Td>{user.lastName || "n/a"}</Td>
+                <Td>
+                  {user.createdAt
+                    ? new Date(user.createdAt)?.toLocaleDateString()
+                    : "n/a"}
+                </Td>
+                <Td>
+                  {user.permissions?.find((p) => {
+                    if (roomId) {
+                      return p.roomId === roomId;
+                    }
+                    if (schoolId) {
+                      return p.schoolId === schoolId;
+                    }
+                    if (organizationId) {
+                      return p.organizationId === organizationId;
+                    }
+                    return false;
+                  })?.type || "n/a"}
+                </Td>
+              </Tr>
+            ))}
         </Tbody>
       </Table>
       {/* Table footer */}

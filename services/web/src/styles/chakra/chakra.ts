@@ -172,4 +172,94 @@ const theme = extendTheme({
   },
 });
 
+export const uploadThemeOverride = {
+  colors: {
+    textColor: "#fff",
+    subtitleColor: "#fff",
+    inactiveColor: "#5D55FA",
+    border: "#5D55FA",
+    background: "#2D3748",
+    backgroundAlpha: "rgba(255,255,255,0)",
+    secondaryBackground: "#1A202C",
+    highlight: "#5D55FA",
+    rsi: {
+      // your brand colors should go here
+      50: "#6D4B9F",
+      100: "#5D55FA",
+      200: "#5D55FA",
+      300: "#5D55FA",
+      400: "#5D55FA",
+      500: "#5D55FA",
+      600: "#5D55FA",
+      700: "#5D55FA",
+      800: "#5D55FA",
+      900: "#5D55FA",
+    },
+  },
+
+  components: {
+    Button: {
+      baseStyle: {
+        borderRadius: "10px",
+        backgroundColor: "#5D55FA",
+        textColor: "#fff",
+      },
+      defaultProps: {
+        colorScheme: "",
+      },
+    },
+
+    MatchColumnsStep: {
+      baseStyle: {
+        select: {
+          control: (provided: any) => ({
+            ...provided,
+            borderColor: "border",
+            _hover: {
+              borderColor: "border",
+            },
+            ["&[data-focus-visible]"]: {
+              borderColor: "border",
+              boxShadow: "none",
+            },
+          }),
+          option: (provided: any, state: any) => ({
+            ...provided,
+            color: "textColor",
+            bg:
+              state.isSelected || state.isFocused ? "highlight" : "background",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "block",
+            whiteSpace: "nowrap",
+            _hover: {
+              bg: "highlight",
+            },
+          }),
+        },
+      },
+    },
+  },
+  styles: {
+    global: {
+      ".rdg": {
+        contain: "size layout style paint",
+        borderRadius: "lg",
+        border: "none",
+        borderTop: "1px solid var(--rdg-border-color)",
+        blockSize: "100%",
+
+        // we have to use vars here because chakra does not autotransform unknown props
+        "--rdg-row-height": "35px",
+        "--rdg-color": "var(--chakra-colors-textColor)",
+        "--rdg-background-color": "var(--chakra-colors-background)",
+        "--rdg-header-background-color": "var(--chakra-colors-background)",
+        "--rdg-row-hover-background-color": "var(--chakra-colors-background)",
+        "--rdg-selection-color": "var(--chakra-colors-blue-400)",
+        "--rdg-row-selected-background-color": "var(--chakra-colors-rsi-50)",
+        "--row-selected-hover-background-color": "var(--chakra-colors-rsi-100)",
+      },
+    },
+  },
+};
 export default theme;
