@@ -6,7 +6,7 @@ from inference_service.test_client.test_chats_config import (
 from grpc_health.v1 import health_pb2, health_pb2_grpc
 
 if __name__ == "__main__":
-    with grpc.insecure_channel("localhost:8080") as channel:
+    with grpc.insecure_channel("localhost:443") as channel:
         stub = health_pb2_grpc.HealthStub(channel)
         print("Liveliness health check")
         response = stub.Check(
