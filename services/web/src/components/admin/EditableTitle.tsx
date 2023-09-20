@@ -8,7 +8,6 @@ import {
   Input,
   useEditableControls,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { AiOutlineCheck } from "react-icons/ai";
 import { TbPencil } from "react-icons/tb";
 
@@ -38,7 +37,7 @@ const EditButton = () => {
 };
 
 interface EditableTitleProps {
-  title: string;
+  title: string | undefined;
   onChange: (value: string) => void;
 }
 const EditableTitle = ({ title, onChange }: EditableTitleProps) => {

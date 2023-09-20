@@ -1,10 +1,4 @@
-import {
-  useMemo,
-  CSSProperties,
-  useContext,
-  useCallback,
-  useState,
-} from "react";
+import { useMemo, CSSProperties, useCallback, useState } from "react";
 import { BsFillChatTextFill } from "react-icons/bs";
 import { BiHelpCircle } from "react-icons/bi";
 import {
@@ -15,10 +9,9 @@ import {
   Spinner,
   Text,
   useColorModeValue,
-  useToast,
   useBreakpointValue,
   Collapse,
-  SlideFade,
+  Box,
   VStack,
   Badge,
 } from "@chakra-ui/react";
@@ -26,10 +19,7 @@ import { useRouter } from "next/router";
 import { FiSettings } from "react-icons/fi";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import useAuth from "@judie/hooks/useAuth";
-import { ChatContext } from "@judie/hooks/useChat";
 import ColorModeSwitcher from "../../ColorModeSwitcher/ColorModeSwitcher";
-import { useQuery } from "react-query";
-import { GET_USER_ENTITIES, getUserEntitiesQuery } from "@judie/data/queries";
 import { Organization, Room, School } from "@judie/data/types/api";
 import useStorageState from "@judie/hooks/useStorageState";
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
@@ -482,7 +472,7 @@ const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             return iconData.label ? (
               <SidebarButton key={iconData.key} {...iconData} />
             ) : (
-              iconData.icon
+              <Box key={iconData.key}>{iconData.icon}</Box>
             );
           })}
         </Flex>

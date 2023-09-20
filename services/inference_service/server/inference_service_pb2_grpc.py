@@ -14,13 +14,13 @@ class InferenceServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetChatResponse = channel.unary_stream(
-            "/inferenceServiceServer.InferenceService/GetChatResponse",
+        self.getChatResponse = channel.unary_stream(
+            "/inferenceServiceServer.InferenceService/getChatResponse",
             request_serializer=inference__service__pb2.ChatDetails.SerializeToString,
             response_deserializer=inference__service__pb2.TutorResponse.FromString,
         )
-        self.ServerConnectionCheck = channel.unary_unary(
-            "/inferenceServiceServer.InferenceService/ServerConnectionCheck",
+        self.serverConnectionCheck = channel.unary_unary(
+            "/inferenceServiceServer.InferenceService/serverConnectionCheck",
             request_serializer=inference__service__pb2.ReturnConnectedCheck.SerializeToString,
             response_deserializer=inference__service__pb2.ConnectedCheckResponse.FromString,
         )
@@ -29,13 +29,13 @@ class InferenceServiceStub(object):
 class InferenceServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetChatResponse(self, request, context):
+    def getChatResponse(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
-    def ServerConnectionCheck(self, request, context):
+    def serverConnectionCheck(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
@@ -44,13 +44,13 @@ class InferenceServiceServicer(object):
 
 def add_InferenceServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-        "GetChatResponse": grpc.unary_stream_rpc_method_handler(
-            servicer.GetChatResponse,
+        "getChatResponse": grpc.unary_stream_rpc_method_handler(
+            servicer.getChatResponse,
             request_deserializer=inference__service__pb2.ChatDetails.FromString,
             response_serializer=inference__service__pb2.TutorResponse.SerializeToString,
         ),
-        "ServerConnectionCheck": grpc.unary_unary_rpc_method_handler(
-            servicer.ServerConnectionCheck,
+        "serverConnectionCheck": grpc.unary_unary_rpc_method_handler(
+            servicer.serverConnectionCheck,
             request_deserializer=inference__service__pb2.ReturnConnectedCheck.FromString,
             response_serializer=inference__service__pb2.ConnectedCheckResponse.SerializeToString,
         ),
@@ -66,7 +66,7 @@ class InferenceService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetChatResponse(
+    def getChatResponse(
         request,
         target,
         options=(),
@@ -81,7 +81,7 @@ class InferenceService(object):
         return grpc.experimental.unary_stream(
             request,
             target,
-            "/inferenceServiceServer.InferenceService/GetChatResponse",
+            "/inferenceServiceServer.InferenceService/getChatResponse",
             inference__service__pb2.ChatDetails.SerializeToString,
             inference__service__pb2.TutorResponse.FromString,
             options,
@@ -95,7 +95,7 @@ class InferenceService(object):
         )
 
     @staticmethod
-    def ServerConnectionCheck(
+    def serverConnectionCheck(
         request,
         target,
         options=(),
@@ -110,7 +110,7 @@ class InferenceService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            "/inferenceServiceServer.InferenceService/ServerConnectionCheck",
+            "/inferenceServiceServer.InferenceService/serverConnectionCheck",
             inference__service__pb2.ReturnConnectedCheck.SerializeToString,
             inference__service__pb2.ConnectedCheckResponse.FromString,
             options,

@@ -79,20 +79,18 @@ const AdminOrganization = ({ id }: { id: string }) => {
         paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        {organizationData && (
-          <EditableTitle
-            title={organizationData?.name as string}
-            onChange={(value) => {
-              value = value.trim();
-              if (!value || value.length < 1) return;
-              if (value === organizationData?.name) return;
-              editOrgMutation.mutate({
-                organizationId: organizationData?.id as string,
-                name: value,
-              });
-            }}
-          />
-        )}
+        <EditableTitle
+          title={organizationData?.name}
+          onChange={(value) => {
+            value = value.trim();
+            if (!value || value.length < 1) return;
+            if (value === organizationData?.name) return;
+            editOrgMutation.mutate({
+              organizationId: organizationData?.id as string,
+              name: value,
+            });
+          }}
+        />
 
         <Button
           size={"sm"}

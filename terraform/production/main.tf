@@ -336,3 +336,12 @@ module "web" {
     # module.inference-service,
   module.app-service]
 }
+
+# Secrets
+resource "google_secret_manager_secret" "tf-vars_secret" {
+  secret_id = "prod_tf_vars"
+
+  replication {
+    automatic = true
+  }
+}
