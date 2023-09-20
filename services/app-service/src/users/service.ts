@@ -59,6 +59,28 @@ export const getUserPermissions = async (
     where: params,
     include: {
       permissions: true,
+      rooms: true,
+    },
+  });
+  return user?.permissions;
+};
+
+export const getUserPermissionsRoomsSchools = async (
+  params: Prisma.UserWhereUniqueInput
+) => {
+  const user = await dbClient.user.findUnique({
+    where: params,
+    include: {
+      permissions: {
+        include: {
+          room: true,
+          school: true,
+          organization: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
   return user?.permissions;

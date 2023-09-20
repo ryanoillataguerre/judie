@@ -18,14 +18,14 @@ if __name__ == "__main__":
         stub = inference_service_pb2_grpc.InferenceServiceStub(channel)
 
         print("Inference connection health check")
-        response = stub.ServerConnectionCheck(
+        response = stub.serverConnectionCheck(
             inference_service_pb2.ReturnConnectedCheck(returnCheck=True)
         )
         print(response)
         print()
 
         print("Chat response stream")
-        response = stub.GetChatResponse(
+        response = stub.getChatResponse(
             inference_service_pb2.ChatDetails(chat_id=SANDBOX_ID_1)
         )
         first = True
