@@ -5,7 +5,11 @@ import {
   handleValidationErrors,
   requireAuth,
 } from "../utils/express.js";
-import { deletePermissionById, updatePermissionById } from "./service.js";
+import {
+  deletePermissionById,
+  updatePermissionById,
+  validateUserAdminForPermission,
+} from "./service.js";
 import {
   validateOrganizationAdmin,
   validateSchoolAdmin,
@@ -75,19 +79,12 @@ router.delete(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const permissionId = req.params.permissionId;
-    // const permission = await getPermissionById({
-    //   id: permissionId,
-    // });
-    // if (permission?.organizationId) {
-    //   await validateOrganizationAdmin({
-    //     userId: userId as string,
-    //     organizationId: permission.organizationId,
-    //   });
-    // } else {
-    //   throw new UnauthorizedError(
-    //     "User is not authorized to delete this permission"
-    //   );
-    // }
+    const userId = req.session?.userId;
+    // Validate if user can delete this permission
+    await validateUserAdminForPermission({
+      userId: userId as string,
+      permissionId,
+    });
     await deletePermissionById({
       id: permissionId,
     });
