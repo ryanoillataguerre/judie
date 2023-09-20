@@ -55,7 +55,7 @@ router.post(
       userId: user.id,
       sessionId: session.id,
     });
-    res.status(201).send({ user });
+    res.status(201).send({ data: user });
   })
 );
 
@@ -75,7 +75,7 @@ router.post(
       userId: user.id,
       sessionId: session.id,
     });
-    res.status(200).send({ user });
+    res.status(200).send({ data: user });
   })
 );
 
@@ -90,7 +90,6 @@ router.put(
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const { newPassword, passwordConfirm, oldPassword } = req.body;
-
     // Change user password if they both match
     const user = await changePassword({
       userId: session.userId as string,
@@ -98,7 +97,7 @@ router.put(
       newPassword,
       passwordConfirm,
     });
-    res.status(200).send({ user });
+    res.status(200).send({ data: user });
   })
 );
 
@@ -109,7 +108,7 @@ router.post(
   errorPassthrough(async (req: Request, res: Response) => {
     const { email } = req.body;
     await addToWaitlist({ email });
-    res.status(200).send({ success: true });
+    res.status(200).send({ data: { success: true } });
   })
 );
 
