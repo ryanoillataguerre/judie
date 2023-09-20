@@ -90,6 +90,7 @@ router.put(
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const { newPassword, passwordConfirm, oldPassword } = req.body;
+
     // Change user password if they both match
     const user = await changePassword({
       userId: session.userId as string,

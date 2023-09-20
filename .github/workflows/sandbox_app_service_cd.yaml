@@ -10,6 +10,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: Sandbox
 
     permissions:
      contents: 'read'
@@ -66,7 +67,7 @@ jobs:
         working-directory: services/app-service
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: DATABASE_URL=$DATABASE_URL npx prisma migrate deploy --schema prisma/schema.prisma
+        run: yarn run migrate:prod
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v1'
