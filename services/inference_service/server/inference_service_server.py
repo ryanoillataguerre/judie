@@ -21,8 +21,7 @@ def setup_env():
     )
     openai.api_key = os.getenv("OPENAI_API_KEY")
     grpc_port = os.getenv("GRPC_PORT")
-    grpc_health_port = os.getenv("GRPC_HEALTH_PORT")
-    return grpc_port, grpc_health_port
+    return grpc_port
 
 
 class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServicer):
@@ -82,7 +81,7 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
 
 def serve():
-    grpc_port, grpc_health_port = setup_env()
+    grpc_port = setup_env()
 
     # Setup Chat Response Server
     logger.info(
@@ -95,26 +94,22 @@ def serve():
     inference_service_pb2_grpc.add_InferenceServiceServicer_to_server(
         InferenceServiceServicer(), inference_server
     )
-    inference_server.start()
-    logger.info(f"Inference gRPC server running on port {grpc_port}")
 
     # Setup health check server
     logger.info(
-        f"Attempting health check connection on port: {grpc_health_port}",
+        f"Attempting health check connection on port: {grpc_port}",
     )
-    health_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    health_server.add_insecure_port(f"0.0.0.0:{grpc_health_port}")
 
     health_servicer = health.HealthServicer(experimental_non_blocking=True)
     health_servicer.set("", health_pb2.HealthCheckResponse.SERVING)
     health_servicer.set("grpc.health.v1.Health", health_pb2.HealthCheckResponse.SERVING)
-    health_pb2_grpc.add_HealthServicer_to_server(health_servicer, health_server)
+    health_pb2_grpc.add_HealthServicer_to_server(health_servicer, inference_server)
 
-    health_server.start()
-    logger.info(f"Health check gRPC server running on port {grpc_health_port}")
+    inference_server.start()
+    logger.info(f"Inference gRPC server running on port {grpc_port}")
+    logger.info(f"Health check gRPC server running on port {grpc_port}")
 
-    # Run both servers indefinitely
-    health_server.wait_for_termination()
+    # Run both services on single server indefinitely
     inference_server.wait_for_termination()
     logger.info("Server ded")
 
