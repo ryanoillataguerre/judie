@@ -102,8 +102,6 @@ router.post(
       req.body.currentUrl || `${req.headers.origin}/chat`
     );
 
-    console.log("checkoutSession: ", checkoutSession);
-
     res.status(200).json({
       data: checkoutSession.url,
     });
