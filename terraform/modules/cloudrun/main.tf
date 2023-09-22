@@ -47,6 +47,7 @@ resource "google_cloud_run_service" "default" {
             for_each = var.startup_probe_grpc
             content {
               service = grpc.value.service
+              port=var.container_port
             }
           }
         }
@@ -66,6 +67,7 @@ resource "google_cloud_run_service" "default" {
             for_each = var.liveness_probe_grpc
             content {
               service = grpc.value.service
+              port=var.container_port
             }
           }
         }
