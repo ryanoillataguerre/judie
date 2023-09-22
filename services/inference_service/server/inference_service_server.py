@@ -11,6 +11,7 @@ from concurrent import futures
 from inference_service.logging_utils import logging_utils
 from inference_service.server import judie
 from inference_service.server.judie import generate_chat_metadata
+from inference_service.openai_manager.openai_manager import check_moderation_policy
 
 
 def setup_env():
@@ -34,12 +35,35 @@ class InferenceServiceServicer(inference_service_pb2_grpc.InferenceServiceServic
 
         chat_id = request.chat_id
 
-        chat_config = judie.grab_chat_config(chat_id)
-        logger.debug(f"Grabbed config for chat {chat_id}")
+        try:
+            chat_config = judie.grab_chat_config(chat_id)
+            logger.debug(f"Grabbed config for chat {chat_id}")
+        except Exception as e:
+            logger.error(f"Issue pulling session config for chat: {chat_id}")
+            logger.error(e)
+            return None
 
-        meta_data = generate_chat_metadata(chat_config)
+        moderated_chat = False
+        try:
+            moderation_violations = check_moderation_policy(chat_config)
+            if len(moderation_violations) > 0:
+                moderated_chat = True
+        except Exception as e:
+            logger.error(f"Error checking content moderation for chat: {chat_id}")
+            logger.error(e)
 
-        response = judie.yield_judie_response(config=chat_config)
+        try:
+            meta_data = generate_chat_metadata(chat_config)
+        except Exception as e:
+            logger.error(f"Issue generating meta data for chat: {chat_id}")
+            logger.error(e)
+
+            meta_data = {}
+
+        if moderated_chat:
+            response = judie.moderation_response(moderation_violations)
+        else:
+            response = judie.yield_judie_response(config=chat_config)
 
         first_message = True
         for part in response:

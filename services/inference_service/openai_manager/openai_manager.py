@@ -66,25 +66,55 @@ def identify_math_exp(message: str) -> str:
 
 
 def comprehension_score(session_config: SessionConfig) -> Optional[int]:
-    print(session_config.history.get_openai_format()[-5:])
     prompt = [
         {
             "role": "system",
-            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversationand subject material given the context of the conversation and the last user response or question after the tutor.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
+            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversation and subject material given the context of the conversation and the last user response or question after the tutor.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
         },
     ] + session_config.history.get_openai_format()[-5:]
     # arbitrarily use last five messages as conversation window
-    print(prompt)
 
     comp_score = get_gpt_response(
         messages=prompt,
         openai_config=OpenAiConfig(temperature=0.3, stream=False, max_tokens=10),
     )
     score_str = next(comp_score)
-    print(score_str)
     logger.info(f"Comprehension score: {score_str}")
 
     if score_str.isnumeric():
         return int(score_str)
     else:
         return None
+
+
+def check_for_sensitive_content(session_config: SessionConfig) -> Optional[str]:
+    prompt = [
+        {
+            "role": "system",
+            "content": f"You are observing a conversation between a tutor and a student. In the last message identify if there are any comments that may be inapropriate, and if there are respond with no more than a few word description of the issues.  If the conversation does not have any problems respond only with 'none'.  Keep in mind that the student is studying {session_config.subject}, so keep in mind that some conversations may be appropriate in that context.",
+        },
+    ] + session_config.history.get_openai_format()[-5:]
+
+    sensitivity_response = get_gpt_response(
+        messages=prompt,
+        openai_config=OpenAiConfig(temperature=0.3, stream=False, max_tokens=10),
+    )
+    sensitivity = next(sensitivity_response)
+
+    logger.info(f"Chat contains sensitive content of type: {sensitivity}")
+
+    if "none" in str.lower(sensitivity):
+        return None
+    return sensitivity
+
+
+def check_moderation_policy(session_config: SessionConfig) -> Optional[List[str]]:
+    moderation_resp = openai.Moderation.create(
+        input=session_config.history.get_last_user_message()
+    )
+
+    violations = []
+    for category, value in moderation_resp["results"][0]["categories"].items():
+        if value is True:
+            violations.append(category)
+    return violations
