@@ -382,18 +382,18 @@ export const SignupForm = ({
 
 const SignupPage = () => {
   useAuth({ allowUnauth: true });
-  useUnauthRedirect();
+  // useUnauthRedirect();
   const { logout } = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 
   const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
 
   // clear session cookie if still present
-  useEffect(() => {
-    if (sessionCookie) {
-      logout();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (sessionCookie) {
+  //     logout();
+  //   }
+  // }, []);
 
   return (
     <>

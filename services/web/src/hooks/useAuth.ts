@@ -205,12 +205,6 @@ export default function useAuth({
     }
   }, [sessionCookie, allowUnauth, isError, isLoading, refetch, router]);
 
-  useEffect(() => {
-    if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
-      logout();
-    }
-  }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
-
   return {
     userData,
     isPaid,
