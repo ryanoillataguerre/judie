@@ -120,5 +120,5 @@ def test_moderation_response():
     violations = ["hate", "self-harm/intent"]
     mod_response = judie.moderation_response(violations=violations)
 
-    assert "flagged" in mod_response
-    assert "support." in mod_response
+    assert "flagged " in mod_response
+    assert "support. " in mod_response

@@ -86,4 +86,7 @@ def moderation_response(violations: List[str]) -> List[str]:
         if "self-harm" in i:
             response += "  If you are having thoughts of self harm please reach out to a trusted friend, family member, or mentor for support."
 
-    return response.split(sep=" ")
+    response_list = response.split(sep=" ")
+    response_list_spaces = [i + " " for i in response_list]
+
+    return response_list_spaces
