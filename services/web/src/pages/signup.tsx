@@ -383,7 +383,7 @@ export const SignupForm = ({
 const SignupPage = () => {
   useAuth({ allowUnauth: true });
   // useUnauthRedirect();
-  const { logout } = useAuth();
+  // const { logout } = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 
   const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
