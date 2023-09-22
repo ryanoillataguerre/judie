@@ -95,7 +95,13 @@ export default function useAuth({
 
   const logout = useCallback(() => {
     reset();
-    deleteCookie(SESSION_COOKIE);
+    deleteCookie(SESSION_COOKIE, {
+      domain: isLocal()
+        ? undefined
+        : isSandbox()
+        ? "sandbox.judie.io"
+        : ".judie.io",
+    });
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
