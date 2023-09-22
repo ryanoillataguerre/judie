@@ -35,6 +35,7 @@ import { useMutation } from "react-query";
 import { whisperTranscribeMutation } from "@judie/data/mutations";
 import AssignmentUploader from "../AssignmentUploader";
 import useResizeTextArea from "@judie/hooks/useResizeTextArea";
+import * as gtag from "@judie/utils/gtag";
 
 const SendButton = () => {
   const sendColor = useColorModeValue("gray.800", "gray.300");
@@ -175,6 +176,12 @@ const RecordButton = ({
       borderRadius={"10px"}
       border={"none"}
       onClick={() => {
+        gtag.event({
+          action: "click",
+          category: "chat",
+          label: "record",
+          value: null,
+        });
         if (isRecording) {
           stopRecording();
         } else {
@@ -199,6 +206,12 @@ const ChatFooter = () => {
       e.preventDefault();
       addMessage(chatValue);
       setChatValue("");
+      gtag.event({
+        action: "submit",
+        category: "chat",
+        label: "chat",
+        value: null,
+      });
     },
     [addMessage, setChatValue, chatValue]
   );

@@ -23,7 +23,7 @@ export const event = ({
   action: string;
   category: string;
   label: string;
-  value: string;
+  value: string | null;
 }) => {
   window.gtag("event", action, {
     event_category: category,
