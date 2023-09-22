@@ -23,6 +23,18 @@ export const createStripeCustomer = async (user: User) => {
   return customer;
 };
 
+export const getStripeCustomer = async (customerId: string) => {
+  const customer = await stripe.customers.retrieve(customerId);
+  return customer;
+};
+
+export const getStripeCustomerSubscriptions = async (customerId: string) => {
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+  });
+  return subscriptions;
+};
+
 export const createCheckoutSession = async (
   params: Stripe.Checkout.SessionCreateParams
 ) => {

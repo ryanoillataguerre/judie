@@ -20,6 +20,7 @@ import {
   createCheckoutSessionMutation,
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
+import * as gtag from "@judie/utils/gtag";
 
 const SubscribeCard = ({
   onClick,
@@ -174,6 +175,12 @@ const Paywall = ({
   });
 
   const onClick = useCallback(() => {
+    gtag.event({
+      action: "click",
+      category: "subscribe",
+      label: "subscribe",
+      value: null,
+    });
     if (!checkoutSessionUrl && !isLoading) {
       setLoading(true);
       mutate();

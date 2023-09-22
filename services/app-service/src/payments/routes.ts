@@ -5,10 +5,60 @@ import {
   requireAuth,
 } from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
-import { checkout, createCustomer } from "./service.js";
-import { body } from "express-validator";
+import {
+  checkout,
+  createCustomer,
+  getCustomer,
+  getCustomerSubscriptions,
+} from "./service.js";
+import { body, param } from "express-validator";
+import NotFoundError from "../utils/errors/NotFoundError.js";
 
 const router = Router();
+
+router.get(
+  "/:customerId",
+  [param("customerId").exists().isString()],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const customerId = req.params.customerId;
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const customer = await getCustomer(customerId);
+    if (!customer) {
+      throw new NotFoundError("Customer not found");
+    }
+
+    res.status(200).json({
+      data: customer,
+    });
+  })
+);
+
+router.get(
+  "/:customerId/subscriptions",
+  [param("customerId").exists().isString()],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const customerId = req.params.customerId;
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const customerSubscriptions = await getCustomerSubscriptions(customerId);
+    if (!customerSubscriptions) {
+      throw new NotFoundError("Customer Subscription not found");
+    }
+
+    res.status(200).json({
+      data: customerSubscriptions,
+    });
+  })
+);
 
 router.post(
   "/customer",
@@ -51,6 +101,8 @@ router.post(
         : `${req.headers.origin}/chat?paid=true`,
       req.body.currentUrl || `${req.headers.origin}/chat`
     );
+
+    console.log("checkoutSession: ", checkoutSession);
 
     res.status(200).json({
       data: checkoutSession.url,
