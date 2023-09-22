@@ -30,7 +30,15 @@ import {
 import { ChatContext } from "./useChat";
 import * as gtag from "@judie/utils/gtag";
 
-const DO_NOT_REDIRECT_PATHS = ["/signin", "/signup"];
+const DO_NOT_REDIRECT_PATHS = [
+  "/signin",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/parental-consent",
+  "/verify",
+  "/invite",
+];
 export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
 
 export const isPermissionTypeAdmin = (type: PermissionType) => {
@@ -62,6 +70,13 @@ export default function useAuth({
   const toast = useToast();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
+  const isOnUnauthedRoute = useMemo(() => {
+    return (
+      allowUnauth ||
+      DO_NOT_REDIRECT_PATHS.some((path) => router.asPath?.includes(path))
+    );
+  }, [allowUnauth, router]);
+
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
   const isB2B = useMemo(() => {
@@ -84,7 +99,13 @@ export default function useAuth({
 
   const logout = useCallback(() => {
     reset();
-    deleteCookie(SESSION_COOKIE);
+    deleteCookie(SESSION_COOKIE, {
+      domain: isLocal()
+        ? undefined
+        : isSandbox()
+        ? "sandbox.judie.io"
+        : ".judie.io",
+    });
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
@@ -99,9 +120,6 @@ export default function useAuth({
       }),
     {
       staleTime: 1000 * 60,
-      // retryDelay(failureCount, error) {
-      //   if (failureCount )
-      // },
       onSuccess: (data) => {
         setUserData(data);
       },
@@ -111,6 +129,7 @@ export default function useAuth({
         }
       },
       refetchOnWindowFocus: true,
+      enabled: !isOnUnauthedRoute,
     }
   );
 
@@ -234,12 +253,6 @@ export default function useAuth({
       refetch();
     }
   }, [sessionCookie, allowUnauth, isError, isLoading, refetch, router]);
-
-  useEffect(() => {
-    if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
-      logout();
-    }
-  }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
   return {
     userData,

@@ -6,6 +6,7 @@ on:
     - production
     paths:
     - "services/inference_service/**"
+    - "services/app-service/prisma/**"
 
 jobs:
   deploy:

@@ -95,15 +95,7 @@ export const checkout = async (
     success_url: currentUrl,
     cancel_url: cancelUrl,
     customer: user.stripeCustomerId || newCustomerId || undefined,
-    allow_promotion_codes: !(user.role === UserRole.JUDIE),
-    discounts:
-      user.role === UserRole.JUDIE
-        ? [
-            {
-              coupon: process.env.STRIPE_EMPLOYEE_COUPON_ID,
-            },
-          ]
-        : [],
+    allow_promotion_codes: true,
   };
   return await createCheckoutSession(params);
 };
