@@ -1,11 +1,12 @@
-name: Production web CD
+name: Production inference-service CD
 
 on:
   push:
     branches:
     - production
     paths:
-    - "services/web/**"
+    - "services/inference_service/**"
+    - "services/app-service/prisma/**"
 
 jobs:
   deploy:
@@ -42,22 +43,19 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: services/web
+          context: services/
+          file: services/inference_service/Dockerfile
           push: true
           platform: linux/amd64
           tags: |
-            us-west1-docker.pkg.dev/production-382518/web/web:${{ github.sha }}
-            us-west1-docker.pkg.dev/production-382518/web/web:latest
-          build-args: |
-            NEXT_PUBLIC_API_URI=https://app-service.judie.io
-            NEXT_PUBLIC_NODE_ENV=production
-            NEXT_PUBLIC_SEGMENT_WRITE_KEY={{ secrets.SEGMENT_WRITE_KEY }}
+            us-west1-docker.pkg.dev/production-382518/inference-service/inference_service:${{ github.sha }}
+            us-west1-docker.pkg.dev/production-382518/inference-service/inference_service:latest
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
-          image: us-west1-docker.pkg.dev/production-382518/web/web:${{ github.sha }}
-          service: web
+          image: us-west1-docker.pkg.dev/production-382518/inference-service/inference_service:${{ github.sha }}
+          service: inference-service
           region: us-west1
           platform: managed
           project: production-382518

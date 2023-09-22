@@ -14,5 +14,7 @@ yarn
 
 protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=${TS_PATH} --ts_proto_opt=outputServices=grpc-js,env=node,esModuleInterop=true -I ../${PROTO_PATH} ../${PROTO_PATH}/inference_service.proto
 
+sed -i '' 's/"protobufjs\/minimal"/"protobufjs\/minimal.js"/g' src/proto/inference_service.ts
+
 echo "Built protos successfully."
 exit 0

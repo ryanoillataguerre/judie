@@ -245,18 +245,18 @@ const SigninForm = () => {
 
 const SigninPage = () => {
   const router = useRouter();
-  useUnauthRedirect();
+  // useUnauthRedirect();
   useAuth({ allowUnauth: true });
-  const { logout } = useAuth();
-  const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
+  // const { logout } = useAuth();
+  // const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 
   // clear session cookie on signin page if still present
-  useEffect(() => {
-    if (sessionCookie) {
-      logout();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (sessionCookie) {
+  //     logout();
+  //   }
+  // }, []);
 
   return (
     <>

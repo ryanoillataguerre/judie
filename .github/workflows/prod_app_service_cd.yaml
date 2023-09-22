@@ -10,6 +10,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: Production
 
     permissions:
      contents: 'read'
@@ -32,7 +33,7 @@ jobs:
         uses: 'google-github-actions/auth@v1'
         with:
           token_format: access_token
-          workload_identity_provider: 'projects/467740700781/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
+          workload_identity_provider: 'projects/467740700781/locations/global/workloadIdentityPools/gha-pool/providers/gha-provider'
           service_account: 'terraform@production-382518.iam.gserviceaccount.com'
           access_token_lifetime: 600s
 
@@ -59,12 +60,15 @@ jobs:
             us-west1-docker.pkg.dev/production-382518/app-service/app-service:latest
 
       # Migrate DB
-      - name: Install Dependencies
-        run: yarn
-      - name: Migrate Database
-        run: npx prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # Removing for now because we need to whitelist GHA job runner IPs on our DB, and I don't want to do that yet
+      # - name: Install Dependencies
+      #   working-directory: services/app-service
+      #   run: yarn
+      # - name: Migrate Database
+      #   working-directory: services/app-service
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: yarn run migrate:prod
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v1'

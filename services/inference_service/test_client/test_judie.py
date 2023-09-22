@@ -114,3 +114,11 @@ def test_session_config(env_setup):
 def test_generate_metadata(env_setup):
     sesh = judie.grab_chat_config(TEST_CHAT_ID_2)
     assert "comprehension" in generate_chat_metadata(sesh)
+
+
+def test_moderation_response():
+    violations = ["hate", "self-harm/intent"]
+    mod_response = judie.moderation_response(violations=violations)
+
+    assert "flagged " in mod_response
+    assert "support. " in mod_response

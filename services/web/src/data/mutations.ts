@@ -374,6 +374,68 @@ export const deleteSchoolMutation = async ({
   return response.data;
 };
 
+export const deletePermissionMutation = async ({
+  permissionId,
+}: {
+  permissionId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/permissions/${permissionId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
+export const createPermissionMutation = async ({
+  userId,
+  type,
+  organizationId,
+  schoolId,
+  roomId,
+}: {
+  userId: string;
+  type: PermissionType;
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/admin/permissions/`,
+    method: "POST",
+    body: { userId, type, organizationId, schoolId, roomId },
+  });
+  return response.data;
+};
+
+export const putPermissionMutation = async ({
+  selectedUserId,
+  permissionId,
+  type,
+  schoolId,
+  organizationId,
+  roomId,
+}: {
+  selectedUserId: string;
+  permissionId: string;
+  type?: PermissionType;
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
+}): Promise<Chat> => {
+  const response = await baseFetch({
+    url: `/admin/permissions/${permissionId}`,
+    method: "PUT",
+    body: {
+      selectedUserId,
+      type,
+      organizationId,
+      schoolId,
+      roomId,
+    },
+  });
+  return response.data;
+};
+
 export const putOrgMutation = async ({
   organizationId,
   name,
