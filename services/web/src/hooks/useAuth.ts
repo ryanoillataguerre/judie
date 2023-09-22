@@ -26,7 +26,15 @@ import {
 } from "react-query";
 import { ChatContext } from "./useChat";
 
-const DO_NOT_REDIRECT_PATHS = ["/signin", "/signup"];
+const DO_NOT_REDIRECT_PATHS = [
+  "/signin",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/parental-consent",
+  "/verify",
+  "/invite",
+];
 export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
 
 export const isPermissionTypeAdmin = (type: PermissionType) => {
@@ -57,6 +65,13 @@ export default function useAuth({
   const router = useRouter();
   const toast = useToast();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
+
+  const isOnUnauthedRoute = useMemo(() => {
+    return (
+      allowUnauth ||
+      DO_NOT_REDIRECT_PATHS.some((path) => router.asPath?.includes(path))
+    );
+  }, [allowUnauth, router]);
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
@@ -95,9 +110,6 @@ export default function useAuth({
       }),
     {
       staleTime: 1000 * 60,
-      // retryDelay(failureCount, error) {
-      //   if (failureCount )
-      // },
       onSuccess: (data) => {
         setUserData(data);
       },
@@ -107,6 +119,7 @@ export default function useAuth({
         }
       },
       refetchOnWindowFocus: true,
+      enabled: !isOnUnauthedRoute,
     }
   );
 
