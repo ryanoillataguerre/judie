@@ -113,3 +113,18 @@ def test_moderation(env_setup):
     )
     moderation = openai_manager.check_moderation_policy(session_config=sesh)
     assert moderation == []
+
+
+def test_moderation_curse(env_setup):
+    history = inference_service.server.judie_data.History()
+    history.add_turn(
+        inference_service.server.judie_data.ChatTurn(
+            role=inference_service.server.judie_data.Role.USER,
+            content="Hey. Fuck You",
+        )
+    )
+    sesh = inference_service.server.judie_data.SessionConfig(
+        history=history, subject="AP Biology"
+    )
+    moderation = openai_manager.check_moderation_policy(session_config=sesh)
+    assert len(moderation) > 0
