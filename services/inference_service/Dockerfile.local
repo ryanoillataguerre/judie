@@ -14,8 +14,7 @@ ENV PYTHONPATH "${PYTHONPATH}:/app/"
 RUN prisma generate --schema app-service/prisma/schema.prisma --generator client-py
 
 EXPOSE 443
-# Cloud run requires it
-EXPOSE 8080
+
 
 ENV GRPC_PORT=443
 ENV GRPC_VERBOSITY=debug

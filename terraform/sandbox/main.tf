@@ -147,10 +147,6 @@ module "inference-service" {
       value = var.grpc_port
     },
     {
-      key   = "GRPC_HEALTH_PORT"
-      value = var.grpc_health_port
-    },
-    {
       key   = "WOLFRAM_APP_ID"
       value = var.wolfram_app_id
     }
