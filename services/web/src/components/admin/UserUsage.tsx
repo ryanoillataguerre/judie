@@ -93,7 +93,7 @@ const UserUsage = ({ id }: { id: string }) => {
               tickValues: "every 2 days",
             }}
             // yFormat=" >-.2f"
-            curve="natural"
+            curve="linear"
             axisTop={null}
             axisRight={null}
             tooltip={({ point }) => (

@@ -9,6 +9,7 @@ import {
   Th,
   Thead,
   Tr,
+  useBreakpointValue,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -25,6 +26,8 @@ const ChatsTable = ({
   folderName?: string;
 }) => {
   const router = useRouter();
+
+  const getMobileValue = useBreakpointValue({ base: 20, md: 35 });
 
   const headerBgColor = useColorModeValue("brand.backgroundLight", "gray.800");
   const rowHoverBgColor = useColorModeValue("gray.100", "gray.700");
@@ -62,7 +65,7 @@ const ChatsTable = ({
                   transition: "ease-in-out 0.3s",
                 }}
               >
-                <Td>{getTitleForChat(chat)}</Td>
+                <Td>{getTitleForChat(chat, getMobileValue)}</Td>
                 <Td>{chat.folder?.userTitle || folderName || "n/a"}</Td>
                 <Td>
                   {chat.updatedAt

@@ -40,6 +40,7 @@ const SidebarChatNav = () => {
   const [todayChats, setTodayChats] = useState<Chat[]>([]);
   const [yesterdayChats, setYesterdayChats] = useState<Chat[]>([]);
   const [recentChats, setRecentChats] = useState<Chat[]>([]);
+  const [oldChats, setOldChats] = useState<Chat[]>([]);
 
   const toast = useToast();
 
@@ -53,6 +54,7 @@ const SidebarChatNav = () => {
   const yesterday = useRef<Date>(new Date(today.current));
   const beforeYesterday = useRef<Date>(new Date(today.current));
   const recently = useRef<Date>(new Date(today.current));
+  const old = useRef<Date>(new Date(today.current));
 
   const borderColor = useColorModeValue(
     "1px solid rgba(0, 0, 0, 0.10)",
@@ -65,6 +67,8 @@ const SidebarChatNav = () => {
     beforeYesterday.current.setDate(beforeYesterday.current.getDate() - 2);
 
     recently.current.setDate(recently.current.getDate() - 14);
+
+    old.current.setDate(old.current.getDate() - 30);
   }, []);
 
   const {
@@ -88,7 +92,7 @@ const SidebarChatNav = () => {
       );
       setYesterdayChats(
         data.filter((chat) => {
-          // get chats that are from 1 day ago
+          // get chats that are from 1 to 2 days ago
           const chatDate = new Date(chat.createdAt);
           return (
             chatDate >= beforeYesterday.current && chatDate < yesterday.current
@@ -97,11 +101,18 @@ const SidebarChatNav = () => {
       );
       setRecentChats(
         data.filter((chat) => {
-          // get chats that are from 1 day ago
+          // get chats that are from 2 to 14 days ago
           const chatDate = new Date(chat.createdAt);
           return (
             chatDate >= recently.current && chatDate < beforeYesterday.current
           );
+        })
+      );
+      setOldChats(
+        data.filter((chat) => {
+          // get chats that are from over 14 days ago
+          const chatDate = new Date(chat.createdAt);
+          return chatDate < recently.current;
         })
       );
     }
@@ -341,7 +352,7 @@ const SidebarChatNav = () => {
 
             {recentChats.length > 0 && (
               <Box>
-                <Text color={"#8F8F8F"}>Recent</Text>
+                <Text color={"#8F8F8F"}>Past 14 days</Text>
                 {isGetChatsLoading || !auth?.userData?.id ? (
                   <Flex
                     style={{
@@ -371,6 +382,54 @@ const SidebarChatNav = () => {
                     gap={"10px"}
                   >
                     {recentChats.map((chat) => (
+                      <SidebarChatItem
+                        chat={chat}
+                        key={chat.id}
+                        beingEditedChatId={beingEditedChatId}
+                        setBeingEditedChatId={(chatId) =>
+                          setBeingEditedChatId(chatId)
+                        }
+                        setBeingDeletedChatId={(chatId) =>
+                          setBeingDeletedChatId(chatId)
+                        }
+                      />
+                    ))}
+                  </Flex>
+                )}
+              </Box>
+            )}
+            {oldChats.length >= 0 && (
+              <Box>
+                <Text color={"#8F8F8F"}>Older</Text>
+                {isGetChatsLoading || !auth?.userData?.id ? (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Spinner />
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      flexDirection: "column",
+                      flexGrow: 1,
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                      overflowY: "scroll",
+                      marginTop: "20px",
+                      overflowX: "scroll",
+                    }}
+                    gap={"10px"}
+                  >
+                    {oldChats.slice(1, 8).map((chat) => (
                       <SidebarChatItem
                         chat={chat}
                         key={chat.id}
