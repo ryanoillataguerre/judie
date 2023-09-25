@@ -1,9 +1,14 @@
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { redeemInviteMutation, signupMutation } from "@judie/data/mutations";
+import {
+  CREATE_CHECKOUT_SESSION,
+  createCheckoutSessionMutation,
+  redeemInviteMutation,
+  signupMutation,
+} from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -26,7 +31,6 @@ import {
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
 import { UserRole } from "@judie/data/types/api";
 import { getCookie } from "cookies-next";
 
@@ -61,8 +65,44 @@ export const SignupForm = ({
     },
     reValidateMode: "onBlur",
   });
+
+  const redirectUrl = useMemo(() => {
+    return typeof window !== "undefined"
+      ? `${window.location.origin}/dashboard`
+      : "";
+  }, [router]);
+
+  const { mutateAsync: createCheckoutSession } = useMutation({
+    mutationKey: CREATE_CHECKOUT_SESSION,
+    mutationFn: () => createCheckoutSessionMutation(redirectUrl),
+  });
+
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signupMutation,
+    onSuccess: async () => {
+      // Get checkout session URL
+      const url = await createCheckoutSession();
+      // Redirect to checkout
+      window?.location?.assign(url);
+      // router.push({
+      //   pathname: "/dashboard",
+      //   query: router.query,
+      // });
+    },
+    onError: (err: HTTPResponseError) => {
+      console.error("Error signing up", err);
+      toast({
+        title: "Error signing up",
+        description: err.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const { mutateAsync: mutateAsyncInvite } = useMutation({
+    mutationFn: redeemInviteMutation,
     onSuccess: () => {
       router.push({
         pathname: "/dashboard",
@@ -80,27 +120,6 @@ export const SignupForm = ({
       });
     },
   });
-
-  const { mutateAsync: mutateAsyncInvite, isLoading: inviteSignupLoading } =
-    useMutation({
-      mutationFn: redeemInviteMutation,
-      onSuccess: () => {
-        router.push({
-          pathname: "/dashboard",
-          query: router.query,
-        });
-      },
-      onError: (err: HTTPResponseError) => {
-        console.error("Error signing up", err);
-        toast({
-          title: "Error signing up",
-          description: err.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      },
-    });
 
   const [receivePromotions, setReceivePromotions] = useState(true);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
