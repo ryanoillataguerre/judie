@@ -84,10 +84,6 @@ export const SignupForm = ({
       const url = await createCheckoutSession();
       // Redirect to checkout
       window?.location?.assign(url);
-      // router.push({
-      //   pathname: "/dashboard",
-      //   query: router.query,
-      // });
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);

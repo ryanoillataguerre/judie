@@ -1,13 +1,6 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
-import {
-  Chat,
-  ChatFolder,
-  GradeYear,
-  Message,
-  PermissionType,
-  UserRole,
-} from "./types/api";
+import { Chat, GradeYear, PermissionType, UserRole } from "./types/api";
 
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({

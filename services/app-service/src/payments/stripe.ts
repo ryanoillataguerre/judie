@@ -61,12 +61,12 @@ export const handleStripeWebhookEvents = async (
             break;
           case "customer.subscription.updated":
             console.info("customer.subscription.updated");
-            const canceled =
+            const canceledOrTrialEnded =
               !!(event.data.object as Stripe.Subscription)?.canceled_at ||
               new Date(
                 (event.data.object as Stripe.Subscription)?.trial_end || ""
               ) < new Date();
-            if (canceled) {
+            if (canceledOrTrialEnded) {
               await handleSubscriptionCancelled(
                 event.data.object as Stripe.Subscription
               );
