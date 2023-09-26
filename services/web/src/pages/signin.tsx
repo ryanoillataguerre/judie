@@ -1,9 +1,13 @@
-import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
+import { HTTPResponseError } from "@judie/data/baseFetch";
 import Head from "next/head";
 import { useMutation } from "react-query";
-import { signinMutation } from "@judie/data/mutations";
+import {
+  CREATE_CHECKOUT_SESSION,
+  createCheckoutSessionMutation,
+  signinMutation,
+} from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Flex,
@@ -24,8 +28,7 @@ import {
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import useUnauthRedirect from "@judie/hooks/useUnauthRedirect";
-import { getCookie } from "cookies-next";
+import { SubscriptionStatus, User } from "@judie/data/types/api";
 
 interface SubmitData {
   email: string;
@@ -43,13 +46,33 @@ const SigninForm = () => {
     },
     reValidateMode: "onBlur",
   });
+
+  const redirectUrl = useMemo(() => {
+    return typeof window !== "undefined"
+      ? `${window.location.origin}/dashboard`
+      : "";
+  }, [router]);
+
+  const { mutateAsync: createCheckoutSession } = useMutation({
+    mutationKey: CREATE_CHECKOUT_SESSION,
+    mutationFn: () => createCheckoutSessionMutation(redirectUrl),
+  });
+
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signinMutation,
-    onSuccess: () => {
-      router.push({
-        pathname: "/dashboard",
-        query: router.query,
-      });
+    onSuccess: async (response: User) => {
+      // Check if user has sub
+      if (response.subscription?.status === SubscriptionStatus.ACTIVE) {
+        // Redirect to dashboard
+        router.push("/dashboard", {
+          query: router.query,
+        });
+      } else {
+        // Get checkout session URL
+        const url = await createCheckoutSession();
+        // Redirect to checkout
+        window?.location?.assign(url);
+      }
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing in", err);
@@ -245,18 +268,18 @@ const SigninForm = () => {
 
 const SigninPage = () => {
   const router = useRouter();
-  useUnauthRedirect();
+  // useUnauthRedirect();
   useAuth({ allowUnauth: true });
-  const { logout } = useAuth();
-  const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
+  // const { logout } = useAuth();
+  // const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 
   // clear session cookie on signin page if still present
-  useEffect(() => {
-    if (sessionCookie) {
-      logout();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (sessionCookie) {
+  //     logout();
+  //   }
+  // }, []);
 
   return (
     <>

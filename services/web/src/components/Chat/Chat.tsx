@@ -368,7 +368,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // console.log("title", chat?.userTitle);
   return (
     <Flex
       h={"100%"}

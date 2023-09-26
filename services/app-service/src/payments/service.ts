@@ -1,12 +1,7 @@
 import Stripe from "stripe";
 import { getUser, updateUser } from "../users/service.js";
 import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
-import {
-  Prisma,
-  SubscriptionStatus,
-  SubscriptionType,
-  UserRole,
-} from "@prisma/client";
+import { Prisma, SubscriptionStatus, SubscriptionType } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 import { sendSubscribedEmail } from "../cio/service.js";
 
@@ -60,15 +55,10 @@ export const checkout = async (
     success_url: currentUrl,
     cancel_url: cancelUrl,
     customer: user.stripeCustomerId || newCustomerId || undefined,
-    allow_promotion_codes: !(user.role === UserRole.JUDIE),
-    discounts:
-      user.role === UserRole.JUDIE
-        ? [
-            {
-              coupon: process.env.STRIPE_EMPLOYEE_COUPON_ID,
-            },
-          ]
-        : [],
+    allow_promotion_codes: true,
+    subscription_data: {
+      trial_period_days: 14,
+    },
   };
   return await createCheckoutSession(params);
 };

@@ -61,9 +61,12 @@ export const handleStripeWebhookEvents = async (
             break;
           case "customer.subscription.updated":
             console.info("customer.subscription.updated");
-            const canceled = !!(event.data.object as Stripe.Subscription)
-              ?.canceled_at;
-            if (canceled) {
+            const canceledOrTrialEnded =
+              !!(event.data.object as Stripe.Subscription)?.canceled_at ||
+              new Date(
+                (event.data.object as Stripe.Subscription)?.trial_end || ""
+              ) < new Date();
+            if (canceledOrTrialEnded) {
               await handleSubscriptionCancelled(
                 event.data.object as Stripe.Subscription
               );
@@ -72,7 +75,9 @@ export const handleStripeWebhookEvents = async (
           case "customer.subscription.deleted":
             console.info("customer.subscription.deleted");
             console.info(event.data);
-
+            await handleSubscriptionCancelled(
+              event.data.object as Stripe.Subscription
+            );
             break;
           case "checkout.session.completed":
             console.info("checkout.session.completed");

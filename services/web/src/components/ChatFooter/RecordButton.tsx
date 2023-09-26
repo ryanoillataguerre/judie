@@ -11,6 +11,7 @@ import { useMutation } from "react-query";
 import { motion, isValidMotionProp } from "framer-motion";
 import { whisperTranscribeMutation } from "@judie/data/mutations";
 import MicIcon from "@judie/components/icons/MicIcon";
+import * as gtag from "@judie/utils/gtag";
 
 const ChakraCircle = chakra(motion.div, {
   /**
@@ -124,6 +125,12 @@ const RecordButton = ({
       borderRadius={"10px"}
       border={"none"}
       onClick={() => {
+        gtag.event({
+          action: "click",
+          category: "chat",
+          label: "record",
+          value: null,
+        });
         if (isRecording) {
           stopRecording();
         } else {

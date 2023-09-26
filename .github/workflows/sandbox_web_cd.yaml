@@ -3,29 +3,29 @@ name: Sandbox web CD
 on:
   push:
     branches:
-    - sandbox
+      - sandbox
     paths:
-    - "services/web/**"
+      - "services/web/**"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-     contents: 'read'
-     id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
         with:
           token_format: access_token
-          workload_identity_provider: 'projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
-          service_account: 'terraform@sandbox-382905.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider"
+          service_account: "terraform@sandbox-382905.iam.gserviceaccount.com"
           access_token_lifetime: 600s
 
       - name: Login to Artifact Registry
@@ -51,9 +51,11 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URI=https://app-service.sandbox.judie.io
             NEXT_PUBLIC_NODE_ENV=sandbox
+            NEXT_PUBLIC_GA_MEASUREMENT_ID={{ secrets.GA_MEASUREMENT_ID }}
+            NEXT_PUBLIC_UPFLUENCE_SCRIPT_ID={{ secrets.UPFLUENCE_SCRIPT_ID }}
 
       - name: Deploy to Cloud Run
-        uses: 'google-github-actions/deploy-cloudrun@v1'
+        uses: "google-github-actions/deploy-cloudrun@v1"
         with:
           image: us-west1-docker.pkg.dev/sandbox-382905/web/web:${{ github.sha }}
           service: web

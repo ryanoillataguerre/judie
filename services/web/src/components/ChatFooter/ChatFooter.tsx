@@ -23,6 +23,7 @@ import { useAudioRecorder } from "react-audio-voice-recorder";
 import { LiveAudioVisualizer } from "react-audio-visualize";
 import AssignmentUploader from "../AssignmentUploader";
 import useResizeTextArea from "@judie/hooks/useResizeTextArea";
+import * as gtag from "@judie/utils/gtag";
 import SendButton from "./SendButton";
 import RecordButton from "./RecordButton";
 
@@ -38,6 +39,12 @@ const ChatFooter = () => {
       e.preventDefault();
       addMessage(chatValue);
       setChatValue("");
+      gtag.event({
+        action: "submit",
+        category: "chat",
+        label: "chat",
+        value: null,
+      });
     },
     [addMessage, setChatValue, chatValue]
   );

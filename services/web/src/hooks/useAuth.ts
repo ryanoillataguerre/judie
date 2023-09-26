@@ -10,7 +10,6 @@ import {
   EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
-  SubscriptionType,
   User,
   UserRole,
 } from "@judie/data/types/api";
@@ -18,15 +17,19 @@ import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo, useCallback, useContext } from "react";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useQuery,
-} from "react-query";
+import { useQuery } from "react-query";
 import { ChatContext } from "./useChat";
+import * as gtag from "@judie/utils/gtag";
 
-const DO_NOT_REDIRECT_PATHS = ["/signin", "/signup"];
+const DO_NOT_REDIRECT_PATHS = [
+  "/signin",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/parental-consent",
+  "/verify",
+  "/invite",
+];
 export const SEEN_CHATS_NOTICE_COOKIE = "judie_scn";
 
 export const isPermissionTypeAdmin = (type: PermissionType) => {
@@ -58,6 +61,13 @@ export default function useAuth({
   const toast = useToast();
   const [sessionCookie, setSessionCookie] = useState(getCookie(SESSION_COOKIE));
 
+  const isOnUnauthedRoute = useMemo(() => {
+    return (
+      allowUnauth ||
+      DO_NOT_REDIRECT_PATHS.some((path) => router.asPath?.includes(path))
+    );
+  }, [allowUnauth, router]);
+
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
   const isB2B = useMemo(() => {
@@ -80,7 +90,13 @@ export default function useAuth({
 
   const logout = useCallback(() => {
     reset();
-    deleteCookie(SESSION_COOKIE);
+    deleteCookie(SESSION_COOKIE, {
+      domain: isLocal()
+        ? undefined
+        : isSandbox()
+        ? "sandbox.judie.io"
+        : ".judie.io",
+    });
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
@@ -95,9 +111,6 @@ export default function useAuth({
       }),
     {
       staleTime: 1000 * 60,
-      // retryDelay(failureCount, error) {
-      //   if (failureCount )
-      // },
       onSuccess: (data) => {
         setUserData(data);
       },
@@ -107,6 +120,7 @@ export default function useAuth({
         }
       },
       refetchOnWindowFocus: true,
+      enabled: !isOnUnauthedRoute,
     }
   );
 
@@ -151,7 +165,7 @@ export default function useAuth({
 
   // Stripe callback url has paid=true query param
   useEffect(() => {
-    if (router.query.paid === "true") {
+    if (router.query.paid === "true" && userData?.subscription) {
       refetch();
       toast({
         title: "Welcome to Judie Premium!",
@@ -161,6 +175,29 @@ export default function useAuth({
         isClosable: true,
         position: "top",
       });
+      gtag.event({
+        action: "paid",
+        category: "subscription",
+        label: "paid",
+        value: null,
+      });
+
+      window?._upf?.push([
+        isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
+        {
+          order_id: userData?.subscription?.id, // required
+          order_name: userData?.subscription?.type, // required
+          amount: "49.00", // required
+          currency: "usd", // required,
+          customer: {
+            customer_id: userData?.id,
+            first_name: userData?.firstName,
+            last_name: userData?.lastName,
+            email: userData?.email,
+          },
+        },
+      ]);
+
       const newQuery = router.query;
       delete newQuery.paid;
       router.push({
@@ -168,7 +205,7 @@ export default function useAuth({
         query: newQuery,
       });
     }
-  }, [router.query, refetch, toast, router]);
+  }, [router.query, refetch, toast, router, userData, userData?.subscription]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
@@ -185,12 +222,6 @@ export default function useAuth({
       refetch();
     }
   }, [sessionCookie, allowUnauth, isError, isLoading, refetch, router]);
-
-  useEffect(() => {
-    if (!userData && !isLoading && isError && isFetched && !allowUnauth) {
-      logout();
-    }
-  }, [userData, isError, isLoading, isFetched, router, allowUnauth, logout]);
 
   return {
     userData,
