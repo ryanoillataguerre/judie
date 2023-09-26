@@ -24,18 +24,6 @@ export const getMeQuery = async ({
   return response.data;
 };
 
-export const GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID =
-  "GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID";
-export const getStripeCustomerSubscriptionsQuery =
-  async () // should we add Stripe to front-end in order to get this type?
-  : Promise<any> => {
-    const response = await baseFetch({
-      url: `/payments/subscriptions`,
-      method: "GET",
-    });
-    return response.data;
-  };
-
 export const GET_USER_CHATS = "GET_USER_CHATS";
 export const getUserChatsQuery = async (): Promise<Chat[]> => {
   const response = await baseFetch({

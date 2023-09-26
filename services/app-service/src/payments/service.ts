@@ -1,12 +1,7 @@
 import Stripe from "stripe";
 import { getUser, updateUser } from "../users/service.js";
 
-import {
-  createCheckoutSession,
-  createStripeCustomer,
-  getStripeCustomer,
-  getStripeCustomerSubscriptions,
-} from "./stripe.js";
+import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
 import {
   Prisma,
   SubscriptionStatus,
@@ -16,36 +11,6 @@ import {
 
 import dbClient from "../utils/prisma.js";
 import { sendSubscribedEmail } from "../cio/service.js";
-
-export const getCustomer = async (userId: string) => {
-  const user = await getUser({ id: userId });
-  if (!user) {
-    throw new Error("User not found");
-  }
-  let customer;
-  if (user.stripeCustomerId) {
-    customer = await getStripeCustomer(user.stripeCustomerId);
-  } else {
-    throw new Error("Stripe customer not found");
-  }
-
-  return customer;
-};
-
-export const getCustomerSubscriptions = async (userId: string) => {
-  const user = await getUser({ id: userId });
-  if (!user) {
-    throw new Error("User not found");
-  }
-  let subscriptions;
-  if (user.stripeCustomerId) {
-    subscriptions = await getStripeCustomerSubscriptions(user.stripeCustomerId);
-  } else {
-    throw new Error("Stripe customer not found");
-  }
-
-  return subscriptions;
-};
 
 export const createCustomer = async (userId: string): Promise<string> => {
   const user = await getUser({ id: userId });

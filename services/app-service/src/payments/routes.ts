@@ -5,37 +5,11 @@ import {
   requireAuth,
 } from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
-import {
-  checkout,
-  createCustomer,
-  getCustomer,
-  getCustomerSubscriptions,
-} from "./service.js";
+import { checkout, createCustomer } from "./service.js";
 import { body, param } from "express-validator";
 import NotFoundError from "../utils/errors/NotFoundError.js";
 
 const router = Router();
-
-router.get(
-  "/subscriptions",
-  requireAuth,
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    if (!session.userId) {
-      throw new UnauthorizedError("No user id found in session");
-    }
-    const customerSubscriptions = await getCustomerSubscriptions(
-      session.userId
-    );
-    if (!customerSubscriptions) {
-      throw new NotFoundError("Customer Subscription not found");
-    }
-
-    res.status(200).json({
-      data: customerSubscriptions,
-    });
-  })
-);
 
 router.post(
   "/customer",

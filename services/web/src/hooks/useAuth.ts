@@ -2,10 +2,8 @@ import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import {
   GET_ME,
-  GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID,
   GET_USER_ENTITIES,
   getMeQuery,
-  getStripeCustomerSubscriptionsQuery,
   getUserEntitiesQuery,
 } from "@judie/data/queries";
 import {
@@ -153,12 +151,6 @@ export default function useAuth({
     staleTime: 1000 * 60,
   });
 
-  const { data: customerSubscriptions } = useQuery({
-    queryKey: [GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID, userData?.id],
-    queryFn: getStripeCustomerSubscriptionsQuery,
-    enabled: !!userData?.id,
-  });
-
   useEffect(() => {
     if (
       isError &&
@@ -173,7 +165,7 @@ export default function useAuth({
 
   // Stripe callback url has paid=true query param
   useEffect(() => {
-    if (router.query.paid === "true" && customerSubscriptions && userData) {
+    if (router.query.paid === "true" && userData?.subscription) {
       refetch();
       toast({
         title: "Welcome to Judie Premium!",
@@ -193,21 +185,12 @@ export default function useAuth({
       window?._upf?.push([
         isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
         {
-          order_id: customerSubscriptions.data[0].id, // required
-          order_name:
-            customerSubscriptions.data[0].object ?? "Judie.io subscription", // required
-          amount: customerSubscriptions.data[0].plan.amount, // required
-          currency: customerSubscriptions.data[0].currency, // required,
-          items: [
-            {
-              name: customerSubscriptions.data[0].items.data[0].object,
-              amount: customerSubscriptions.data[0].items.data[0].plan.amount,
-              currency:
-                customerSubscriptions.data[0].items.data[0].plan.currency,
-            },
-          ],
+          order_id: userData?.subscription?.id, // required
+          order_name: userData?.subscription?.type, // required
+          amount: "49.00", // required
+          currency: "usd", // required,
           customer: {
-            customer_id: customerSubscriptions.data[0].customer,
+            customer_id: userData?.id,
             first_name: userData?.firstName,
             last_name: userData?.lastName,
             email: userData?.email,
@@ -222,14 +205,7 @@ export default function useAuth({
         query: newQuery,
       });
     }
-  }, [
-    router.query,
-    refetch,
-    toast,
-    router,
-    userData,
-    customerSubscriptions?.data,
-  ]);
+  }, [router.query, refetch, toast, router, userData, userData?.subscription]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
