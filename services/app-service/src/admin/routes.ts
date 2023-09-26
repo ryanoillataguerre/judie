@@ -31,7 +31,7 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const entities = await getEntitiesForUser({
-      id: req.session.userId as string,
+      id: req.userId as string,
     });
     res.status(200).send({
       data: entities,
@@ -45,7 +45,7 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const users = await getUsersForAdminUser({
-      id: req.session.userId as string,
+      id: req.userId as string,
     });
     res.status(200).send({
       data: users,

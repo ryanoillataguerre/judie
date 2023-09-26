@@ -33,7 +33,7 @@ router.post(
     // Validate user has organization-level privileges
     if (schoolId) {
       await validateSchoolAdmin({
-        userId: req.session.userId as string,
+        userId: req.userId as string,
         schoolId,
       });
     }
@@ -76,7 +76,7 @@ router.post(
       },
       user: {
         connect: {
-          id: req.session.userId,
+          id: req.userId,
         },
       },
     });
@@ -92,7 +92,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const roomId = req.params.roomId;
     await validateRoomAdmin({
       userId: userId as string,
@@ -112,7 +112,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const roomId = req.params.roomId;
     await validateRoomAdmin({
       userId: userId as string,
@@ -132,7 +132,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const roomId = req.params.roomId;
     await validateRoomAdmin({
       userId: userId as string,
@@ -152,7 +152,7 @@ router.delete(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const roomId = req.params.roomId;
     const room = await getRoomById({
       id: roomId,
@@ -183,7 +183,7 @@ router.put(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
-    const { userId } = req.session;
+    const userId = req.userId;
 
     await validateRoomAdmin({
       userId: userId as string,

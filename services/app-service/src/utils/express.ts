@@ -15,6 +15,7 @@ import { isProduction, isSandbox } from "./env.js";
 import { getUser, updateUser } from "../users/service.js";
 import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
 import { SubscriptionStatus, UserRole } from "@prisma/client";
+import firebaseApp from "./firebase.js";
 
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
@@ -60,7 +61,7 @@ export const messageRateLimit = async (
   _: Response,
   next: NextFunction
 ) => {
-  const userId = req.session?.userId;
+  const userId = req.userId;
   if (!userId) {
     throw new UnauthorizedError("No user id found in session");
   }
@@ -88,7 +89,7 @@ export const messageRateLimit = async (
 
 export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
   try {
-    if (!req.session?.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("Not authorized");
     }
     next();
@@ -103,10 +104,10 @@ export const requireJudieAuth = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.session?.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("Not authorized");
     }
-    const user = await getUser({ id: req.session?.userId });
+    const user = await getUser({ id: req.userId });
     if (!(user?.role === UserRole.JUDIE)) {
       throw new UnauthorizedError("Not authorized");
     }
@@ -164,36 +165,23 @@ const redisClient = new Redis({
   host: process.env.REDIS_HOST || "localhost",
 });
 export const sessionStore = new RedisStore({ client: redisClient });
-export const sessionLayer = () =>
-  session({
-    unset: "destroy",
-    rolling: true,
-    name: "judie_sid",
-    store: sessionStore,
-    secret: process.env.SESSION_SECRET || "secret",
-    resave: false,
-    saveUninitialized: false,
-    proxy: isProduction() || isSandbox(),
-    cookie: {
-      secure: isProduction() || isSandbox(), // if true only transmit cookie over https
-      httpOnly: false, // if true prevent client side JS from reading the cookie
-      maxAge: 1000 * 60 * 60 * 24 * 30, // session max age in milliseconds - 30d - expire after 30d inactivity
-      path: "/",
-      domain: isProduction()
-        ? "judie.io"
-        : isSandbox()
-        ? "sandbox.judie.io"
-        : undefined,
-      ...(isProduction() || isSandbox() ? { sameSite: "strict" } : {}),
-    },
-  });
+export const authMiddleware =
+  () => async (req: Request, res: Response, next: NextFunction) => {
+    const headerToken = req.headers.authorization;
+    if (!headerToken) {
+      next();
+      return;
+    }
 
-// Extend express session type
-declare module "express-session" {
-  interface SessionData {
-    userId: string;
-  }
-}
+    const token = headerToken.split(" ")[1];
+    const { uid } = await firebaseApp.auth().verifyIdToken(token);
+    const user = await getUser({ firebaseUid: uid });
+    if (!user) {
+      next();
+      return;
+    }
+    req.userId = user.id;
+  };
 
 // Morgan logger
 export const morganLogger = () =>

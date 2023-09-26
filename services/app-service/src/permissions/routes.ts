@@ -79,7 +79,7 @@ router.delete(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const permissionId = req.params.permissionId;
-    const userId = req.session?.userId;
+    const userId = req.userId;
     // Validate if user can delete this permission
     await validateUserAdminForPermission({
       userId: userId as string,

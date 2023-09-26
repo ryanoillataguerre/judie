@@ -1,6 +1,8 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
 import { Chat, GradeYear, PermissionType, UserRole } from "./types/api";
+import { createUserWithEmailAndPassword, getAuth } from "@firebase/auth";
+import firebaseApp from "@judie/utils/firebase";
 
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
@@ -87,20 +89,25 @@ export const signupMutation = async ({
   role: UserRole;
   districtOrSchool?: string;
 }) => {
-  const response = await baseFetch({
-    url: "/auth/signup",
-    method: "POST",
-    body: {
-      email,
-      password,
-      firstName,
-      lastName,
-      receivePromotions,
-      role,
-      districtOrSchool,
-    },
-  });
-  return response.data;
+  // Firebase auth logic
+  const auth = getAuth(firebaseApp);
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  console.log(result);
+
+  // const response = await baseFetch({
+  //   url: "/auth/signup",
+  //   method: "POST",
+  //   body: {
+  //     email,
+  //     password,
+  //     firstName,
+  //     lastName,
+  //     receivePromotions,
+  //     role,
+  //     districtOrSchool,
+  //   },
+  // });
+  // return response.data;
 };
 
 export const createChatMutation = async ({
