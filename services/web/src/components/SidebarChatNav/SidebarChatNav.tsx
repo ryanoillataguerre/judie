@@ -54,7 +54,6 @@ const SidebarChatNav = () => {
   const yesterday = useRef<Date>(new Date(today.current));
   const beforeYesterday = useRef<Date>(new Date(today.current));
   const recently = useRef<Date>(new Date(today.current));
-  const old = useRef<Date>(new Date(today.current));
 
   const borderColor = useColorModeValue(
     "1px solid rgba(0, 0, 0, 0.10)",
@@ -67,8 +66,6 @@ const SidebarChatNav = () => {
     beforeYesterday.current.setDate(beforeYesterday.current.getDate() - 2);
 
     recently.current.setDate(recently.current.getDate() - 14);
-
-    old.current.setDate(old.current.getDate() - 30);
   }, []);
 
   const {

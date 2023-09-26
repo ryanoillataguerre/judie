@@ -161,12 +161,9 @@ const SidebarChatItem = ({
           }
         }}
         //TODO: default value is truncated when editing
-        defaultValue={
-          isSelected
-            ? getTitleForChat(chat, true)
-            : chat.userTitle ?? chat.subject
-        }
-        placeholder={getTitleForChat(chat, true)}
+        defaultValue={chat.userTitle ?? chat.subject}
+        value={editingValue}
+        placeholder={getTitleForChat(chat, 14)}
         style={{
           fontSize: 16,
           fontWeight: 500,
@@ -178,7 +175,7 @@ const SidebarChatItem = ({
         }}
         submitOnBlur={false}
         onSubmit={async () => {
-          if (editingValue !== getTitleForChat(chat, true)) {
+          if (editingValue !== getTitleForChat(chat, 14)) {
             await editTitleMutation.mutateAsync({
               title: editingValue as string,
             });
