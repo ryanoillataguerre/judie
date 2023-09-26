@@ -5,3 +5,5 @@ SANDBOX_ID_1 = "f579698f-4608-41a2-ac2b-5ab272093510"
 
 LOCAL_ID_1 = "2320b4b0-1b0b-45bc-987c-cfc381a623ca"
 LOCAL_ID_2 = "e3aac7df-93f1-41a0-8b77-db1c74ca8940"
+
+LOCAL_USER_ID = "9a6efffb-9ba0-4d4b-b54f-d4fb9dc22ab4"
