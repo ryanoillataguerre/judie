@@ -6,15 +6,16 @@ from typing import List, Optional
 
 
 def assemble_prompt_chunks(subject: str, user_type: Optional[str] = None):
-    user_chunk = prompt_chunks.DEFAULT_PROMPT
-    if user_type:
-        if user_type == "STUDENT":
-            user_chunk = prompt_chunks.STUDENT_TUTOR_CHUNK
-        elif user_type == "PARENT":
-            user_chunk = prompt_chunks.PARENT_TUTOR_CHUNK
+    if subject in prompt_chunks.NON_TUTOR_SUBJECTS:
+        chunks = prompt_chunks[subject]
+    else:
+        user_chunk = prompt_chunks.STUDENT_TUTOR_CHUNK
+        if user_type:
+            if user_type == "PARENT":
+                user_chunk = prompt_chunks.PARENT_TUTOR_CHUNK
 
-    chunks = user_chunk
-    chunks += prompt_chunks.PROMPT_MAP[subject]
+        chunks = user_chunk
+        chunks += prompt_chunks.PROMPT_MAP[subject]
     return chunks
 
 
