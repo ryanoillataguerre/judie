@@ -16,6 +16,10 @@ def assemble_prompt_chunks(subject: str, user_type: Optional[str] = None):
 
         chunks = user_chunk
         chunks += prompt_chunks.PROMPT_MAP[subject]
+
+        if subject in prompt_chunks.MATH_SUBJECTS:
+            chunks += prompt_chunks.MATH_CHUNK
+
     return chunks
 
 
