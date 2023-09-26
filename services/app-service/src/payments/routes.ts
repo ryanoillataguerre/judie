@@ -17,39 +17,16 @@ import NotFoundError from "../utils/errors/NotFoundError.js";
 const router = Router();
 
 router.get(
-  "/:customerId",
-  [param("customerId").exists().isString()],
+  "/subscriptions",
   requireAuth,
-  errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const customerId = req.params.customerId;
     const session = req.session;
     if (!session.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
-    const customer = await getCustomer(customerId);
-    if (!customer) {
-      throw new NotFoundError("Customer not found");
-    }
-
-    res.status(200).json({
-      data: customer,
-    });
-  })
-);
-
-router.get(
-  "/:customerId/subscriptions",
-  [param("customerId").exists().isString()],
-  requireAuth,
-  errorPassthrough(handleValidationErrors),
-  errorPassthrough(async (req: Request, res: Response) => {
-    const customerId = req.params.customerId;
-    const session = req.session;
-    if (!session.userId) {
-      throw new UnauthorizedError("No user id found in session");
-    }
-    const customerSubscriptions = await getCustomerSubscriptions(customerId);
+    const customerSubscriptions = await getCustomerSubscriptions(
+      session.userId
+    );
     if (!customerSubscriptions) {
       throw new NotFoundError("Customer Subscription not found");
     }

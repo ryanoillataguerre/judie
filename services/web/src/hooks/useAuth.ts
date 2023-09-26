@@ -2,7 +2,6 @@ import { useToast } from "@chakra-ui/react";
 import { HTTPResponseError, SESSION_COOKIE } from "@judie/data/baseFetch";
 import {
   GET_ME,
-  GET_STRIPE_CUSTOMER_BY_ID,
   GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID,
   GET_USER_ENTITIES,
   getMeQuery,
@@ -13,7 +12,6 @@ import {
   EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
-  SubscriptionType,
   User,
   UserRole,
 } from "@judie/data/types/api";
@@ -21,12 +19,7 @@ import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo, useCallback, useContext } from "react";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useQuery,
-} from "react-query";
+import { useQuery } from "react-query";
 import { ChatContext } from "./useChat";
 import * as gtag from "@judie/utils/gtag";
 
@@ -162,7 +155,7 @@ export default function useAuth({
 
   const { data: customerSubscriptions } = useQuery({
     queryKey: [GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID, userData?.id],
-    queryFn: () => getStripeCustomerSubscriptionsQuery(userData?.id ?? ""),
+    queryFn: getStripeCustomerSubscriptionsQuery,
     enabled: !!userData?.id,
   });
 
