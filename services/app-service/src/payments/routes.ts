@@ -6,8 +6,7 @@ import {
 } from "../utils/express.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import { checkout, createCustomer } from "./service.js";
-import { body, param } from "express-validator";
-import NotFoundError from "../utils/errors/NotFoundError.js";
+import { body } from "express-validator";
 
 const router = Router();
 

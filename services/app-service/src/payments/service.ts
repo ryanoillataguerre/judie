@@ -2,12 +2,7 @@ import Stripe from "stripe";
 import { getUser, updateUser } from "../users/service.js";
 
 import { createCheckoutSession, createStripeCustomer } from "./stripe.js";
-import {
-  Prisma,
-  SubscriptionStatus,
-  SubscriptionType,
-  UserRole,
-} from "@prisma/client";
+import { Prisma, SubscriptionStatus, SubscriptionType } from "@prisma/client";
 
 import dbClient from "../utils/prisma.js";
 import { sendSubscribedEmail } from "../cio/service.js";
