@@ -189,8 +189,7 @@ MATH_SUBJECTS = [
     "Calculus",
     "Elementary School Math",
     "AP Statistics",
-    "Statistics & Probability"
-
+    "Statistics & Probability",
 ]
 
 NON_TUTOR_SUBJECTS = [

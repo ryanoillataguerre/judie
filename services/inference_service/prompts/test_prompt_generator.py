@@ -58,17 +58,23 @@ def test_context_limit(env_setup):
         <= CONTEXT_LIMIT
     )
 
+
 def test_chunk_assembly(env_setup):
     prompt = prompt_generator.assemble_prompt_chunks(subject="AP Art History")
     assert "tutor" in prompt
 
+
 def test_chunk_assembly_parent(env_setup):
-    prompt = prompt_generator.assemble_prompt_chunks(subject="AP Art History",user_type="PARENT")
+    prompt = prompt_generator.assemble_prompt_chunks(
+        subject="AP Art History", user_type="PARENT"
+    )
     assert "parent" in prompt
+
 
 def test_chunk_assembly_math(env_setup):
     prompt = prompt_generator.assemble_prompt_chunks(subject="Geometry")
     assert "calculations" in prompt
+
 
 def test_chunk_assembly_non_tutor(env_setup):
     prompt = prompt_generator.assemble_prompt_chunks(subject="Testing")
