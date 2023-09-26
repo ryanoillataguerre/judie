@@ -13,12 +13,6 @@ import SidebarOpenCloseProvider from "@judie/context/sidebarOpenCloseProvider";
 import * as gtag from "@judie/utils/gtag";
 import Script from "next/script";
 
-const openSans = Open_Sans({
-  weight: ["300", "400", "600", "700"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-});
-
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
