@@ -15,12 +15,12 @@ router.post(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
 
     // Create Stripe customer for user
-    const customerId = await createCustomer(session.userId);
+    const customerId = await createCustomer(req.userId);
 
     res.status(200).json({
       data: {
@@ -37,13 +37,13 @@ router.post(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
 
     // Create Stripe Checkout Session for user
     const checkoutSession = await checkout(
-      session.userId,
+      req.userId,
       req.body.currentUrl
         ? `${req.body.currentUrl}?${
             req.body.currentUrl.includes("?id=") ? "&paid=true" : "?paid=true"

@@ -17,6 +17,14 @@ import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
 import { SubscriptionStatus, UserRole } from "@prisma/client";
 import firebaseApp from "./firebase.js";
 
+declare global {
+  namespace Express {
+    export interface Request {
+      userId?: string;
+    }
+  }
+}
+
 // Base server headers
 export const headers = (req: Request, res: Response, next: NextFunction) => {
   res.header(

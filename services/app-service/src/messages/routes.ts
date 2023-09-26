@@ -81,7 +81,7 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     if (!req.params.messageId) {

@@ -57,20 +57,20 @@ router.post(
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     // Get chat and messages
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     await getCompletion({
       chatId: req.query.chatId as string | undefined,
       query: req.body.query,
-      userId: session.userId,
+      userId: req.userId,
       response: res,
     });
     res.status(200).end();
-    await incrementQuestionCountEntry({ userId: session.userId });
+    await incrementQuestionCountEntry({ userId: req.userId });
     await dbClient.user.update({
       where: {
-        id: session.userId,
+        id: req.userId,
       },
       data: {
         lastMessageAt: new Date(),
@@ -84,11 +84,11 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     // Typecasting to transform - need to better define transformChat type
-    const chats = (await getUserChats(session.userId)) as (Chat & {
+    const chats = (await getUserChats(req.userId)) as (Chat & {
       messages: Message[];
       folder?: ChatFolder;
     })[];
@@ -105,7 +105,7 @@ router.get(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const chat = await getChat({
@@ -128,13 +128,13 @@ router.post(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const newChat = await createChat({
       user: {
         connect: {
-          id: session.userId,
+          id: req.userId,
         },
       },
       ...(req.body?.folderId
@@ -167,7 +167,7 @@ router.put(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const { chatId } = req.params;
@@ -197,10 +197,10 @@ router.delete(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
-    await deleteChatsForUser(session.userId);
+    await deleteChatsForUser(req.userId);
 
     res.status(200).json({
       data: { success: true },
@@ -213,7 +213,7 @@ router.delete(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const { chatId } = req.params;
@@ -235,7 +235,7 @@ router.post(
   upload.single("audio"),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     // How to get formData?
@@ -260,7 +260,7 @@ router.post(
   upload.single("file"),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const file = req.file;
@@ -280,7 +280,7 @@ router.post(
         // Get completion from inference service
         await getCompletion({
           chatId: req.params.chatId,
-          userId: session.userId,
+          userId: req.userId,
           response: res,
           query,
           readableContent,

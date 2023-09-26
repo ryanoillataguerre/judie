@@ -73,8 +73,6 @@ export const resetPasswordMutation = async ({
 };
 
 export const signupMutation = async ({
-  firstName,
-  lastName,
   email,
   password,
   receivePromotions,
@@ -90,24 +88,25 @@ export const signupMutation = async ({
   districtOrSchool?: string;
 }) => {
   // Firebase auth logic
-  const auth = getAuth(firebaseApp);
-  const result = await createUserWithEmailAndPassword(auth, email, password);
-  console.log(result);
+  try {
+    const auth = getAuth(firebaseApp);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
 
-  // const response = await baseFetch({
-  //   url: "/auth/signup",
-  //   method: "POST",
-  //   body: {
-  //     email,
-  //     password,
-  //     firstName,
-  //     lastName,
-  //     receivePromotions,
-  //     role,
-  //     districtOrSchool,
-  //   },
-  // });
-  // return response.data;
+    const response = await baseFetch({
+      url: "/auth/signup",
+      method: "POST",
+      body: {
+        uid: result.user.uid,
+        receivePromotions,
+        role,
+        districtOrSchool,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    console.error("Error signing up", err);
+    throw err;
+  }
 };
 
 export const createChatMutation = async ({

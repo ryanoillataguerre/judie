@@ -3,11 +3,9 @@ import { body } from "express-validator";
 import { errorPassthrough, handleValidationErrors } from "../utils/express.js";
 import {
   signup,
-  signin,
   addToWaitlist,
   forgotPassword,
   resetPassword,
-  setUserSessionId,
   changePassword,
 } from "./service.js";
 
@@ -28,54 +26,15 @@ router.post(
   signupValidation,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      receivePromotions,
-      role,
-      districtOrSchool,
-    } = req.body;
+    const { uid, receivePromotions, role, districtOrSchool } = req.body;
     // Create user
     const user = await signup({
-      email,
-      password,
-      firstName,
-      lastName,
+      uid,
       receivePromotions,
       role,
       districtOrSchool,
     });
-    // Create session for user
-    session.userId = user.id;
-    session.save();
-    await setUserSessionId({
-      userId: user.id,
-      sessionId: session.id,
-    });
     res.status(201).send({ data: user });
-  })
-);
-
-router.post(
-  "/signin",
-  [body("email").exists().isEmail(), body("password").isString().exists()],
-  errorPassthrough(handleValidationErrors),
-  errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
-    const { email, password } = req.body;
-    // Create user
-    const user = await signin({ email, password });
-    // Create session for user
-    session.userId = user.id;
-    session.save();
-    await setUserSessionId({
-      userId: user.id,
-      sessionId: session.id,
-    });
-    res.status(200).send({ data: user });
   })
 );
 
@@ -88,11 +47,10 @@ router.put(
   ],
   handleValidationErrors,
   errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
     const { newPassword, passwordConfirm, oldPassword } = req.body;
     // Change user password if they both match
     const user = await changePassword({
-      userId: session.userId as string,
+      userId: req.userId as string,
       oldPassword,
       newPassword,
       passwordConfirm,

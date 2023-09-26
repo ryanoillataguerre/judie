@@ -22,7 +22,7 @@ router.get(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const folder = await getFolderById(req.params.folderId as string);
@@ -37,10 +37,10 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
-    const folders = await getUserFoldersWithChatCounts(session.userId);
+    const folders = await getUserFoldersWithChatCounts(req.userId);
     res.status(200).json({
       data: folders,
     });
@@ -54,14 +54,14 @@ router.post(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
 
     const folder = await createFolder({
       user: {
         connect: {
-          id: session.userId,
+          id: req.userId,
         },
       },
       userTitle: req.body?.title || undefined,
@@ -85,7 +85,7 @@ router.put(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
 
