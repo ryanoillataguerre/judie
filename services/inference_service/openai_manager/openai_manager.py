@@ -88,10 +88,13 @@ def comprehension_score(session_config: SessionConfig) -> Optional[int]:
 
 
 def check_for_sensitive_content(session_config: SessionConfig) -> Optional[str]:
+    if not session_config.history.last_msg_is_user():
+        return None
+
     prompt = [
         {
             "role": "system",
-            "content": f"You are observing a conversation between a tutor and a student. In the last message identify if there are any comments that may be inapropriate, and if there are respond with no more than a few word description of the issues.  If the conversation does not have any problems respond only with 'none'.  Keep in mind that the student is studying {session_config.subject}, so keep in mind that some conversations may be appropriate in that context.",
+            "content": f"You are observing a conversation between a tutor and a student. Given the context of the convesation determine if there are any comments that may be inapropriate in only the latest user message.  If there is inappropriate content respond with no more than a few word description of the issues.  If the conversation does not have any problems respond only with 'none'.  Keep in mind that the student is studying {session_config.subject}, so keep in mind that some conversations may be appropriate in that context that otherwise would not be.",
         },
     ] + session_config.history.get_openai_format()[-5:]
 
