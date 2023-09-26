@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { getUser, updateUser } from "../users/service.js";
+
 import {
   createCheckoutSession,
   createStripeCustomer,
@@ -12,6 +13,7 @@ import {
   SubscriptionType,
   UserRole,
 } from "@prisma/client";
+
 import dbClient from "../utils/prisma.js";
 import { sendSubscribedEmail } from "../cio/service.js";
 
@@ -96,6 +98,9 @@ export const checkout = async (
     cancel_url: cancelUrl,
     customer: user.stripeCustomerId || newCustomerId || undefined,
     allow_promotion_codes: true,
+    subscription_data: {
+      trial_period_days: 14,
+    },
   };
   return await createCheckoutSession(params);
 };
