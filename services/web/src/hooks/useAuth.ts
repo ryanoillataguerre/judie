@@ -163,7 +163,7 @@ export default function useAuth({
   const { data: customerSubscriptions } = useQuery({
     queryKey: [GET_STRIPE_CUSTOMER_SUBSCRIPTIONS_BY_ID, userData?.id],
     queryFn: () => getStripeCustomerSubscriptionsQuery(userData?.id ?? ""),
-    enabled: !!isAdmin && !!userData?.stripeCustomerId,
+    enabled: !!userData?.id,
   });
 
   useEffect(() => {
@@ -197,8 +197,8 @@ export default function useAuth({
         value: null,
       });
 
-      window?._upf.push([
-        "order",
+      window?._upf?.push([
+        isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
         {
           order_id: customerSubscriptions.data[0].id, // required
           order_name:
