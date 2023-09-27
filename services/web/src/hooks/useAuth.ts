@@ -165,7 +165,11 @@ export default function useAuth({
 
   // Stripe callback url has paid=true query param
   useEffect(() => {
-    if (router.query.paid === "true" && userData?.subscription) {
+    if (
+      router.query.paid === "true" &&
+      userData?.subscription &&
+      window?._upf
+    ) {
       refetch();
       toast({
         title: "Welcome to Judie Premium!",
@@ -205,7 +209,15 @@ export default function useAuth({
         query: newQuery,
       });
     }
-  }, [router.query, refetch, toast, router, userData, userData?.subscription]);
+  }, [
+    router.query,
+    refetch,
+    toast,
+    router,
+    userData,
+    userData?.subscription,
+    window?._upf,
+  ]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
