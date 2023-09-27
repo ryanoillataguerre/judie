@@ -85,7 +85,8 @@ services:
       NEXT_PUBLIC_NODE_ENV: local
       NEXT_PUBLIC_API_URI: http://app-service:8080
       NEXT_PUBLIC_SEGMENT_WRITE_KEY: ${NEXT_PUBLIC_SEGMENT_WRITE_KEY}
-
+      NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID}
+      NEXT_PUBLIC_UPFLUENCE_SCRIPT_ID: ${NEXT_PUBLIC_UPFLUENCE_SCRIPT_ID}
   inference-service:
     networks:
       - dev
@@ -101,7 +102,6 @@ services:
     environment:
       LOGGING_LEVEL: info
       GRPC_PORT: 443
-      GRPC_HEALTH_PORT: 8080
       DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/postgres}
       WOLFRAM_APP_ID: ${WOLFRAM_APP_ID}
       OPENAI_API_KEY: ${OPENAI_API_KEY}

@@ -13,9 +13,6 @@ RUN prisma generate --schema app-service/prisma/schema.prisma --generator client
 
 # gRPC communication port
 EXPOSE 443
-# Health check port. Cloud run requires it
-EXPOSE 8080
-
 
 #ENV GRPC_VERBOSITY=debug
 

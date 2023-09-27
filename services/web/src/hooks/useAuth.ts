@@ -10,7 +10,6 @@ import {
   EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
-  SubscriptionType,
   User,
   UserRole,
 } from "@judie/data/types/api";
@@ -18,13 +17,9 @@ import { isLocal, isProduction, isSandbox } from "@judie/utils/env";
 import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo, useCallback, useContext } from "react";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-  useQuery,
-} from "react-query";
+import { useQuery } from "react-query";
 import { ChatContext } from "./useChat";
+import * as gtag from "@judie/utils/gtag";
 
 const DO_NOT_REDIRECT_PATHS = [
   "/signin",
@@ -170,7 +165,11 @@ export default function useAuth({
 
   // Stripe callback url has paid=true query param
   useEffect(() => {
-    if (router.query.paid === "true") {
+    if (
+      router.query.paid === "true" &&
+      userData?.subscription &&
+      window?._upf
+    ) {
       refetch();
       toast({
         title: "Welcome to Judie Premium!",
@@ -180,6 +179,29 @@ export default function useAuth({
         isClosable: true,
         position: "top",
       });
+      gtag.event({
+        action: "paid",
+        category: "subscription",
+        label: "paid",
+        value: null,
+      });
+
+      window?._upf?.push([
+        isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
+        {
+          order_id: userData?.subscription?.id, // required
+          order_name: userData?.subscription?.type, // required
+          amount: "49.00", // required
+          currency: "usd", // required,
+          customer: {
+            customer_id: userData?.id,
+            first_name: userData?.firstName,
+            last_name: userData?.lastName,
+            email: userData?.email,
+          },
+        },
+      ]);
+
       const newQuery = router.query;
       delete newQuery.paid;
       router.push({
@@ -187,7 +209,15 @@ export default function useAuth({
         query: newQuery,
       });
     }
-  }, [router.query, refetch, toast, router]);
+  }, [
+    router.query,
+    refetch,
+    toast,
+    router,
+    userData,
+    userData?.subscription,
+    window?._upf,
+  ]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {

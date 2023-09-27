@@ -2,7 +2,26 @@ from inference_service.prompts import prompt_chunks
 from inference_service.context import context_retriever
 from inference_service.wolfram_manager import math_api_handler
 from inference_service.openai_manager import openai_manager
-from typing import List
+from typing import List, Optional
+
+
+def assemble_prompt_chunks(subject: str, user_type: Optional[str] = None):
+    if subject in prompt_chunks.NON_TUTOR_SUBJECTS:
+        chunks = prompt_chunks.PROMPT_MAP[subject]
+    else:
+        user_chunk = prompt_chunks.STUDENT_TUTOR_CHUNK
+        if user_type:
+            if user_type == "PARENT":
+                user_chunk = prompt_chunks.PARENT_TUTOR_CHUNK
+
+        chunks = user_chunk
+        if prompt_chunks in prompt_chunks.PROMPT_MAP:
+            chunks = "  ".join([chunks, prompt_chunks.PROMPT_MAP[subject]])
+
+        if subject in prompt_chunks.MATH_SUBJECTS:
+            chunks = "  ".join([chunks, prompt_chunks.MATH_CHUNK])
+
+    return chunks
 
 
 def generate_question_answer_prompt(
@@ -12,7 +31,7 @@ def generate_question_answer_prompt(
 
     try:
         if subject:
-            subject_prompt = prompt_chunks.PROMPT_MAP[subject]
+            subject_prompt = assemble_prompt_chunks(subject=subject)
 
             # special triggers
             if subject in prompt_chunks.MATH_SUBJECTS:
