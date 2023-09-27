@@ -19,6 +19,7 @@ import {
 import { sessionStore } from "../utils/express.js";
 import { Environment, getEnv } from "../utils/env.js";
 import firebaseApp from "../utils/firebase.js";
+import { getUser } from "../users/service.js";
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firebaseUid: user.firebaseUid,
@@ -118,6 +119,16 @@ export const forgotPassword = async ({
   origin: string;
 }) => {
   // TODO: Fire forgot password email in firebase
+  const user = await getUser({ email });
+  if (!user) {
+    throw new BadRequestError("User not found");
+  }
+  const link = await firebaseApp.auth().generatePasswordResetLink(email, {
+    url: `${origin}/reset-password`,
+    handleCodeInApp: true,
+  });
+
+  return await sendUserForgotPasswordEmail({ user, url: link });
 };
 
 export const resetPassword = async ({
