@@ -13,7 +13,7 @@ jobs:
   build-app-service:
     name: Build App Service
     runs-on: ubuntu-latest
-    environment: Sandbox
+    environment: Test
     defaults:
       run:
         working-directory: services/app-service
