@@ -14,7 +14,6 @@ const users = [
     password: "test",
   },
 ];
-
 const seed = async (prismaClient: PrismaClient) => {
   return await Promise.all(
     users.map((user) =>
