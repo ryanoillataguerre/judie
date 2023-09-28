@@ -33,6 +33,9 @@ jobs:
       - name: Generate Prisma Client
         run: yarn generate || true
       - name: Build App Service
+        env:
+          NODE_ENV: test
+          FIREBASE_LOCAL_AUTH: ${{ secrets.SEGMENT_WRITE_KEY }}
         run: yarn run build
   test-app-service:
     name: Test App Service
