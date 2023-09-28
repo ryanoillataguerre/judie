@@ -22,3 +22,4 @@ Thumbs.db
 
 # Temp
 gitignore
+firebase-local-auth.json
