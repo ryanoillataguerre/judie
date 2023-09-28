@@ -6,7 +6,7 @@ import json from "./firebase-local-auth.json";
 const getFirebaseConfig = () => {
   const config: firebase.AppOptions = {};
   const env = getEnv();
-  if (env === Environment.Local) {
+  if (env === Environment.Local || env === Environment.Test) {
     config.credential = firebase.credential.cert(
       JSON.stringify(json) || (process.env.FIREBASE_LOCAL_AUTH as string)
     );
