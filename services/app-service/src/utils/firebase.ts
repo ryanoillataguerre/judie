@@ -7,10 +7,11 @@ const getFirebaseConfig = () => {
   const env = getEnv();
   if (env === Environment.Local || env === Environment.Test) {
     config.credential = firebase.credential.cert(
-      (process.env.FIREBASE_LOCAL_AUTH as string) ||
-        JSON.stringify(
-          import("./firebase-local-auth.json").then((m) => m.default)
-        )
+      env === Environment.Test
+        ? (process.env.FIREBASE_LOCAL_AUTH as string)
+        : JSON.stringify(
+            import("./firebase-local-auth.json").then((m) => m.default)
+          )
     );
     config.databaseURL = "https://sandbox-382905.firebaseio.com";
   }
