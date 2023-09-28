@@ -1,6 +1,8 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
 import { Chat, GradeYear, PermissionType, UserRole } from "./types/api";
+import { createUserWithEmailAndPassword, getAuth } from "@firebase/auth";
+import firebaseApp from "@judie/utils/firebase";
 
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
@@ -71,8 +73,6 @@ export const resetPasswordMutation = async ({
 };
 
 export const signupMutation = async ({
-  firstName,
-  lastName,
   email,
   password,
   receivePromotions,
@@ -87,20 +87,26 @@ export const signupMutation = async ({
   role: UserRole;
   districtOrSchool?: string;
 }) => {
-  const response = await baseFetch({
-    url: "/auth/signup",
-    method: "POST",
-    body: {
-      email,
-      password,
-      firstName,
-      lastName,
-      receivePromotions,
-      role,
-      districtOrSchool,
-    },
-  });
-  return response.data;
+  // Firebase auth logic
+  try {
+    const auth = getAuth(firebaseApp);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+
+    const response = await baseFetch({
+      url: "/auth/signup",
+      method: "POST",
+      body: {
+        uid: result.user.uid,
+        receivePromotions,
+        role,
+        districtOrSchool,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    console.error("Error signing up", err);
+    throw err;
+  }
 };
 
 export const createChatMutation = async ({

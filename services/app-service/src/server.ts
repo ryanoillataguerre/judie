@@ -5,11 +5,11 @@ import http from "http";
 import router from "./router.js";
 import webhookRoutes from "./payments/webhooks.js";
 import {
+  authMiddleware,
   errorHandler,
   errorPassthrough,
   headers,
   morganLogger,
-  sessionLayer,
 } from "./utils/express.js";
 
 const app = express();
@@ -18,7 +18,7 @@ const app = express();
 app.use(headers);
 app.use(helmet());
 app.use(cookieParser());
-app.use(sessionLayer());
+app.use(authMiddleware());
 app.use(morganLogger());
 // Webhooks
 app.use(

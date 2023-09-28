@@ -9,7 +9,6 @@ import { BulkInviteBody, bulkInvite, invite, redeemInvite } from "./service.js";
 
 import dbClient from "../utils/prisma.js";
 import { signupValidation } from "../auth/routes.js";
-import { setUserSessionId } from "../auth/service.js";
 import { sendInviteEmail } from "../cio/service.js";
 
 const router = Router();
@@ -43,7 +42,7 @@ router.post(
 
     const newInvite = await invite({
       ...body,
-      userId: session.userId as string,
+      userId: req.userId as string,
     });
 
     res.status(201).send({
@@ -117,14 +116,6 @@ router.post(
       receivePromotions: req.body.receivePromotions,
     });
 
-    // Create session
-    const session = req.session;
-    session.userId = newUser?.id;
-    session.save();
-    await setUserSessionId({
-      userId: newUser.id,
-      sessionId: session.id,
-    });
     // Send user
     res.status(201).send({
       data: newUser,
@@ -150,7 +141,7 @@ router.post(
 
     const invites = await bulkInvite({
       ...body,
-      userId: session.userId as string,
+      userId: req.userId as string,
     });
 
     res.status(201).send({

@@ -8,6 +8,7 @@ import { sendInviteEmail } from "../cio/service.js";
 import { CreateInviteBody } from "./routes.js";
 import BadRequestError from "../utils/errors/BadRequestError.js";
 import moment from "moment";
+import firebaseApp from "../utils/firebase.js";
 
 export const validateInviteRights = async ({
   userId,
@@ -175,12 +176,13 @@ export const redeemInvite = async (params: RedeemInviteParams) => {
   }
 
   // Create user
-  const newUser = await signup({
-    firstName: params.firstName,
-    lastName: params.lastName,
+  // TODO: Create firebase user
+  const newFbUser = await firebaseApp.auth().createUser({
     email: invite.email,
     password: params.password,
-    gradeYear: invite.gradeYear as GradeYear | undefined,
+  });
+  const newUser = await signup({
+    uid: newFbUser.uid,
     receivePromotions: params.receivePromotions,
     isB2B: true,
   });

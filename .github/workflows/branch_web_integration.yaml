@@ -3,11 +3,11 @@ name: Branch Web Integration
 on:
   push:
     branches-ignore:
-    - master
-    - sandbox
-    - production
+      - master
+      - sandbox
+      - production
     paths:
-    - "services/web/**"
+      - "services/web/**"
 
 jobs:
   build-web:
@@ -20,14 +20,14 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-        cache-dependency-path: services/web/yarn.lock
-    - name: Install Dependencies
-      run: yarn
-    - name: Build Web
-      run: yarn run build
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          cache-dependency-path: services/web/yarn.lock
+      - name: Install Dependencies
+        run: yarn
+      - name: Build Web
+        run: yarn run build

@@ -40,7 +40,7 @@ router.post(
       primaryContactFirstName,
       primaryContactLastName,
     } = req.body;
-    const { userId } = req.session;
+    const userId = req.userId;
     const organization = await createOrganization({
       name,
       primaryContactEmail,
@@ -128,7 +128,7 @@ router.put(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
-    const { userId } = req.session;
+    const userId = req.userId;
 
     await validateOrganizationAdmin({
       userId: userId as string,
@@ -150,7 +150,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
       userId: userId as string,
@@ -170,7 +170,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
       userId: userId as string,
@@ -190,7 +190,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const organizationId = req.params.organizationId;
     await validateOrganizationAdmin({
       userId: userId as string,

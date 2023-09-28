@@ -7,20 +7,34 @@ import {
 } from "./service.js";
 import { getUser } from "../users/service.js";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
+import firebaseApp from "../utils/firebase.js";
+import InternalError from "../utils/errors/InternalError.js";
 
 const stripe = new Stripe(process.env.STRIPE_SK || "", {
   apiVersion: "2022-11-15",
 });
 
 export const createStripeCustomer = async (user: User) => {
-  const customer = await stripe.customers.create({
-    email: user.email,
-    name: `${user.firstName || ""} ${user.lastName || ""}`,
-    metadata: {
-      userId: user.id,
-    },
-  });
-  return customer;
+  const email = await (async () => {
+    if (!user.firebaseUid) {
+      return user?.email;
+    } else {
+      // Get user from firebase and return email
+      const fbUser = await firebaseApp.auth().getUser(user.firebaseUid);
+      return fbUser.email;
+    }
+  })();
+  if (email) {
+    const customer = await stripe.customers.create({
+      email,
+      metadata: {
+        userId: user.id,
+      },
+    });
+    return customer;
+  } else {
+    throw new InternalError("No email found for user");
+  }
 };
 
 export const createCheckoutSession = async (

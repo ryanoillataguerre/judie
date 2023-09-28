@@ -56,7 +56,6 @@ const transformUser = (
       })[];
     }
   > = { ...user };
-  delete newUser.password;
   delete newUser.stripeCustomerId;
   delete newUser.receivePromotions;
   return user;
@@ -70,10 +69,10 @@ router.put(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
-    const user = await updateUser(session.userId, {
+    const user = await updateUser(req.userId, {
       ...(req.body.firstName ? { firstName: req.body.firstName } : {}),
       ...(req.body.lastName ? { lastName: req.body.lastName } : {}),
       ...(req.body.receivePromotions !== undefined
@@ -94,7 +93,7 @@ router.get(
     const admin = req.query.admin;
     try {
       const user = await getUser(
-        { id: session.userId },
+        { id: req.userId },
         {
           permissions: admin
             ? {
@@ -145,11 +144,11 @@ router.post(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const user = await userAgeConsent({
-      userId: session.userId,
+      userId: req.userId,
       dateOfBirth: req.body.dateOfBirth,
       parentEmail: req.body.parentEmail,
     });
@@ -164,11 +163,11 @@ router.get(
   requireAuth,
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
-    if (!session.userId) {
+    if (!req.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
     const link = await createStripeBillingPortalSession(
-      session.userId,
+      req.userId,
       req.headers.origin as string
     );
     res.status(200).send({
@@ -183,7 +182,7 @@ router.get(
   errorPassthrough(async (req: Request, res: Response) => {
     const session = req.session;
     const user = await getUserPermissions({
-      id: session.userId as string,
+      id: req.userId as string,
     });
 
     res.status(200).send({
@@ -240,14 +239,13 @@ router.post(
     body("email").isEmail().optional().withMessage("Invalid email"),
   ],
   errorPassthrough(async (req: Request, res: Response) => {
-    const session = req.session;
     const feedback = req.body.feedback;
     const email = req.body.email;
-    if (session.userId) {
-      const user = await getUser({ id: session.userId });
+    if (req.userId) {
+      const user = await getUser({ id: req.userId });
       if (user) {
         await sendFeedbackEmail({
-          email: user.email,
+          email: email || user.email,
           feedback,
         });
       }

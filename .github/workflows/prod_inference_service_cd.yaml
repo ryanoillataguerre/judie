@@ -3,30 +3,30 @@ name: Production inference-service CD
 on:
   push:
     branches:
-    - production
+      - production
     paths:
-    - "services/inference_service/**"
-    - "services/app-service/prisma/**"
+      - "services/inference_service/**"
+      - "services/app-service/prisma/**"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-     contents: 'read'
-     id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
         with:
           token_format: access_token
-          workload_identity_provider: 'projects/467740700781/locations/global/workloadIdentityPools/gha-pool/providers/gha-provider'
-          service_account: 'terraform@production-382518.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/467740700781/locations/global/workloadIdentityPools/gha-pool/providers/gha-provider"
+          service_account: "terraform@production-382518.iam.gserviceaccount.com"
           access_token_lifetime: 600s
 
       - name: Login to Artifact Registry
@@ -52,7 +52,7 @@ jobs:
             us-west1-docker.pkg.dev/production-382518/inference-service/inference_service:latest
 
       - name: Deploy to Cloud Run
-        uses: 'google-github-actions/deploy-cloudrun@v1'
+        uses: "google-github-actions/deploy-cloudrun@v1"
         with:
           image: us-west1-docker.pkg.dev/production-382518/inference-service/inference_service:${{ github.sha }}
           service: inference-service

@@ -36,7 +36,7 @@ router.post(
     const { name, organizationId, address } = req.body;
     // Validate user has organization-level privileges
     await validateOrganizationAdmin({
-      userId: req.session.userId as string,
+      userId: req.userId as string,
       organizationId,
     });
     const school = await createSchool({
@@ -64,7 +64,7 @@ router.post(
       },
       user: {
         connect: {
-          id: req.session.userId,
+          id: req.userId,
         },
       },
     });
@@ -80,7 +80,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const schoolId = req.params.schoolId;
     await validateSchoolAdmin({
       userId: userId as string,
@@ -100,7 +100,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const schoolId = req.params.schoolId;
     await validateSchoolAdmin({
       userId: userId as string,
@@ -120,7 +120,7 @@ router.get(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const schoolId = req.params.schoolId;
     await validateSchoolAdmin({
       userId: userId as string,
@@ -140,7 +140,7 @@ router.delete(
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
-    const { userId } = req.session;
+    const userId = req.userId;
     const schoolId = req.params.schoolId;
     const school = await getSchoolById({
       id: schoolId,
@@ -173,7 +173,7 @@ router.put(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { name } = req.body;
-    const { userId } = req.session;
+    const userId = req.userId;
 
     await validateSchoolAdmin({
       userId: userId as string,

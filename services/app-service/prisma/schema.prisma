@@ -86,10 +86,10 @@ model Subscription {
 
 model User {
   id                   String     @id @default(uuid())
-  email                String     @unique
+  email                String?    @unique
   firstName            String?    @map("first_name")
   lastName             String?    @map("last_name")
-  password             String?
+  firebaseUid          String?    @map("firebase_uid")
   receivePromotions    Boolean    @map("receive_promotions")
   gradeYear            GradeYear? @map("grade_year")
   createdAt            DateTime   @default(now()) @map("created_at")
@@ -114,7 +114,7 @@ model User {
   createdOrganizations Organization[] @relation("creator")
   ChatFolder           ChatFolder[]
 
-  @@index([id, email])
+  @@index([id])
   @@map("users")
 }
 

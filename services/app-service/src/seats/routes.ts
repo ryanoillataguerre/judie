@@ -25,7 +25,7 @@ router.put(
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
     const { count } = req.body;
-    const { userId } = req.session;
+    const userId = req.userId;
 
     // The ordering of these does matter
     if (req.body.schoolId) {
