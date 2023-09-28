@@ -3,24 +3,18 @@
     "esm": true
   },
   "compilerOptions": {
-    "target": "ESNext",                              
-    "module": "NodeNext",                      
+    "target": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
     "rootDir": "./src",
     "outDir": "./dist",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-	"include": [
-    "src/**/*.ts",
-  ],
-  "exclude": [
-    "**/node_modules/*",
-    "**/*.test.ts",
-  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/node_modules/*", "**/*.test.ts"]
 }

@@ -1,13 +1,13 @@
-import firebase, { initializeApp } from "firebase-admin";
+import * as firebase from "firebase-admin";
+const { initializeApp } = firebase;
 import { Environment, getEnv } from "./env.js";
+import json from "./firebase-local-auth.json";
 
 const getFirebaseConfig = () => {
   const config: firebase.AppOptions = {};
   const env = getEnv();
   if (env === Environment.Local) {
-    config.credential = firebase.credential.cert(
-      require("./firebase-local-auth.json")
-    );
+    config.credential = firebase.credential.cert(JSON.stringify(json));
     config.databaseURL = "https://sandbox-382905.firebaseio.com";
   }
   // If deployed, no auth is needed - env var GOOGLE_CLOUD_PROJECT is set and VPC works correctly
