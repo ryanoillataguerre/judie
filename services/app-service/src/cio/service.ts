@@ -155,7 +155,7 @@ export const sendFeedbackEmail = async ({
       body,
     },
     identifiers: {
-      email: email,
+      email,
     },
   });
   return await apiClient.sendEmail(newEmail);
