@@ -102,7 +102,7 @@ model User {
   dateOfBirth          DateTime?  @map("date_of_birth")
   parentalConsent      Boolean?   @map("parental_consent")
   parentalConsentEmail String?    @map("parental_consent_email")
-  firebase_uid         String?    @map("firebase_uid")
+  firebaseUid          String?    @map("firebase_uid")
 
   role UserRole @default(STUDENT)
 
