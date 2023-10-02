@@ -116,7 +116,7 @@ module "inference-service" {
     module.sql_db.connection_name
   ]
   concurrency = 80
-  cpus        = 1
+  cpus        = 2
   env = [
     {
       key   = "DATABASE_URL"
