@@ -109,24 +109,26 @@ const SigninForm = () => {
     },
   });
 
-  useEffect(() => {
-    if (window.google) {
-      window.google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        callback: googleSigninMutation.mutate,
-      });
+  // useEffect(() => {
+  //   if (window.google) {
+  //     console.log("window.google", window.google);
+  //     // window.google.accounts.id.initialize({
+  //     //   client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+  //     //   callback: googleSigninMutation.mutate,
+  //     //   use_fedcm_for_prompt: true,
+  //     // });
 
-      window.google.accounts.id.renderButton(googleButtonRef, {
-        // type: "standard",
-        theme: "filled_black",
-        // size: "small",
-        text: "continue_with",
-        shape: "pill",
-      });
+  //     // window.google.accounts.id.renderButton(googleButtonRef, {
+  //     //   // type: "standard",
+  //     //   theme: "filled_black",
+  //     //   // size: "small",
+  //     //   text: "continue_with",
+  //     //   shape: "pill",
+  //     // });
 
-      // google.accounts.id.prompt()
-    }
-  }, [googleSigninMutation, googleButtonRef]);
+  //     // google.accounts.id.prompt()
+  //   }
+  // }, [googleSigninMutation, googleButtonRef]);
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

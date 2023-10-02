@@ -70,6 +70,7 @@ export default function App({ Component, pageProps }: AppProps) {
         strategy="afterInteractive"
         src={`https://tracking.upfluence.co/js/v1/init-${process.env.NEXT_PUBLIC_UPFLUENCE_SCRIPT_ID}.js`}
       />
+      {/* <Script src="https://accounts.google.com/gsi/client" async defer /> */}
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
           <SidebarOpenCloseProvider>
