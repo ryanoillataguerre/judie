@@ -146,7 +146,7 @@ module "inference-service" {
   execution_environment = "gen1"
   http2                 = true
   max_instances         = 50
-  memory                = 1024
+  memory                = 2048
   container_port        = 443
   project               = var.gcp_project
   vpc_access            = { connector = module.vpc.connector_id, egress = "private-ranges-only" }
