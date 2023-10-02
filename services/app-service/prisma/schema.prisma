@@ -63,6 +63,11 @@ enum PermissionType {
   STUDENT
 }
 
+enum AccountType {
+  EMAIL_PASS
+  GOOGLE
+}
+
 model Subscription {
   id                         String             @id @default(uuid())
   userId                     String             @unique @map("user_id")
@@ -85,23 +90,24 @@ model Subscription {
 }
 
 model User {
-  id                   String     @id @default(uuid())
-  email                String     @unique
-  firstName            String?    @map("first_name")
-  lastName             String?    @map("last_name")
+  id                   String      @id @default(uuid())
+  email                String      @unique
+  firstName            String?     @map("first_name")
+  lastName             String?     @map("last_name")
   password             String?
-  receivePromotions    Boolean    @map("receive_promotions")
-  gradeYear            GradeYear? @map("grade_year")
-  createdAt            DateTime   @default(now()) @map("created_at")
-  updatedAt            DateTime?  @updatedAt @map("updated_at")
-  lastMessageAt        DateTime?  @map("last_message_at")
-  stripeCustomerId     String?    @map("stripe_customer_id")
-  questionsAsked       Int        @default(0) @map("questions_asked")
-  lastSessionId        String?    @map("last_session_id")
-  emailVerified        Boolean    @default(false) @map("email_verified")
-  dateOfBirth          DateTime?  @map("date_of_birth")
-  parentalConsent      Boolean?   @map("parental_consent")
-  parentalConsentEmail String?    @map("parental_consent_email")
+  receivePromotions    Boolean     @map("receive_promotions")
+  gradeYear            GradeYear?  @map("grade_year")
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime?   @updatedAt @map("updated_at")
+  lastMessageAt        DateTime?   @map("last_message_at")
+  stripeCustomerId     String?     @map("stripe_customer_id")
+  questionsAsked       Int         @default(0) @map("questions_asked")
+  lastSessionId        String?     @map("last_session_id")
+  emailVerified        Boolean     @default(false) @map("email_verified")
+  dateOfBirth          DateTime?   @map("date_of_birth")
+  parentalConsent      Boolean?    @map("parental_consent")
+  parentalConsentEmail String?     @map("parental_consent_email")
+  accountType          AccountType @default(EMAIL_PASS)
 
   role UserRole @default(STUDENT)
 

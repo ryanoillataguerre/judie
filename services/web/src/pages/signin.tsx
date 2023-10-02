@@ -4,10 +4,11 @@ import { useMutation } from "react-query";
 import {
   CREATE_CHECKOUT_SESSION,
   createCheckoutSessionMutation,
+  googleAuthMutation,
   signinMutation,
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Flex,
@@ -25,6 +26,7 @@ import {
   useToast,
   Spinner,
   Button,
+  Box,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
@@ -86,6 +88,45 @@ const SigninForm = () => {
       });
     },
   });
+
+  const googleButtonRef = useRef(null);
+
+  const googleSigninMutation = useMutation({
+    mutationFn: googleAuthMutation,
+    onSuccess: async (response: User) => {
+      // Check if user has sub
+      if (response.subscription?.status === SubscriptionStatus.ACTIVE) {
+        // Redirect to dashboard
+        router.push("/dashboard", {
+          query: router.query,
+        });
+      } else {
+        // Get checkout session URL
+        const url = await createCheckoutSession();
+        // Redirect to checkout
+        window?.location?.assign(url);
+      }
+    },
+  })
+
+  useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        callback: googleSigninMutation.mutate,
+      });
+
+      window.google.accounts.id.renderButton(googleButtonRef, {
+        // type: "standard",
+        theme: "filled_black",
+        // size: "small",
+        text: "continue_with",
+        shape: "pill",
+      });
+
+      // google.accounts.id.prompt()
+    }
+  }, [googleSigninMutation, googleButtonRef])
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -196,6 +237,8 @@ const SigninForm = () => {
             </InputGroup>
           </FormControl>
         </Flex>
+        OR
+        <Button ref={googleButtonRef} />
         <Flex
           style={{
             flexDirection: "row",

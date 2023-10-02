@@ -9,6 +9,7 @@ import {
   resetPassword,
   setUserSessionId,
   changePassword,
+  googleSignin,
 } from "./service.js";
 
 export const signupValidation = [
@@ -22,6 +23,28 @@ export const signupValidation = [
 ];
 
 const router = Router();
+
+router.post(
+  "/google",
+  [body("credential").isString().exists()],
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    const { credential } = req.body;
+    // Create user
+    const user = await googleSignin({
+      credential,
+    });
+    // Create session for user
+    session.userId = user.id;
+    session.save();
+    await setUserSessionId({
+      userId: user.id,
+      sessionId: session.id,
+    });
+    res.status(201).send({ data: user });
+  })
+);
 
 router.post(
   "/signup",

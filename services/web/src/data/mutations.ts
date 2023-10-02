@@ -103,6 +103,21 @@ export const signupMutation = async ({
   return response.data;
 };
 
+export const googleAuthMutation = async ({
+  credential
+}: {
+  credential: string;
+}) => {
+  const response = await baseFetch({
+    url: "/auth/google",
+    method: "POST",
+    body: {
+      credential
+    },
+  });
+  return response.data;
+};
+
 export const createChatMutation = async ({
   subject,
   folderId,

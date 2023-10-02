@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { BadRequestError, UnauthorizedError } from "../utils/errors/index.js";
 import dbClient from "../utils/prisma.js";
 import isEmail from "validator/lib/isEmail.js";
-import { GradeYear, User, UserRole } from "@prisma/client";
+import { AccountType, GradeYear, User, UserRole } from "@prisma/client";
 import { createCustomer } from "../payments/service.js";
 import analytics from "../utils/analytics.js";
 import { cioClient } from "../utils/customerio.js";
@@ -18,6 +18,10 @@ import {
 } from "../cio/service.js";
 import { sessionStore } from "../utils/express.js";
 import { Environment, getEnv } from "../utils/env.js";
+import { OAuth2Client } from "google-auth-library";
+import { getUser } from "../users/service.js";
+
+const oauthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   firstName: user.firstName,
@@ -31,6 +35,56 @@ const transformUserForSegment = (user: User, districtOrSchool?: string) => ({
   districtOrSchool,
 });
 
+async function verifyGoogleToken(token: string) {
+  try {
+    const ticket = await oauthClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    return { payload: ticket.getPayload() };
+  } catch (error) {
+    return { error: "Invalid user detected. Please try again" };
+  }
+}
+
+export const googleSignin = async ({ credential }: { credential: string }) => {
+  const verificationResponse = await verifyGoogleToken(credential);
+
+  if (verificationResponse.error) {
+    throw new UnauthorizedError(verificationResponse.error);
+  }
+
+  const profile = verificationResponse?.payload;
+  const email = profile?.email;
+
+  if (!email) {
+    throw new UnauthorizedError("Invalid user detected. Please try again");
+  }
+
+  const user = await getUser(
+    { email },
+    {
+      subscription: true,
+    }
+  );
+
+  if (!user) {
+    // Signing up - create user
+    const newUser = await signup({
+      firstName: profile?.given_name || "",
+      lastName: profile?.family_name || "",
+      email,
+      receivePromotions: false,
+      role: UserRole.STUDENT,
+      isB2B: false,
+      accountType: AccountType.GOOGLE,
+    });
+    return newUser;
+  }
+
+  return user;
+};
+
 export const signup = async ({
   firstName,
   lastName,
@@ -41,16 +95,18 @@ export const signup = async ({
   districtOrSchool,
   gradeYear,
   isB2B,
+  accountType = AccountType.EMAIL_PASS,
 }: {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password?: string;
   receivePromotions: boolean;
   role?: UserRole;
   districtOrSchool?: string;
   gradeYear?: GradeYear;
   isB2B?: boolean;
+  accountType?: AccountType;
 }) => {
   email = email.trim().toLowerCase();
 
@@ -69,17 +125,15 @@ export const signup = async ({
     throw new BadRequestError("User already exists");
   }
 
-  // Hash password
-  const _password = await bcrypt.hash(password, 10);
-
   const newUser = await dbClient.user.create({
     data: {
       firstName,
       lastName,
       email,
-      password: _password,
+      password: password ? await bcrypt.hash(password, 10) : undefined,
       receivePromotions,
       role: role || UserRole.STUDENT,
+      accountType,
       gradeYear,
       ...(isB2B
         ? {

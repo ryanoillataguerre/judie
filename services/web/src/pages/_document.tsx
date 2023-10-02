@@ -27,6 +27,7 @@ export default function Document() {
           dangerouslySetInnerHTML={{ __html: loadSegment() }}
           id="segmentScript"
         />
+        <script src="https://accounts.google.com/gsi/client" async defer />
       </Head>
       <body>
         <ColorModeScript />

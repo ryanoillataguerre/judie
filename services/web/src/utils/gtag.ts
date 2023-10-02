@@ -5,6 +5,7 @@ declare global {
     gtag: any;
     // this is needed for upfluence window object
     _upf: any;
+    google: any;
   }
 }
 
