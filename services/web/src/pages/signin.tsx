@@ -107,12 +107,12 @@ const SigninForm = () => {
         window?.location?.assign(url);
       }
     },
-  })
+  });
 
   useEffect(() => {
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         callback: googleSigninMutation.mutate,
       });
 
@@ -126,7 +126,7 @@ const SigninForm = () => {
 
       // google.accounts.id.prompt()
     }
-  }, [googleSigninMutation, googleButtonRef])
+  }, [googleSigninMutation, googleButtonRef]);
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
