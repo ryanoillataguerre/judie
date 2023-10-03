@@ -10,6 +10,7 @@ import {
   Flex,
   Box,
   useColorModeValue,
+  Button,
 } from "@chakra-ui/react";
 import useAuth from "@judie/hooks/useAuth";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -45,7 +46,23 @@ const SubscribeCard = ({
       onClick={loading ? () => {} : onClick}
     >
       {loading ? (
-        <Spinner height={12} width={12} colorScheme={"teal"} />
+        <Flex
+          style={{
+            width: "100%",
+            height: "100%",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
+            borderRadius: "0.5rem",
+          }}
+          _hover={{
+            backgroundColor: cardHoverBgColor,
+            transition: "all .2s ease-in-out",
+          }}
+        >
+          <Spinner height={12} width={12} colorScheme={"teal"} />
+        </Flex>
       ) : (
         <Flex
           style={{
@@ -206,28 +223,15 @@ const Paywall = ({
           }}
         >
           <ModalHeader>
-            <Text
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: 600,
-              }}
-            >
-              Thank you for checking out Judie! We&apos;re so glad you&apos;re
-              here learning with us 🎉
+            <Text variant={"header"}>
+              We&apos;re so glad you&apos;re here learning with us 🎉
             </Text>
           </ModalHeader>
           <ModalBody>
-            <p>
-              We&apos;re currently in beta, and we&apos;re working hard to make
-              Judie the best learning experience possible. We&apos;re also
-              relying on subscriptions to help us keep the lights on.
-            </p>
-            <br />
-            <p>
-              In the meantime, we&apos;re limiting the number of questions every
-              user can ask for free to 7 per day. If you&apos;d like to ask more
-              questions, please consider subscribing!
-            </p>
+            <Text variant={"subheading"}>
+              Click below to start your free trial and get unlimited access to
+              Judie.
+            </Text>
           </ModalBody>
           <ModalFooter
             style={{
@@ -237,7 +241,18 @@ const Paywall = ({
               alignItems: "center",
             }}
           >
-            <SubscribeCard onClick={onClick} loading={loading} />
+            <Button
+              width={"100%"}
+              variant={"purp"}
+              bgColor={"green.400"}
+              _hover={{
+                bgColor: "green.500",
+              }}
+              isLoading={loading}
+              onClick={onClick}
+            >
+              Start your free trial
+            </Button>
           </ModalFooter>
         </Flex>
       </ModalContent>
