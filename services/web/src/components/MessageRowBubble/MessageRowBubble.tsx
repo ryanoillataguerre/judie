@@ -216,7 +216,11 @@ const MessageRow = ({
           {message.type === MessageType.USER ? (
             <Avatar
               size={"sm"}
-              name={`${userData?.firstName} ${userData?.lastName}`}
+              name={
+                userData?.firstName && userData?.lastName
+                  ? `${userData?.firstName} ${userData?.lastName}`
+                  : "My Ename"
+              }
               color={"#FFF"}
               bg="purple.600"
             />
