@@ -51,9 +51,9 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URI=https://app-service.judie.io
             NEXT_PUBLIC_NODE_ENV=production
-            NEXT_PUBLIC_SEGMENT_WRITE_KEY={{ secrets.SEGMENT_WRITE_KEY }}
-            NEXT_PUBLIC_GA_MEASUREMENT_ID={{ secrets.GA_MEASUREMENT_ID }}
-            NEXT_PUBLIC_UPFLUENCE_SCRIPT_ID={{ secrets.UPFLUENCE_SCRIPT_ID }}
+            NEXT_PUBLIC_SEGMENT_WRITE_KEY=${{ secrets.SEGMENT_WRITE_KEY }}
+            NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ secrets.GA_MEASUREMENT_ID }}
+            NEXT_PUBLIC_UPFLUENCE_SCRIPT_ID=${{ secrets.UPFLUENCE_SCRIPT_ID }}
 
       - name: Deploy to Cloud Run
         uses: "google-github-actions/deploy-cloudrun@v1"
