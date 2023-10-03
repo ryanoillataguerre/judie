@@ -67,23 +67,9 @@ export const messageRateLimit = async (
   const user = await getUser({ id: userId });
   if (user?.subscription?.status === SubscriptionStatus.ACTIVE) {
     return next();
-  }
-
-  const existingQuestionCountEntry = await getQuestionCountEntry({ userId });
-  if (existingQuestionCountEntry >= 7) {
+  } else {
     throw new BadRequestError("Rate limit exceeded", 429);
   }
-  if (!existingQuestionCountEntry) {
-    await createQuestionCountEntry({
-      userId,
-    });
-  }
-  await updateUser(userId, {
-    questionsAsked: {
-      increment: 1,
-    },
-  });
-  next();
 };
 
 export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
