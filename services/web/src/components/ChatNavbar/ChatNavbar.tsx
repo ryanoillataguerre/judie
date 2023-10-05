@@ -17,7 +17,7 @@ const ChatNavbar = () => {
         justifyContent: "center",
       }}
     >
-      {subject && (
+      {subject ? (
         <Badge
           style={{
             justifySelf: "center",
@@ -26,6 +26,8 @@ const ChatNavbar = () => {
         >
           {subject}
         </Badge>
+      ) : (
+        "No Subject"
       )}
     </Flex>
   );
