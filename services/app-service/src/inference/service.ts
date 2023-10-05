@@ -4,6 +4,12 @@ import { ChatDetails } from "../proto/inference_service.js";
 import InternalError from "../utils/errors/InternalError.js";
 import { deleteMostRecentChatMessage } from "../chats/service.js";
 
+const sleep = (ms: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
+
 export const getChatCompletion = async ({
   chatId,
   response,
@@ -40,6 +46,7 @@ export const getChatCompletion = async ({
       // );
     }
     triesCounter++;
+    await sleep(500);
   }
   // If it failed 3 times:
   await deleteMostRecentChatMessage({ chatId });
