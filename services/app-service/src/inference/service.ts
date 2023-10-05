@@ -16,7 +16,7 @@ export const getChatCompletion = async ({
   };
   // Retry if return is not hit
   let triesCounter = 0;
-  while (triesCounter < 2) {
+  while (triesCounter < 3) {
     console.log(`try #${triesCounter}`);
     try {
       const result = inferenceServiceClient.getChatResponse(chatRequest);
@@ -35,7 +35,6 @@ export const getChatCompletion = async ({
       return fullText;
     } catch (err) {
       console.error(err);
-
       // throw new InternalError(
       //   "Could not get chat completion. Please try again later."
       // );
