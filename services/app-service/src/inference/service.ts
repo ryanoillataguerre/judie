@@ -27,6 +27,14 @@ export const getChatCompletion = async ({
     try {
       const result = inferenceServiceClient.getChatResponse(chatRequest);
       const fullResponse = [];
+      const killOnHang = () => {
+        if (!fullResponse.length) {
+          console.error("No response yet. Trying again...");
+          triesCounter++;
+          throw new InternalError("No response yet. Trying again...");
+        }
+      };
+      setTimeout(killOnHang, 3000);
       for await (const chunk of result) {
         if (chunk.responsePart) {
           fullResponse.push(chunk.responsePart);
