@@ -34,7 +34,7 @@ export const getChatCompletion = async ({
           throw new InternalError("No response yet. Trying again...");
         }
       };
-      setTimeout(killOnHang, 3000);
+      setTimeout(killOnHang, 15000);
       for await (const chunk of result) {
         if (chunk.responsePart) {
           fullResponse.push(chunk.responsePart);
