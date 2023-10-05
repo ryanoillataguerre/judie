@@ -35,11 +35,16 @@ export const getChatCompletion = async ({
       return fullText;
     } catch (err) {
       console.error(err);
-      await deleteMostRecentChatMessage({ chatId });
+
       // throw new InternalError(
       //   "Could not get chat completion. Please try again later."
       // );
     }
     triesCounter++;
   }
+  // If it failed 3 times:
+  await deleteMostRecentChatMessage({ chatId });
+  throw new InternalError(
+    "Could not get chat completion. Please try again later."
+  );
 };
