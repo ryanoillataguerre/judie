@@ -8,7 +8,7 @@ import {
   signupMutation,
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -403,12 +403,26 @@ const SignupPage = () => {
 
   const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
 
+  const router = useRouter();
+
   // clear session cookie if still present
   // useEffect(() => {
   //   if (sessionCookie) {
   //     logout();
   //   }
   // }, []);
+
+  // Add all query params to local storage
+  useEffect(() => {
+    if (router.isReady) {
+      const { query } = router;
+      const queryKeys = Object.keys(query);
+      for (const key of queryKeys) {
+        localStorage.setItem(key, query[key] as string);
+      }
+      console.log("log all local storage", localStorage);
+    }
+  }, [router.query]);
 
   return (
     <>

@@ -7,7 +7,7 @@ import {
   signinMutation,
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Flex,
@@ -273,6 +273,27 @@ const SigninPage = () => {
   // const { logout } = useAuth();
   // const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
+
+  // Add all query params to local storage
+  useEffect(() => {
+    if (router.isReady) {
+      const { query } = router;
+      const queryKeys = Object.keys(query);
+      for (const key of queryKeys) {
+        localStorage.setItem(key, query[key] as string);
+      }
+      console.log("log all local storage", localStorage);
+    }
+
+    // set query params in cookies
+    const { query } = router;
+    const queryKeys = Object.keys(query);
+    for (const key of queryKeys) {
+      document.cookie = `${key}=${query[key]}; path=/`;
+    }
+
+    console.log("log all cookies", document.cookie);
+  }, [router.query]);
 
   // clear session cookie on signin page if still present
   // useEffect(() => {

@@ -186,28 +186,40 @@ export default function useAuth({
         value: null,
       });
 
-      window?._upf?.push([
-        isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
+      const upfVisitor = localStorage.getItem("_upf_visitor");
+
+      window._upf.push([
+        "order",
         {
-          order_id: userData?.subscription?.id, // required
-          order_name: userData?.subscription?.type, // required
-          amount: "49.00", // required
-          currency: "usd", // required,
-          customer: {
-            customer_id: userData?.id,
-            first_name: userData?.firstName,
-            last_name: userData?.lastName,
-            email: userData?.email,
-          },
+          order_id: 6, // required - set to new user ID
+          order_name: "Upfluence - dev", // required
+          amount: 12, // required
+          currency: "usd", // required
         },
       ]);
 
+      // window!._upf?.push([
+      //   isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
+      //   {
+      //     order_id: userData?.subscription?.id, // required
+      //     order_name: userData?.subscription?.type, // required
+      //     amount: "49.00", // required
+      //     currency: "usd", // required,
+      //     customer: {
+      //       customer_id: userData?.id,
+      //       first_name: userData?.firstName,
+      //       last_name: userData?.lastName,
+      //       email: userData?.email,
+      //     },
+      //   },
+      // ]);
+
       const newQuery = router.query;
       delete newQuery.paid;
-      router.push({
-        pathname: router.pathname,
-        query: newQuery,
-      });
+      // router.push({
+      //   pathname: router.pathname,
+      //   query: newQuery,
+      // });
     }
   }, [
     router.query,
