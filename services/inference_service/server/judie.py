@@ -37,8 +37,8 @@ def yield_judie_response(
             ),
         )
         logger.info(f"Full messages: \n{full_messages}")
-        openai_config = openai_manager.OpenAiConfig(stream=True)
-        openai_response = openai_manager.get_gpt_response(
+        openai_config = openai_manager.OpenAiConfig()
+        openai_response = openai_manager.get_gpt_response_stream(
             full_messages, openai_config=openai_config
         )
 

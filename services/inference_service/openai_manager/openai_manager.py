@@ -13,10 +13,9 @@ class OpenAiConfig:
     temperature: float = 0.7
     max_tokens: int = 600
     top_p: int = 1
-    stream: bool = False
 
 
-def get_gpt_response(messages=None, openai_config: OpenAiConfig = None):
+def get_gpt_response_stream(messages=None, openai_config: OpenAiConfig = None):
     chat_response = openai.ChatCompletion.create(
         model=openai_config.model,
         messages=messages,
@@ -25,20 +24,35 @@ def get_gpt_response(messages=None, openai_config: OpenAiConfig = None):
         top_p=openai_config.top_p,
         frequency_penalty=0,
         presence_penalty=0,
-        stream=openai_config.stream,
+        stream=True,
     )
 
-    if openai_config.stream == True:
-        for res_chunk in chat_response:
-            if hasattr(res_chunk.choices[0].delta, "content"):
-                try:
-                    yield res_chunk.choices[0].delta.content
-                except AttributeError as e:
-                    # catch any other attribute error other than missing `content`. That is expected
-                    # on the first and last messages
-                    logger.info(f"ATTRIBUTE ERROR: {e}")
-    else:
-        yield chat_response.choices[0].message.content
+    for res_chunk in chat_response:
+        if hasattr(res_chunk.choices[0].delta, "content"):
+            try:
+                yield res_chunk.choices[0].delta.content
+            except AttributeError as e:
+                # catch any other attribute error other than missing `content`. That is expected
+                # on the first and last messages
+                logger.info(f"ATTRIBUTE ERROR: {e}")
+
+
+def get_gpt_response_single(messages=None, openai_config: OpenAiConfig = None) -> str:
+    chat_response = openai.ChatCompletion.create(
+        model=openai_config.model,
+        messages=messages,
+        temperature=openai_config.temperature,
+        max_tokens=openai_config.max_tokens,
+        top_p=openai_config.top_p,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stream=False,
+    )
+
+    try:
+        return chat_response.choices[0].message.content
+    except AttributeError as e:
+        logger.error(f"Error parsing OpenAi response: {e}")
 
 
 def concat_sys_and_messages_openai(sys_prompt: str, messages: List[Dict]) -> List[Dict]:
@@ -56,13 +70,12 @@ def identify_math_exp(message: str) -> str:
         },
         {"role": "user", "content": message},
     ]
-    config = OpenAiConfig(temperature=0.3, stream=False)
+    config = OpenAiConfig(temperature=0.3)
 
-    openai_response = get_gpt_response(messages=prompt, openai_config=config)
+    openai_response = get_gpt_response_single(messages=prompt, openai_config=config)
 
     # only one element in the generator because we called without streaming
-    response_return = next(openai_response)
-    return response_return
+    return openai_response
 
 
 def comprehension_score(session_config: SessionConfig) -> Optional[int]:
@@ -74,15 +87,14 @@ def comprehension_score(session_config: SessionConfig) -> Optional[int]:
     ] + session_config.history.get_openai_format()[-5:]
     # arbitrarily use last five messages as conversation window
 
-    comp_score = get_gpt_response(
+    comp_score = get_gpt_response_single(
         messages=prompt,
-        openai_config=OpenAiConfig(temperature=0.3, stream=False, max_tokens=10),
+        openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
     )
-    score_str = next(comp_score)
-    logger.info(f"Comprehension score: {score_str}")
+    logger.info(f"Comprehension score: {comp_score}")
 
-    if score_str.isnumeric():
-        return int(score_str)
+    if comp_score.isnumeric():
+        return int(comp_score)
     else:
         return None
 
@@ -98,17 +110,16 @@ def check_for_sensitive_content(session_config: SessionConfig) -> Optional[str]:
         },
     ] + session_config.history.get_openai_format()[-5:]
 
-    sensitivity_response = get_gpt_response(
+    sensitivity_response = get_gpt_response_single(
         messages=prompt,
-        openai_config=OpenAiConfig(temperature=0.3, stream=False, max_tokens=10),
+        openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
     )
-    sensitivity = next(sensitivity_response)
 
-    logger.info(f"Chat contains sensitive content of type: {sensitivity}")
+    logger.info(f"Chat contains sensitive content of type: {sensitivity_response}")
 
-    if "none" in str.lower(sensitivity):
+    if "none" in str.lower(sensitivity_response) or len(sensitivity_response) == 0:
         return None
-    return sensitivity
+    return sensitivity_response
 
 
 def check_moderation_policy(session_config: SessionConfig) -> Optional[List[str]]:
