@@ -53,6 +53,8 @@ const AgeModal = () => {
     auth?.userData?.dateOfBirth,
     auth.userData?.parentalConsent,
     auth.userData?.parentalConsentEmail,
+    auth.userData?.id,
+    auth.isB2B,
   ]);
 
   const { handleSubmit, register, reset, watch } = useForm<SubmitData>({
