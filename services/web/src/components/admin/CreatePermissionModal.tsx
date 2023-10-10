@@ -116,13 +116,13 @@ const CreatePermissionModal = ({
       resetField("schoolId", { defaultValue: "None" });
       resetField("roomId", { defaultValue: "None" });
     }
-  }, [organizationId]);
+  }, [organizationId, resetField]);
 
   useEffect(() => {
     if (schoolId === "None") {
       resetField("roomId", { defaultValue: "None" });
     }
-  }, [schoolId]);
+  }, [schoolId, resetField]);
 
   const clearSelections = useCallback(() => {
     setOrganizationId("None");
@@ -130,7 +130,7 @@ const CreatePermissionModal = ({
     setRoomId("None");
     setOrganization(undefined);
     reset();
-  }, [setOrganizationId, setSchoolId, setRoomId, setOrganization]);
+  }, [setOrganizationId, setSchoolId, setRoomId, setOrganization, reset]);
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
     type,

@@ -405,6 +405,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     });
   }, [
     messages,
+    beingStreamedChatId,
     tempUserMessage,
     streaming,
     chatId,

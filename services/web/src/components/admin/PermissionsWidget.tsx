@@ -145,6 +145,7 @@ const NewPermissionRow = ({
     }
   }, [
     type,
+    organizationId,
     reset,
     setOrganizationId,
     setSchoolId,

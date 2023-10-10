@@ -100,7 +100,7 @@ export default function useAuth({
     setSessionCookie(undefined);
     setUserData(undefined);
     router.push("/signin");
-  }, [setUserData, setSessionCookie, reset]);
+  }, [setUserData, setSessionCookie, reset, router]);
 
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(
@@ -209,15 +209,7 @@ export default function useAuth({
         query: newQuery,
       });
     }
-  }, [
-    router.query,
-    refetch,
-    toast,
-    router,
-    userData,
-    userData?.subscription,
-    window?._upf,
-  ]);
+  }, [router.query, refetch, toast, router, userData, userData?.subscription]);
 
   // If cookies do not exist, redirect to signin
   useEffect(() => {
