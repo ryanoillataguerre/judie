@@ -32,6 +32,10 @@ const textComponentStyle: ComponentStyleConfig = {
       fontWeight: 500,
       fontSize: "1.375rem",
     },
+    boldSubheader: {
+      fontWeight: 700,
+      fontSize: "1.25rem",
+    },
     subheaderDetail: {
       color: "gray.500",
       fontWeight: 500,
