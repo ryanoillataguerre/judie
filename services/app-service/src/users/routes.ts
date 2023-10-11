@@ -106,6 +106,7 @@ router.get(
               }
             : true,
           subscription: true,
+          profile: true,
         }
       );
       // TODO: Create a job to turn subs with a canceledAt in the past into canceled subs

@@ -39,8 +39,8 @@ export const signup = async ({
   receivePromotions,
   role,
   districtOrSchool,
-  gradeYear,
   isB2B,
+  gradeYear,
 }: {
   firstName: string;
   lastName: string;
@@ -80,12 +80,16 @@ export const signup = async ({
       password: _password,
       receivePromotions,
       role: role || UserRole.STUDENT,
-      gradeYear,
       ...(isB2B
         ? {
             parentalConsent: true,
           }
         : {}),
+      profile: {
+        create: {
+          gradeYear,
+        },
+      },
     },
     include: {
       subscription: true,

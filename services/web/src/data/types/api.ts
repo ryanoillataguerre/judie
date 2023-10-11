@@ -10,24 +10,48 @@ export enum SubscriptionType {
 }
 
 export enum GradeYear {
-  FIRST = "FIRST",
-  SECOND = "SECOND",
-  THIRD = "THIRD",
-  FOURTH = "FOURTH",
-  FIFTH = "FIFTH",
-  SIXTH = "SIXTH",
-  SEVENTH = "SEVENTH",
-  EIGHTH = "EIGHTH",
-  FRESHMAN = "FRESHMAN",
-  SOPHOMORE = "SOPHOMORE",
-  JUNIOR = "JUNIOR",
-  SENIOR = "SENIOR",
-  UNI_FRESHMAN = "UNI_FRESHMAN",
-  UNI_SOPHOMORE = "UNI_SOPHOMORE",
-  UNI_JUNIOR = "UNI_JUNIOR",
-  UNI_SENIOR = "UNI_SENIOR",
-  GRADUATE = "GRADUATE",
+  FIRST,
+  SECOND,
+  THIRD,
+  FOURTH,
+  FIFTH,
+  SIXTH,
+  SEVENTH,
+  EIGHTH,
+  FRESHMAN,
+  SOPHOMORE,
+  JUNIOR,
+  SENIOR,
+  UNI_FRESHMAN,
+  UNI_SOPHOMORE,
+  UNI_JUNIOR,
+  UNI_SENIOR,
+  GRADUATE,
 }
+
+export const gradeYearToNameMap = {
+  [GradeYear.FIRST]: "1st",
+  [GradeYear.SECOND]: "2nd",
+  [GradeYear.THIRD]: "3rd",
+  [GradeYear.FOURTH]: "4th",
+  [GradeYear.FIFTH]: "5th",
+  [GradeYear.SIXTH]: "6th",
+  [GradeYear.SEVENTH]: "7th",
+  [GradeYear.EIGHTH]: "8th",
+  [GradeYear.FRESHMAN]: "Freshman",
+  [GradeYear.SOPHOMORE]: "Sophomore",
+  [GradeYear.JUNIOR]: "Junior",
+  [GradeYear.SENIOR]: "Senior",
+  [GradeYear.UNI_FRESHMAN]: "College Freshman",
+  [GradeYear.UNI_SOPHOMORE]: "College Sophomore",
+  [GradeYear.UNI_JUNIOR]: "College Junior",
+  [GradeYear.UNI_SENIOR]: "College Senior",
+  [GradeYear.GRADUATE]: "Graduate",
+};
+
+export const getGradeYearName = (gradeYear: GradeYear) => {
+  return gradeYearToNameMap[gradeYear];
+};
 
 export interface Subscription {
   id: string;
@@ -105,6 +129,47 @@ export interface Permission {
   organization?: Organization;
   room?: Room;
 }
+
+export enum Purpose {
+  PERSONAL,
+  TEST_PREP,
+  CLASSES,
+  HOMESCHOOLING,
+}
+
+const purposeToNameMap = {
+  [Purpose.PERSONAL]: "Personal",
+  [Purpose.TEST_PREP]: "Test Prep",
+  [Purpose.CLASSES]: "Classes",
+  [Purpose.HOMESCHOOLING]: "Homeschooling",
+};
+
+export const getPurposeName = (purpose: Purpose) => {
+  return purposeToNameMap[purpose];
+};
+
+// Not enforced in the schema, but should remain a list here
+export enum PrepForTest {
+  SAT,
+  ACT,
+  LSAT,
+  MCAT,
+  GMAT,
+  GRE,
+  DAT,
+}
+
+export interface UserProfile {
+  purpose: Purpose;
+  prepForTest: PrepForTest;
+  gradeYear: GradeYear;
+  country: string;
+  state: string;
+  subjects: string[];
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+}
 export interface User {
   id: string;
   email: string;
@@ -128,6 +193,7 @@ export interface User {
   schools?: School[];
   createdOrganizations?: Organization[];
   rooms?: Room[];
+  profile?: UserProfile;
 }
 
 export enum MessageType {

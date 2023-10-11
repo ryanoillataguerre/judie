@@ -429,6 +429,18 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const { userData } = useAuth();
+
+  const availableKeys = useMemo(() => {
+    if (userData?.email.includes("@judie.io")) {
+      return Object.keys(subjectSectionToSubjectsMap);
+    }
+    // TODO: Use user profile's purpose here to find the right subjects
+    const subjectsCopy = { ...subjectSectionToSubjectsMap };
+    delete subjectsCopy["Admin"];
+    return Object.keys(subjectSectionToSubjectsMap);
+  }, [subjectSectionToSubjectsMap, userData]);
+
   return (
     <Flex
       h={"100%"}
@@ -488,7 +500,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                     height={"50%"}
                     wrap={"wrap"}
                   >
-                    {Object.keys(subjectSectionToSubjectsMap).map((section) => (
+                    {availableKeys.map((section) => (
                       <SubjectCloudSection
                         key={section}
                         title={section}
