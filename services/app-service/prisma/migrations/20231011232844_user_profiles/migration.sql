@@ -11,7 +11,7 @@ CREATE TYPE "Purpose" AS ENUM ('PERSONAL', 'TEST_PREP', 'CLASSES', 'HOMESCHOOLIN
 ALTER TABLE "users" DROP COLUMN "grade_year";
 
 -- CreateTable
-CREATE TABLE "UserProfile" (
+CREATE TABLE "user_profiles" (
     "purpose" "Purpose",
     "prep_for_test" TEXT,
     "grade_year" "GradeYear",
@@ -24,10 +24,10 @@ CREATE TABLE "UserProfile" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserProfile_user_id_key" ON "UserProfile"("user_id");
+CREATE UNIQUE INDEX "user_profiles_user_id_key" ON "user_profiles"("user_id");
 
 -- CreateIndex
-CREATE INDEX "UserProfile_user_id_idx" ON "UserProfile"("user_id");
+CREATE INDEX "user_profiles_user_id_idx" ON "user_profiles"("user_id");
 
 -- AddForeignKey
-ALTER TABLE "UserProfile" ADD CONSTRAINT "UserProfile_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
