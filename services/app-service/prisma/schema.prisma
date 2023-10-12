@@ -85,24 +85,23 @@ model Subscription {
 }
 
 model User {
-  id                   String     @id @default(uuid())
-  email                String     @unique
-  firstName            String?    @map("first_name")
-  lastName             String?    @map("last_name")
+  id                   String    @id @default(uuid())
+  email                String    @unique
+  firstName            String?   @map("first_name")
+  lastName             String?   @map("last_name")
   password             String?
-  receivePromotions    Boolean    @map("receive_promotions")
-  gradeYear            GradeYear? @map("grade_year")
-  createdAt            DateTime   @default(now()) @map("created_at")
-  updatedAt            DateTime?  @updatedAt @map("updated_at")
-  lastMessageAt        DateTime?  @map("last_message_at")
-  stripeCustomerId     String?    @map("stripe_customer_id")
-  questionsAsked       Int        @default(0) @map("questions_asked")
-  lastSessionId        String?    @map("last_session_id")
-  emailVerified        Boolean    @default(false) @map("email_verified")
-  dateOfBirth          DateTime?  @map("date_of_birth")
-  parentalConsent      Boolean?   @map("parental_consent")
-  parentalConsentEmail String?    @map("parental_consent_email")
-  firebaseUid          String?    @map("firebase_uid")
+  receivePromotions    Boolean   @map("receive_promotions")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime? @updatedAt @map("updated_at")
+  lastMessageAt        DateTime? @map("last_message_at") // Deprecated?
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  questionsAsked       Int       @default(0) @map("questions_asked")
+  lastSessionId        String?   @map("last_session_id")
+  emailVerified        Boolean   @default(false) @map("email_verified")
+  dateOfBirth          DateTime? @map("date_of_birth")
+  parentalConsent      Boolean?  @map("parental_consent")
+  parentalConsentEmail String?   @map("parental_consent_email")
+  firebaseUid          String?   @map("firebase_uid") // Not in use yet
 
   role UserRole @default(STUDENT)
 
@@ -114,9 +113,34 @@ model User {
   permissions          Permission[]
   createdOrganizations Organization[] @relation("creator")
   ChatFolder           ChatFolder[]
+  profile              UserProfile?
 
   @@index([id, email])
   @@map("users")
+}
+
+enum Purpose {
+  PERSONAL
+  TEST_PREP
+  CLASSES
+  HOMESCHOOLING
+}
+
+model UserProfile {
+  purpose     Purpose?
+  prepForTest String?    @map("prep_for_test")
+  gradeYear   GradeYear? @map("grade_year")
+  country     String?
+  state       String?
+  subjects    String[]   @default([])
+  userId      String     @unique @map("user_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime?  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("user_profiles")
 }
 
 model Chat {

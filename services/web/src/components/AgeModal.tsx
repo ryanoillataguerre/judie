@@ -52,7 +52,6 @@ const AgeModal = () => {
   }, [
     auth?.userData?.dateOfBirth,
     auth.userData?.parentalConsent,
-    auth.userData?.parentalConsentEmail,
     auth.userData?.id,
     auth.isB2B,
   ]);

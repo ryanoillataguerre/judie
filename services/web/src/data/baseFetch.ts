@@ -1,4 +1,4 @@
-import { deleteCookie, getCookie, setCookie } from "cookies-next";
+import { getCookie } from "cookies-next";
 import { NextApiResponse } from "next";
 import { Environment, getEnv } from "@judie/utils/env";
 

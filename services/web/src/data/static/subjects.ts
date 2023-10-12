@@ -1,3 +1,5 @@
+import { GradeYear } from "../types/api";
+
 export const subjectSections: string[] = [
   "AP",
   "High School",
@@ -100,4 +102,49 @@ export const subjectSectionToSubjectsMap: { [key: string]: string[] } = {
     "PurePromise",
     "Testing",
   ],
+};
+
+export const getUserSubjectsForGradeYear = (gradeYear: GradeYear) => {
+  switch (gradeYear) {
+    case GradeYear.FIRST:
+      return [];
+    case GradeYear.SECOND:
+      return [];
+    case GradeYear.THIRD:
+      return [];
+    case GradeYear.FOURTH:
+      return [];
+    case GradeYear.FIFTH:
+      return [];
+    case GradeYear.SIXTH:
+      return subjectSectionToSubjectsMap["Middle School"];
+    case GradeYear.SEVENTH:
+      return subjectSectionToSubjectsMap["Middle School"];
+    case GradeYear.EIGHTH:
+      return subjectSectionToSubjectsMap["Middle School"];
+    case GradeYear.FRESHMAN:
+      return subjectSectionToSubjectsMap["High School"];
+    case GradeYear.SOPHOMORE:
+      return subjectSectionToSubjectsMap["High School"];
+    case GradeYear.JUNIOR:
+      return subjectSectionToSubjectsMap["High School"];
+    case GradeYear.SENIOR:
+      return subjectSectionToSubjectsMap["High School"];
+    case GradeYear.UNI_FRESHMAN:
+      return subjectSectionToSubjectsMap["College"];
+    case GradeYear.UNI_SOPHOMORE:
+      return subjectSectionToSubjectsMap["College"];
+    case GradeYear.UNI_JUNIOR:
+      return subjectSectionToSubjectsMap["College"];
+    case GradeYear.UNI_SENIOR:
+      return subjectSectionToSubjectsMap["College"];
+    case GradeYear.GRADUATE:
+      return Object.keys(subjectSectionToSubjectsMap).flatMap(
+        (section) => subjectSectionToSubjectsMap[section]
+      );
+    default:
+      return Object.keys(subjectSectionToSubjectsMap).flatMap(
+        (section) => subjectSectionToSubjectsMap[section]
+      );
+  }
 };

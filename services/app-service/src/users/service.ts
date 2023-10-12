@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { GradeYear, Prisma, Purpose } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 import { sendParentalConsentEmail } from "../cio/service.js";
 
@@ -128,6 +128,43 @@ export const userAgeConsent = async ({
 export const parentalConsentUser = async (userId: string) => {
   const newUser = await updateUser(userId, {
     parentalConsent: true,
+  });
+  return newUser;
+};
+
+export const onboardUser = async ({
+  userId,
+  purpose,
+  prepForTest,
+  gradeYear,
+  subjects,
+  country,
+  state,
+}: {
+  userId: string;
+  purpose: Purpose;
+  prepForTest?: string;
+  gradeYear?: GradeYear;
+  subjects?: string[];
+  country?: string;
+  state?: string;
+}) => {
+  const newUser = await updateUser(userId, {
+    profile: {
+      connectOrCreate: {
+        where: {
+          userId,
+        },
+        create: {
+          purpose,
+          prepForTest,
+          gradeYear,
+          subjects,
+          country,
+          state,
+        },
+      },
+    },
   });
   return newUser;
 };
