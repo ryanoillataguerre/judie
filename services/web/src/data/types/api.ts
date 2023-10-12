@@ -10,23 +10,23 @@ export enum SubscriptionType {
 }
 
 export enum GradeYear {
-  FIRST,
-  SECOND,
-  THIRD,
-  FOURTH,
-  FIFTH,
-  SIXTH,
-  SEVENTH,
-  EIGHTH,
-  FRESHMAN,
-  SOPHOMORE,
-  JUNIOR,
-  SENIOR,
-  UNI_FRESHMAN,
-  UNI_SOPHOMORE,
-  UNI_JUNIOR,
-  UNI_SENIOR,
-  GRADUATE,
+  FIRST = "FIRST",
+  SECOND = "SECOND",
+  THIRD = "THIRD",
+  FOURTH = "FOURTH",
+  FIFTH = "FIFTH",
+  SIXTH = "SIXTH",
+  SEVENTH = "SEVENTH",
+  EIGHTH = "EIGHTH",
+  FRESHMAN = "FRESHMAN",
+  SOPHOMORE = "SOPHOMORE",
+  JUNIOR = "JUNIOR",
+  SENIOR = "SENIOR",
+  UNI_FRESHMAN = "UNI_FRESHMAN",
+  UNI_SOPHOMORE = "UNI_SOPHOMORE",
+  UNI_JUNIOR = "UNI_JUNIOR",
+  UNI_SENIOR = "UNI_SENIOR",
+  GRADUATE = "GRADUATE",
 }
 
 export const gradeYearToNameMap = {
@@ -131,10 +131,10 @@ export interface Permission {
 }
 
 export enum Purpose {
-  PERSONAL,
-  TEST_PREP,
-  CLASSES,
-  HOMESCHOOLING,
+  PERSONAL = "PERSONAL",
+  TEST_PREP = "TEST_PREP",
+  CLASSES = "CLASSES",
+  HOMESCHOOLING = "HOMESCHOOLING",
 }
 
 const purposeToNameMap = {
@@ -150,13 +150,13 @@ export const getPurposeName = (purpose: Purpose) => {
 
 // Not enforced in the schema, but should remain a list here
 export enum PrepForTest {
-  SAT,
-  ACT,
-  LSAT,
-  MCAT,
-  GMAT,
-  GRE,
-  DAT,
+  SAT = "SAT",
+  ACT = "ACT",
+  LSAT = "LSAT",
+  MCAT = "MCAT",
+  GMAT = "GMAT",
+  GRE = "GRE",
+  DAT = "DAT",
 }
 
 export interface UserProfile {
@@ -170,6 +170,7 @@ export interface UserProfile {
   createdAt: Date;
   updatedAt: Date | null;
 }
+
 export interface User {
   id: string;
   email: string;

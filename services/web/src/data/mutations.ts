@@ -1,6 +1,13 @@
 import { InviteSheetRole } from "@judie/components/admin/InviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
-import { Chat, GradeYear, PermissionType, UserRole } from "./types/api";
+import {
+  Chat,
+  GradeYear,
+  PermissionType,
+  UserProfile,
+  UserRole,
+} from "./types/api";
+import { SubmitData } from "@judie/components/OnboardingModal";
 
 export const GET_COMPLETION_QUERY = "GET_COMPLETION_QUERY";
 export const completionFromQueryMutation = async ({
@@ -601,6 +608,17 @@ export const feedbackMutation = async ({
     url: `/user/feedback`,
     method: "POST",
     body: { email, feedback },
+  });
+  return response.data;
+};
+
+export interface OnboardMutationArgs
+  extends Omit<UserProfile, "createdAt" | "updatedAt" | "userId"> {}
+export const onboardMutation = async (params: OnboardMutationArgs) => {
+  const response = await baseFetch({
+    url: `/user/onboard`,
+    method: "POST",
+    body: params,
   });
   return response.data;
 };
