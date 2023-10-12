@@ -26,7 +26,7 @@ import {
 } from "@judie/data/types/api";
 import useAuth from "@judie/hooks/useAuth";
 import { MultiSelect } from "chakra-multiselect";
-import { setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
@@ -368,12 +368,13 @@ const OnboardingModal = () => {
   const country = watch("country");
   const [isOpen, setIsOpen] = useState(false);
   const toast = useToast();
+  const onboardedRecently = getCookie("onboarded_closed_recently");
 
   useEffect(() => {
-    if (userData && !userData?.profile?.purpose) {
+    if (userData && !userData?.profile?.purpose && !onboardedRecently) {
       setIsOpen(true);
     }
-  }, [userData?.profile]);
+  }, [userData?.profile, onboardedRecently]);
 
   const onboardingMutation = useMutation({
     mutationFn: onboardMutation,
