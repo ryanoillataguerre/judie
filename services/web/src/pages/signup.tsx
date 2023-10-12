@@ -70,7 +70,7 @@ export const SignupForm = ({
     return typeof window !== "undefined"
       ? `${window.location.origin}/dashboard`
       : "";
-  }, [router]);
+  }, []);
 
   const { mutateAsync: createCheckoutSession } = useMutation({
     mutationKey: CREATE_CHECKOUT_SESSION,

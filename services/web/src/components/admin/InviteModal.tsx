@@ -69,7 +69,7 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
         return;
       }
       await createInvite.mutateAsync({
-        gradeYear: (gradeYear as string) === "None" ? undefined : gradeYear,
+        gradeYear,
         email,
         permissions,
       });

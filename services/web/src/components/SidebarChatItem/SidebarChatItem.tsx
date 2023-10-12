@@ -49,7 +49,7 @@ const EditableControls = ({
     if (isEditing) {
       setBeingEditedChatId(chat.id);
     }
-  }, [isEditing]);
+  }, [isEditing, setBeingEditedChatId, chat.id]);
 
   return (
     <>

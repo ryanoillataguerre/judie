@@ -147,13 +147,13 @@ const EditPermissionModal = ({
       resetField("schoolId", { defaultValue: "None" });
       resetField("roomId", { defaultValue: "None" });
     }
-  }, [organizationId]);
+  }, [organizationId, resetField]);
 
   useEffect(() => {
     if (schoolId === "None") {
       resetField("roomId", { defaultValue: "None" });
     }
-  }, [schoolId]);
+  }, [schoolId, resetField]);
 
   return (
     <Modal

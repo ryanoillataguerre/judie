@@ -106,18 +106,18 @@ const RecordButton = ({
     transcribeMutation.mutate({
       data: formData,
     });
-  }, [recordingBlob, transcribeMutation.mutate]);
+  }, [recordingBlob, transcribeMutation.mutate, transcribeMutation]);
 
   useEffect(() => {
     setIsRecording(isRecording);
-  }, [isRecording]);
+  }, [isRecording, setIsRecording]);
 
   // If recording for 1 min, stop recording and send
   useEffect(() => {
     if (recordingTime >= 60) {
       stopRecording();
     }
-  }, [recordingTime]);
+  }, [recordingTime, stopRecording]);
 
   const micColor = useColorModeValue("gray.800", "gray.300");
 

@@ -16,8 +16,8 @@ def env_setup():
 def test_openai_stream(env_setup):
     test_messages = [{"role": "user", "content": "What is photosynthesis?"}]
 
-    response = openai_manager.get_gpt_response(
-        messages=test_messages, openai_config=openai_manager.OpenAiConfig(stream=True)
+    response = openai_manager.get_gpt_response_stream(
+        messages=test_messages, openai_config=openai_manager.OpenAiConfig()
     )
     i = 0
     for chunk in response:
