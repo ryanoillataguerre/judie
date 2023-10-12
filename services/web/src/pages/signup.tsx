@@ -81,9 +81,10 @@ export const SignupForm = ({
     mutationFn: signupMutation,
     onSuccess: async () => {
       // Get checkout session URL
-      const url = await createCheckoutSession();
-      // Redirect to checkout
-      window?.location?.assign(url);
+      router.push("/dashboard");
+      // const url = await createCheckoutSession();
+      // // Redirect to checkout
+      // window?.location?.assign(url);
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);
