@@ -348,7 +348,7 @@ export interface SubmitData
   extends Omit<UserProfile, "createdAt" | "updatedAt"> {}
 
 const OnboardingModal = () => {
-  const { userData } = useAuth();
+  const { userData, refresh } = useAuth();
   const { handleSubmit, register, reset, watch } = useForm<SubmitData>({
     defaultValues: {
       purpose: userData?.profile?.purpose || undefined,
@@ -383,6 +383,7 @@ const OnboardingModal = () => {
         description: "Your profile has been updated.",
         status: "success",
       });
+      refresh();
       // Wait for 1 second
       setTimeout(() => {
         setIsOpen(false);
