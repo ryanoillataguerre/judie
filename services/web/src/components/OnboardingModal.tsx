@@ -453,8 +453,8 @@ const OnboardingModal = () => {
               marginBottom: "0.5rem",
             }}
           >
-            We'd love to know what brings you to Judie, so we can make your
-            experience (and Judie's responses) even better.
+            We&apos;d love to know what brings you to Judie, so we can make your
+            experience (and Judie&apos;s responses) even better.
           </Text>
           <Text
             variant={"subtitle"}
