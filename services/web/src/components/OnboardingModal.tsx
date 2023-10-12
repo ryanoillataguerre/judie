@@ -374,7 +374,7 @@ const OnboardingModal = () => {
     if (userData && !userData?.profile?.purpose && !onboardedRecently) {
       setIsOpen(true);
     }
-  }, [userData?.profile, onboardedRecently]);
+  }, [userData?.profile, onboardedRecently, userData]);
 
   const onboardingMutation = useMutation({
     mutationFn: onboardMutation,

@@ -410,7 +410,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     streaming,
     chatId,
     tempUserMessageChatId,
-    existingChatQuery.isLoading,
   ]);
 
   const [animatedEllipsisStringValue, setAnimatedEllipsisStringValue] =
@@ -439,7 +438,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     const subjectsCopy = { ...subjectSectionToSubjectsMap };
     delete subjectsCopy["Admin"];
     return Object.keys(subjectSectionToSubjectsMap);
-  }, [subjectSectionToSubjectsMap, userData]);
+  }, [userData]);
 
   return (
     <Flex

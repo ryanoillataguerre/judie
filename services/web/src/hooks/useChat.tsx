@@ -374,11 +374,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     [
       chatId,
-      beingStreamedMessage,
       completionMutation,
       toast,
       streaming,
-      setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
       setTempUserMessageChatId,
@@ -466,11 +464,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     [
       chatId,
-      beingStreamedMessage,
       uploadMutation,
       toast,
       streaming,
-      setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
       existingChatQuery.data?.subject,
