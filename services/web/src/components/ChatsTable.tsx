@@ -63,11 +63,11 @@ const ChatsTable = ({
                 }}
               >
                 <Td>{getTitleForChat(chat)}</Td>
-                <Td>{chat.folder?.userTitle || folderName || "n/a"}</Td>
+                <Td>{chat.folder?.userTitle || folderName || "--"}</Td>
                 <Td>
                   {chat.updatedAt
                     ? new Date(chat.updatedAt)?.toISOString().replace(/T.*/, "")
-                    : "n/a"}
+                    : "--"}
                 </Td>
               </Tr>
             ))}
