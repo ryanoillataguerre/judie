@@ -70,7 +70,7 @@ export const SignupForm = ({
     return typeof window !== "undefined"
       ? `${window.location.origin}/dashboard`
       : "";
-  }, [router]);
+  }, []);
 
   const { mutateAsync: createCheckoutSession } = useMutation({
     mutationKey: CREATE_CHECKOUT_SESSION,
@@ -81,9 +81,10 @@ export const SignupForm = ({
     mutationFn: signupMutation,
     onSuccess: async () => {
       // Get checkout session URL
-      const url = await createCheckoutSession();
-      // Redirect to checkout
-      window?.location?.assign(url);
+      router.push("/dashboard");
+      // const url = await createCheckoutSession();
+      // // Redirect to checkout
+      // window?.location?.assign(url);
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);

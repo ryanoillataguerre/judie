@@ -116,7 +116,16 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setMessages([]);
     }
-  }, [chatId]);
+  }, [
+    chatId,
+    setBeingStreamedMessage,
+    setBeingStreamedChatId,
+    setTempUserMessage,
+    setTempUserMessageChatId,
+    setStreaming,
+    setDisplayWelcome,
+    setMessages,
+  ]);
 
   useEffect(() => {
     setStreaming(false);
@@ -140,7 +149,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     if (beingStreamedMessage) {
       reset();
     }
-  }, [auth?.userData?.id, reset]);
+  }, [auth?.userData?.id, reset, beingStreamedMessage]);
 
   // If beingStreamedMessage hasn't been updated in 5 seconds, reset it
   useEffect(() => {
@@ -194,7 +203,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         setBeingStreamedMessage((prev) => prev + message);
       }
     },
-    [streaming, setBeingStreamedMessage]
+    [setBeingStreamedMessage]
   );
 
   useEffect(() => {
@@ -202,7 +211,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       reset();
       setStreaming(false);
     };
-  }, []);
+  }, [reset, setStreaming]);
 
   const completionOnError = (err: HTTPResponseError) => {
     setBeingStreamedChatId(() => undefined);
@@ -365,13 +374,12 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     [
       chatId,
-      beingStreamedMessage,
       completionMutation,
       toast,
       streaming,
-      setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
+      setTempUserMessageChatId,
     ]
   );
 
@@ -456,14 +464,13 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     [
       chatId,
-      beingStreamedMessage,
       uploadMutation,
       toast,
       streaming,
-      setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
       existingChatQuery.data?.subject,
+      setTempUserMessageChatId,
     ]
   );
 

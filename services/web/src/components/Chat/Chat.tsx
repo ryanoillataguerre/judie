@@ -30,9 +30,11 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { adminSubjects, subjects } from "../../data/static/subjects";
+import {
+  subjectSectionToSubjectsMap,
+  subjectSections,
+} from "../../data/static/subjects";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
-import SubjectSelector from "../SubjectSelector/SubjectSelector";
 import MessageRowBubble from "../MessageRowBubble/MessageRowBubble";
 import { MessageType } from "@judie/data/types/api";
 import ScrollContainerBubbles from "../ScrollContainerBubbles/ScrollContainerBubbles";
@@ -146,7 +148,7 @@ const AddToFolderButton = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <>
+    <Flex>
       <AddToFolderModal
         chatId={chatId}
         isOpen={isOpen}
@@ -168,26 +170,25 @@ const AddToFolderButton = ({
           {!!existingFolderId ? "Change folder" : "Add to folder"}
         </Text>
       </Button>
-    </>
+    </Flex>
   );
 };
 
 const SubjectCloud = ({
+  subjects,
   onSelectSubject,
 }: {
   onSelectSubject: (subject: string) => void;
+  subjects: string[];
 }) => {
   const { userData } = useAuth();
-  const subjectOptions = useMemo(() => {
-    if (userData?.email?.includes("@judie.io")) {
-      return [...subjects, ...adminSubjects];
-    }
-    return subjects;
-  }, [userData]);
-  const subjectSelectorWidth = useBreakpointValue({
-    base: "80%",
-    md: "70%",
-  });
+  // const subjectSections: string[] = useMemo(() => {
+  //   if (userData?.email?.includes("@judie.io")) {
+  //     return [...subjectSections, "Admin"];
+  //   }
+  //   return subjectSections;
+  // }, [userData]);
+
   const bgColor = useColorModeValue("#FFF", "whiteAlpha.300");
   const tagColor = useColorModeValue(
     {
@@ -202,18 +203,18 @@ const SubjectCloud = ({
     "rgba(60, 20, 120, 0.80)",
     "whiteAlpha.300"
   );
+  const [expanded, setExpanded] = useState(false);
   return (
     <Flex
-      width={subjectSelectorWidth}
+      width={"100%"}
       overflowY={"auto"}
       // flexDirection={"column"}
-      alignItems={"center"}
-      justifyContent={"center"}
+      justifyContent={"flex-start"}
+      // ={"center"}
       maxW={"100%"}
-      height={"50%"}
       wrap={"wrap"}
     >
-      {subjectOptions.map((subject) => (
+      {(expanded ? subjects : subjects.slice(0, 5)).map((subject) => (
         <Tag
           key={subject}
           onClick={() => onSelectSubject(subject)}
@@ -237,6 +238,65 @@ const SubjectCloud = ({
           <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
         </Tag>
       ))}
+      {!expanded && subjects.length > 5 && (
+        <Tag
+          key={"more"}
+          onClick={() => setExpanded(true)}
+          position={"relative"}
+          size={"lg"}
+          variant={"solid"}
+          cursor={"pointer"}
+          bg={"purple.500"}
+          borderRadius="full"
+          width={"fit-content"}
+          m={"0.25rem"}
+          px={"20px"}
+          py={"10px"}
+          border={"1px solid #d3d3d3"}
+          borderColor={subjectBorderColor}
+          _hover={{
+            bg: "purple.600",
+          }}
+          top={0}
+          zIndex={1}
+          color={"white"}
+        >
+          + More
+        </Tag>
+      )}
+    </Flex>
+  );
+};
+
+const SubjectCloudSection = ({
+  title,
+  subjects,
+  onClickSubject,
+}: {
+  title: string;
+  subjects: string[];
+  onClickSubject: (subject: string) => void;
+}) => {
+  const subjectSelectorWidth = useBreakpointValue({
+    base: "90%",
+    md: "80%",
+  });
+  return (
+    <Flex
+      flexDirection={"column"}
+      alignItems={"center"}
+      justifyContent={"flex-start"}
+      width={subjectSelectorWidth}
+      paddingBottom={"1rem"}
+    >
+      <HStack justifyContent={"flex-start"} w={"100%"}>
+        <Text textAlign={"start"} variant={"boldSubheader"}>
+          {title}
+        </Text>
+      </HStack>
+      <Flex w={"100%"} wrap={"wrap"}>
+        <SubjectCloud subjects={subjects} onSelectSubject={onClickSubject} />
+      </Flex>
     </Flex>
   );
 };
@@ -345,11 +405,11 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     });
   }, [
     messages,
+    beingStreamedChatId,
     tempUserMessage,
     streaming,
     chatId,
     tempUserMessageChatId,
-    existingChatQuery.isLoading,
   ]);
 
   const [animatedEllipsisStringValue, setAnimatedEllipsisStringValue] =
@@ -367,6 +427,18 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     }, 400);
     return () => clearInterval(interval);
   }, []);
+
+  const { userData } = useAuth();
+
+  const availableKeys = useMemo(() => {
+    if (userData?.email.includes("@judie.io")) {
+      return Object.keys(subjectSectionToSubjectsMap);
+    }
+    // TODO: Use user profile's purpose here to find the right subjects
+    const subjectsCopy = { ...subjectSectionToSubjectsMap };
+    delete subjectsCopy["Admin"];
+    return Object.keys(subjectSectionToSubjectsMap);
+  }, [userData]);
 
   return (
     <Flex
@@ -419,7 +491,25 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                   >
                     Select a topic below to get started
                   </Text>
-                  <SubjectCloud onSelectSubject={submitSubject} />
+                  <Flex
+                    width={"100%"}
+                    overflowY={"auto"}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    height={"50%"}
+                    wrap={"wrap"}
+                  >
+                    {availableKeys.map((section) => (
+                      <SubjectCloudSection
+                        key={section}
+                        title={section}
+                        subjects={subjectSectionToSubjectsMap[section]}
+                        onClickSubject={(subject) => {
+                          submitSubject(subject);
+                        }}
+                      />
+                    ))}
+                  </Flex>
                 </VStack>
               </Flex>
             )

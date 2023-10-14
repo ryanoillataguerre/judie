@@ -29,6 +29,30 @@ export enum GradeYear {
   GRADUATE = "GRADUATE",
 }
 
+export const gradeYearToNameMap = {
+  [GradeYear.FIRST]: "1st",
+  [GradeYear.SECOND]: "2nd",
+  [GradeYear.THIRD]: "3rd",
+  [GradeYear.FOURTH]: "4th",
+  [GradeYear.FIFTH]: "5th",
+  [GradeYear.SIXTH]: "6th",
+  [GradeYear.SEVENTH]: "7th",
+  [GradeYear.EIGHTH]: "8th",
+  [GradeYear.FRESHMAN]: "Freshman",
+  [GradeYear.SOPHOMORE]: "Sophomore",
+  [GradeYear.JUNIOR]: "Junior",
+  [GradeYear.SENIOR]: "Senior",
+  [GradeYear.UNI_FRESHMAN]: "College Freshman",
+  [GradeYear.UNI_SOPHOMORE]: "College Sophomore",
+  [GradeYear.UNI_JUNIOR]: "College Junior",
+  [GradeYear.UNI_SENIOR]: "College Senior",
+  [GradeYear.GRADUATE]: "Graduate",
+};
+
+export const getGradeYearName = (gradeYear: GradeYear) => {
+  return gradeYearToNameMap[gradeYear];
+};
+
 export interface Subscription {
   id: string;
   userId: string;
@@ -105,6 +129,48 @@ export interface Permission {
   organization?: Organization;
   room?: Room;
 }
+
+export enum Purpose {
+  PERSONAL = "PERSONAL",
+  TEST_PREP = "TEST_PREP",
+  CLASSES = "CLASSES",
+  HOMESCHOOLING = "HOMESCHOOLING",
+}
+
+const purposeToNameMap = {
+  [Purpose.PERSONAL]: "Personal",
+  [Purpose.TEST_PREP]: "Test Prep",
+  [Purpose.CLASSES]: "Classes",
+  [Purpose.HOMESCHOOLING]: "Homeschooling",
+};
+
+export const getPurposeName = (purpose: Purpose) => {
+  return purposeToNameMap[purpose];
+};
+
+// Not enforced in the schema, but should remain a list here
+export enum PrepForTest {
+  SAT = "SAT",
+  ACT = "ACT",
+  LSAT = "LSAT",
+  MCAT = "MCAT",
+  GMAT = "GMAT",
+  GRE = "GRE",
+  DAT = "DAT",
+}
+
+export interface UserProfile {
+  purpose: Purpose;
+  prepForTest: PrepForTest;
+  gradeYear: GradeYear;
+  country: string;
+  state: string;
+  subjects: string[];
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -128,6 +194,7 @@ export interface User {
   schools?: School[];
   createdOrganizations?: Organization[];
   rooms?: Room[];
+  profile?: UserProfile;
 }
 
 export enum MessageType {

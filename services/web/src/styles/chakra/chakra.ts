@@ -8,6 +8,7 @@ import { ComponentStyleConfig, extendTheme } from "@chakra-ui/react";
 import type { StyleFunctionProps } from "@chakra-ui/styled-system";
 import { mode } from "@chakra-ui/theme-tools";
 import { defineStyleConfig } from "@chakra-ui/react";
+import { MultiSelectTheme } from "chakra-multiselect";
 
 const config = {
   initialColorMode: "dark",
@@ -31,6 +32,10 @@ const textComponentStyle: ComponentStyleConfig = {
     subheader: {
       fontWeight: 500,
       fontSize: "1.375rem",
+    },
+    boldSubheader: {
+      fontWeight: 700,
+      fontSize: "1.25rem",
     },
     subheaderDetail: {
       color: "gray.500",
@@ -132,6 +137,7 @@ const theme = extendTheme({
     FormLabel: formLabelStyle,
     Button: buttonComponentStyle,
     Text: textComponentStyle,
+    MultiSelect: MultiSelectTheme,
   },
   config,
   fonts: {
