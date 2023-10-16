@@ -7,7 +7,7 @@ import {
   signinMutation,
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   Flex,
@@ -273,13 +273,6 @@ const SigninPage = () => {
   // const { logout } = useAuth();
   // const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
-
-  // clear session cookie on signin page if still present
-  // useEffect(() => {
-  //   if (sessionCookie) {
-  //     logout();
-  //   }
-  // }, []);
 
   return (
     <>
