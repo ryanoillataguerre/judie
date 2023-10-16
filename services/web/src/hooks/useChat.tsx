@@ -145,12 +145,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setTempUserMessageChatId,
   ]);
 
-  useEffect(() => {
-    if (beingStreamedMessage) {
-      reset();
-    }
-  }, [auth?.userData?.id, reset, beingStreamedMessage]);
-
   // If beingStreamedMessage hasn't been updated in 5 seconds, reset it
   useEffect(() => {
     if (beingStreamedMessage) {
