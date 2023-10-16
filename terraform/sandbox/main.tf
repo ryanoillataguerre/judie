@@ -21,7 +21,7 @@ resource "google_project_service" "sqladmin-api" {
 
 module "exploration-bucket" {
   source = "../modules/bucket"
-  name   = "exploration"
+  name   = "judie-exploration"
 }
 
 # Store backend state in Cloud Storage
