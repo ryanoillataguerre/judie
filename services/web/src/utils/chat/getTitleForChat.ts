@@ -8,6 +8,7 @@ export const getTitleForChat = (chat: Chat, sliced?: boolean) => {
     }
     return result;
   }
+
   if (chat.subject) {
     const result = chat.subject.slice(0, 14);
     if (result.length === 14) {
