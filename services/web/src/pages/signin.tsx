@@ -26,6 +26,7 @@ import {
   Spinner,
   Button,
 } from "@chakra-ui/react";
+import { isLocal } from "@judie/utils/env";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
@@ -273,34 +274,6 @@ const SigninPage = () => {
   // const { logout } = useAuth();
   // const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
-
-  // Add all query params to local storage
-  useEffect(() => {
-    if (router.isReady) {
-      const { query } = router;
-      const queryKeys = Object.keys(query);
-      for (const key of queryKeys) {
-        localStorage.setItem(key, query[key] as string);
-      }
-      console.log("log all local storage", localStorage);
-    }
-
-    // set query params in cookies
-    const { query } = router;
-    const queryKeys = Object.keys(query);
-    for (const key of queryKeys) {
-      document.cookie = `${key}=${query[key]}; path=/`;
-    }
-
-    console.log("log all cookies", document.cookie);
-  }, [router.query]);
-
-  // clear session cookie on signin page if still present
-  // useEffect(() => {
-  //   if (sessionCookie) {
-  //     logout();
-  //   }
-  // }, []);
 
   return (
     <>

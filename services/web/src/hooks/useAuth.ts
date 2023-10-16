@@ -186,40 +186,41 @@ export default function useAuth({
         value: null,
       });
 
-      const upfVisitor = localStorage.getItem("_upf_visitor");
+      // create an order_id of type number taking the first 8 hex characters of the subscription id
+      const order_id = userData?.subscription?.id.split("-")[0];
+      const order_id_num = parseInt(order_id, 16);
+      const customer_id_num = parseInt(userData?.id.split("-")[0], 16);
+      const subscriptionType = userData?.subscription?.type.toLowerCase();
 
+      const orderName = isProduction()
+        ? `order_${subscriptionType}`
+        : isSandbox()
+        ? `order_sandbox_${subscriptionType}`
+        : `order_dev_${subscriptionType}`;
+
+      // add to the order_id ( + 1, 2, 3, etc ) in order to push more than one order with same subscription for testing.
       window._upf.push([
         "order",
         {
-          order_id: 6, // required - set to new user ID
-          order_name: "Upfluence - dev", // required
-          amount: 12, // required
+          order_id: order_id_num, // required - must be unique and will not be accepted if it is not
+          order_name: orderName, // required
+          amount: 49, // required
           currency: "usd", // required
+          customer: {
+            customer_id: customer_id_num,
+            first_name: userData?.firstName,
+            last_name: userData?.lastName,
+            email: userData?.email,
+          },
         },
       ]);
 
-      // window!._upf?.push([
-      //   isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
-      //   {
-      //     order_id: userData?.subscription?.id, // required
-      //     order_name: userData?.subscription?.type, // required
-      //     amount: "49.00", // required
-      //     currency: "usd", // required,
-      //     customer: {
-      //       customer_id: userData?.id,
-      //       first_name: userData?.firstName,
-      //       last_name: userData?.lastName,
-      //       email: userData?.email,
-      //     },
-      //   },
-      // ]);
-
       const newQuery = router.query;
       delete newQuery.paid;
-      // router.push({
-      //   pathname: router.pathname,
-      //   query: newQuery,
-      // });
+      router.push({
+        pathname: router.pathname,
+        query: newQuery,
+      });
     }
   }, [
     router.query,

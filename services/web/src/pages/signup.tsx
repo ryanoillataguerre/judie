@@ -412,18 +412,6 @@ const SignupPage = () => {
   //   }
   // }, []);
 
-  // Add all query params to local storage
-  useEffect(() => {
-    if (router.isReady) {
-      const { query } = router;
-      const queryKeys = Object.keys(query);
-      for (const key of queryKeys) {
-        localStorage.setItem(key, query[key] as string);
-      }
-      console.log("log all local storage", localStorage);
-    }
-  }, [router.query]);
-
   return (
     <>
       <Head>
