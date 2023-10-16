@@ -8,7 +8,7 @@ import {
   signupMutation,
 } from "@judie/data/mutations";
 import { useRouter } from "next/router";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Button from "@judie/components/Button/Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -402,8 +402,6 @@ const SignupPage = () => {
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 
   const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
-
-  const router = useRouter();
 
   // clear session cookie if still present
   // useEffect(() => {

@@ -26,7 +26,6 @@ import {
   Spinner,
   Button,
 } from "@chakra-ui/react";
-import { isLocal } from "@judie/utils/env";
 import useAuth from "@judie/hooks/useAuth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import { SubscriptionStatus, User } from "@judie/data/types/api";
