@@ -199,21 +199,23 @@ export default function useAuth({
         : `order_dev_${subscriptionType}`;
 
       // add to the order_id ( + 1, 2, 3, etc ) in order to push more than one order with same subscription for testing.
-      window._upf.push([
-        "order",
-        {
-          order_id: order_id_num, // required - must be unique and will not be accepted if it is not
-          order_name: orderName, // required
-          amount: 49, // required
-          currency: "usd", // required
-          customer: {
-            customer_id: customer_id_num,
-            first_name: userData?.firstName,
-            last_name: userData?.lastName,
-            email: userData?.email,
+      if (isProduction()) {
+        window._upf.push([
+          "order",
+          {
+            order_id: order_id_num, // required - must be unique and will not be accepted if it is not
+            order_name: orderName, // required
+            amount: 49, // required
+            currency: "usd", // required
+            customer: {
+              customer_id: customer_id_num,
+              first_name: userData?.firstName,
+              last_name: userData?.lastName,
+              email: userData?.email,
+            },
           },
-        },
-      ]);
+        ]);
+      }
 
       const newQuery = router.query;
       delete newQuery.paid;
