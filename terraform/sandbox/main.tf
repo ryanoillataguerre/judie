@@ -17,6 +17,13 @@ resource "google_project_service" "sqladmin-api" {
   service = "sqladmin.googleapis.com"
 }
 
+# Development buckets
+
+module "exploration-bucket" {
+  source = "../modules/bucket"
+  name   = "exploration"
+}
+
 # Store backend state in Cloud Storage
 
 module "backend-bucket" {
