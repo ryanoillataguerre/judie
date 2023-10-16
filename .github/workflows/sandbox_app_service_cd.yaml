@@ -3,9 +3,9 @@ name: Sandbox app-service CD
 on:
   push:
     branches:
-    - sandbox
+      - sandbox
     paths:
-    - "services/app-service/**"
+      - "services/app-service/**"
 
 jobs:
   deploy:
@@ -13,28 +13,28 @@ jobs:
     environment: Sandbox
 
     permissions:
-     contents: 'read'
-     id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # For the migration down below
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
-          cache-dependency-path: services/app-service/yarn.lock
+      # # For the migration down below
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     cache: 'yarn'
+      #     cache-dependency-path: services/app-service/yarn.lock
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
         with:
           token_format: access_token
-          workload_identity_provider: 'projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider'
-          service_account: 'terraform@sandbox-382905.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/617839389948/locations/global/workloadIdentityPools/github-actions/providers/gha-provider"
+          service_account: "terraform@sandbox-382905.iam.gserviceaccount.com"
           access_token_lifetime: 600s
 
       - name: Login to Artifact Registry
@@ -58,7 +58,7 @@ jobs:
           tags: |
             us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:${{ github.sha }}
             us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:latest
-      
+
       # Migrate DB
       # Removing for now because we need to whitelist GHA job runner IPs on our DB, and I don't want to do that yet
       # - name: Install Dependencies
@@ -71,7 +71,7 @@ jobs:
       #   run: yarn run migrate:prod
 
       - name: Deploy to Cloud Run
-        uses: 'google-github-actions/deploy-cloudrun@v1'
+        uses: "google-github-actions/deploy-cloudrun@v1"
         with:
           image: us-west1-docker.pkg.dev/sandbox-382905/app-service/app-service:${{ github.sha }}
           service: app-service
