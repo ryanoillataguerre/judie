@@ -59,6 +59,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import { FiFolderPlus } from "react-icons/fi";
 import useAuth from "@judie/hooks/useAuth";
 import { getTopicEmoji } from "@judie/utils/topicEmoji";
+import SuggestedPrompts from "../SuggestedPrompts";
 
 const AddToFolderModal = ({
   chatId,
@@ -359,6 +360,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     paywallOpen,
     setPaywallOpen,
     displayWelcome,
+    addMessage,
   } = useContext(ChatContext);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -528,7 +530,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
             >
               <Spinner colorScheme="blue.400" />
             </Flex>
-          ) : (
+          ) : messages.length || tempUserMessage || beingStreamedMessage ? (
             <ScrollContainerBubbles>
               {renderedMessages}
               {(streaming ||
@@ -544,6 +546,12 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                   }}
                 />
               )}
+              <Spacer />
+              <ChatFooter />
+            </ScrollContainerBubbles>
+          ) : (
+            <ScrollContainerBubbles>
+              <SuggestedPrompts subject={chat?.subject} onSelect={addMessage} />
               <Spacer />
               <ChatFooter />
             </ScrollContainerBubbles>
