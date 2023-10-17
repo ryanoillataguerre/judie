@@ -106,7 +106,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!chatId) {
-      console.log("3");
       setBeingStreamedMessage(undefined);
       setBeingStreamedChatId(undefined);
       setTempUserMessage(undefined);
@@ -135,7 +134,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const reset = useCallback(() => {
     setBeingStreamedMessage(undefined);
     setBeingStreamedChatId(undefined);
-    console.log("4");
     setTempUserMessage(undefined);
     setTempUserMessageChatId(undefined);
     setStreaming(false);
@@ -163,7 +161,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (beingStreamedMessage && chatId !== prevChatId) {
       // setBeingStreamedMessage(undefined);
-      console.log("1");
       setTempUserMessage(undefined);
     }
     setPrevChatId(chatId);
@@ -174,7 +171,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     const abortStream = () => {
       if (beingStreamedMessage) {
         // setBeingStreamedMessage(undefined);
-        console.log("2");
         setTempUserMessage(undefined);
       }
     };
