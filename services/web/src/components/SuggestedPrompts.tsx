@@ -16,7 +16,7 @@ const SuggestedPrompts = ({
     }
     return [];
   }, []);
-  return (
+  return prompts.length ? (
     <Flex
       width={"100%"}
       flexDirection={"column"}
@@ -44,7 +44,7 @@ const SuggestedPrompts = ({
         </Flex>
       ))}
     </Flex>
-  );
+  ) : null;
 };
 
 export default SuggestedPrompts;
