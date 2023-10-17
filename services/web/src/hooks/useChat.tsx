@@ -145,12 +145,12 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setTempUserMessageChatId,
   ]);
 
-  // If beingStreamedMessage hasn't been updated in 5 seconds, reset it
+  // If beingStreamedMessage hasn't been updated in 10 seconds, reset it
   useEffect(() => {
     if (beingStreamedMessage) {
       const timeout = setTimeout(() => {
         reset();
-      }, 5000);
+      }, 10000);
       return () => {
         clearTimeout(timeout);
       };
@@ -166,6 +166,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setPrevChatId(chatId);
   }, [chatId, beingStreamedMessage, prevChatId, setBeingStreamedMessage]);
 
+  console.log("tempUserMessage", tempUserMessage);
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
@@ -203,9 +204,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     return () => {
       reset();
-      setStreaming(false);
     };
-  }, [reset, setStreaming]);
+  }, [reset]);
 
   const completionOnError = (err: HTTPResponseError) => {
     setBeingStreamedChatId(() => undefined);
