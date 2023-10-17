@@ -6,3 +6,6 @@ tables:
     users_table: "users"
 sql:
     users_query: "sql/user_stats.sql"
+gcs:
+    base_prefix: "rowan/data_stats"
+    user_stats: "user_stats"
