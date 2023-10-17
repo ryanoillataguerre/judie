@@ -374,10 +374,10 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     }
   };
 
-  useEffect(() => {
-    scroll();
-    setTempUserMessage(undefined);
-  }, [setTempUserMessage]);
+  // useEffect(() => {
+  //   scroll();
+  //   setTempUserMessage(undefined);
+  // }, [setTempUserMessage]);
   useEffect(() => {
     scroll();
   }, [messages, tempUserMessage, beingStreamedMessage]);
@@ -390,17 +390,20 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   });
   const renderedMessages = useMemo(() => {
     let newMessages: UIMessageType[] = messages;
-    if (streaming && beingStreamedChatId === chatId) {
+    if (streaming || beingStreamedChatId === chatId) {
       if (tempUserMessage && tempUserMessageChatId === chatId) {
         newMessages = [...newMessages, tempUserMessage];
       }
     }
     return newMessages.map((message, idx) => {
-      const key = `${message.type}-${
-        message.readableContent?.slice(0, 9).includes("undefined")
-          ? message.readableContent?.slice(9, 50)
-          : message.readableContent?.slice(0, 50)
-      }-${idx}`;
+      const key =
+        message.type === MessageType.BOT && idx === messages.length + 1
+          ? `${MessageType.BOT}-mostRecent`
+          : `${message.type}-${
+              message.readableContent?.slice(0, 9).includes("undefined")
+                ? message.readableContent?.slice(9, 50)
+                : message.readableContent?.slice(0, 50)
+            }-${idx}`;
       return <MessageRowBubble key={key} message={message} />;
     });
   }, [
@@ -538,7 +541,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                     readableContent:
                       beingStreamedMessage?.slice(9, -1) ||
                       animatedEllipsisStringValue,
-                    createdAt: new Date(),
                   }}
                 />
               )}
