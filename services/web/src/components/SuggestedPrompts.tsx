@@ -1,4 +1,9 @@
-import { Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  useBreakpointValue,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { subjectToSuggestedPromptsMap } from "@judie/data/static/subjects";
 import { useMemo } from "react";
 
@@ -9,21 +14,24 @@ const SuggestedPrompts = ({
   subject?: string;
   onSelect: (prompt: string) => void;
 }) => {
-  const bg = useColorModeValue("purple.200", "purple.700");
+  const bg = useColorModeValue("purple.200", "purple.600");
   const prompts = useMemo(() => {
     if (subject) {
       return subjectToSuggestedPromptsMap[subject];
     }
     return [];
   }, [subject]);
+
+  const paddingX = useBreakpointValue({ base: 6, md: 12 });
   return prompts.length ? (
     <Flex
       width={"100%"}
       flexDirection={"column"}
       alignItems={"center"}
-      padding={2}
+      paddingY={2}
       borderRadius={4}
       marginY={1}
+      paddingX={paddingX}
     >
       <Text variant={"subheader"}>
         Choose a prompt below if you don&apos;t know where to get started
