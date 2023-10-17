@@ -15,7 +15,7 @@ const SuggestedPrompts = ({
       return subjectToSuggestedPromptsMap[subject];
     }
     return [];
-  }, []);
+  }, [subject]);
   return prompts.length ? (
     <Flex
       width={"100%"}
@@ -26,7 +26,7 @@ const SuggestedPrompts = ({
       marginY={1}
     >
       <Text variant={"subheader"}>
-        Choose a prompt below if you don't know where to get started
+        Choose a prompt below if you don&apos;t know where to get started
       </Text>
       {prompts.map((prompt) => (
         <Flex
