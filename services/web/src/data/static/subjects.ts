@@ -701,7 +701,7 @@ export const subjectToSuggestedPromptsMap: { [key: string]: string[] } = {
     "Could you provide a practice scenario involving a sample Writing and Language question with a step-by-step breakdown of how to answer it?",
     "How would you approach preparing for the SAT if you had limited time to study and wanted to prioritize efficiently?",
   ],
-  "ACT Preperation": [
+  "ACT Preparation": [
     "Can you explain the structure of the ACT and what each section tests for?",
     "What strategies are recommended for tackling the Math section of the ACT?",
     "Could you provide an overview of the types of questions in the Reading section and how to approach them?",
@@ -709,7 +709,7 @@ export const subjectToSuggestedPromptsMap: { [key: string]: string[] } = {
     "Could you provide a practice scenario involving a sample Science Reasoning question with a step-by-step breakdown of how to answer it?",
     "How would you approach preparing for the ACT if you were strong in Math and Science, but struggled with Reading and English?",
   ],
-  "GED Preperation": [
+  "GED Preparation": [
     "Can you explain the structure of the GED and what each section tests for?",
     "What strategies are recommended for tackling the Mathematical Reasoning section of the GED?",
     "Could you provide an overview of the types of questions in the Reasoning through Language Arts section and how to approach them?",
@@ -717,7 +717,7 @@ export const subjectToSuggestedPromptsMap: { [key: string]: string[] } = {
     "Could you provide a practice scenario involving a sample Science question with a step-by-step breakdown of how to answer it?",
     "How would you approach preparing for the GED if you had limited time to study and needed to balance preparation with other responsibilities?",
   ],
-  "GMAT Preperation": [
+  "GMAT Preparation": [
     "Can you explain the structure of the GMAT and what each section tests for?",
     "What strategies are recommended for tackling the Quantitative Reasoning section of the GMAT?",
     "Could you provide an overview of the types of questions in the Verbal Reasoning section and how to approach them?",
