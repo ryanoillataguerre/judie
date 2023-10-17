@@ -348,7 +348,7 @@ export interface SubmitData
   extends Omit<UserProfile, "createdAt" | "updatedAt"> {}
 
 const OnboardingModal = () => {
-  const { userData, refresh } = useAuth();
+  const { userData, refresh, isLoading } = useAuth();
   const { handleSubmit, register, reset, watch } = useForm<SubmitData>({
     defaultValues: {
       purpose: userData?.profile?.purpose || undefined,
@@ -371,7 +371,12 @@ const OnboardingModal = () => {
   const onboardedRecently = getCookie("onboarded_closed_recently");
 
   useEffect(() => {
-    if (userData && !userData?.profile?.purpose && !onboardedRecently) {
+    if (
+      userData &&
+      !userData?.profile?.purpose &&
+      !onboardedRecently &&
+      !isLoading
+    ) {
       setIsOpen(true);
     }
   }, [userData?.profile, onboardedRecently, userData]);
@@ -432,7 +437,7 @@ const OnboardingModal = () => {
         });
       }}
       closeOnOverlayClick={false}
-      size={"5xl"}
+      size={"4xl"}
     >
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
 

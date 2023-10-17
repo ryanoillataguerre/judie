@@ -23,7 +23,7 @@ const SuggestedPrompts = ({
   }, [subject]);
 
   const paddingX = useBreakpointValue({ base: 6, md: 12 });
-  return prompts.length ? (
+  return prompts?.length ? (
     <Flex
       width={"100%"}
       flexDirection={"column"}
