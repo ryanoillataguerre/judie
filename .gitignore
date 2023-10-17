@@ -1,5 +1,6 @@
 .idea/
 infrastructure/python/ve
+.python-version
 
 **/dist
 .env
