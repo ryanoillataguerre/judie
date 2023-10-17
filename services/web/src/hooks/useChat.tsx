@@ -166,7 +166,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setPrevChatId(chatId);
   }, [chatId, beingStreamedMessage, prevChatId, setBeingStreamedMessage]);
 
-  console.log("tempUserMessage", tempUserMessage);
   useEffect(() => {
     const abortStream = () => {
       if (beingStreamedMessage) {
