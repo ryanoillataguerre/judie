@@ -1,0 +1,8 @@
+gcp:
+    sandbox_project_id: "sandbox-382905"
+    prod_project_id: "production-382518"
+    prod_db: "app_db_public"
+tables:
+    users_table: "users"
+sql:
+    users_query: "sql/user_stats.sql"
