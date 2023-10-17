@@ -5,16 +5,90 @@ Date: 2023-10-16 (modified 2023-10-16)
 """
 import json
 import logging
+import os
+from io import BytesIO
 from typing import Optional
 
 import pandas as pd
-from google.cloud import bigquery, bigquery_storage
+from google.cloud import bigquery, bigquery_storage, storage
 from jinja2 import Template
 
 from src.general_utils import get_logger
 
 
-class BQUtils:
+class GCPUtils:
+    """Base class with common functions for other GCP util classes."""
+
+    def set_logger(self, logger: Optional[logging.Logger] = None) -> None:
+        """Set the logger for the class instance.
+        """
+        if logger is None:
+            self.logger = get_logger(name=__name__)
+        else:
+            self.logger = logger
+
+    def set_gcp_project_id(self, gcp_project_id: str) -> None:
+        """Set the GCP project_id for the class instance.
+
+        Args:
+            gcp_project_id  : The GCP project-id with which to interact
+        """
+        self.gcp_project_id = gcp_project_id
+
+
+class GCSUtils(GCPUtils):
+    """Class that defines utility functions for GCP Cloud Storage.
+
+        Attributes:
+            gcp_project_id  : The GCP project-id with which to interact
+            logger          : Logger to use when displaying logs
+    """
+
+    def __init__(self, gcp_project_id: str, logger: Optional[logging.Logger] = None) -> None:
+        """Init method.
+
+        Args:
+            gcp_project_id  : The GCP project-id with which to interact
+            logger          : Optional logger to use when displaying logs
+        """
+        self.set_gcp_project_id(gcp_project_id)
+        self.set_logger(logger)
+
+    def write_pd_dataframe_to_gcs(
+        self, df: pd.DataFrame, bucket: str, prefix: str, file_format: str="parquet",
+    ) -> None:
+        """Write a Pandas dataframe to Google Cloud Storage.
+
+        Args:
+            df          : The Pandas dataframe to write
+            bucket      : The bucket to which to write
+            prefix      : The gcs path within the bucket
+            file_format : The file format to use when writing
+        """
+        self.logger.info(f"Writing dataframe to {bucket}/{prefix} as a {file_format} file ...")
+        client = storage.Client(project=self.gcp_project_id)
+        bucket = client.bucket(bucket)
+        blob = bucket.blob(prefix)
+
+        # Convert dataframe to in-memory bytes buffer
+        buffer = BytesIO()
+
+        # Save DataFrame to a Parquet format and upload to GCS
+        if file_format == "parquet":
+            df.to_parquet(buffer, index=False, compression='snappy')
+        elif file_format == "csv":
+            df.to_csv(buffer, index=False)
+        else:
+            raise ValueError(f"Unsupported file format: {file_format}")
+
+        # Create a blob and upload the file's content (seek buffer to beginning)
+        buffer.seek(0)
+        blob = bucket.blob(prefix)
+        blob.upload_from_file(buffer, content_type='application/octet-stream')
+        self.logger.info(f"Dataframe written successfully.")
+
+
+class BQUtils(GCPUtils):
     """Class that defines utility functions for GCP BigQuery.
 
         Attributes:
@@ -27,11 +101,10 @@ class BQUtils:
 
         Args:
             gcp_project_id  : The GCP project-id with which to interact
-            logger  : Optional logger to use for logging
+            logger          : Optional logger to use for logging
         """
-        self.gcp_project_id = gcp_project_id
-        if logger is None:
-            self.logger = get_logger(name=__name__)
+        self.set_gcp_project_id(gcp_project_id)
+        self.set_logger(logger)
 
     def get_query_from_file(self, query_file: str) -> str:
         """Read query from a file and return the query string.
