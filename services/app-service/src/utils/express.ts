@@ -12,8 +12,7 @@ import {
 import { Redis } from "ioredis";
 import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
-import { getUser, updateUser } from "../users/service.js";
-import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
+import { getUser } from "../users/service.js";
 import { SubscriptionStatus, UserRole } from "@prisma/client";
 
 // Base server headers

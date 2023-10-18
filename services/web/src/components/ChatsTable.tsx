@@ -1,4 +1,5 @@
 import {
+  Button,
   Center,
   Spinner,
   Table,
@@ -11,6 +12,7 @@ import {
   Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { FaTrashAlt } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { getTitleForChat } from "@judie/utils/chat/getTitleForChat";
 import { Chat } from "@judie/data/types/api";
@@ -46,7 +48,7 @@ const ChatsTable = ({
             <Tr>
               <Th>Name</Th>
               <Th>Folder</Th>
-              <Th>Last edit</Th>
+              <Th>Delete</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -68,6 +70,11 @@ const ChatsTable = ({
                   {chat.updatedAt
                     ? new Date(chat.updatedAt)?.toISOString().replace(/T.*/, "")
                     : "--"}
+                </Td>
+                <Td>
+                  <Button variant={"ghost"}>
+                    <FaTrashAlt size={16} />
+                  </Button>
                 </Td>
               </Tr>
             ))}
