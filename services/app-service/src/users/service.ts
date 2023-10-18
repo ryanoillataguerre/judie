@@ -149,22 +149,31 @@ export const onboardUser = async ({
   country?: string;
   state?: string;
 }) => {
-  const newUser = await updateUser(userId, {
-    profile: {
-      connectOrCreate: {
-        where: {
-          userId,
-        },
-        create: {
-          purpose,
-          prepForTest,
-          gradeYear,
-          subjects,
-          country,
-          state,
+  const profile = await dbClient.userProfile.upsert({
+    where: {
+      userId: userId || "",
+    },
+    update: {
+      purpose,
+      prepForTest,
+      gradeYear,
+      subjects,
+      country,
+      state,
+    },
+    create: {
+      user: {
+        connect: {
+          id: userId,
         },
       },
+      purpose,
+      prepForTest,
+      gradeYear,
+      subjects,
+      country,
+      state,
     },
   });
-  return newUser;
+  return profile;
 };
