@@ -445,6 +445,12 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     return Object.keys(subjectSectionToSubjectsMap);
   }, [userData]);
 
+  const subjectsHeight = useBreakpointValue({
+    base: "50%",
+    lg: "75%",
+    xl: "80%",
+  });
+
   return (
     <Flex
       h={"100%"}
@@ -501,7 +507,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                     overflowY={"auto"}
                     alignItems={"center"}
                     justifyContent={"center"}
-                    height={"50%"}
+                    height={subjectsHeight}
                     wrap={"wrap"}
                   >
                     {availableKeys.map((section) => (
