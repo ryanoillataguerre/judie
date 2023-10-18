@@ -211,3 +211,24 @@ export const getFolderByIdQuery = async ({
   });
   return response.data;
 };
+
+interface SuperUsageResponse {
+  daily: {
+    date: string;
+    count: number;
+    users: User[];
+  };
+  monthly: {
+    date: string;
+    count: number;
+    users: User[];
+  };
+}
+export const GET_SUPER_USAGE = "GET_SUPER_USAGE";
+export const getSuperUsageQuery = async (): Promise<SuperUsageResponse> => {
+  const response = await baseFetch({
+    url: `/admin/usage`,
+    method: "GET",
+  });
+  return response.data;
+};
