@@ -8,9 +8,11 @@ import {
   errorPassthrough,
   handleValidationErrors,
   requireAuth,
+  requireJudieAuth,
 } from "../utils/express.js";
 import {
   getEntitiesForUser,
+  getUsage,
   getUserAdmin,
   getUsersForAdminUser,
 } from "./service.js";
@@ -49,6 +51,17 @@ router.get(
     });
     res.status(200).send({
       data: users,
+    });
+  })
+);
+
+router.get(
+  "/usage",
+  requireJudieAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const usage = await getUsage();
+    res.status(200).send({
+      data: usage,
     });
   })
 );
