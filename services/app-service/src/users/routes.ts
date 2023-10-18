@@ -180,7 +180,7 @@ router.post(
     if (!session.userId) {
       throw new UnauthorizedError("No user id found in session");
     }
-    const user = await onboardUser({
+    const profile = await onboardUser({
       userId: session.userId,
       purpose: req.body.purpose,
       prepForTest: req.body.prepForTest,
@@ -190,7 +190,7 @@ router.post(
       state: req.body.state,
     });
     res.status(200).send({
-      data: transformUser(user),
+      data: profile,
     });
   })
 );

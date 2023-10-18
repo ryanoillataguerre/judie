@@ -383,7 +383,7 @@ const OnboardingModal = () => {
 
   const onboardingMutation = useMutation({
     mutationFn: onboardMutation,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Success!",
         description: "Your profile has been updated.",
