@@ -371,7 +371,6 @@ const COLLEGE_GRADES = [
 ];
 
 const getMainSectionFromProfile = (profile: UserProfile) => {
-  console.log("profile", profile);
   // If purpose is test prep, get test
   // Sort test prep subjects first
   // TODO: Add subject sorting for test prep, section sorting for grade, etc.
@@ -454,10 +453,6 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     }
   };
 
-  // useEffect(() => {
-  //   scroll();
-  //   setTempUserMessage(undefined);
-  // }, [setTempUserMessage]);
   useEffect(() => {
     scroll();
   }, [messages, tempUserMessage, beingStreamedMessage]);
