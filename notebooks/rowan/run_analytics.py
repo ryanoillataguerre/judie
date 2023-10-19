@@ -53,6 +53,7 @@ if __name__ == "__main__":
     df = bq_utils.run_query_to_df(params["sql"]["users_query"], query_params)
 
     # Save data to Google Cloud Storage
-    prefix = os.path.join(params["gcs"]["base_prefix"], params["gcs"]["user_stats"]) \
-             + "." + args.file_format
+    prefix = os.path.join(
+        params["gcs"]["base"], params["gcs"]["analytics"], params["gcs"]["user_stats"]
+    ) + "." + args.file_format
     gcs_utils.write_pd_dataframe_to_gcs(df, args.bucket, prefix, args.file_format)

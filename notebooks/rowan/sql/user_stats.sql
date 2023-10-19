@@ -1,4 +1,9 @@
 -- This query pulls basic statistics from the users table.
+-- Input values:
+--      prod_project_id : The GCP ID for the production project
+--      prod_db         : The name of the production BigQuery database
+--      users_table     : The name of the table holding the users
+--
 -- 2023-10-16 (modified 2023-10-16)
 
 SELECT

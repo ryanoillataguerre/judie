@@ -1,11 +1,18 @@
 gcp:
+    location: "us-west1"
     sandbox_project_id: "sandbox-382905"
     prod_project_id: "production-382518"
     prod_db: "app_db_public"
+gcs:
+    base: "rowan"
+    analytics: "data_stats"
+    transcripts: "transcripts"
+    user_stats: "user_stats"
 tables:
     users_table: "users"
+    messages_table: "messages"
+    chats_table: "chats"
 sql:
     users_query: "sql/user_stats.sql"
-gcs:
-    base_prefix: "rowan/data_stats"
-    user_stats: "user_stats"
+    all_transcripts: "sql/all_transcripts.sql"
+    select_transcripts: "sql/select_transcripts.sql"
