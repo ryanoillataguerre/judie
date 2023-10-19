@@ -268,7 +268,6 @@ const SigninForm = () => {
 
 const SigninPage = () => {
   const router = useRouter();
-  // useUnauthRedirect();
   useAuth({ allowUnauth: true });
   // const { logout } = useAuth();
   // const [sessionCookie] = useState(getCookie(SESSION_COOKIE));
