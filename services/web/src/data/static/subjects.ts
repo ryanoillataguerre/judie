@@ -3,9 +3,9 @@ import { GradeYear } from "../types/api";
 export const subjectSections: string[] = [
   "AP",
   "High School",
-  "Middle School",
   "College",
   "Test Prep",
+  "Middle School",
 ];
 
 export const subjectSectionToSubjectsMap: { [key: string]: string[] } = {
