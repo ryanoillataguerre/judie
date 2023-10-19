@@ -326,7 +326,7 @@ const ChatHeader = ({
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
-        py={5}
+        py={3}
         width={"100%"}
       >
         <HStack paddingRight={"1rem"} ml={8}>
@@ -371,6 +371,7 @@ const COLLEGE_GRADES = [
 ];
 
 const getMainSectionFromProfile = (profile: UserProfile) => {
+  console.log("profile", profile);
   // If purpose is test prep, get test
   // Sort test prep subjects first
   // TODO: Add subject sorting for test prep, section sorting for grade, etc.
