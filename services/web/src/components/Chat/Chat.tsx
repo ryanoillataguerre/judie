@@ -36,7 +36,12 @@ import {
 } from "../../data/static/subjects";
 import { ChatContext, UIMessageType } from "@judie/hooks/useChat";
 import MessageRowBubble from "../MessageRowBubble/MessageRowBubble";
-import { MessageType } from "@judie/data/types/api";
+import {
+  GradeYear,
+  MessageType,
+  Purpose,
+  UserProfile,
+} from "@judie/data/types/api";
 import ScrollContainerBubbles from "../ScrollContainerBubbles/ScrollContainerBubbles";
 import Paywall from "../Paywall/Paywall";
 import { useRouter } from "next/router";
@@ -346,6 +351,78 @@ const ChatHeader = ({
   );
 };
 
+const HIGH_SCHOOL_GRADES = [
+  GradeYear.FRESHMAN,
+  GradeYear.SOPHOMORE,
+  GradeYear.JUNIOR,
+  GradeYear.SENIOR,
+];
+const MIDDLE_SCHOOL_GRADES = [
+  GradeYear.SIXTH,
+  GradeYear.SEVENTH,
+  GradeYear.EIGHTH,
+];
+const COLLEGE_GRADES = [
+  GradeYear.UNI_FRESHMAN,
+  GradeYear.UNI_SOPHOMORE,
+  GradeYear.UNI_JUNIOR,
+  GradeYear.UNI_SENIOR,
+  GradeYear.GRADUATE,
+];
+
+const getMainSectionFromProfile = (profile: UserProfile) => {
+  // If purpose is test prep, get test
+  // Sort test prep subjects first
+  // TODO: Add subject sorting for test prep, section sorting for grade, etc.
+  if (profile.purpose === Purpose.CLASSES) {
+    if (HIGH_SCHOOL_GRADES.includes(profile.gradeYear)) {
+      return "High School";
+    }
+    if (MIDDLE_SCHOOL_GRADES.includes(profile.gradeYear)) {
+      return "Middle School";
+    }
+    if (COLLEGE_GRADES.includes(profile.gradeYear)) {
+      return "College";
+    }
+    return "AP";
+  }
+  if (profile.purpose === Purpose.HOMESCHOOLING) {
+    if (HIGH_SCHOOL_GRADES.includes(profile.gradeYear)) {
+      return "High School";
+    }
+    if (MIDDLE_SCHOOL_GRADES.includes(profile.gradeYear)) {
+      return "Middle School";
+    }
+    if (COLLEGE_GRADES.includes(profile.gradeYear)) {
+      return "College";
+    }
+    return "AP";
+  }
+  if (profile.purpose === Purpose.PERSONAL) {
+    if (HIGH_SCHOOL_GRADES.includes(profile.gradeYear)) {
+      return "High School";
+    }
+    if (MIDDLE_SCHOOL_GRADES.includes(profile.gradeYear)) {
+      return "Middle School";
+    }
+    if (COLLEGE_GRADES.includes(profile.gradeYear)) {
+      return "College";
+    }
+    return "AP";
+  }
+  if (profile.purpose === Purpose.TEST_PREP) {
+    return "Test Prep";
+  }
+  return "AP";
+};
+
+// const getSubjectsForSectionAndProfile = (section: string, profile: UserProfile) => {
+//   // If high school, get high school subjects that they're enrolled in and sort them first
+//   if (section === "High School") {
+//     if ((profile.gradeYear))
+//   }
+// }
+
 const Chat = ({ initialQuery }: { initialQuery?: string }) => {
   const {
     tempUserMessageChatId,
@@ -439,16 +516,26 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     if (userData?.email.includes("@judie.io")) {
       return Object.keys(subjectSectionToSubjectsMap);
     }
-    // TODO: Use user profile's purpose here to find the right subjects
     const subjectsCopy = { ...subjectSectionToSubjectsMap };
     delete subjectsCopy["Admin"];
+    const userProfilePurpose = userData?.profile?.purpose;
+    if (userProfilePurpose) {
+      const mainSection = getMainSectionFromProfile(
+        userData.profile as UserProfile
+      );
+      const subjectSectionsCopy = [...subjectSections];
+      const mainSectionIdx = subjectSectionsCopy.indexOf(mainSection);
+      subjectSectionsCopy.splice(mainSectionIdx, 1);
+      return [mainSection, ...subjectSectionsCopy];
+    }
+
     return Object.keys(subjectSectionToSubjectsMap);
   }, [userData]);
 
   const subjectsHeight = useBreakpointValue({
-    base: "50%",
-    lg: "75%",
-    xl: "80%",
+    base: "40%",
+    lg: "40%",
+    xl: "500%",
   });
 
   return (
@@ -483,12 +570,12 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
               <Flex
                 position={"relative"}
                 overflowY={"scroll"}
-                alignItems={"center"}
+                alignItems={"flex-start"}
                 justifyContent={"center"}
                 h={"100%"}
                 w={"80%"}
               >
-                <VStack w={"100%"} alignItems={"center"} h={"100%"} pt={"5rem"}>
+                <VStack w={"100%"} alignItems={"center"} h={"90%"} pt={"3rem"}>
                   <Text
                     variant={"header"}
                     textAlign={{ base: "center", md: "unset" }}
@@ -504,10 +591,11 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                   </Text>
                   <Flex
                     width={"100%"}
-                    overflowY={"auto"}
+                    overflowY={"scroll"}
                     alignItems={"center"}
                     justifyContent={"center"}
-                    height={subjectsHeight}
+                    // height={"100%"}
+                    paddingBottom={"3rem"}
                     wrap={"wrap"}
                   >
                     {availableKeys.map((section) => (
