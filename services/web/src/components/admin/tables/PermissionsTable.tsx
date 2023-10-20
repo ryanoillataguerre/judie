@@ -120,7 +120,7 @@ const PermissionsTable = ({
             <Th>Type</Th>
             <Th>Organization</Th>
             <Th>School</Th>
-            <Th>Room</Th>
+            <Th>Class</Th>
             <Th>Edit</Th>
             <Th>Delete</Th>
           </Tr>

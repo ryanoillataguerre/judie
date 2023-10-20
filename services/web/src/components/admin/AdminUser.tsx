@@ -9,6 +9,7 @@ import {
   VStack,
   Flex,
   Box,
+  HStack,
 } from "@chakra-ui/react";
 import {
   GET_PERMISSIONS_BY_ID,
@@ -19,8 +20,11 @@ import {
 import { useQuery } from "react-query";
 import UserUsage from "./UserUsage";
 import PermissionsTable from "./tables/PermissionsTable";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
 
 const AdminUser = ({ id }: { id: string }) => {
+  const router = useRouter();
   const { data: userData } = useQuery({
     queryKey: [GET_USER_BY_ID, id],
     queryFn: () => getUserByIdQuery(id),
@@ -44,22 +48,34 @@ const AdminUser = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
-      <Flex direction={"column"}>
-        <Text
-          style={{
-            marginTop: "2rem",
-            fontSize: "2rem",
-          }}
-        >
-          {userData?.email}
-        </Text>
-        <Text>
-          Name:{" "}
-          <Box fontSize={"20px"} as={"span"}>
-            {userData?.firstName} {userData?.lastName}
-          </Box>
-        </Text>
-      </Flex>
+      <HStack>
+        <Box minW={"20px"}>
+          <BsArrowLeft
+            size={20}
+            style={{
+              margin: "0 1rem",
+            }}
+            onClick={() => router.back()}
+            cursor={"pointer"}
+          />
+        </Box>
+        <Flex direction={"column"}>
+          <Text
+            style={{
+              marginTop: "2rem",
+              fontSize: "2rem",
+            }}
+          >
+            {userData?.email}
+          </Text>
+          <Text>
+            Name:{" "}
+            <Box fontSize={"20px"} as={"span"}>
+              {userData?.firstName} {userData?.lastName}
+            </Box>
+          </Text>
+        </Flex>
+      </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           <Tab>Usage</Tab>

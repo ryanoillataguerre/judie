@@ -7,6 +7,7 @@ export enum SubscriptionStatus {
 export enum SubscriptionType {
   MONTHLY = "MONTHLY",
   YEARLY = "YEARLY",
+  SEAT = "SEAT",
 }
 
 export enum GradeYear {

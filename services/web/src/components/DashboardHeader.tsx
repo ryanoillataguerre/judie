@@ -68,7 +68,7 @@ const DashboardHeader = () => {
       <HStack>
         <Button
           size={buttonSize}
-          variant={"secondary"}
+          variant={"purp"}
           type={"button"}
           isLoading={createChat.isLoading}
           onClick={() => createChat.mutate({})}
@@ -79,7 +79,7 @@ const DashboardHeader = () => {
         {!isMobile && (
           <Button
             size={buttonSize}
-            variant={"purp"}
+            variant={"secondary"}
             type={"button"}
             onClick={() => {
               setIsCreateOpen(true);

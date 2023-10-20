@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { PermissionType, Prisma, User } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createOrganization = async (
@@ -15,6 +15,9 @@ export const getUsersForOrganization = async ({ id }: { id: string }) => {
       organizationId: id,
       userId: {
         not: null,
+      },
+      type: {
+        not: PermissionType.ORG_ADMIN,
       },
       deletedAt: null,
     },

@@ -9,7 +9,7 @@ import {
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 
-const useAdminActiveOrganization = () => {
+const useAdminActiveEntities = () => {
   const router = useRouter();
   const { organizationId, schoolId, roomId } = router.query;
 
@@ -29,19 +29,29 @@ const useAdminActiveOrganization = () => {
     enabled: !!roomId,
   });
 
-  if (organizationId) {
-    return organizationId as string;
+  if (organizationId && !schoolId && !roomId) {
+    return {
+      organizationId: organizationId as string,
+    };
   }
-  switch (true) {
-    case router.asPath.includes("/admin/organizations"):
-      return organizationData?.id;
-    case router.asPath.includes("/admin/schools"):
-      return schoolData?.organizationId;
-    case router.asPath.includes("/admin/rooms"):
-      return roomData?.organizationId;
-    default:
-      return null;
+  if (schoolId) {
+    return {
+      organizationId: schoolData?.organizationId,
+      schoolId: schoolId as string,
+    };
   }
+  if (roomId) {
+    return {
+      organizationId: roomData?.organizationId,
+      schoolId: roomData?.schoolId,
+      roomId: roomId as string,
+    };
+  }
+  return {
+    organizationId: organizationId as string | undefined,
+    schoolId: schoolId as string | undefined,
+    roomId: roomId as string | undefined,
+  };
 };
 
-export default useAdminActiveOrganization;
+export default useAdminActiveEntities;

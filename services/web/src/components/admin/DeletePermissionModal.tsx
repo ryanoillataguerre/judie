@@ -94,7 +94,7 @@ const DeletePermissionModal = ({
                     <Th>Type</Th>
                     <Th>Organization</Th>
                     <Th>School</Th>
-                    <Th>Room</Th>
+                    <Th>Class</Th>
                   </Tr>
                 </Thead>
                 <Tbody>

@@ -71,7 +71,7 @@ const DeleteRoomModal = ({
               fontWeight: 500,
             }}
           >
-            Are you sure you want to delete this room?
+            Are you sure you want to delete this class?
           </Text>
           {roomName && (
             <Text
