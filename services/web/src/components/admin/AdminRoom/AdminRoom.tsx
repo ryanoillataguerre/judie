@@ -1,4 +1,5 @@
 import {
+  Box,
   HStack,
   Tab,
   TabIndicator,
@@ -22,6 +23,8 @@ import { Invite, User } from "@judie/data/types/api";
 import InvitesTable from "../tables/InvitesTable";
 import { putRoomMutation } from "@judie/data/mutations";
 import EditableTitle from "../EditableTitle";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData, refetch: refetchRoom } = useQuery({
@@ -46,6 +49,7 @@ const AdminRoom = ({ id }: { id: string }) => {
       refetchRoom();
     },
   });
+  const router = useRouter();
 
   return (
     <VStack
@@ -63,20 +67,32 @@ const AdminRoom = ({ id }: { id: string }) => {
         justifyContent={"space-between"}
         width={"100%"}
       >
-        {roomData && (
-          <EditableTitle
-            title={roomData?.name as string}
-            onChange={(value) => {
-              value = value.trim();
-              if (!value || value.length < 1) return;
-              if (value === roomData?.name) return;
-              editRoomMutation.mutate({
-                roomId: roomData?.id as string,
-                name: value,
-              });
-            }}
-          />
-        )}
+        <HStack paddingRight={"1rem"}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
+          {roomData && (
+            <EditableTitle
+              title={roomData?.name as string}
+              onChange={(value) => {
+                value = value.trim();
+                if (!value || value.length < 1) return;
+                if (value === roomData?.name) return;
+                editRoomMutation.mutate({
+                  roomId: roomData?.id as string,
+                  name: value,
+                });
+              }}
+            />
+          )}
+        </HStack>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   Tab,
@@ -27,6 +28,8 @@ import UsersTable from "../tables/UsersTable";
 import RoomsTable from "../tables/RoomsTable";
 import EditableTitle from "../EditableTitle";
 import { putSchoolMutation } from "@judie/data/mutations";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData, refetch: refetchSchool } = useQuery({
@@ -55,6 +58,8 @@ const AdminSchool = ({ id }: { id: string }) => {
     },
   });
 
+  const router = useRouter();
+
   return (
     <VStack
       style={{
@@ -76,23 +81,34 @@ const AdminSchool = ({ id }: { id: string }) => {
         alignItems={"center"}
         justifyContent={"space-between"}
         width={"100%"}
-        paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        {schoolData && (
-          <EditableTitle
-            title={schoolData?.name as string}
-            onChange={(value) => {
-              value = value.trim();
-              if (!value || value.length < 1) return;
-              if (value === schoolData?.name) return;
-              editSchoolMutation.mutate({
-                schoolId: schoolData?.id as string,
-                name: value,
-              });
-            }}
-          />
-        )}
+        <HStack paddingRight={"1rem"}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
+          {schoolData && (
+            <EditableTitle
+              title={schoolData?.name as string}
+              onChange={(value) => {
+                value = value.trim();
+                if (!value || value.length < 1) return;
+                if (value === schoolData?.name) return;
+                editSchoolMutation.mutate({
+                  schoolId: schoolData?.id as string,
+                  name: value,
+                });
+              }}
+            />
+          )}
+        </HStack>
 
         <Button
           size={"sm"}
