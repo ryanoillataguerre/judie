@@ -5,6 +5,7 @@ gcp:
     prod_project_id: "production-382518"
     prod_db: "app_db_public"
 gcs:
+    bucket: "judie-exploration-us-west1"
     base: "rowan"
     analytics: "data_stats"
     transcripts: "transcripts"

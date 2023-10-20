@@ -7,6 +7,7 @@ Note: The table name that is passed to hold the intermediary results will be rep
 test ids:
 1946d447-4d94-4098-8e29-b5cd60ea5869
 46c01f3d-08c3-4885-a5ad-a91775a301e6
+09b2d1e9-2dcb-4e42-87be-b36cd2e65cac
 
 Date: 2023-10-19 (modified 2023-10-19)
 """
@@ -46,7 +47,11 @@ def setup_argparser() -> argparse.ArgumentParser:
         help="""The name of the BQ table to which to save data."""
     )
     parser.add_argument(
-        "--bucket", type=str, default="judie-exploration",
+        "--table_write_mode", type=str, default="WRITE_EMPTY",
+        help="""How to treat existing table {WRITE_EMPTY, WRITE_APPEND, WRITE_TRUNCATE}"""
+    )
+    parser.add_argument(
+        "--bucket", type=str, default="judie-exploration-us-west1",
         help="""The name of the bucket to which to save data."""
     )
     parser.add_argument(
@@ -73,15 +78,17 @@ if __name__ == "__main__":
         query_file = params["sql"]["select_transcripts"]
         query_params.update({"chat_ids": str(tuple(args.chat_ids))})
 
-    # Pull data from BigQuery
-    bq_utils.run_query_to_bq_table(query_file, query_params, args.dataset, args.table)
-
-    # Extract data to Google Cloud Storage
-    '''
-    file_name = f"transcripts_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.{args.file_format}"
+    # Pull data from BigQuery to Google Cloud Storage
+    file_name = f"transcripts_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.{args.file_format}"
     prefix = os.path.join(params["gcs"]["base"], params["gcs"]["transcripts"], file_name)
-    bq_utils.extract_bq_table_to_gcs(
-        args.dataset, args.table, args.bucket, prefix, args.file_format
+    bq_utils.run_query_to_gcs(
+        query_file,
+        query_params,
+        args.bucket,
+        prefix,
+        args.file_format,
+        args.dataset,
+        args.table,
+        args.table_write_mode
     )
-    '''
 

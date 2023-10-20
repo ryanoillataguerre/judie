@@ -7,11 +7,11 @@ import json
 import logging
 import os
 from io import BytesIO
-from typing import Optional
+from typing import Dict, Optional
 
 import pandas as pd
 import pyarrow
-from google.api_core.exceptions import BadRequest, GoogleAPICallError, NotFound
+from google.api_core.exceptions import BadRequest, Conflict, GoogleAPICallError, NotFound
 from google.cloud import bigquery, bigquery_storage, storage
 from jinja2 import Template
 
@@ -181,6 +181,7 @@ class BQUtils(GCPUtils):
             BigQuery client object.
         """
         try:
+            self.logger.info("Instantiating bigquery.Client() ...")
             return bigquery.Client(project=self.gcp_project_id, location=self.gcp_location)
         except GoogleAPICallError as e:
             self.logger.exception(f"Failed to initialize BigQuery client: {e}")
@@ -194,6 +195,7 @@ class BQUtils(GCPUtils):
             BigQueryReadClient object.
         """
         try:
+            self.logger.info("Instantiating BigQueryReadClient ...")
             return bigquery_storage.BigQueryReadClient()
         except GoogleAPICallError as e:
             self.logger.exception(f"Failed to initialize BigQueryReadClient: {e}")
@@ -268,6 +270,7 @@ class BQUtils(GCPUtils):
             client  : Initialized BigQuery client object
         """
         # Create reference to dataset
+        self.logger.info(f"Checking if dataset {dataset} exists and creating if not ...")
         dataset_ref = client.dataset(dataset)
 
         try:
@@ -281,107 +284,6 @@ class BQUtils(GCPUtils):
             client.create_dataset(dataset)
             self.logger.info(f"Dataset {dataset} created in the {self.gcp_location} region.")
 
-    def run_query(
-        self,
-        query_file: str,
-        query_params: dict,
-        job_config: Optional[bigquery.QueryJobConfig]=None,
-    ) -> bigquery.job.query.QueryJob:
-        """Run a query against BigQuery.
-
-        Args:
-            query_file      : Path to query file to run
-            query_params    : Parameters to use when completing the query template
-            job_config      : Optional job configurations for the query
-        Return:
-            QueryJob object
-        """
-        self.logger.info(f"Reading query from {query_file} and templating ...")
-        query = self.template_query(query_file, query_params)
-
-        self.logger.info("Instantiating bigquery.Client() ...")
-        client = self._get_bq_client()
-
-        self.logger.info(f"Running query ...\n{query}")
-        try:
-            if job_config:
-                query_job = client.query(query, job_config=job_config)
-            else:
-                query_job = client.query(query)
-            query_job.result()  # Wait for the query to complete
-
-            if query_job.errors:
-                for error in query_job.errors:
-                    self.logger.error(f"Error: {error['message']}")
-            else:
-                self.logger.info("Query completed successfully.")
-
-        except BadRequest as e:
-            self.logger.exception(f"An error occurred while querying or fetching the data: {e}")
-
-        except GoogleAPICallError as e:
-            self.logger.exception(f"An error occurred while querying or fetching the data: {e}")
-
-        except Exception as e:
-            self.logger.exception(f"An unexpected error occurred: {e}")
-
-        return query_job
-
-    def run_query_to_df(self, query_file: str, query_params: dict) -> pd.DataFrame:
-        """Run query and return results in a Pandas DataFrame.
-
-        Args:
-            query_file      : Path to query file to run
-            query_params    : Parameters to use when completing the query template
-        Return:
-            df              : Results in a dataframe
-        """
-        # Run query
-        query_job = self.run_query(query_file, query_params)
-
-        # Convert results to pd.DataFrame
-        self.logger.info("Instantiating BigQueryReadClient ...")
-        bqstorage_client = self._get_bq_storage_client()
-        try:
-            self.logger.info("Converting results to dataframe ...")
-            df = query_job.to_arrow(bqstorage_client=bqstorage_client).to_pandas()
-
-        except pyarrow.ArrowInvalid as e:
-            self.logger.exception(f"An error occurred converting the data to a pd.DataFrame: {e}")
-
-        self.logger.info(f"Results in df with shape: {df.shape}")
-        self.logger.info(f"\n{df.head()}")
-        return df
-
-    def run_query_to_bq_table(
-        self,
-        query_file: str,
-        query_params: dict,
-        dataset: str,
-        table: str
-    ) -> None:
-        """Run query and save results in a BigQuery dataset.table.
-
-        Args:
-            query_file      : Path to query file to run
-            query_params    : Parameters to use when completing the query template
-            dataset         : The dataset in BigQuery to which to save the data 
-            table           : The table in BigQuery to which to save the data
-        """
-        # Initialize a BigQuery client
-        client = self._get_bq_client()
-
-        # Ensure dataset exists
-        self.create_dataset_if_not_exists(dataset, client)
-
-        # Specify the destination table
-        table_ref = client.dataset(dataset).table(table)
-        job_config = bigquery.QueryJobConfig()
-        job_config.destination = table_ref
-
-        # Run query
-        query_job = self.run_query(query_file, query_params, job_config)
-
     def extract_bq_table_to_gcs(
         self,
         dataset: str,
@@ -390,12 +292,12 @@ class BQUtils(GCPUtils):
         prefix: str,
         file_format: str='csv',
     ) -> None:
-        """Run a query and export results to specified bucket/prefix.
+        """Extract data from BigQuery table to specified bucket/prefix in GCS.
 
         Args:
             dataset     : The dataset in BigQuery that has the data
             table       : The table in BigQuery with the data to extract
-            bucket      : The bucket for the query results
+            bucket      : The bucket for the table results
             prefix      : The full file prefix including file extension
             file_format : Which file format to use when writing results, e.g. 'csv' or 'parquet'
 
@@ -437,12 +339,142 @@ class BQUtils(GCPUtils):
             else:
                 self.logger.info("Export job completed successfully")
 
-        except BadRequest as e:
-            self.logger.exception(f"Failed to initiate export job: {e}")
-
-        except GoogleAPICallError as e:
+        except (BadRequest, Conflict, GoogleAPICallError) as e:
             self.logger.exception(f"Failed to initiate export job: {e}")
 
         except Exception as e:
             self.logger.exception(f"An unexpected error occurred: {e}")
+
+    def run_query(
+        self,
+        query_file: str,
+        query_params: Dict[str, str],
+        job_config: Optional[bigquery.QueryJobConfig]=None,
+    ) -> bigquery.job.query.QueryJob:
+        """Run a query against BigQuery.
+
+        Args:
+            query_file      : Path to query file to run
+            query_params    : Parameters to use when completing the query template
+            job_config      : Optional job configurations for the query
+        Return:
+            QueryJob object
+        """
+        self.logger.info(f"Reading query from {query_file} and templating ...")
+        query = self.template_query(query_file, query_params)
+
+        self.logger.info(f"Running query ...\n{query}")
+        client = self._get_bq_client()
+        try:
+            if job_config:
+                query_job = client.query(query, job_config=job_config)
+            else:
+                query_job = client.query(query)
+            query_job.result()  # Wait for the query to complete
+
+            if query_job.errors:
+                for error in query_job.errors:
+                    self.logger.error(f"Error: {error['message']}")
+            else:
+                self.logger.info("Query completed successfully.")
+
+        except (BadRequest, Conflict, GoogleAPICallError) as e:
+            self.logger.exception(f"An error occurred while querying or fetching the data: {e}")
+
+        except Exception as e:
+            self.logger.exception(f"An unexpected error occurred: {e}")
+
+        return query_job
+
+    def run_query_to_df(self, query_file: str, query_params: Dict[str, str]) -> pd.DataFrame:
+        """Run query and return results in a Pandas DataFrame.
+
+        Args:
+            query_file      : Path to query file to run
+            query_params    : Parameters to use when completing the query template
+        Return:
+            df              : Results in a dataframe
+        """
+        # Run query
+        query_job = self.run_query(query_file, query_params)
+
+        # Convert results to pd.DataFrame
+        bqstorage_client = self._get_bq_storage_client()
+        try:
+            self.logger.info("Converting results to dataframe ...")
+            df = query_job.to_arrow(bqstorage_client=bqstorage_client).to_pandas()
+
+        except pyarrow.ArrowInvalid as e:
+            self.logger.exception(f"An error occurred converting the data to a pd.DataFrame: {e}")
+
+        self.logger.info(f"Results in df with shape: {df.shape}")
+        self.logger.info(f"\n{df.head()}")
+        return df
+
+    def run_query_to_bq_table(
+        self,
+        query_file: str,
+        query_params: Dict[str, str],
+        dataset: str,
+        table: str,
+        write_mode: str = "WRITE_EMPTY",
+    ) -> None:
+        """Run query and save results in a BigQuery dataset.table.
+
+        Args:
+            query_file      : Path to query file to run
+            query_params    : Parameters to use when completing the query template
+            dataset         : The dataset in BigQuery to which to save the data
+            table           : The table in BigQuery to which to save the data
+            write_mode      : How to treat a table that already exists:
+                                - WRITE_EMPTY   : Only write to empty tables
+                                - WRITE_APPEND  : Append to the table
+                                - WRITE_TRUNCATE: Truncate the existing table data (overwrite)
+        """
+        # Initialize a BigQuery client
+        self.logger.info(f"Running query and outputting to data to {dataset}.{table} ...")
+        client = self._get_bq_client()
+
+        # Ensure dataset exists
+        self.create_dataset_if_not_exists(dataset, client)
+
+        # Specify the destination table and write modes
+        job_params = {
+            "destination": client.dataset(dataset).table(table),
+            "write_disposition": getattr(bigquery.WriteDisposition, write_mode),
+        }
+        job_config = bigquery.QueryJobConfig(**job_params)
+
+        # Run query
+        query_job = self.run_query(query_file, query_params, job_config)
+
+    def run_query_to_gcs(
+        self,
+        query_file: str,
+        query_params: Dict[str, str],
+        bucket: str,
+        prefix: str,
+        file_format: str = "csv",
+        dataset: str = "tmp_dataset",
+        table: str = "tmp_table",
+        write_mode: str = "WRITE_EMPTY",
+    ) -> None:
+        """Run a query and export the results to the specified bucket/prefix in GCS.
+
+        Args:
+            query_file      : Path to query file to run
+            query_params    : Parameters to use when completing the query template
+            bucket          : The bucket for the query results
+            prefix          : The full file prefix including file extension
+            file_format     : Which file format to use when writing results, e.g. 'csv' or 'parquet'
+            dataset         : The dataset in BigQuery that has the data
+            table           : The table in BigQuery with the data to extract
+            write_mode      : How to treat a table that already exists:
+                                - WRITE_EMPTY   : Only write to empty tables
+                                - WRITE_APPEND  : Append to the table
+                                - WRITE_TRUNCATE: Truncate the existing table data (overwrite)
+        """
+        self.logger.info(f"Running query and outputting to data to GCS, {bucket}/{prefix} ...")
+        self.run_query_to_bq_table(query_file, query_params, dataset, table, write_mode)
+        self.extract_bq_table_to_gcs(dataset, table, bucket, prefix, file_format)
 
