@@ -52,9 +52,6 @@ const UsersTable = ({
   organizationId?: string;
   loading?: boolean;
 }) => {
-  console.log("organizationId", organizationId);
-  console.log("schoolId", schoolId);
-  console.log("roomId", roomId);
   const [page, setPage] = useState<number>(1);
   const router = useRouter();
   const rowBackgroundColor = useColorModeValue("gray.100", "gray.700");
