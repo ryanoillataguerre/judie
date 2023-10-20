@@ -71,9 +71,9 @@ const EditableControls = ({
             {...(isEditing ? getSubmitButtonProps() : getEditButtonProps())}
             icon={
               isEditing ? (
-                <AiOutlineCheck size={18} color={"#A3A3A3"} />
+                <AiOutlineCheck size={16} color={"#A3A3A3"} />
               ) : (
-                <EditIcon boxSize={6} color={iconColor} />
+                <EditIcon boxSize={5} color={iconColor} />
               )
             }
           />
@@ -89,9 +89,9 @@ const EditableControls = ({
                 })}
             icon={
               isEditing ? (
-                <RxCross2 size={18} color={"#A3A3A3"} />
+                <RxCross2 size={16} color={"#A3A3A3"} />
               ) : (
-                <TrashIcon boxSize={6} color={iconColor} />
+                <TrashIcon boxSize={5} color={iconColor} />
               )
             }
           />

@@ -7,8 +7,8 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    logging:
-      driver: none
+    # logging:
+    #   driver: none
     ports:
       - 5438:5432
     networks:

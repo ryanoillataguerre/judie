@@ -29,7 +29,6 @@ export const getChatCompletion = async ({
       const fullResponse = [];
       const killOnHang = () => {
         if (!fullResponse.length) {
-          console.error("No response yet. Trying again...");
           triesCounter++;
           throw new InternalError("No response yet. Trying again...");
         }

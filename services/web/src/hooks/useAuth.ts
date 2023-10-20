@@ -99,7 +99,9 @@ export default function useAuth({
     });
     setSessionCookie(undefined);
     setUserData(undefined);
-    router.push("/signin");
+    if (!isOnUnauthedRoute) {
+      router.push("/signin");
+    }
   }, [setUserData, setSessionCookie, reset, router]);
 
   // GET /users/me
