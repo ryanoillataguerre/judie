@@ -31,26 +31,26 @@ const useAdminActiveEntities = () => {
 
   if (organizationId && !schoolId && !roomId) {
     return {
-      organizationId,
+      organizationId: organizationId as string,
     };
   }
   if (schoolId) {
     return {
       organizationId: schoolData?.organizationId,
-      schoolId,
+      schoolId: schoolId as string,
     };
   }
   if (roomId) {
     return {
       organizationId: roomData?.organizationId,
       schoolId: roomData?.schoolId,
-      roomId,
+      roomId: roomId as string,
     };
   }
   return {
-    organizationId,
-    schoolId,
-    roomId,
+    organizationId: organizationId as string | undefined,
+    schoolId: schoolId as string | undefined,
+    roomId: roomId as string | undefined,
   };
 };
 
