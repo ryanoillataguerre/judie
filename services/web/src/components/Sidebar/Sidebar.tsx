@@ -361,7 +361,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
                 Judie AI
               </Text>
               {isAdmin ? (
-                <Badge mx={"0.5rem"} colorScheme="purple">
+                <Badge ml={"0.8rem"} colorScheme="purple">
                   Admin
                 </Badge>
               ) : null}
