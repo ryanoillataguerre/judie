@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { PermissionType, Prisma, User } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createSchool = async (params: Prisma.SchoolCreateInput) => {
@@ -14,6 +14,9 @@ export const getUsersForSchool = async ({ id }: { id: string }) => {
       deletedAt: null,
       userId: {
         not: null,
+      },
+      type: {
+        not: PermissionType.SCHOOL_ADMIN,
       },
     },
     include: {

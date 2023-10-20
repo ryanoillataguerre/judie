@@ -25,6 +25,7 @@ import {
   shouldForwardProp,
   Tooltip,
   HStack,
+  Badge,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FiSettings } from "react-icons/fi";
@@ -359,6 +360,11 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
               >
                 Judie AI
               </Text>
+              {isAdmin ? (
+                <Badge mx={"0.5rem"} colorScheme="purple">
+                  Admin
+                </Badge>
+              ) : null}
             </Flex>
             <BiChevronsLeft
               size={24}
