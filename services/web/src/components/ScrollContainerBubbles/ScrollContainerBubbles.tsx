@@ -13,12 +13,15 @@ import { getTopicEmoji } from "@judie/utils/topicEmoji";
 
 const ScrollContainerBubbles = ({
   children,
+  defaultTop,
 }: {
   children: React.ReactNode;
+  defaultTop?: boolean;
 }) => {
   const outerDiv = useRef<HTMLDivElement>(null);
   const innerDiv = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
 
   const chatContext = useContext(ChatContext);
   const subject = chatContext.chat?.subject;
@@ -30,8 +33,12 @@ const ScrollContainerBubbles = ({
   );
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({});
-  }, [innerDiv.current?.scrollHeight]);
+    if (defaultTop) {
+      topRef.current?.scrollIntoView({});
+    } else {
+      bottomRef.current?.scrollIntoView({});
+    }
+  }, [innerDiv.current?.scrollHeight, defaultTop]);
 
   return (
     <Box
@@ -58,6 +65,7 @@ const ScrollContainerBubbles = ({
         maxW={"860px"}
         m={"auto"}
       >
+        <div ref={topRef} />
         {subject && (
           <Tag
             as={"div"}

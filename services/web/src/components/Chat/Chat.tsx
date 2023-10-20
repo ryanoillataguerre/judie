@@ -453,9 +453,11 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
     }
   };
 
-  useEffect(() => {
-    scroll();
-  }, [messages, tempUserMessage, beingStreamedMessage]);
+  // useEffect(() => {
+  //   if (messages.length) {
+  //     scroll();
+  //   }
+  // }, [messages, tempUserMessage, beingStreamedMessage]);
 
   const existingChatQuery = useQuery({
     queryKey: [GET_CHAT_BY_ID, chatId],
@@ -640,7 +642,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
               <ChatFooter />
             </ScrollContainerBubbles>
           ) : (
-            <ScrollContainerBubbles>
+            <ScrollContainerBubbles defaultTop>
               <SuggestedPrompts subject={chat?.subject} onSelect={addMessage} />
               <Spacer />
               <ChatFooter />
