@@ -99,10 +99,10 @@ const AdminRoot = () => {
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
-          <Tab>Your Organizations</Tab>
-          <Tab>Your Schools</Tab>
-          <Tab>Your Rooms</Tab>
-          <Tab>Your Users</Tab>
+          <Tab>Organizations</Tab>
+          <Tab>Schools</Tab>
+          <Tab>Classes</Tab>
+          <Tab>Users</Tab>
         </TabList>
         <TabPanels>
           <TabPanel p={{ base: "16px 0", md: "16px 16px" }}>

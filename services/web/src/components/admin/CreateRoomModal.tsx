@@ -93,7 +93,7 @@ const CreateRoomModal = ({
               fontWeight: 500,
             }}
           >
-            Create a room in your school
+            Create a class in your school
           </Text>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -114,7 +114,7 @@ const CreateRoomModal = ({
                   margin: "1rem 0",
                 }}
               >
-                Enter the room&apos;s name below
+                Enter the class&apos;s name below
               </Text>
               <FormControl
                 style={{
@@ -123,7 +123,7 @@ const CreateRoomModal = ({
                 }}
                 isRequired
               >
-                <FormLabel htmlFor="name">Room Name</FormLabel>
+                <FormLabel htmlFor="name">Class Name</FormLabel>
                 <Input id="name" required {...register("name", {})} />
               </FormControl>
               <Button
@@ -134,7 +134,7 @@ const CreateRoomModal = ({
                 colorScheme="green"
                 variant={"solid"}
                 loading={createRoom.isLoading}
-                label="Create Room"
+                label="Submit"
                 type="submit"
               />
             </Flex>

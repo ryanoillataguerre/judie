@@ -108,19 +108,14 @@ const AdminOrganization = ({ id }: { id: string }) => {
           />
         </HStack>
 
-        <Button
-          size={"sm"}
-          variant={"solid"}
-          colorScheme="green"
-          onClick={() => setCreateSchoolOpen(true)}
-        >
+        <Button colorScheme="green" onClick={() => setCreateSchoolOpen(true)}>
           <PlusSquareIcon marginRight={"0.3rem"} /> Create School
         </Button>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
-          {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {organizationData?.rooms?.length ? <Tab>Classes</Tab> : null}
           {organizationUserData?.length ? <Tab>Users</Tab> : null}
           {organizationInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>

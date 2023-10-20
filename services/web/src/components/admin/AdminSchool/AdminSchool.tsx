@@ -111,17 +111,16 @@ const AdminSchool = ({ id }: { id: string }) => {
         </HStack>
 
         <Button
-          size={"sm"}
           variant={"solid"}
           colorScheme="green"
           onClick={() => setCreateRoomOpen(true)}
         >
-          <PlusSquareIcon marginRight={"0.3rem"} /> Create Room
+          <PlusSquareIcon marginRight={"0.3rem"} /> Create Class
         </Button>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
-          {schoolData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {schoolData?.rooms?.length ? <Tab>Classes</Tab> : null}
           {schoolUserData?.length ? <Tab>Users</Tab> : null}
           {schoolInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
