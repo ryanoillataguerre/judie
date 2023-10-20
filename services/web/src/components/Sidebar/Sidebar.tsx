@@ -427,7 +427,9 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
               </Tooltip>
             </HStack>
           ) : (
-            <Text variant={"detail"}>Folders</Text>
+            <Text variant={"detail"} mt={"1rem"}>
+              Folders
+            </Text>
           )}
           {isAdmin ? (
             auth.isLoading ? (
