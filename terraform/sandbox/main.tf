@@ -24,6 +24,12 @@ module "exploration-bucket" {
   name   = "judie-exploration"
 }
 
+module "exploration-bucket-us-west1" {
+  source = "../modules/bucket"
+  name   = "judie-exploration-us-west1"
+  location = "us-west1"
+}
+
 # Store backend state in Cloud Storage
 
 module "backend-bucket" {
