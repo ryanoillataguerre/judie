@@ -76,7 +76,11 @@ const NestedButton = ({
       ) : null}
       <Text
         onClick={onClickButton}
-        overflowX={"scroll"}
+        overflowY={"hidden"}
+        overflowX={"hidden"}
+        _hover={{
+          overflowX: "auto",
+        }}
         style={{
           width: "100%",
           textAlign: "start",
