@@ -23,6 +23,8 @@ import {
   VStack,
   chakra,
   shouldForwardProp,
+  Tooltip,
+  HStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FiSettings } from "react-icons/fi";
@@ -43,10 +45,16 @@ import {
   BiChevronsRight,
   BiHelpCircle,
   BiHomeAlt,
+  BiSolidInfoCircle,
 } from "react-icons/bi";
 import { HiMiniFolderOpen } from "react-icons/hi2";
 import { isValidMotionProp, motion } from "framer-motion";
 import { useSidebarOpenClose } from "@judie/context/sidebarOpenCloseProvider";
+import {
+  SidebarOrganization,
+  SidebarRoom,
+  SidebarSchool,
+} from "./AdminButtons";
 
 interface SidebarButtonProps {
   icon?: JSX.Element | undefined;
@@ -127,7 +135,7 @@ const FolderButton = ({
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
   const router = useRouter();
   const auth = useAuth();
   const toast = useToast();
@@ -144,9 +152,14 @@ const Sidebar = () => {
     {
       queryFn: getUserFoldersQuery,
       staleTime: 60000,
-      enabled: !!auth?.userData?.id,
+      enabled: !!auth?.userData?.id && !isAdmin,
     }
   );
+
+  const hasEntities =
+    auth?.entities?.organizations?.length ||
+    auth?.entities?.schools?.length ||
+    auth?.entities?.rooms?.length;
 
   const onAdminClick = useCallback(() => {
     const filteredAdminPermissions = auth.userData?.permissions?.filter(
@@ -175,7 +188,7 @@ const Sidebar = () => {
     } else {
       toast({
         status: "warning",
-        title: "No admin orgs",
+        title: "No admin permissions",
       });
     }
   }, [auth.userData?.permissions, auth.isAdmin, router, toast]);
@@ -214,7 +227,6 @@ const Sidebar = () => {
           router.push("/feedback");
         },
       },
-
       ...(!(
         auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE
       ) &&
@@ -371,9 +383,9 @@ const Sidebar = () => {
             bg={router.route === "/dashboard" ? activeBGColor : "transparent"}
           >
             <BiHomeAlt size={18} style={{ marginRight: "0.6rem" }} />
-            Dashboard
+            {isAdmin ? "Dashboard (Chat)" : "Dashboard"}
           </Button>
-          {auth.isAdmin ? (
+          {auth.isAdmin && !isAdmin ? (
             <Button
               variant={"ghost"}
               size={"squareSm"}
@@ -395,10 +407,79 @@ const Sidebar = () => {
           ) : null}
           <Divider backgroundColor="#565555" />
           {/* Chats container - scrollable */}
-          <Text marginTop={"1rem"} variant={"detail"}>
-            Folders
-          </Text>
-          {isGetChatsLoading || !auth?.userData?.id ? (
+          {isAdmin ? (
+            <HStack position={"relative"} alignItems={"center"} py={"1rem"}>
+              <Text variant={"detail"}>Quick View </Text>
+              <Tooltip
+                label={
+                  "You can view all of your available admin entities here (Organizations, Schools, and Classes)"
+                }
+                placement={"right"}
+                // padding={2}
+                borderRadius={4}
+              >
+                <Box>
+                  <BiSolidInfoCircle size={12} />
+                </Box>
+              </Tooltip>
+            </HStack>
+          ) : (
+            "Folders"
+          )}
+          {isAdmin ? (
+            auth.isLoading ? (
+              <Flex
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Spinner />
+              </Flex>
+            ) : hasEntities ? (
+              <Flex
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                  overflowY: "scroll",
+                }}
+              >
+                {auth?.entities?.organizations?.map((org) => (
+                  <SidebarOrganization org={org} key={org.id} />
+                ))}
+                {auth?.entities?.schools?.map((school) => (
+                  <SidebarSchool school={school} key={school.id} />
+                ))}
+                {auth?.entities?.rooms &&
+                  !auth?.entities?.organizations?.length &&
+                  !auth?.entities?.schools?.length &&
+                  auth?.entities?.rooms?.map((room) => (
+                    <SidebarRoom key={room.id} room={room} />
+                  ))}
+              </Flex>
+            ) : (
+              <Flex
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                No admin privileges
+              </Flex>
+            )
+          ) : isGetChatsLoading || !auth?.userData?.id ? (
             <Flex
               style={{
                 width: "100%",
@@ -434,6 +515,7 @@ const Sidebar = () => {
               ))}
             </Flex>
           )}
+
           {/* Bottom container - fixed to bottom */}
           <Flex
             style={{
