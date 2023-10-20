@@ -103,6 +103,7 @@ const Folder = ({ id }: { id: string }) => {
       <ChatsTable
         isLoading={folderQuery.isLoading}
         chats={folderQuery.data?.chats}
+        refreshChats={folderQuery.refetch}
         folderName={folderQuery.data?.userTitle || undefined}
       />
     </VStack>
