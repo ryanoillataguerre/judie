@@ -26,10 +26,12 @@ const ChatsTable = ({
   chats,
   isLoading,
   folderName,
+  refreshChats,
 }: {
   chats?: Chat[];
   isLoading?: boolean;
   folderName?: string;
+  refreshChats?: () => void;
 }) => {
   const router = useRouter();
 
@@ -47,6 +49,7 @@ const ChatsTable = ({
     mutationFn: deleteChatMutation,
     onSuccess: () => {
       refetch();
+      refreshChats?.();
     },
   });
 
