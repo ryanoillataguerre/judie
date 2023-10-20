@@ -1,5 +1,6 @@
 gcp:
-    location: "us-west1"
+    location: "us"
+    region: "us-west1"
     sandbox_project_id: "sandbox-382905"
     prod_project_id: "production-382518"
     prod_db: "app_db_public"

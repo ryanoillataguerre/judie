@@ -11,7 +11,7 @@ from typing import Optional
 
 import pandas as pd
 import pyarrow
-from google.api_core.exceptions import GoogleAPICallError
+from google.api_core.exceptions import BadRequest, GoogleAPICallError, NotFound
 from google.cloud import bigquery, bigquery_storage, storage
 from jinja2 import Template
 
@@ -25,20 +25,27 @@ class GCPUtils:
     """Base class with common functions for other GCP util classes."""
 
     def set_logger(self, logger: Optional[logging.Logger] = None) -> None:
-        """Set the logger for the class instance.
-        """
+        """Set the logger for the class instance."""
         if logger is None:
             self.logger = get_logger(name=__name__)
         else:
             self.logger = logger
 
     def set_gcp_project_id(self, gcp_project_id: str) -> None:
-        """Set the GCP project_id for the class instance.
+        """Set the GCP project_id for the class instance / clients.
 
         Args:
             gcp_project_id  : The GCP project-id with which to interact
         """
         self.gcp_project_id = gcp_project_id
+
+    def set_gcp_location(self, location: str) -> None:
+        """Set the GCP location for the class instance / clients.
+
+        Args:
+            location    : The GCP location to set
+        """
+        self.gcp_location = location
 
     def _is_valid_file_format(self, file_format: str) -> bool:
         """Validate that passed in file_format is one of the allowed formats.
@@ -63,18 +70,26 @@ class GCSUtils(GCPUtils):
 
         Attributes:
             gcp_project_id  : The GCP project-id with which to interact
+            gcp_location    : The location to use with the GCP project
             logger          : Logger to use when displaying logs
     """
 
-    def __init__(self, gcp_project_id: str, logger: Optional[logging.Logger] = None) -> None:
+    def __init__(
+        self,
+        gcp_project_id: str,
+        gcp_location: str = "us-west1",
+        logger: Optional[logging.Logger] = None,
+    ) -> None:
         """Init method.
 
         Args:
             gcp_project_id  : The GCP project-id with which to interact
+            gcp_location    : The location to use with the GCP project
             logger          : Optional logger to use when displaying logs
         """
         self.set_logger(logger)
         self.set_gcp_project_id(gcp_project_id)
+        self.set_gcp_location(gcp_location)
 
     def _get_storage_client(self) -> storage.Client:
         """Instantiate a GCS storage client.
@@ -83,7 +98,7 @@ class GCSUtils(GCPUtils):
             GSC storage client object.
         """
         try:
-            return storage.Client(project=self.gcp_project_id)
+            return storage.Client(project=self.gcp_project_id, location=self.gcp_location)
         except GoogleAPICallError as e:
             self.logger.exception(f"Failed to initialize GSC storage client: {e}")
         except Exception as e:
@@ -138,18 +153,26 @@ class BQUtils(GCPUtils):
 
         Attributes:
             gcp_project_id  : The GCP project-id with which to interact
+            gcp_location    : The location to use with the GCP project
             logger          : Logger to use when displaying logs
     """
 
-    def __init__(self, gcp_project_id: str, logger: Optional[logging.Logger] = None) -> None:
+    def __init__(
+        self,
+        gcp_project_id: str,
+        gcp_location: str = "us-west1",
+        logger: Optional[logging.Logger] = None,
+    ) -> None:
         """Init method.
 
         Args:
             gcp_project_id  : The GCP project-id with which to interact
+            gcp_location    : The location to use with the GCP project
             logger          : Optional logger to use for logging
         """
         self.set_logger(logger)
         self.set_gcp_project_id(gcp_project_id)
+        self.set_gcp_location(gcp_location)
 
     def _get_bq_client(self) -> bigquery.Client:
         """Instantiate a BigQuery client.
@@ -158,7 +181,7 @@ class BQUtils(GCPUtils):
             BigQuery client object.
         """
         try:
-            return bigquery.Client(project=self.gcp_project_id)
+            return bigquery.Client(project=self.gcp_project_id, location=self.gcp_location)
         except GoogleAPICallError as e:
             self.logger.exception(f"Failed to initialize BigQuery client: {e}")
         except Exception as e:
@@ -237,6 +260,27 @@ class BQUtils(GCPUtils):
         formatted_qstr = Template(query).render(params=params or {})
         return formatted_qstr
 
+    def create_dataset_if_not_exists(self, dataset: str, client: bigquery.Client) -> None:
+        """Create a BigQuery dataset if it doesn't exist.
+
+        Args:
+            dataset : The name of the dataset to create
+            client  : Initialized BigQuery client object
+        """
+        # Create reference to dataset
+        dataset_ref = client.dataset(dataset)
+
+        try:
+            # Attempt to get the dataset, if it exists
+            client.get_dataset(dataset_ref)
+            self.logger.info(f"Dataset {dataset} already exists, no action taken.")
+        except NotFound:
+            # If the dataset doesn't exist, create it
+            dataset = bigquery.Dataset(dataset_ref)
+            dataset.location = self.gcp_location
+            client.create_dataset(dataset)
+            self.logger.info(f"Dataset {dataset} created in the {self.gcp_location} region.")
+
     def run_query(
         self,
         query_file: str,
@@ -271,6 +315,9 @@ class BQUtils(GCPUtils):
                     self.logger.error(f"Error: {error['message']}")
             else:
                 self.logger.info("Query completed successfully.")
+
+        except BadRequest as e:
+            self.logger.exception(f"An error occurred while querying or fetching the data: {e}")
 
         except GoogleAPICallError as e:
             self.logger.exception(f"An error occurred while querying or fetching the data: {e}")
@@ -324,6 +371,9 @@ class BQUtils(GCPUtils):
         # Initialize a BigQuery client
         client = self._get_bq_client()
 
+        # Ensure dataset exists
+        self.create_dataset_if_not_exists(dataset, client)
+
         # Specify the destination table
         table_ref = client.dataset(dataset).table(table)
         job_config = bigquery.QueryJobConfig()
@@ -375,6 +425,7 @@ class BQUtils(GCPUtils):
             extract_job = client.extract_table(
                 table_ref,
                 destination_uri,
+                location = self.gcp_location,
                 job_config=extract_job_config
             )
             extract_job.result()  # Wait for the job to complete
@@ -385,6 +436,9 @@ class BQUtils(GCPUtils):
                     self.logger.error(f"Error: {error['message']}")
             else:
                 self.logger.info("Export job completed successfully")
+
+        except BadRequest as e:
+            self.logger.exception(f"Failed to initiate export job: {e}")
 
         except GoogleAPICallError as e:
             self.logger.exception(f"Failed to initiate export job: {e}")
