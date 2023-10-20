@@ -14,7 +14,6 @@ import {
 import { User } from "@judie/data/types/api";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import TableFooter from "./TableFooter";
 import SearchBar from "@judie/components/SearchBar/SearchBar";
 
@@ -25,7 +24,6 @@ const UsersTable = ({
   organizationId,
   schoolId,
   roomId,
-  loading,
 }: {
   users: User[];
   roomId?: string;
@@ -33,6 +31,9 @@ const UsersTable = ({
   organizationId?: string;
   loading?: boolean;
 }) => {
+  console.log("organizationId", organizationId);
+  console.log("schoolId", schoolId);
+  console.log("roomId", roomId);
   const [page, setPage] = useState<number>(1);
   const router = useRouter();
   const rowBackgroundColor = useColorModeValue("gray.100", "gray.700");

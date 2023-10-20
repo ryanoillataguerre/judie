@@ -132,7 +132,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           ) : null}
           {organizationUserData?.length ? (
             <TabPanel>
-              <UsersTable users={organizationUserData} />
+              <UsersTable users={organizationUserData} organizationId={id} />
             </TabPanel>
           ) : null}
           {organizationInvitesData?.length ? (

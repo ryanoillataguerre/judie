@@ -46,7 +46,6 @@ const AdminRoot = () => {
     }
   }, [userData, setDisplayCreateOrg]);
 
-  const showSpinner = isAuthLoading || isLoading || !userData;
   return (
     <VStack
       style={{
