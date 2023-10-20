@@ -299,7 +299,7 @@ const InviteModal = ({
   const onCloseUpload = () => {
     setIsUploadOpen(false);
   };
-  const organizationId = useAdminActiveOrganization();
+  const { organizationId } = useAdminActiveOrganization();
 
   const toast = useToast();
 
