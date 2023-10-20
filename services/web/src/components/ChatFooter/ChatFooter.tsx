@@ -265,25 +265,6 @@ const ChatFooter = () => {
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && e.shiftKey) {
         e.preventDefault();
-        if (!shiftPressedRecently) {
-          toast({
-            title: (
-              <Flex direction={"row"} alignItems={"center"} gap={2}>
-                <Text>Press only </Text>
-                <AiOutlineEnter />
-                <Text> to submit</Text>
-              </Flex>
-            ),
-            status: "info",
-            duration: 4000,
-            isClosable: true,
-            position: toastPosition,
-          });
-          setShiftPressedRecently(true);
-        }
-        setTimeout(() => {
-          setShiftPressedRecently(false);
-        }, 15000);
       }
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
