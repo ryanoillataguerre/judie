@@ -56,7 +56,11 @@ export const getFolderById = (id: string) => {
       id,
     },
     include: {
-      chats: true,
+      chats: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
 };
