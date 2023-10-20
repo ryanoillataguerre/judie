@@ -183,6 +183,14 @@ const Sidebar = () => {
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
       {
+        icon: <FiSettings />,
+        key: "settings",
+        label: "Settings",
+        onClick: () => {
+          router.push("/settings");
+        },
+      },
+      {
         icon: <BiHelpCircle />,
         key: "help",
         label: "Help",
@@ -206,16 +214,7 @@ const Sidebar = () => {
           router.push("/feedback");
         },
       },
-      ...(auth.isAdmin
-        ? [
-            {
-              icon: <MdAdminPanelSettings />,
-              key: "admin",
-              label: "Admin",
-              onClick: onAdminClick,
-            },
-          ]
-        : []),
+
       ...(!(
         auth?.userData?.subscription?.status === SubscriptionStatus.ACTIVE
       ) &&
@@ -374,22 +373,26 @@ const Sidebar = () => {
             <BiHomeAlt size={18} style={{ marginRight: "0.6rem" }} />
             Dashboard
           </Button>
-          <Button
-            variant={"ghost"}
-            size={"squareSm"}
-            width={"100%"}
-            marginTop={"0.3rem"}
-            marginBottom={"1rem"}
-            alignItems={"center"}
-            justifyContent={"flex-start"}
-            onClick={() => {
-              router.push("/settings");
-            }}
-            bg={router.route === "/settings" ? activeBGColor : "transparent"}
-          >
-            <FiSettings size={18} style={{ marginRight: "0.6rem" }} />
-            Settings
-          </Button>
+          {auth.isAdmin ? (
+            <Button
+              variant={"ghost"}
+              size={"squareSm"}
+              width={"100%"}
+              marginTop={"0.3rem"}
+              marginBottom={"1rem"}
+              alignItems={"center"}
+              justifyContent={"flex-start"}
+              onClick={() => {
+                router.push("/admin");
+              }}
+            >
+              <MdAdminPanelSettings
+                size={18}
+                style={{ marginRight: "0.6rem" }}
+              />
+              Admin
+            </Button>
+          ) : null}
           <Divider backgroundColor="#565555" />
           {/* Chats container - scrollable */}
           <Text marginTop={"1rem"} variant={"detail"}>
