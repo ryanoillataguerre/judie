@@ -19,6 +19,27 @@ import SearchBar from "@judie/components/SearchBar/SearchBar";
 
 const USER_PAGE_SIZE = 20;
 
+const getEntityNameForIds = ({
+  organizationId,
+  schoolId,
+  roomId,
+}: {
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
+}) => {
+  if (roomId) {
+    return "class";
+  }
+  if (schoolId) {
+    return "school";
+  }
+  if (organizationId) {
+    return "organization";
+  }
+  return "entity";
+};
+
 const UsersTable = ({
   users,
   organizationId,
@@ -54,6 +75,7 @@ const UsersTable = ({
     }
     return users.slice(page * USER_PAGE_SIZE, (page + 1) * USER_PAGE_SIZE);
   }, [users, page]);
+
   return (
     <TableContainer>
       <SearchBar
@@ -68,7 +90,15 @@ const UsersTable = ({
             <Th>First name</Th>
             <Th>Last name</Th>
             <Th>Last message</Th>
-            <Th>Permissions</Th>
+            <Th>
+              Role (in this{" "}
+              {getEntityNameForIds({
+                organizationId,
+                schoolId,
+                roomId,
+              })}
+              )
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
