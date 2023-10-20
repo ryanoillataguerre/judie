@@ -166,32 +166,31 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
     const filteredAdminPermissions = auth.userData?.permissions?.filter(
       (permission) => isPermissionTypeAdmin(permission.type)
     );
-    if (filteredAdminPermissions?.length === 1) {
-      const permission = filteredAdminPermissions[0];
-      switch (permission.type) {
-        case PermissionType.ORG_ADMIN:
-          router.push(`/admin/organizations/${permission.organizationId}`);
-          break;
-        case PermissionType.SCHOOL_ADMIN:
-          router.push(`/admin/schools/${permission.schoolId}`);
-          break;
-        case PermissionType.ROOM_ADMIN:
-          router.push(`/admin/rooms/${permission.roomId}`);
-          break;
-        default:
-          router.push("/admin");
-          break;
-      }
+    const orgAdminPermissions = filteredAdminPermissions?.filter(
+      (permission) => permission.type === PermissionType.ORG_ADMIN
+    );
+    if (orgAdminPermissions?.length === 1) {
+      const permission = orgAdminPermissions[0];
+      router.push(`/admin/organizations/${permission.organizationId}`);
       return;
-    } else if ((filteredAdminPermissions?.length || 0) > 1 || auth.isAdmin) {
-      router.push("/admin");
-      return;
-    } else {
-      toast({
-        status: "warning",
-        title: "No admin permissions",
-      });
     }
+    const schoolAdminPermissions = filteredAdminPermissions?.filter(
+      (permission) => permission.type === PermissionType.SCHOOL_ADMIN
+    );
+    if (schoolAdminPermissions?.length === 1) {
+      const permission = schoolAdminPermissions[0];
+      router.push(`/admin/schools/${permission.schoolId}`);
+      return;
+    }
+    const roomAdminPermissions = filteredAdminPermissions?.filter(
+      (permission) => permission.type === PermissionType.ROOM_ADMIN
+    );
+    if (roomAdminPermissions?.length === 1) {
+      const permission = roomAdminPermissions[0];
+      router.push(`/admin/rooms/${permission.roomId}`);
+      return;
+    }
+    return router.push("/admin");
   }, [auth.userData?.permissions, auth.isAdmin, router, toast]);
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
@@ -259,7 +258,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
       },
     ];
     return options;
-  }, [auth, router, onAdminClick]);
+  }, [auth, router]);
 
   const bgColor = useColorModeValue("#FFFFFF", "gray.900");
   const bgColorMobile = useColorModeValue("#FFFFFF", "gray.900");
@@ -380,7 +379,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
             size={"squareSm"}
             width={"100%"}
             marginTop={"2rem"}
-            marginBottom={"0.3rem"}
+            marginBottom={auth.isAdmin && !isAdmin ? "0.5rem" : "1rem"}
             alignItems={"center"}
             justifyContent={"flex-start"}
             onClick={() => {
@@ -389,7 +388,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
             bg={router.route === "/dashboard" ? activeBGColor : "transparent"}
           >
             <BiHomeAlt size={18} style={{ marginRight: "0.6rem" }} />
-            {isAdmin ? "Dashboard (Chat)" : "Dashboard"}
+            Dashboard
           </Button>
           {auth.isAdmin && !isAdmin ? (
             <Button
@@ -400,9 +399,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
               marginBottom={"1rem"}
               alignItems={"center"}
               justifyContent={"flex-start"}
-              onClick={() => {
-                router.push("/admin");
-              }}
+              onClick={onAdminClick}
             >
               <MdAdminPanelSettings
                 size={18}
@@ -430,7 +427,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
               </Tooltip>
             </HStack>
           ) : (
-            "Folders"
+            <Text variant={"detail"}>Folders</Text>
           )}
           {isAdmin ? (
             auth.isLoading ? (

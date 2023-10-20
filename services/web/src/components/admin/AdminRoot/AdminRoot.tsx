@@ -28,7 +28,7 @@ import UsersTable from "../tables/UsersTable";
 import { useRouter } from "next/router";
 
 const AdminRoot = () => {
-  const { userData } = useAuth();
+  const { userData, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const { organizations, schools, rooms } = useFlatAllEntities();
 
@@ -45,6 +45,8 @@ const AdminRoot = () => {
       setDisplayCreateOrg(true);
     }
   }, [userData, setDisplayCreateOrg]);
+
+  const showSpinner = isAuthLoading || isLoading || !userData;
   return (
     <VStack
       style={{
@@ -63,10 +65,13 @@ const AdminRoot = () => {
         paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        <CreateOrgModal
-          isOpen={createOrgModalOpen}
-          onClose={() => setCreateOrgModalOpen(false)}
-        />
+        {userData?.role === UserRole.JUDIE ? (
+          <CreateOrgModal
+            isOpen={createOrgModalOpen}
+            onClose={() => setCreateOrgModalOpen(false)}
+          />
+        ) : null}
+
         <Text
           style={{
             fontSize: "2rem",
