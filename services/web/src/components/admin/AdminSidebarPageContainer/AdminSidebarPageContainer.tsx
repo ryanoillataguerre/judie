@@ -1,8 +1,5 @@
 import { Box, Flex } from "@chakra-ui/react";
 import { LuChevronLeftSquare, LuChevronRightSquare } from "react-icons/lu";
-import useStorageState from "@judie/hooks/useStorageState";
-import AdminSidebar from "../AdminSidebar/AdminSidebar";
-import { useSidebarOpenClose } from "@judie/context/sidebarOpenCloseProvider";
 import Sidebar from "@judie/components/Sidebar/Sidebar";
 
 interface AdminSidebarPageContainerProps {
