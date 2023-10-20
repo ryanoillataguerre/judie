@@ -10,6 +10,7 @@ import {
   EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
+  SubscriptionType,
   User,
   UserRole,
 } from "@judie/data/types/api";
@@ -71,7 +72,10 @@ export default function useAuth({
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
   const isB2B = useMemo(() => {
-    return !!userData?.subscription?.organizationId;
+    return (
+      !!userData?.subscription?.organizationId ||
+      userData?.subscription?.type === SubscriptionType.SEAT
+    );
   }, [userData]);
 
   const isPaid = useMemo(() => {

@@ -6,6 +6,7 @@ import {
   Link,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalOverlay,
   Select,
@@ -298,7 +299,7 @@ const InviteModal = ({
   const onCloseUpload = () => {
     setIsUploadOpen(false);
   };
-  const organizationId = useAdminActiveOrganization();
+  const { organizationId } = useAdminActiveOrganization();
 
   const toast = useToast();
 
@@ -375,6 +376,7 @@ const InviteModal = ({
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
       <ModalContent py={8}>
+        <ModalCloseButton />
         <ModalBody
           style={{
             display: "flex",

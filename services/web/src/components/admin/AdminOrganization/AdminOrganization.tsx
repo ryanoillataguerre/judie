@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   Tab,
@@ -27,6 +28,8 @@ import UsersTable from "../tables/UsersTable";
 import InvitesTable from "../tables/InvitesTable";
 import EditableTitle from "../EditableTitle";
 import { putOrgMutation } from "@judie/data/mutations";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData, refetch: refetchOrg } = useQuery({
@@ -55,6 +58,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
   });
 
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <VStack
@@ -76,35 +80,42 @@ const AdminOrganization = ({ id }: { id: string }) => {
         alignItems={"center"}
         justifyContent={"space-between"}
         width={"100%"}
-        paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        <EditableTitle
-          title={organizationData?.name}
-          onChange={(value) => {
-            value = value.trim();
-            if (!value || value.length < 1) return;
-            if (value === organizationData?.name) return;
-            editOrgMutation.mutate({
-              organizationId: organizationData?.id as string,
-              name: value,
-            });
-          }}
-        />
+        <HStack paddingRight={"1rem"}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
 
-        <Button
-          size={"sm"}
-          variant={"solid"}
-          colorScheme="green"
-          onClick={() => setCreateSchoolOpen(true)}
-        >
+          <EditableTitle
+            title={organizationData?.name}
+            onChange={(value) => {
+              value = value.trim();
+              if (!value || value.length < 1) return;
+              if (value === organizationData?.name) return;
+              editOrgMutation.mutate({
+                organizationId: organizationData?.id as string,
+                name: value,
+              });
+            }}
+          />
+        </HStack>
+
+        <Button colorScheme="green" onClick={() => setCreateSchoolOpen(true)}>
           <PlusSquareIcon marginRight={"0.3rem"} /> Create School
         </Button>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
-          {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {organizationData?.rooms?.length ? <Tab>Classes</Tab> : null}
           {organizationUserData?.length ? <Tab>Users</Tab> : null}
           {organizationInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
@@ -121,7 +132,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           ) : null}
           {organizationUserData?.length ? (
             <TabPanel>
-              <UsersTable users={organizationUserData} />
+              <UsersTable users={organizationUserData} organizationId={id} />
             </TabPanel>
           ) : null}
           {organizationInvitesData?.length ? (

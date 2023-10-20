@@ -4,7 +4,7 @@ import { GET_USER_BY_ID, getUserByIdQuery } from "@judie/data/queries";
 import { useQuery } from "react-query";
 import { Line, ResponsiveLine } from "@nivo/line";
 import { useMemo } from "react";
-import { Flex, Tag, useTheme, useToken } from "@chakra-ui/react";
+import { Flex, Tag, Text, useTheme, useToken } from "@chakra-ui/react";
 
 const UserUsage = ({ id }: { id: string }) => {
   const { data: userData } = useQuery({
@@ -39,7 +39,8 @@ const UserUsage = ({ id }: { id: string }) => {
 
   const color = useToken("colors", "blue.400");
 
-  return (
+  return userData?.chats?.length &&
+    userData?.chats?.some((chat) => chat.messages.length) ? (
     <Flex width={"100%"} height={"400px"}>
       <AutoSizer style={{ width: "100%" }}>
         {({ height, width }: { height: number; width: number }) => (
@@ -130,6 +131,15 @@ const UserUsage = ({ id }: { id: string }) => {
           />
         )}
       </AutoSizer>
+    </Flex>
+  ) : (
+    <Flex
+      width={"100%"}
+      py={"2rem"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      <Text variant={"subheader"}>No chats yet!</Text>
     </Flex>
   );
 };

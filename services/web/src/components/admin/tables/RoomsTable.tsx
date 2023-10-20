@@ -42,7 +42,7 @@ const RoomsTable = ({ rooms }: { rooms: Room[] }) => {
         />
       )}
       <SearchBar
-        title="Rooms"
+        title="Classes"
         searchText={searchText}
         setSearchText={setSearchText}
       />
