@@ -74,17 +74,18 @@ export const sendSubscribedEmail = async ({ user }: { user: User }) => {
 
 export const sendWelcomeEmail = async ({ user }: { user: User }) => {
   // Send email
-  const newEmail = new SendEmailRequest({
-    to: user.email,
-    transactional_message_id: "5",
-    message_data: {
-      first_name: user.firstName,
-    },
-    identifiers: {
-      email: user.email,
-    },
-  });
-  return await apiClient.sendEmail(newEmail);
+  // const newEmail = new SendEmailRequest({
+  //   to: user.email,
+  //   transactional_message_id: "5",
+  //   message_data: {
+  //     first_name: user.firstName,
+  //   },
+  //   identifiers: {
+  //     email: user.email,
+  //   },
+  // });
+  // return await apiClient.sendEmail(newEmail);
+  return null;
 };
 
 export const sendParentalConsentEmail = async ({ user }: { user: User }) => {

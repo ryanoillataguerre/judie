@@ -223,8 +223,8 @@ const SidebarChatNav = () => {
           }}
           onClick={() => {
             if (
-              ((chatContext?.chat?.messages?.length || 0) > 0 &&
-                chatContext?.chat?.subject) ||
+              (chatContext?.chat?.messages?.length || 0) > 0 ||
+              chatContext?.chat?.subject ||
               !chatContext?.chat
             ) {
               createChat.mutate({});
