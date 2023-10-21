@@ -25,6 +25,7 @@ import { putRoomMutation } from "@judie/data/mutations";
 import EditableTitle from "../EditableTitle";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
+import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData, refetch: refetchRoom } = useQuery({

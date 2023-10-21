@@ -30,6 +30,7 @@ import EditableTitle from "../EditableTitle";
 import { putOrgMutation } from "@judie/data/mutations";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
+import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData, refetch: refetchOrg } = useQuery({

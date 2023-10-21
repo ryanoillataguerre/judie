@@ -30,6 +30,7 @@ import EditableTitle from "../EditableTitle";
 import { putSchoolMutation } from "@judie/data/mutations";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
+import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData, refetch: refetchSchool } = useQuery({
