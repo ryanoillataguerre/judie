@@ -128,3 +128,24 @@ def test_moderation_curse(env_setup):
     )
     moderation = openai_manager.check_moderation_policy(session_config=sesh)
     assert len(moderation) > 0
+
+
+def test_completion_single(env_setup):
+    test_messages = [{"role": "user", "content": "What is photosynthesis?"}]
+
+    response = openai_manager.get_gpt_response_single(
+        messages=test_messages, openai_config=openai_manager.OpenAiConfig()
+    )
+
+    assert "synth" in response
+
+
+@pytest.mark.asyncio
+async def test_async_completion(env_setup):
+    test_messages = [{"role": "user", "content": "What is photosynthesis?"}]
+
+    response = await openai_manager.get_gpt_response_async(
+        messages=test_messages, openai_config=openai_manager.OpenAiConfig()
+    )
+
+    assert "synth" in response

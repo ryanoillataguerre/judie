@@ -54,9 +54,13 @@ def get_gpt_response_single(messages=None, openai_config: OpenAiConfig = None) -
     except AttributeError as e:
         logger.error(f"Error parsing OpenAi response: {e}")
 
-async def get_gpt_response_async(messages=None, openai_config: OpenAiConfig = None) -> str:
-    '''Response single callable asynchronously'''
-    chat_response = await openai.ChatCompletion.create(
+
+async def get_gpt_response_async(
+    messages=None, openai_config: OpenAiConfig = None
+) -> str:
+    """Response single callable asynchronously"""
+
+    chat_response = await openai.ChatCompletion.acreate(
         model=openai_config.model,
         messages=messages,
         temperature=openai_config.temperature,
@@ -71,6 +75,7 @@ async def get_gpt_response_async(messages=None, openai_config: OpenAiConfig = No
         return chat_response.choices[0].message.content
     except AttributeError as e:
         logger.error(f"Error parsing OpenAi response: {e}")
+
 
 def concat_sys_and_messages_openai(sys_prompt: str, messages: List[Dict]) -> List[Dict]:
     full_messages = [{"role": "system", "content": sys_prompt}]
@@ -100,11 +105,11 @@ def comprehension_score(session_config: SessionConfig) -> Optional[int]:
         {
             "role": "system",
             "content": "You are observing a conversation between a tutor and a student. On a scale "
-                       "of 1 to 10 classify how well the student understood the conversation and "
-                       "subject material given the context of the conversation and the last user "
-                       "response or question after the tutor.  Remember, well formed clarifying or "
-                       "curious questions can show comprehension.  Respond only with the numeric "
-                       "comprehension score on the scale of 1 to 10.",
+            "of 1 to 10 classify how well the student understood the conversation and "
+            "subject material given the context of the conversation and the last user "
+            "response or question after the tutor.  Remember, well formed clarifying or "
+            "curious questions can show comprehension.  Respond only with the numeric "
+            "comprehension score on the scale of 1 to 10.",
         },
     ] + session_config.history.get_openai_format()[-5:]
     # arbitrarily use last five messages as conversation window
