@@ -75,11 +75,18 @@ const InviteModalBody = ({
   const [permissionType, setPermissionType] = useState<
     PermissionType | undefined
   >(undefined);
+  const [schoolIdSuper, setSchoolIdSuper] = useState<string | undefined>(
+    undefined
+  );
+  const [roomIdSuper, setRoomIdSuper] = useState<string | undefined>(undefined);
   const { handleSubmit, register, watch } = useForm<SubmitData>({
     defaultValues: {
       gradeYear: undefined,
       email: "",
       permissionType: undefined,
+      organizationId: undefined,
+      schoolId: undefined,
+      roomId: undefined,
     },
     reValidateMode: "onBlur",
   });
@@ -129,16 +136,23 @@ const InviteModalBody = ({
       return (
         <>
           <Text variant={"body"} mb={"1rem"}>
-            Invite a user to be a student or admin in this school or one of its
-            Classrooms.
+            Invite a user to be a student, teacher, or Principal in this School.
+            You can add them to specific classrooms once they accept their
+            invite.
           </Text>
           <Text variant={"detail"}>
-            Teachers can view and edit their Classrooms.
+            Teachers can view and edit their Classrooms and the users in them.
+          </Text>
+          <Text variant={"detail"}>
+            Principals can view and edit the School, and Classrooms within the
+            school.
           </Text>
           <Alert status={"info"} my={"0.5rem"}>
             <AlertIcon />
             <Text variant={"title"}>
-              You are inviting the user to be in the School {school?.name}.
+              You are inviting the user to be in the School {school?.name}. If
+              you&apos;d like to invite them to a specific Classroom, please
+              exit and click into the Classroom before you invite them.
             </Text>
           </Alert>
         </>
@@ -148,19 +162,19 @@ const InviteModalBody = ({
       return (
         <>
           <Text variant={"body"} mb={"1rem"}>
-            Invite a user to be a Student, Teacher, Principal, or Org Admin in
-            this Organization or one of its Schools or Classrooms.
+            Invite a user to be an Org Admin for this Organization
           </Text>
           <Text variant={"detail"} mb={"1rem"}>
             Principals can view and edit a school, teachers can view and edit
             their Classrooms, and Organization Admins can view and edit the same
             things that you can.
           </Text>
-          <Alert status={"info"} my={"0.5rem"}>
+          <Alert status={"warning"} my={"0.5rem"}>
             <AlertIcon />
             <Text variant={"title"}>
-              You are inviting the user to be in the Organization{" "}
-              {organization?.name}.
+              You are inviting the user to the Organization {organization?.name}
+              . Be careful with permissions, as you can add Org Admins, School
+              Admins, Teachers, and Students.
             </Text>
           </Alert>
         </>
@@ -190,8 +204,8 @@ const InviteModalBody = ({
           {
             type: permissionType,
             organizationId,
-            schoolId,
-            roomId,
+            schoolId: schoolIdSuper || schoolId,
+            roomId: roomIdSuper || roomId,
           },
         ],
       });
@@ -211,6 +225,161 @@ const InviteModalBody = ({
     }
   };
   const email = watch("email");
+
+  const roomOptions = useMemo(() => {
+    console.log("schoolIdSuper", schoolIdSuper);
+    console.log("school?.rooms", school?.rooms);
+    console.log("organization?.schools", organization?.schools);
+    if (schoolIdSuper) {
+      const school = organization?.schools?.find(
+        (school) => school.id === schoolIdSuper
+      );
+      return school?.rooms || [];
+    }
+    return school?.rooms || [];
+  }, [schoolIdSuper, school?.rooms, organization?.schools]);
+  const getExtraFieldsFromType = () => {
+    // For org admin, return none
+    // For school admin, and if type === org, return school
+    // For school admin, and if type === school, return none
+    // For room admin, and if type === school, return room
+    // For room admin, and if type === org, return school and room
+    // For room admin, and if type === room, return none
+    // For student, and if type === room, return none
+    // For student, and if type === school, return room
+    // For student, and if type === org, return school and room
+
+    const caseForRoomLevel = () => {
+      if (type === InviteModalType.ORGANIZATION) {
+        const schoolOptions = organization?.schools || [];
+
+        return (
+          <>
+            <FormControl
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+                width: "100%",
+              }}
+              isRequired
+            >
+              <FormLabel htmlFor="schoolId">School</FormLabel>
+              <Select
+                id="schoolId"
+                value={schoolIdSuper}
+                defaultValue={schoolOptions[0]?.id}
+                onChange={(e) => setSchoolIdSuper(e.target.value)}
+              >
+                {schoolOptions.map((school) => (
+                  <option value={school.id} key={school.id}>
+                    {school.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            {schoolIdSuper && (
+              <FormControl
+                style={{
+                  marginTop: "0.5rem",
+                  marginBottom: "0.5rem",
+                  width: "100%",
+                }}
+                isRequired
+              >
+                <FormLabel htmlFor="roomId">Classroom</FormLabel>
+                <Select
+                  id="roomId"
+                  value={roomIdSuper}
+                  defaultValue={roomOptions[0]?.id}
+                  onChange={(e) => setRoomIdSuper(e.target.value)}
+                >
+                  {roomOptions.map((room) => (
+                    <option value={room.id} key={room.id}>
+                      {room.name}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </>
+        );
+      }
+      if (type === InviteModalType.SCHOOL) {
+        const roomOptions = school?.rooms || [];
+        return (
+          <FormControl
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.5rem",
+              width: "100%",
+            }}
+            isRequired
+          >
+            <FormLabel htmlFor="roomId">Classroom</FormLabel>
+            <Select
+              id="roomId"
+              value={roomIdSuper}
+              onChange={(e) => setRoomIdSuper(e.target.value)}
+            >
+              {roomOptions.map((room) => (
+                <option value={room.id} key={room.id}>
+                  {room.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      }
+
+      if (type === InviteModalType.ROOM) {
+        return null;
+      }
+    };
+    switch (permissionType) {
+      case PermissionType.ORG_ADMIN:
+        // organizationId is defined, and that's all we need.
+        return null;
+      case PermissionType.SCHOOL_ADMIN:
+        if (type === InviteModalType.ORGANIZATION) {
+          // User is at organization level, adding a school admin.
+          const schoolOptions = organization?.schools || [];
+          return (
+            <FormControl
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+                width: "100%",
+              }}
+              isRequired
+            >
+              <FormLabel htmlFor="schoolId">School</FormLabel>
+              <Select
+                id="schoolId"
+                value={schoolIdSuper}
+                onChange={(e) => setSchoolIdSuper(e.target.value)}
+              >
+                {schoolOptions.map((school) => (
+                  <option value={school.id} key={school.id}>
+                    {school.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        }
+        if (type === InviteModalType.SCHOOL) {
+          return null;
+        }
+        break;
+      case PermissionType.ROOM_ADMIN:
+        return caseForRoomLevel();
+      case PermissionType.STUDENT:
+        return caseForRoomLevel();
+      default:
+        return null;
+    }
+  };
+
   const isDisabled = useMemo(() => {
     // Require email and permissionType
     if (!permissionType) {
@@ -220,17 +389,42 @@ const InviteModalBody = ({
       return true;
     }
     if (permissionType === PermissionType.ROOM_ADMIN) {
-      return !roomId;
+      switch (type) {
+        case InviteModalType.ROOM:
+          return !roomId;
+        case InviteModalType.SCHOOL:
+          return !(roomId || roomIdSuper) || !(schoolId || schoolIdSuper);
+        case InviteModalType.ORGANIZATION:
+          return (
+            !(roomId || roomIdSuper) ||
+            !(schoolId || schoolIdSuper) ||
+            !organizationId
+          );
+      }
     }
     if (permissionType === PermissionType.SCHOOL_ADMIN) {
-      return !schoolId;
+      switch (type) {
+        case InviteModalType.SCHOOL:
+          return !schoolId;
+        case InviteModalType.ORGANIZATION:
+          return !(schoolId || schoolIdSuper) || !organizationId;
+      }
     }
     if (permissionType === PermissionType.ORG_ADMIN) {
       return !organizationId;
     }
 
     return false;
-  }, [permissionType, email, roomId, schoolId, organizationId]);
+  }, [
+    permissionType,
+    email,
+    roomId,
+    schoolId,
+    organizationId,
+    type,
+    roomIdSuper,
+    schoolIdSuper,
+  ]);
   return (
     <>
       <Text variant={"subheader"}>Invite User</Text>
@@ -277,6 +471,7 @@ const InviteModalBody = ({
             ))}
           </Select>
         </FormControl>
+        {getExtraFieldsFromType()}
         <Button
           style={{
             width: "100%",

@@ -48,7 +48,11 @@ export const getOrganizationById = async ({ id }: { id: string }) => {
       id,
     },
     include: {
-      schools: true,
+      schools: {
+        include: {
+          rooms: true,
+        },
+      },
       rooms: true,
     },
   });
