@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   HStack,
   Tab,
   TabIndicator,
@@ -8,6 +9,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   GET_INVITES_FOR_ROOM,
@@ -26,6 +28,8 @@ import EditableTitle from "../EditableTitle";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
 import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
+import InviteModal, { InviteModalType } from "../InviteModal";
+import { useState } from "react";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData, refetch: refetchRoom } = useQuery({
@@ -51,6 +55,8 @@ const AdminRoom = ({ id }: { id: string }) => {
     },
   });
   const router = useRouter();
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const buttonSize = useBreakpointValue({ base: "sm", md: "md" });
 
   return (
     <VStack
@@ -63,6 +69,11 @@ const AdminRoom = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
+      <InviteModal
+        type={InviteModalType.ROOM}
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+      />
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
@@ -94,6 +105,13 @@ const AdminRoom = ({ id }: { id: string }) => {
             />
           )}
         </HStack>
+        <Button
+          variant={"purp"}
+          size={buttonSize}
+          onClick={() => setInviteModalOpen(true)}
+        >
+          + Invite
+        </Button>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

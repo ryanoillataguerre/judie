@@ -1,4 +1,4 @@
-import { InviteSheetRole } from "@judie/components/admin/InviteModal";
+import { InviteSheetRole } from "@judie/components/admin/BulkInviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
 import {
   Chat,
