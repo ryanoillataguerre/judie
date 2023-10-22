@@ -29,7 +29,7 @@ import Button from "../Button/Button";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
 
-export const getPermissionTypeLabel = (type: PermissionType) => {
+export const getPermissionTypeLabel = (type: PermissionType | undefined) => {
   switch (type) {
     case PermissionType.ORG_ADMIN:
       return "Organization Admin";
@@ -40,7 +40,20 @@ export const getPermissionTypeLabel = (type: PermissionType) => {
     case PermissionType.STUDENT:
       return "Student";
     default:
-      return "Unknown";
+      return "--";
+  }
+};
+
+const getDefaultPermissionTypeForType = (type: InviteModalType) => {
+  switch (type) {
+    case InviteModalType.ORGANIZATION:
+      return PermissionType.ORG_ADMIN;
+    case InviteModalType.SCHOOL:
+      return PermissionType.SCHOOL_ADMIN;
+    case InviteModalType.ROOM:
+      return PermissionType.STUDENT;
+    default:
+      return undefined;
   }
 };
 
@@ -74,22 +87,10 @@ const InviteModalBody = ({
 
   const [permissionType, setPermissionType] = useState<
     PermissionType | undefined
-  >(undefined);
+  >(PermissionType.STUDENT);
   const [schoolIdSuper, setSchoolIdSuper] = useState<string | undefined>(
     undefined
   );
-  const [roomIdSuper, setRoomIdSuper] = useState<string | undefined>(undefined);
-  const { handleSubmit, register, watch } = useForm<SubmitData>({
-    defaultValues: {
-      gradeYear: undefined,
-      email: "",
-      permissionType: undefined,
-      organizationId: undefined,
-      schoolId: undefined,
-      roomId: undefined,
-    },
-    reValidateMode: "onBlur",
-  });
 
   // Set permission type options based on current location
   const permissionOptions = useMemo(() => {
@@ -183,6 +184,19 @@ const InviteModalBody = ({
     return null;
   };
 
+  const roomOptions = useMemo(() => {
+    if (schoolIdSuper) {
+      const school = organization?.schools?.find(
+        (school) => school.id === schoolIdSuper
+      );
+      return school?.rooms || [];
+    }
+    return school?.rooms || [];
+  }, [schoolIdSuper, school?.rooms, organization?.schools]);
+  const [roomIdSuper, setRoomIdSuper] = useState<string | undefined>(
+    roomOptions[0]?.id || undefined
+  );
+
   const onSubmit: SubmitHandler<SubmitData> = async ({
     gradeYear,
     email,
@@ -224,20 +238,7 @@ const InviteModalBody = ({
       });
     }
   };
-  const email = watch("email");
 
-  const roomOptions = useMemo(() => {
-    console.log("schoolIdSuper", schoolIdSuper);
-    console.log("school?.rooms", school?.rooms);
-    console.log("organization?.schools", organization?.schools);
-    if (schoolIdSuper) {
-      const school = organization?.schools?.find(
-        (school) => school.id === schoolIdSuper
-      );
-      return school?.rooms || [];
-    }
-    return school?.rooms || [];
-  }, [schoolIdSuper, school?.rooms, organization?.schools]);
   const getExtraFieldsFromType = () => {
     // For org admin, return none
     // For school admin, and if type === org, return school
@@ -267,9 +268,9 @@ const InviteModalBody = ({
               <Select
                 id="schoolId"
                 value={schoolIdSuper}
-                defaultValue={schoolOptions[0]?.id}
                 onChange={(e) => setSchoolIdSuper(e.target.value)}
               >
+                <option value={undefined}>Select a School</option>
                 {schoolOptions.map((school) => (
                   <option value={school.id} key={school.id}>
                     {school.name}
@@ -290,9 +291,9 @@ const InviteModalBody = ({
                 <Select
                   id="roomId"
                   value={roomIdSuper}
-                  defaultValue={roomOptions[0]?.id}
                   onChange={(e) => setRoomIdSuper(e.target.value)}
                 >
+                  <option value={undefined}>Select a Classroom</option>
                   {roomOptions.map((room) => (
                     <option value={room.id} key={room.id}>
                       {room.name}
@@ -380,14 +381,33 @@ const InviteModalBody = ({
     }
   };
 
+  const { handleSubmit, register, watch } = useForm<SubmitData>({
+    defaultValues: {
+      gradeYear: undefined,
+      email: "",
+      permissionType: PermissionType.STUDENT,
+      organizationId: organizationId,
+      schoolId: schoolIdSuper || schoolId,
+      roomId: roomIdSuper || roomId || roomOptions[0]?.id,
+    },
+    reValidateMode: "onBlur",
+  });
+  const email = watch("email");
+
+  console.log("orgId", organizationId);
+  console.log("schoolIdSuper", schoolIdSuper);
+  console.log("roomIdSuper", roomIdSuper);
+
   const isDisabled = useMemo(() => {
     // Require email and permissionType
+    console.log("permissionType", permissionType);
     if (!permissionType) {
       return true;
     }
     if (!email) {
       return true;
     }
+    console.log("got here 1");
     if (permissionType === PermissionType.ROOM_ADMIN) {
       switch (type) {
         case InviteModalType.ROOM:
@@ -402,6 +422,7 @@ const InviteModalBody = ({
           );
       }
     }
+    console.log("got here 2");
     if (permissionType === PermissionType.SCHOOL_ADMIN) {
       switch (type) {
         case InviteModalType.SCHOOL:
@@ -410,9 +431,11 @@ const InviteModalBody = ({
           return !(schoolId || schoolIdSuper) || !organizationId;
       }
     }
+    console.log("got here 3");
     if (permissionType === PermissionType.ORG_ADMIN) {
       return !organizationId;
     }
+    console.log("got here 4");
 
     return false;
   }, [
