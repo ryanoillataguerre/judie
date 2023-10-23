@@ -60,7 +60,11 @@ export const getInvitesForRoom = async ({ id }: { id: string }) => {
       },
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
 };

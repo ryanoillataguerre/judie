@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import TableFooter from "./TableFooter";
 import SearchBar from "@judie/components/SearchBar/SearchBar";
+import { getPermissionTypeLabel } from "../InviteModal";
 
 const USER_PAGE_SIZE = 20;
 
@@ -122,26 +123,28 @@ const UsersTable = ({
                 }}
               >
                 <Td>{user.email}</Td>
-                <Td>{user.firstName || "n/a"}</Td>
-                <Td>{user.lastName || "n/a"}</Td>
+                <Td>{user.firstName || "--"}</Td>
+                <Td>{user.lastName || "--"}</Td>
                 <Td>
                   {user.createdAt
                     ? new Date(user.createdAt)?.toLocaleDateString()
-                    : "n/a"}
+                    : "--"}
                 </Td>
                 <Td>
-                  {user.permissions?.find((p) => {
-                    if (roomId) {
-                      return p.roomId === roomId;
-                    }
-                    if (schoolId) {
-                      return p.schoolId === schoolId;
-                    }
-                    if (organizationId) {
-                      return p.organizationId === organizationId;
-                    }
-                    return false;
-                  })?.type || "n/a"}
+                  {getPermissionTypeLabel(
+                    user.permissions?.find((p) => {
+                      if (roomId) {
+                        return p.roomId === roomId;
+                      }
+                      if (schoolId) {
+                        return p.schoolId === schoolId;
+                      }
+                      if (organizationId) {
+                        return p.organizationId === organizationId;
+                      }
+                      return false;
+                    })?.type || undefined
+                  ) || "--"}
                 </Td>
               </Tr>
             ))}

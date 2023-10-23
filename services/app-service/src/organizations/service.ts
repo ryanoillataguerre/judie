@@ -48,8 +48,19 @@ export const getOrganizationById = async ({ id }: { id: string }) => {
       id,
     },
     include: {
-      schools: true,
-      rooms: true,
+      schools: {
+        include: {
+          rooms: true,
+        },
+        where: {
+          deletedAt: null,
+        },
+      },
+      rooms: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
 };
@@ -65,7 +76,11 @@ export const getInvitesForOrganization = async ({ id }: { id: string }) => {
       deletedAt: null,
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
 };

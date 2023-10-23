@@ -191,7 +191,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
       return;
     }
     return router.push("/admin");
-  }, [auth.userData?.permissions, auth.isAdmin, router, toast]);
+  }, [auth.userData?.permissions, router, toast]);
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [
@@ -283,7 +283,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
     <ChakraMotionBox
       initial={false}
       animate={{
-        width: isSidebarOpen ? "18rem" : "2.5rem",
+        width: isSidebarOpen ? "20rem" : "2.5rem",
         // height: isSidebarOpen ? "calc(100vh - 2rem)" : "4.5rem",
         // opacity: isSidebarOpen ? 1 : 0.5,
       }}

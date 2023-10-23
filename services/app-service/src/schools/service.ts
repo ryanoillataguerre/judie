@@ -22,7 +22,11 @@ export const getUsersForSchool = async ({ id }: { id: string }) => {
     include: {
       user: {
         include: {
-          permissions: true,
+          permissions: {
+            where: {
+              deletedAt: null,
+            },
+          },
         },
       },
     },
@@ -67,7 +71,11 @@ export const getInvitesForSchool = async ({ id }: { id: string }) => {
       },
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
 };

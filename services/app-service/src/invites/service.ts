@@ -115,7 +115,7 @@ export const validateInviteRights = async ({
     }
 
     if (isImplicitRoomAdmin) {
-      implicitSchoolPermission = true;
+      implicitRoomPermission = true;
     }
   }
   if (roomId && !explicitRoomPermission && !implicitRoomPermission) {
