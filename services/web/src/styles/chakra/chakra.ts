@@ -56,6 +56,10 @@ const textComponentStyle: ComponentStyleConfig = {
       fontWeight: 400,
       fontSize: "0.875rem",
     },
+    base: {
+      fontWeight: 500,
+      fontSize: "1rem",
+    },
     tinyTitle: {
       fontWeight: 500,
       fontSize: "0.875rem",

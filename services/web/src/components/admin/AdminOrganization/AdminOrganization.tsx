@@ -9,6 +9,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   GET_INVITES_FOR_ORG,
@@ -30,8 +31,12 @@ import EditableTitle from "../EditableTitle";
 import { putOrgMutation } from "@judie/data/mutations";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
+import InviteModal, { InviteModalType } from "../InviteModal";
+import BulkInviteModal from "../BulkInviteModal";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminOrganization = ({ id }: { id: string }) => {
+  const { refreshEntities } = useAuth();
   const { data: organizationData, refetch: refetchOrg } = useQuery({
     queryKey: [GET_ORG_BY_ID, id],
     queryFn: () => getOrgByIdQuery(id),
@@ -54,10 +59,14 @@ const AdminOrganization = ({ id }: { id: string }) => {
     mutationFn: putOrgMutation,
     onSuccess: () => {
       refetchOrg();
+      refreshEntities();
     },
   });
 
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [bulkInviteOpen, setBulkInviteOpen] = useState(false);
+  const buttonSize = useBreakpointValue({ base: "sm", md: "md" });
   const router = useRouter();
 
   return (
@@ -75,6 +84,15 @@ const AdminOrganization = ({ id }: { id: string }) => {
         isOpen={createSchoolOpen}
         onClose={() => setCreateSchoolOpen(false)}
         organizationId={organizationData?.id as string}
+      />
+      <InviteModal
+        type={InviteModalType.ORGANIZATION}
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+      />
+      <BulkInviteModal
+        isOpen={bulkInviteOpen}
+        onClose={() => setBulkInviteOpen(false)}
       />
       <HStack
         alignItems={"center"}
@@ -107,10 +125,29 @@ const AdminOrganization = ({ id }: { id: string }) => {
             }}
           />
         </HStack>
-
-        <Button colorScheme="green" onClick={() => setCreateSchoolOpen(true)}>
-          <PlusSquareIcon marginRight={"0.3rem"} /> Create School
-        </Button>
+        <HStack spacing={2}>
+          <Button
+            variant={"purp"}
+            size={buttonSize}
+            onClick={() => setInviteModalOpen(true)}
+          >
+            + Invite
+          </Button>
+          <Button
+            variant={"purp"}
+            size={buttonSize}
+            onClick={() => setBulkInviteOpen(true)}
+          >
+            + Bulk Invite
+          </Button>
+          <Button
+            colorScheme="green"
+            size={buttonSize}
+            onClick={() => setCreateSchoolOpen(true)}
+          >
+            <PlusSquareIcon marginRight={"0.3rem"} /> Create School
+          </Button>
+        </HStack>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

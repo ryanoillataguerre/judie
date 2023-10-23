@@ -20,6 +20,7 @@ import DeletePermissionModal from "../DeletePermissionModal";
 import CreatePermissionModal from "../CreatePermissionModal";
 import EditPermissionModal from "../EditPermissionModal";
 import { EditIcon } from "@chakra-ui/icons";
+import { getPermissionTypeLabel } from "../InviteModal";
 
 type PermissionTableProps = {
   permissions: Permission[];
@@ -117,7 +118,7 @@ const PermissionsTable = ({
               },
             }}
           >
-            <Th>Type</Th>
+            <Th>Role</Th>
             <Th>Organization</Th>
             <Th>School</Th>
             <Th>Class</Th>
@@ -135,9 +136,9 @@ const PermissionsTable = ({
                   return true;
                 }
                 const searchString = `${
-                  permission?.organization?.name ?? "N/A"
-                } ${permission?.school?.name ?? "N/A"} ${
-                  permission?.room?.name ?? "N/A"
+                  permission?.organization?.name ?? "--"
+                } ${permission?.school?.name ?? "--"} ${
+                  permission?.room?.name ?? "--"
                 }`;
                 return searchString
                   .toLowerCase()
@@ -158,16 +159,16 @@ const PermissionsTable = ({
                 }}
               >
                 <Td>
-                  <Text>{permission.type ?? "N/A"}</Text>
+                  <Text>{getPermissionTypeLabel(permission.type) ?? "--"}</Text>
                 </Td>
                 <Td>
-                  <Text>{permission.organization?.name ?? "N/A"}</Text>
+                  <Text>{permission.organization?.name ?? "--"}</Text>
                 </Td>
                 <Td>
-                  <Text>{permission.school?.name ?? "N/A"}</Text>
+                  <Text>{permission.school?.name ?? "--"}</Text>
                 </Td>
                 <Td>
-                  <Text>{permission.room?.name ?? "N/A"}</Text>
+                  <Text>{permission.room?.name ?? "--"}</Text>
                 </Td>
                 <Td>
                   <Button

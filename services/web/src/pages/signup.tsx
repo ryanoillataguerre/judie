@@ -98,25 +98,26 @@ export const SignupForm = ({
     },
   });
 
-  const { mutateAsync: mutateAsyncInvite } = useMutation({
-    mutationFn: redeemInviteMutation,
-    onSuccess: () => {
-      router.push({
-        pathname: "/dashboard",
-        query: router.query,
-      });
-    },
-    onError: (err: HTTPResponseError) => {
-      console.error("Error signing up", err);
-      toast({
-        title: "Error signing up",
-        description: err.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    },
-  });
+  const { mutateAsync: mutateAsyncInvite, isLoading: inviteIsLoading } =
+    useMutation({
+      mutationFn: redeemInviteMutation,
+      onSuccess: () => {
+        router.push({
+          pathname: "/dashboard",
+          query: router.query,
+        });
+      },
+      onError: (err: HTTPResponseError) => {
+        console.error("Error signing up", err);
+        toast({
+          title: "Error signing up",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+    });
 
   const [receivePromotions, setReceivePromotions] = useState(true);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
@@ -387,7 +388,7 @@ export const SignupForm = ({
             width: "100%",
           }}
           variant={"purp"}
-          loading={isLoading}
+          loading={isLoading || inviteIsLoading}
           label="Sign Up"
           type="submit"
         />

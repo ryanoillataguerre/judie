@@ -106,7 +106,7 @@ export default function useAuth({
     if (!isOnUnauthedRoute) {
       router.push("/signin");
     }
-  }, [setUserData, setSessionCookie, reset, router]);
+  }, [setUserData, setSessionCookie, reset, router, isOnUnauthedRoute]);
 
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(

@@ -259,8 +259,6 @@ const ChatFooter = () => {
     }
   );
   const toast = useToast();
-  const [shiftPressedRecently, setShiftPressedRecently] =
-    useState<boolean>(false);
   const onKeyUp = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && e.shiftKey) {
@@ -271,13 +269,7 @@ const ChatFooter = () => {
         onSubmit(e);
       }
     },
-    [
-      onSubmit,
-      toast,
-      shiftPressedRecently,
-      setShiftPressedRecently,
-      toastPosition,
-    ]
+    [onSubmit, toast, toastPosition]
   );
 
   return (
