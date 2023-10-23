@@ -247,7 +247,6 @@ router.post(
       const tempDir = temporaryDirectory();
       (readableStream as any).path = `${tempDir}/audio.wav`;
       const transcript = await transcribeAudio(readableStream);
-      console.log("transcript", transcript);
       res.status(200).json({
         data: { transcript },
       });
