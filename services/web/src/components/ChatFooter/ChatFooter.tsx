@@ -106,11 +106,11 @@ const RecordButton = ({
     transcribeMutation.mutate({
       data: formData,
     });
-  }, [recordingBlob, transcribeMutation.mutate, transcribeMutation]);
+  }, [recordingBlob, transcribeMutation.mutate]);
 
-  useEffect(() => {
-    setIsRecording(isRecording);
-  }, [isRecording, setIsRecording]);
+  // useEffect(() => {
+  //   setIsRecording(isRecording);
+  // }, [isRecording, setIsRecording]);
 
   // If recording for 1 min, stop recording and send
   useEffect(() => {
