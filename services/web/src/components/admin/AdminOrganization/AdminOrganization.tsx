@@ -32,6 +32,7 @@ import { putOrgMutation } from "@judie/data/mutations";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
 import InviteModal, { InviteModalType } from "../InviteModal";
+import BulkInviteModal from "../BulkInviteModal";
 
 const AdminOrganization = ({ id }: { id: string }) => {
   const { data: organizationData, refetch: refetchOrg } = useQuery({
@@ -61,6 +62,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
 
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [bulkInviteOpen, setBulkInviteOpen] = useState(false);
   const buttonSize = useBreakpointValue({ base: "sm", md: "md" });
   const router = useRouter();
 
@@ -84,6 +86,10 @@ const AdminOrganization = ({ id }: { id: string }) => {
         type={InviteModalType.ORGANIZATION}
         isOpen={inviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
+      />
+      <BulkInviteModal
+        isOpen={bulkInviteOpen}
+        onClose={() => setBulkInviteOpen(false)}
       />
       <HStack
         alignItems={"center"}
@@ -123,6 +129,13 @@ const AdminOrganization = ({ id }: { id: string }) => {
             onClick={() => setInviteModalOpen(true)}
           >
             + Invite
+          </Button>
+          <Button
+            variant={"purp"}
+            size={buttonSize}
+            onClick={() => setBulkInviteOpen(true)}
+          >
+            + Bulk Invite
           </Button>
           <Button
             colorScheme="green"

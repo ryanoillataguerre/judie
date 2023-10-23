@@ -1,186 +1,27 @@
 import {
+  Button,
   Flex,
-  FormControl,
-  FormLabel,
-  Input,
   Link,
+  ListIcon,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
-  Select,
   Text,
+  UnorderedList,
   useToast,
 } from "@chakra-ui/react";
-import {
-  CreatePermissionType,
-  bulkInviteMutation,
-  createInviteMutation,
-} from "@judie/data/mutations";
-import { GradeYear } from "@judie/data/types/api";
+import { bulkInviteMutation } from "@judie/data/mutations";
 import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
-import Button from "../Button/Button";
-import PermissionsWidget from "./PermissionsWidget";
 import { HTTPResponseError } from "@judie/data/baseFetch";
 import { ReactSpreadsheetImport } from "react-spreadsheet-import";
 import useAdminActiveOrganization from "@judie/hooks/useAdminActiveEntities";
 import { uploadThemeOverride } from "@judie/styles/chakra/chakra";
 import { useColorModeValue } from "@chakra-ui/react";
-
-interface SubmitData {
-  gradeYear?: GradeYear;
-  email: string;
-  permissions: CreatePermissionType[];
-}
-
-const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
-  const toast = useToast();
-  const createInvite = useMutation({
-    mutationFn: createInviteMutation,
-  });
-  const { handleSubmit, register } = useForm<SubmitData>({
-    defaultValues: {
-      gradeYear: undefined,
-      email: "",
-    },
-    reValidateMode: "onBlur",
-  });
-  const [permissions, setPermissions] = useState<CreatePermissionType[]>([]);
-
-  useEffect(() => {
-    return () => {
-      setPermissions([]);
-    };
-  }, []);
-
-  const onSubmit: SubmitHandler<SubmitData> = async ({
-    gradeYear,
-    email,
-  }: SubmitData) => {
-    try {
-      if (!permissions.length) {
-        toast({
-          status: "error",
-          title: "Must attach permissions",
-          description: "We need to know what to do with this user",
-        });
-        return;
-      }
-      await createInvite.mutateAsync({
-        gradeYear,
-        email,
-        permissions,
-      });
-      // Toast
-      toast({
-        title: "Invite Sent!",
-        description: "The user will receive an email with the invite link",
-        status: "success",
-      });
-      setPermissions([]);
-      onClose();
-    } catch (err) {
-      toast({
-        title: "Oops!",
-        description: (err as unknown as HTTPResponseError).message,
-        status: "error",
-      });
-    }
-  };
-  return (
-    <>
-      <Text
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 500,
-        }}
-      >
-        Add a user
-      </Text>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{
-          width: "100%",
-        }}
-      >
-        <Flex
-          style={{
-            flexDirection: "column",
-            alignItems: "flex-start",
-            paddingBottom: "1rem",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: "1rem",
-              margin: "1rem 0",
-            }}
-          >
-            Enter the user&apos;s info below and attach them to an organization,
-            school, or room for them to start out.
-          </Text>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-            isRequired
-          >
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <Input id="email" type="email" {...register("email", {})} />
-          </FormControl>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <FormLabel htmlFor="gradeYear">Grade Year</FormLabel>
-            <Select id="gradeYear" {...register("gradeYear", {})}>
-              <option value={undefined}>{"None"}</option>
-              {/* TODO Ryan: Make user-facing versions of these */}
-              {Object.keys(GradeYear).map((key) => (
-                <option value={key} key={key}>
-                  {key}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-              width: "100%",
-            }}
-            isRequired
-          >
-            <FormLabel htmlFor="permissions">Permissions</FormLabel>
-            <PermissionsWidget
-              onChangePermissions={setPermissions}
-              permissions={permissions}
-            />
-          </FormControl>
-
-          <Button
-            style={{
-              width: "100%",
-              marginTop: "1rem",
-            }}
-            colorScheme="green"
-            variant={"solid"}
-            loading={createInvite.isLoading}
-            label="Invite User"
-            disabled={!permissions.length}
-            type="submit"
-          />
-        </Flex>
-      </form>
-    </>
-  );
-};
+import { MdCheckCircle } from "react-icons/md";
 
 export enum InviteSheetRole {
   Student,
@@ -288,7 +129,7 @@ const fields = [
 //   return data;
 // };
 
-const InviteModal = ({
+const BulkInviteModal = ({
   isOpen,
   onClose,
 }: {
@@ -384,7 +225,6 @@ const InviteModal = ({
             alignItems: "flex-start",
           }}
         >
-          <SingleInviteModalBody onClose={onClose} />
           <ReactSpreadsheetImport
             isOpen={isUploadOpen}
             onClose={onCloseUpload}
@@ -396,21 +236,58 @@ const InviteModal = ({
           <Flex
             style={{
               width: "100%",
+              flexDirection: "column",
               padding: "1rem",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Text
-              style={{
-                fontSize: "0.8rem",
-              }}
-            >
-              Want to invite many students at one time?{" "}
-              <Link color={"teal.500"} onClick={() => setIsUploadOpen(true)}>
-                Upload instead
-              </Link>
+            <Text variant={"header"} marginBottom={"1rem"}>
+              Want to invite many users at one time?{" "}
             </Text>
+            <Text variant={"title"} marginBottom={"0.5rem"}>
+              Before you upload, please make sure the you have an Excel
+              spreadsheet with the following structure for each row:
+            </Text>
+            <Text variant={"base"}>
+              <UnorderedList spacing={"0.5rem"}>
+                <ListItem>
+                  <ListIcon as={MdCheckCircle} color="green.500" />
+                  Column A is the user's email
+                </ListItem>
+                <ListItem>
+                  <ListIcon as={MdCheckCircle} color="green.500" />
+                  Column B is one of the following:
+                  <UnorderedList>
+                    <ListItem>Student</ListItem>
+                    <ListItem>Teacher</ListItem>
+                    <ListItem>Principal</ListItem>
+                    <ListItem>Administrator</ListItem>
+                  </UnorderedList>
+                </ListItem>
+                <ListItem>
+                  <ListIcon as={MdCheckCircle} color="green.500" />
+                  For a Student, Teacher, or Principal, Column C is the School
+                  Name (please ensure this is accurate and the school is already
+                  created in Judie)
+                </ListItem>
+                <ListItem>
+                  <ListIcon as={MdCheckCircle} color="green.500" />
+                  For a Student or a Teacher, Column D is the Classroom Name
+                  (please ensure this is accurate and the classroom is already
+                  created in Judie, and that the classroom is in the school in
+                  column C)
+                </ListItem>
+              </UnorderedList>
+            </Text>
+            <Button
+              marginTop={"1rem"}
+              width={"100%"}
+              variant={"purp"}
+              onClick={() => setIsUploadOpen(true)}
+            >
+              Upload
+            </Button>
           </Flex>
         </ModalBody>
       </ModalContent>
@@ -418,4 +295,4 @@ const InviteModal = ({
   );
 };
 
-export default InviteModal;
+export default BulkInviteModal;
