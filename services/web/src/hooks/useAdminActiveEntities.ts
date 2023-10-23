@@ -27,7 +27,8 @@ const useAdminActiveEntities = () => {
     if (roomId) {
       return roomData?.schoolId;
     }
-  }, [schoolId, roomId]);
+  }, [schoolId, roomId, roomData?.schoolId]);
+
   const { data: schoolData } = useQuery({
     queryKey: [GET_SCHOOL_BY_ID, schId],
     queryFn: () => getSchoolByIdQuery(schId as string),
@@ -44,7 +45,7 @@ const useAdminActiveEntities = () => {
     if (roomId) {
       return roomData?.organizationId;
     }
-  }, [organizationId, schoolId, roomId]);
+  }, [organizationId, schoolId, roomId, roomData?.organizationId]);
 
   const { data: organizationData } = useQuery({
     queryKey: [GET_ORG_BY_ID, orgId],

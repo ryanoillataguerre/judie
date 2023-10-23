@@ -191,7 +191,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
       return;
     }
     return router.push("/admin");
-  }, [auth.userData?.permissions, auth.isAdmin, router, toast]);
+  }, [auth.userData?.permissions, router, toast]);
 
   const footerIcons: SidebarButtonProps[] = useMemo(() => {
     const options = [

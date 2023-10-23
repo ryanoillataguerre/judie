@@ -1,7 +1,6 @@
 import {
   Button,
   Flex,
-  Link,
   ListIcon,
   ListItem,
   Modal,
@@ -253,7 +252,7 @@ const BulkInviteModal = ({
               <UnorderedList spacing={"0.5rem"}>
                 <ListItem>
                   <ListIcon as={MdCheckCircle} color="green.500" />
-                  Column A is the user's email
+                  Column A is the user&apos;s email
                 </ListItem>
                 <ListItem>
                   <ListIcon as={MdCheckCircle} color="green.500" />
