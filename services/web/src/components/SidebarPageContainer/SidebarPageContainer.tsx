@@ -62,7 +62,7 @@ const SidebarPageContainer = ({
     >
       <Sidebar />
       <Box
-        overflow={scroll ? "scroll" : "hidden"}
+        overflow={scroll ? "auto" : "hidden"}
         style={{
           width: "100%",
           height: "100%",

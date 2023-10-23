@@ -46,7 +46,7 @@ const ScrollContainerBubbles = ({
       style={{
         position: "relative",
         height: "100%",
-        overflow: "scroll",
+        overflow: "auto",
       }}
       display={"flex"}
       flexGrow={1}
