@@ -162,9 +162,6 @@ const InviteModalBody = ({
     if (type === InviteModalType.ORGANIZATION) {
       return (
         <>
-          <Text variant={"body"} mb={"1rem"}>
-            Invite a user to be an Org Admin for this Organization
-          </Text>
           <Text variant={"detail"} mb={"1rem"}>
             Principals can view and edit a school, teachers can view and edit
             their Classrooms, and Organization Admins can view and edit the same
