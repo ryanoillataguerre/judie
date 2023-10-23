@@ -24,7 +24,7 @@ const Dashboard = () => {
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
-      overflowY={"scroll"}
+      overflowY={"auto"}
     >
       <OnboardingModal />
       {/* Dashboard Header */}

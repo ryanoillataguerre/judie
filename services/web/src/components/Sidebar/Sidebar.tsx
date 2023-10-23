@@ -454,7 +454,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
                   flexGrow: 1,
                   alignItems: "center",
                   justifyContent: "flex-start",
-                  overflowY: "scroll",
+                  overflowY: "auto",
                 }}
               >
                 {auth?.entities?.organizations?.map((org) => (
@@ -506,8 +506,9 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
                 flexGrow: 1,
                 alignItems: "center",
                 justifyContent: "flex-start",
-                overflowY: "scroll",
+                overflowY: "auto",
                 marginTop: "1rem",
+                paddingRight: "1rem",
               }}
             >
               {data?.map((folder) => (

@@ -240,7 +240,7 @@ const SidebarChatNav = () => {
             w={"100%"}
             maxH={"100%"}
             direction={"column"}
-            overflow={"scroll"}
+            overflow={"auto"}
             position={"absolute"}
           >
             {todayChats.length > 0 && (
@@ -268,7 +268,7 @@ const SidebarChatNav = () => {
                       flexGrow: 1,
                       alignItems: "center",
                       justifyContent: "flex-start",
-                      overflowY: "scroll",
+                      overflowY: "auto",
                       marginTop: "20px",
                     }}
                     gap={"10px"}
@@ -316,7 +316,7 @@ const SidebarChatNav = () => {
                       flexGrow: 1,
                       alignItems: "center",
                       justifyContent: "flex-start",
-                      overflowY: "scroll",
+                      overflowY: "auto",
                       marginTop: "20px",
                     }}
                     gap={"10px"}
@@ -364,9 +364,9 @@ const SidebarChatNav = () => {
                       flexGrow: 1,
                       alignItems: "center",
                       justifyContent: "flex-start",
-                      overflowY: "scroll",
+                      overflowY: "auto",
                       marginTop: "20px",
-                      overflowX: "scroll",
+                      overflowX: "auto",
                     }}
                     gap={"10px"}
                   >

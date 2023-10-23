@@ -490,7 +490,7 @@ const OnboardingModal = () => {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 paddingBottom: "1rem",
-                overflowY: "scroll",
+                overflowY: "auto",
                 maxHeight: "50vh",
               }}
               paddingX={"0.2rem"}

@@ -567,7 +567,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
             ) : (
               <Flex
                 position={"relative"}
-                overflowY={"scroll"}
+                overflowY={"auto"}
                 alignItems={"flex-start"}
                 justifyContent={"center"}
                 h={"100%"}
@@ -589,7 +589,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
                   </Text>
                   <Flex
                     width={"100%"}
-                    overflowY={"scroll"}
+                    overflowY={"auto"}
                     alignItems={"center"}
                     justifyContent={"center"}
                     // height={"100%"}

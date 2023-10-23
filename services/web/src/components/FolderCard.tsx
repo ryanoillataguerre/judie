@@ -17,7 +17,7 @@ const FolderCard = ({
   const purpleHexCode = useToken("colors", colorKey);
   return (
     <VStack
-      h={"9rem"}
+      h={"100%"}
       w={"100%"}
       maxW={"16rem"}
       borderColor={"gray.200"}
