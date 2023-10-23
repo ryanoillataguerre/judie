@@ -33,8 +33,10 @@ import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
 import InviteModal, { InviteModalType } from "../InviteModal";
 import BulkInviteModal from "../BulkInviteModal";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminOrganization = ({ id }: { id: string }) => {
+  const { refreshEntities } = useAuth();
   const { data: organizationData, refetch: refetchOrg } = useQuery({
     queryKey: [GET_ORG_BY_ID, id],
     queryFn: () => getOrgByIdQuery(id),
@@ -57,6 +59,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
     mutationFn: putOrgMutation,
     onSuccess: () => {
       refetchOrg();
+      refreshEntities();
     },
   });
 

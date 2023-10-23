@@ -33,6 +33,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
 import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
 import InviteModal, { InviteModalType } from "../InviteModal";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData, refetch: refetchSchool } = useQuery({
@@ -54,10 +55,12 @@ const AdminSchool = ({ id }: { id: string }) => {
 
   const [createRoomOpen, setCreateRoomOpen] = useState(false);
 
+  const { refreshEntities } = useAuth();
   const editSchoolMutation = useMutation({
     mutationFn: putSchoolMutation,
     onSuccess: () => {
       refetchSchool();
+      refreshEntities();
     },
   });
 

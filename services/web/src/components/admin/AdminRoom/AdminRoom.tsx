@@ -27,9 +27,9 @@ import { putRoomMutation } from "@judie/data/mutations";
 import EditableTitle from "../EditableTitle";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
-import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
 import InviteModal, { InviteModalType } from "../InviteModal";
 import { useState } from "react";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData, refetch: refetchRoom } = useQuery({
@@ -48,10 +48,12 @@ const AdminRoom = ({ id }: { id: string }) => {
     enabled: !!id,
   });
 
+  const { refreshEntities } = useAuth();
   const editRoomMutation = useMutation({
     mutationFn: putRoomMutation,
     onSuccess: () => {
       refetchRoom();
+      refreshEntities();
     },
   });
   const router = useRouter();
