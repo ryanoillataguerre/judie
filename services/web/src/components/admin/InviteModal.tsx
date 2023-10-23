@@ -391,20 +391,14 @@ const InviteModalBody = ({
   });
   const email = watch("email");
 
-  console.log("orgId", organizationId);
-  console.log("schoolIdSuper", schoolIdSuper);
-  console.log("roomIdSuper", roomIdSuper);
-
   const isDisabled = useMemo(() => {
     // Require email and permissionType
-    console.log("permissionType", permissionType);
     if (!permissionType) {
       return true;
     }
     if (!email) {
       return true;
     }
-    console.log("got here 1");
     if (permissionType === PermissionType.ROOM_ADMIN) {
       switch (type) {
         case InviteModalType.ROOM:
@@ -419,7 +413,6 @@ const InviteModalBody = ({
           );
       }
     }
-    console.log("got here 2");
     if (permissionType === PermissionType.SCHOOL_ADMIN) {
       switch (type) {
         case InviteModalType.SCHOOL:
@@ -428,11 +421,9 @@ const InviteModalBody = ({
           return !(schoolId || schoolIdSuper) || !organizationId;
       }
     }
-    console.log("got here 3");
     if (permissionType === PermissionType.ORG_ADMIN) {
       return !organizationId;
     }
-    console.log("got here 4");
 
     return false;
   }, [
@@ -445,6 +436,7 @@ const InviteModalBody = ({
     roomIdSuper,
     schoolIdSuper,
   ]);
+
   return (
     <>
       <Text variant={"subheader"}>Invite User</Text>
