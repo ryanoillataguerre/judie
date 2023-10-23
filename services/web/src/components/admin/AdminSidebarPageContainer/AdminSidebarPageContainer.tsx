@@ -65,7 +65,7 @@ const AdminSidebarPageContainer = ({
           height: "100%",
           maxHeight: "100vh",
           position: "relative",
-          overflow: "scroll",
+          overflow: "auto",
           maxWidth: "100%",
         }}
         p={{ base: "1rem 1rem 1rem 2rem", md: "2rem 2rem" }}

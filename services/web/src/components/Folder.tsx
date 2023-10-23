@@ -57,7 +57,7 @@ const Folder = ({ id }: { id: string }) => {
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
-      overflowY={"scroll"}
+      overflowY={"auto"}
     >
       <HStack
         alignItems={"center"}
