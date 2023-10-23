@@ -128,7 +128,7 @@ const FolderButton = ({
       >
         <HiMiniFolderOpen size={24} color={purpleHexCode} />
       </Center>
-      <VStack alignItems={"flex-start"}>
+      <VStack alignItems={"flex-start"} overflowX={"auto"}>
         <Text variant={"title"}>{title}</Text>
         <Text variant={"detail"}>{numChats} chats</Text>
       </VStack>
