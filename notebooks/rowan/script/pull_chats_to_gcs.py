@@ -1,8 +1,8 @@
 """
 Pull chat transcripts from BigQuery for better readability and save to GCS.
 
-Note: The table name that is passed to hold the intermediary results will be replaced if
-      there is a naming conflict.
+Note: If the table name that is passed to hold the intermediary results already exists, no new
+      data will be added to the table unless the `table_write_mode` is changed from the default.
 
 test ids:
 1946d447-4d94-4098-8e29-b5cd60ea5869

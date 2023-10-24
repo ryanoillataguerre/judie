@@ -1,4 +1,4 @@
--- This query pulls a single chat transcript from the chat table.
+-- This query pulls a select set of chat transcripts from the chat table.
 -- Input values:
 --      prod_project_id     : The GCP ID for the production project (data source)
 --      prod_db             : The name of the production BigQuery database

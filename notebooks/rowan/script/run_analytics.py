@@ -1,5 +1,4 @@
-"""
-Exploration script to run queries against BigQuery.
+"""Exploration script to run queries against BigQuery.
 
 Date: 2023-10-16 (modified 2023-10-16)
 """
