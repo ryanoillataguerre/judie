@@ -5,8 +5,9 @@ Date: 2023-10-16 (modified 2023-10-16)
 """
 import argparse
 import os
+import sys
 
-
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from src.gcp_utils import BQUtils, GCSUtils
 from src.general_utils import load_params
 
@@ -57,3 +58,4 @@ if __name__ == "__main__":
         params["gcs"]["base"], params["gcs"]["analytics"], params["gcs"]["user_stats"]
     ) + "." + args.file_format
     gcs_utils.write_pd_dataframe_to_gcs(df, args.bucket, prefix, args.file_format)
+

@@ -13,9 +13,10 @@ Date: 2023-10-19 (modified 2023-10-19)
 """
 import argparse
 import os
+import sys
 from datetime import datetime
 
-
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from src.gcp_utils import BQUtils, GCSUtils
 from src.general_utils import load_params
 
@@ -31,12 +32,14 @@ def setup_argparser() -> argparse.ArgumentParser:
         A configured argparse object
     """
     parser = argparse.ArgumentParser(
-        description="""This script ingests option chain data using Yahoo Finance API."""
+        description="""This script pulls chat transcripts into GCS for ease of readability."""
     )
     parser.add_argument(
-        '--chat_ids', nargs='*', type=str, default=[], help='A list of chat_ids to pull from')
-    parser.add_argument(
         "--config_file", type=str, default=CONFIG_FILE, help="""Config file to use."""
+    )
+    parser.add_argument(
+        '--chat_ids', nargs='*', type=str, default=[],
+        help='A list of chat_ids to pull (use "all" to pull all chats - careful with data size)'
     )
     parser.add_argument(
         "--dataset", type=str, default="rowan_dataset",
@@ -52,7 +55,11 @@ def setup_argparser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--bucket", type=str, default="judie-exploration-us-west1",
-        help="""The name of the bucket to which to save data."""
+        help="""The name of the bucket to which to save the data."""
+    )
+    parser.add_argument(
+        "--dir_prefix", type=str, default="",
+        help="""The prefix (directory path not file path) to which to save the transcript files."""
     )
     parser.add_argument(
         "--file_format", type=str, default="csv",
@@ -79,13 +86,25 @@ if __name__ == "__main__":
         query_params.update({"chat_ids": str(tuple(args.chat_ids))})
 
     # Pull data from BigQuery to Google Cloud Storage
-    file_name = f"transcripts_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.{args.file_format}"
-    prefix = os.path.join(params["gcs"]["base"], params["gcs"]["transcripts"], file_name)
+    dt_str = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+    # Dump all raw data into a single file (or directory if parquet)
+    if args.file_format.lower() == "parquet":
+        dump_path = f"transcripts_dump_{dt_str}"
+    else:
+        dump_path = f"transcripts_dump_{dt_str}.{args.file_format}"
+
+    if not args.dir_prefix:
+        prefix = os.path.join(params["gcs"]["base"], params["gcs"]["transcripts"])
+
+    dump_prefix = os.path.join(prefix, dump_path)
+
+    # Pull all transcript records into GCS
     bq_utils.run_query_to_gcs(
         query_file,
         query_params,
         args.bucket,
-        prefix,
+        dump_prefix,
         args.file_format,
         args.dataset,
         args.table,
