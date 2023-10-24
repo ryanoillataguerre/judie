@@ -56,6 +56,7 @@ import {
   SidebarRoom,
   SidebarSchool,
 } from "./AdminButtons";
+import { getIconForSubject } from "../FolderCard";
 
 interface SidebarButtonProps {
   icon?: JSX.Element | undefined;
@@ -126,11 +127,16 @@ const FolderButton = ({
         marginRight={"0.5rem"}
         bgColor={folderBtnBGColor}
       >
-        <HiMiniFolderOpen size={24} color={purpleHexCode} />
+        {getIconForSubject({
+          defaultColor: purpleHexCode,
+          title,
+        })}
       </Center>
       <VStack alignItems={"flex-start"} overflowX={"auto"}>
         <Text variant={"title"}>{title}</Text>
-        <Text variant={"detail"}>{numChats} chats</Text>
+        <Text variant={"detail"}>
+          {numChats} chat{(numChats || 0) === 1 ? "" : "s"}
+        </Text>
       </VStack>
     </Button>
   );
