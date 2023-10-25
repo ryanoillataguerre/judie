@@ -6,18 +6,32 @@ import { HiMiniFolderOpen } from "react-icons/hi2";
 export const getIconForSubject = ({
   defaultColor,
   title,
+  padding,
 }: {
   defaultColor?: string;
   title?: string | null;
+  padding?: boolean;
 }) => {
   if (!title) {
     return <HiMiniFolderOpen size={24} color={defaultColor} />;
   }
   const emoji = getTopicEmoji(title);
   if (emoji && emoji !== "📚") {
-    return <Text fontSize={"1rem"}>{emoji}</Text>;
+    return <Text fontSize={"1.5rem"}>{emoji}</Text>;
   }
-  return <HiMiniFolderOpen size={24} color={defaultColor} />;
+  return (
+    <HiMiniFolderOpen
+      style={
+        padding
+          ? {
+              margin: "0.5rem",
+            }
+          : {}
+      }
+      size={24}
+      color={defaultColor}
+    />
+  );
 };
 
 const FolderCard = ({
@@ -52,8 +66,12 @@ const FolderCard = ({
         router.push(`/folders/${id}`);
       }}
     >
-      <Center borderRadius={"0.5rem"} padding={"0.5rem"} bgColor={"white"}>
-        {getIconForSubject({ defaultColor: purpleHexCode, title })}
+      <Center aspectRatio={"1"} borderRadius={"0.5rem"} bgColor={"white"}>
+        {getIconForSubject({
+          defaultColor: purpleHexCode,
+          title,
+          padding: true,
+        })}
       </Center>
       <Text variant={"title"}>{title}</Text>
       {chatCount ? (
