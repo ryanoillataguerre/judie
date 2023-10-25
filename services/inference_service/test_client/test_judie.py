@@ -96,6 +96,24 @@ def test_history_openai_fmt_len_limit(env_setup):
     ]
 
 
+def test_history_single_str(env_setup):
+    history = judie_data.History()
+    history.add_turn(
+        judie_data.ChatTurn(
+            role=judie_data.Role.USER,
+            content="Sick content here",
+        )
+    )
+    history.add_turn(
+        judie_data.ChatTurn(
+            role=judie_data.Role.ASSISTANT,
+            content="Wow that was sick content",
+        )
+    )
+
+    assert "Student" in history.get_last_n_single_string(4)
+
+
 def test_session_config(env_setup):
     history = judie_data.History()
     history.add_turn(

@@ -3,6 +3,7 @@ from typing import List, Dict, Optional, Coroutine
 import logging
 from dataclasses import dataclass
 from inference_service.server.judie_data import SessionConfig
+from inference_service.prompts.comprehension_prompts import construct_comp_prompt_list
 
 logger = logging.getLogger("inference_logger")
 
@@ -100,31 +101,32 @@ def identify_math_exp(message: str) -> str:
     return openai_response
 
 
-def comprehension_score(session_config: SessionConfig) -> Optional[int]:
-    prompt = [
-        {
-            "role": "system",
-            "content": "You are observing a conversation between a tutor and a student. On a scale "
-            "of 1 to 10 classify how well the student understood the conversation and "
-            "subject material given the context of the conversation and the last user "
-            "response or question after the tutor.  Remember, well formed clarifying or "
-            "curious questions can show comprehension.  Respond only with the numeric "
-            "comprehension score on the scale of 1 to 10.",
-        },
-    ] + session_config.history.get_openai_format()[-5:]
+async def comprehension_score(session_config: SessionConfig) -> Optional[float]:
+    prompts = construct_comp_prompt_list(subject=session_config.subject)
     # arbitrarily use last five messages as conversation window
-    # TODO bring all messages into first user block to force a regular completion instead of chat format
+    history_str = session_config.history.get_last_n_single_string(5)
 
-    comp_score = get_gpt_response_single(
-        messages=prompt,
-        openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
-    )
-    logger.info(f"Comprehension score: {comp_score}")
+    comp_responses = []
+    for prompt in prompts:
+        comp_score = await get_gpt_response_async(
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": history_str},
+            ],
+            openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
+        )
+        comp_responses.append(comp_score)
 
-    if comp_score.isnumeric():
-        return int(comp_score)
-    else:
-        return None
+    sum_comp = 0
+    num_comps = 0
+    for score in comp_responses:
+        if score.isnumeric():
+            sum_comp += int(score)
+            num_comps += 1
+
+    if num_comps:
+        return sum_comp / num_comps
+    return None
 
 
 def check_for_sensitive_content(session_config: SessionConfig) -> Optional[str]:

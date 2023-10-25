@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from inference_service.openai_manager import openai_manager
 import inference_service.server.judie_data
+import asyncio
 
 
 @pytest.fixture
@@ -65,7 +66,7 @@ def test_comprehension(env_setup):
     sesh = inference_service.server.judie_data.SessionConfig(
         history=history, subject=""
     )
-    comp_score = openai_manager.comprehension_score(session_config=sesh)
+    comp_score = asyncio.run(openai_manager.comprehension_score(session_config=sesh))
 
     assert comp_score in [i for i in range(11)]
 
