@@ -5,6 +5,7 @@ import ChatsTable from "./ChatsTable";
 import { useQuery } from "react-query";
 import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
 import DashboardFoldersList from "./DashboardFoldersList";
+import OnboardingModal from "./OnboardingModal";
 
 const Dashboard = () => {
   const { userData } = useAuth();
@@ -23,8 +24,9 @@ const Dashboard = () => {
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
-      overflowY={"scroll"}
+      overflowY={"auto"}
     >
+      <OnboardingModal />
       {/* Dashboard Header */}
       <DashboardHeader />
       {/* Title */}

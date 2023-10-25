@@ -146,6 +146,8 @@ const NewPermissionRow = ({
   }, [
     type,
     organizationId,
+    roomId,
+    schoolId,
     reset,
     setOrganizationId,
     setSchoolId,
@@ -338,7 +340,7 @@ const NewPermissionRow = ({
               }}
               isRequired={type === PermissionType.ROOM_ADMIN}
             >
-              <FormLabel htmlFor="room">Room</FormLabel>
+              <FormLabel htmlFor="room">Class</FormLabel>
               <Select
                 id="roomId"
                 {...register("roomId", {})}

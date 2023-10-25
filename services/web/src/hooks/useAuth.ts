@@ -10,6 +10,7 @@ import {
   EntitiesResponse,
   PermissionType,
   SubscriptionStatus,
+  SubscriptionType,
   User,
   UserRole,
 } from "@judie/data/types/api";
@@ -71,7 +72,10 @@ export default function useAuth({
   const [userData, setUserData] = useState<User | undefined>(undefined);
 
   const isB2B = useMemo(() => {
-    return !!userData?.subscription?.organizationId;
+    return (
+      !!userData?.subscription?.organizationId ||
+      userData?.subscription?.type === SubscriptionType.SEAT
+    );
   }, [userData]);
 
   const isPaid = useMemo(() => {
@@ -99,8 +103,10 @@ export default function useAuth({
     });
     setSessionCookie(undefined);
     setUserData(undefined);
-    router.push("/signin");
-  }, [setUserData, setSessionCookie, reset, router]);
+    if (!isOnUnauthedRoute) {
+      router.push("/signin");
+    }
+  }, [setUserData, setSessionCookie, reset, router, isOnUnauthedRoute]);
 
   // GET /users/me
   const { isError, refetch, isLoading, isFetched } = useQuery(
@@ -186,21 +192,36 @@ export default function useAuth({
         value: null,
       });
 
-      window?._upf?.push([
-        isProduction() ? "order" : isSandbox() ? "order_sandbox" : "order_dev",
-        {
-          order_id: userData?.subscription?.id, // required
-          order_name: userData?.subscription?.type, // required
-          amount: "49.00", // required
-          currency: "usd", // required,
-          customer: {
-            customer_id: userData?.id,
-            first_name: userData?.firstName,
-            last_name: userData?.lastName,
-            email: userData?.email,
+      // create an order_id of type number taking the first 8 hex characters of the subscription id
+      const order_id = userData?.subscription?.id.split("-")[0];
+      const order_id_num = parseInt(order_id, 16);
+      const customer_id_num = parseInt(userData?.id.split("-")[0], 16);
+      const subscriptionType = userData?.subscription?.type.toLowerCase();
+
+      const orderName = isProduction()
+        ? `order_${subscriptionType}`
+        : isSandbox()
+        ? `order_sandbox_${subscriptionType}`
+        : `order_dev_${subscriptionType}`;
+
+      // add to the order_id ( + 1, 2, 3, etc ) in order to push more than one order with same subscription for testing.
+      if (isProduction()) {
+        window._upf.push([
+          "order",
+          {
+            order_id: order_id_num, // required - must be unique and will not be accepted if it is not
+            order_name: orderName, // required
+            amount: 49, // required
+            currency: "usd", // required
+            customer: {
+              customer_id: customer_id_num,
+              first_name: userData?.firstName,
+              last_name: userData?.lastName,
+              email: userData?.email,
+            },
           },
-        },
-      ]);
+        ]);
+      }
 
       const newQuery = router.query;
       delete newQuery.paid;

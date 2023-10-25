@@ -12,8 +12,7 @@ import {
 import { Redis } from "ioredis";
 import morgan from "morgan";
 import { isProduction, isSandbox } from "./env.js";
-import { getUser, updateUser } from "../users/service.js";
-import { createQuestionCountEntry, getQuestionCountEntry } from "./redis.js";
+import { getUser } from "../users/service.js";
 import { SubscriptionStatus, UserRole } from "@prisma/client";
 
 // Base server headers
@@ -72,16 +71,33 @@ export const messageRateLimit = async (
   }
 };
 
-export const requireAuth = (req: Request, _: Response, next: NextFunction) => {
-  try {
-    if (!req.session?.userId) {
-      throw new UnauthorizedError("Not authorized");
+// Error wrapping Higher order function
+// This is used to pass our custom errors into the error handler middleware below
+export const errorPassthrough =
+  (fn: RequestHandler) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // No idea why eslint is warning here
+      // Awaiting definitely does have an affect, since
+      // RequestHandler can be (and always is in our case) async
+      await fn(req, res, next);
+    } catch (err) {
+      next(err);
     }
-    next();
-  } catch (err) {
-    next(err);
+  };
+
+export const requireAuth = errorPassthrough(
+  (req: Request, _: Response, next: NextFunction) => {
+    try {
+      if (!req.session?.userId) {
+        throw new UnauthorizedError("Not authorized");
+      }
+      next();
+    } catch (err) {
+      next(err);
+    }
   }
-};
+);
 
 export const requireJudieAuth = async (
   req: Request,
@@ -101,21 +117,6 @@ export const requireJudieAuth = async (
     next(err);
   }
 };
-
-// Error wrapping Higher order function
-// This is used to pass our custom errors into the error handler middleware below
-export const errorPassthrough =
-  (fn: RequestHandler) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // No idea why eslint is warning here
-      // Awaiting definitely does have an affect, since
-      // RequestHandler can be (and always is in our case) async
-      await fn(req, res, next);
-    } catch (err) {
-      next(err);
-    }
-  };
 
 // Error handler
 export const errorHandler = (

@@ -402,3 +402,59 @@ export const getUsersForAdminUser = async ({ id }: { id: string }) => {
 
   return userQueryResult;
 };
+
+export const getUsage = async () => {
+  const midnightLastNight = new Date();
+  midnightLastNight.setHours(0, 0, 0, 0);
+
+  const daus = await dbClient.user.findMany({
+    where: {
+      // Filter out employees
+      email: {
+        not: {
+          contains: "@judie.io",
+        },
+      },
+      lastMessageAt: {
+        gte: midnightLastNight,
+      },
+    },
+    include: {
+      subscription: true,
+    },
+  });
+
+  const midnightBeginningOfMonth = new Date();
+  midnightBeginningOfMonth.setDate(1);
+  midnightBeginningOfMonth.setHours(0, 0, 0, 0);
+
+  const maus = await dbClient.user.findMany({
+    where: {
+      // Filter out employees
+      email: {
+        not: {
+          contains: "@judie.io",
+        },
+      },
+      lastMessageAt: {
+        gte: midnightBeginningOfMonth,
+      },
+    },
+    include: {
+      subscription: true,
+    },
+  });
+
+  return {
+    daily: {
+      date: midnightLastNight.toISOString(),
+      count: daus.length,
+      users: daus,
+    },
+    monthly: {
+      date: midnightBeginningOfMonth.toISOString(),
+      count: maus.length,
+      users: maus,
+    },
+  };
+};

@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { PermissionType, Prisma, User } from "@prisma/client";
 import dbClient from "../utils/prisma.js";
 
 export const createRoom = async (params: Prisma.RoomCreateArgs) => {
@@ -13,6 +13,9 @@ export const getUsersForRoom = async ({ id }: { id: string }) => {
         not: null,
       },
       deletedAt: null,
+      type: {
+        not: PermissionType.ROOM_ADMIN,
+      },
     },
     include: {
       user: {
@@ -57,7 +60,11 @@ export const getInvitesForRoom = async ({ id }: { id: string }) => {
       },
     },
     include: {
-      permissions: true,
+      permissions: {
+        where: {
+          deletedAt: null,
+        },
+      },
     },
   });
 };

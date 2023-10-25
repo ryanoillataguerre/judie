@@ -1,6 +1,24 @@
 import { Center, Text, VStack, useColorMode, useToken } from "@chakra-ui/react";
+import { getTopicEmoji } from "@judie/utils/topicEmoji";
 import { useRouter } from "next/router";
 import { HiMiniFolderOpen } from "react-icons/hi2";
+
+export const getIconForSubject = ({
+  defaultColor,
+  title,
+}: {
+  defaultColor?: string;
+  title?: string | null;
+}) => {
+  if (!title) {
+    return <HiMiniFolderOpen size={24} color={defaultColor} />;
+  }
+  const emoji = getTopicEmoji(title);
+  if (emoji && emoji !== "📚") {
+    return <Text fontSize={"1rem"}>{emoji}</Text>;
+  }
+  return <HiMiniFolderOpen size={24} color={defaultColor} />;
+};
 
 const FolderCard = ({
   id,
@@ -17,7 +35,7 @@ const FolderCard = ({
   const purpleHexCode = useToken("colors", colorKey);
   return (
     <VStack
-      h={"9rem"}
+      h={"100%"}
       w={"100%"}
       maxW={"16rem"}
       borderColor={"gray.200"}
@@ -35,7 +53,7 @@ const FolderCard = ({
       }}
     >
       <Center borderRadius={"0.5rem"} padding={"0.5rem"} bgColor={"white"}>
-        <HiMiniFolderOpen size={24} color={purpleHexCode} />
+        {getIconForSubject({ defaultColor: purpleHexCode, title })}
       </Center>
       <Text variant={"title"}>{title}</Text>
       {chatCount ? (

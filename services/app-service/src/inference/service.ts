@@ -23,13 +23,12 @@ export const getChatCompletion = async ({
   // Retry if return is not hit
   let triesCounter = 0;
   while (triesCounter < 3) {
-    console.log(`try #${triesCounter}`);
+    console.info(`try #${triesCounter}`);
     try {
       const result = inferenceServiceClient.getChatResponse(chatRequest);
       const fullResponse = [];
       const killOnHang = () => {
         if (!fullResponse.length) {
-          console.error("No response yet. Trying again...");
           triesCounter++;
           throw new InternalError("No response yet. Trying again...");
         }

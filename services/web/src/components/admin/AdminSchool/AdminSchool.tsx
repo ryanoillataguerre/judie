@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   Tab,
@@ -8,6 +9,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   GET_INVITES_FOR_SCHOOL,
@@ -27,6 +29,11 @@ import UsersTable from "../tables/UsersTable";
 import RoomsTable from "../tables/RoomsTable";
 import EditableTitle from "../EditableTitle";
 import { putSchoolMutation } from "@judie/data/mutations";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
+import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
+import InviteModal, { InviteModalType } from "../InviteModal";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminSchool = ({ id }: { id: string }) => {
   const { data: schoolData, refetch: refetchSchool } = useQuery({
@@ -48,12 +55,19 @@ const AdminSchool = ({ id }: { id: string }) => {
 
   const [createRoomOpen, setCreateRoomOpen] = useState(false);
 
+  const { refreshEntities } = useAuth();
   const editSchoolMutation = useMutation({
     mutationFn: putSchoolMutation,
     onSuccess: () => {
       refetchSchool();
+      refreshEntities();
     },
   });
+
+  const router = useRouter();
+
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const buttonSize = useBreakpointValue({ base: "sm", md: "md" });
 
   return (
     <VStack
@@ -72,40 +86,64 @@ const AdminSchool = ({ id }: { id: string }) => {
         schoolId={schoolData?.id as string}
         organizationId={schoolData?.organizationId as string}
       />
+      <InviteModal
+        type={InviteModalType.SCHOOL}
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+      />
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
         width={"100%"}
-        paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        {schoolData && (
-          <EditableTitle
-            title={schoolData?.name as string}
-            onChange={(value) => {
-              value = value.trim();
-              if (!value || value.length < 1) return;
-              if (value === schoolData?.name) return;
-              editSchoolMutation.mutate({
-                schoolId: schoolData?.id as string,
-                name: value,
-              });
-            }}
-          />
-        )}
-
-        <Button
-          size={"sm"}
-          variant={"solid"}
-          colorScheme="green"
-          onClick={() => setCreateRoomOpen(true)}
-        >
-          <PlusSquareIcon marginRight={"0.3rem"} /> Create Room
-        </Button>
+        <HStack paddingRight={"1rem"}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
+          {schoolData && (
+            <EditableTitle
+              title={schoolData?.name as string}
+              onChange={(value) => {
+                value = value.trim();
+                if (!value || value.length < 1) return;
+                if (value === schoolData?.name) return;
+                editSchoolMutation.mutate({
+                  schoolId: schoolData?.id as string,
+                  name: value,
+                });
+              }}
+            />
+          )}
+        </HStack>
+        <HStack spacing={2}>
+          <Button
+            variant={"purp"}
+            size={buttonSize}
+            onClick={() => setInviteModalOpen(true)}
+          >
+            + Invite
+          </Button>
+          <Button
+            variant={"solid"}
+            size={buttonSize}
+            colorScheme="green"
+            onClick={() => setCreateRoomOpen(true)}
+          >
+            <PlusSquareIcon marginRight={"0.3rem"} /> Create Class
+          </Button>
+        </HStack>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
-          {schoolData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {schoolData?.rooms?.length ? <Tab>Classes</Tab> : null}
           {schoolUserData?.length ? <Tab>Users</Tab> : null}
           {schoolInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>

@@ -14,18 +14,38 @@ import {
 import { User } from "@judie/data/types/api";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import TableFooter from "./TableFooter";
 import SearchBar from "@judie/components/SearchBar/SearchBar";
+import { getPermissionTypeLabel } from "../InviteModal";
 
 const USER_PAGE_SIZE = 20;
+
+const getEntityNameForIds = ({
+  organizationId,
+  schoolId,
+  roomId,
+}: {
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
+}) => {
+  if (roomId) {
+    return "class";
+  }
+  if (schoolId) {
+    return "school";
+  }
+  if (organizationId) {
+    return "organization";
+  }
+  return "entity";
+};
 
 const UsersTable = ({
   users,
   organizationId,
   schoolId,
   roomId,
-  loading,
 }: {
   users: User[];
   roomId?: string;
@@ -53,6 +73,7 @@ const UsersTable = ({
     }
     return users.slice(page * USER_PAGE_SIZE, (page + 1) * USER_PAGE_SIZE);
   }, [users, page]);
+
   return (
     <TableContainer>
       <SearchBar
@@ -67,7 +88,15 @@ const UsersTable = ({
             <Th>First name</Th>
             <Th>Last name</Th>
             <Th>Last message</Th>
-            <Th>Permissions</Th>
+            <Th>
+              Role (in this{" "}
+              {getEntityNameForIds({
+                organizationId,
+                schoolId,
+                roomId,
+              })}
+              )
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -94,26 +123,28 @@ const UsersTable = ({
                 }}
               >
                 <Td>{user.email}</Td>
-                <Td>{user.firstName || "n/a"}</Td>
-                <Td>{user.lastName || "n/a"}</Td>
+                <Td>{user.firstName || "--"}</Td>
+                <Td>{user.lastName || "--"}</Td>
                 <Td>
                   {user.createdAt
                     ? new Date(user.createdAt)?.toLocaleDateString()
-                    : "n/a"}
+                    : "--"}
                 </Td>
                 <Td>
-                  {user.permissions?.find((p) => {
-                    if (roomId) {
-                      return p.roomId === roomId;
-                    }
-                    if (schoolId) {
-                      return p.schoolId === schoolId;
-                    }
-                    if (organizationId) {
-                      return p.organizationId === organizationId;
-                    }
-                    return false;
-                  })?.type || "n/a"}
+                  {getPermissionTypeLabel(
+                    user.permissions?.find((p) => {
+                      if (roomId) {
+                        return p.roomId === roomId;
+                      }
+                      if (schoolId) {
+                        return p.schoolId === schoolId;
+                      }
+                      if (organizationId) {
+                        return p.organizationId === organizationId;
+                      }
+                      return false;
+                    })?.type || undefined
+                  ) || "--"}
                 </Td>
               </Tr>
             ))}

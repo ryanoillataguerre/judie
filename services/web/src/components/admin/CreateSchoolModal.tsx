@@ -141,7 +141,7 @@ const CreateSchoolModal = ({
                 colorScheme="green"
                 variant={"solid"}
                 loading={createSchool.isLoading}
-                label="Create School"
+                label="Submit"
                 type="submit"
               />
             </Flex>

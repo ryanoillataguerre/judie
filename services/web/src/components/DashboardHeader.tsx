@@ -10,7 +10,12 @@ import CreateFolderModal from "./CreateFolderModal";
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { createChatMutation } from "@judie/data/mutations";
-import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
+import {
+  GET_USER_CHATS,
+  GET_USER_FOLDERS,
+  getUserChatsQuery,
+  getUserFoldersQuery,
+} from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
 
@@ -68,7 +73,7 @@ const DashboardHeader = () => {
       <HStack>
         <Button
           size={buttonSize}
-          variant={"secondary"}
+          variant={"purp"}
           type={"button"}
           isLoading={createChat.isLoading}
           onClick={() => createChat.mutate({})}
@@ -79,7 +84,7 @@ const DashboardHeader = () => {
         {!isMobile && (
           <Button
             size={buttonSize}
-            variant={"purp"}
+            variant={"secondary"}
             type={"button"}
             onClick={() => {
               setIsCreateOpen(true);

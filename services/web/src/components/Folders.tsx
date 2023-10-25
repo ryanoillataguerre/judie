@@ -29,7 +29,7 @@ const Folders = () => {
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
-      overflowY={"scroll"}
+      overflowY={"auto"}
       pt={"3rem"}
     >
       <VStack width={"100%"} alignItems={"flex-start"}>

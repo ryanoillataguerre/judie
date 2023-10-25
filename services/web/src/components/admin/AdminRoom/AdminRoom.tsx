@@ -1,4 +1,6 @@
 import {
+  Box,
+  Button,
   HStack,
   Tab,
   TabIndicator,
@@ -7,6 +9,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   GET_INVITES_FOR_ROOM,
@@ -22,6 +25,11 @@ import { Invite, User } from "@judie/data/types/api";
 import InvitesTable from "../tables/InvitesTable";
 import { putRoomMutation } from "@judie/data/mutations";
 import EditableTitle from "../EditableTitle";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
+import InviteModal, { InviteModalType } from "../InviteModal";
+import { useState } from "react";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminRoom = ({ id }: { id: string }) => {
   const { data: roomData, refetch: refetchRoom } = useQuery({
@@ -40,12 +48,17 @@ const AdminRoom = ({ id }: { id: string }) => {
     enabled: !!id,
   });
 
+  const { refreshEntities } = useAuth();
   const editRoomMutation = useMutation({
     mutationFn: putRoomMutation,
     onSuccess: () => {
       refetchRoom();
+      refreshEntities();
     },
   });
+  const router = useRouter();
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const buttonSize = useBreakpointValue({ base: "sm", md: "md" });
 
   return (
     <VStack
@@ -58,25 +71,49 @@ const AdminRoom = ({ id }: { id: string }) => {
         maxWidth: "100%",
       }}
     >
+      <InviteModal
+        type={InviteModalType.ROOM}
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+      />
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
         width={"100%"}
       >
-        {roomData && (
-          <EditableTitle
-            title={roomData?.name as string}
-            onChange={(value) => {
-              value = value.trim();
-              if (!value || value.length < 1) return;
-              if (value === roomData?.name) return;
-              editRoomMutation.mutate({
-                roomId: roomData?.id as string,
-                name: value,
-              });
-            }}
-          />
-        )}
+        <HStack paddingRight={"1rem"}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
+          {roomData && (
+            <EditableTitle
+              title={roomData?.name as string}
+              onChange={(value) => {
+                value = value.trim();
+                if (!value || value.length < 1) return;
+                if (value === roomData?.name) return;
+                editRoomMutation.mutate({
+                  roomId: roomData?.id as string,
+                  name: value,
+                });
+              }}
+            />
+          )}
+        </HStack>
+        <Button
+          variant={"purp"}
+          size={buttonSize}
+          onClick={() => setInviteModalOpen(true)}
+        >
+          + Invite
+        </Button>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>

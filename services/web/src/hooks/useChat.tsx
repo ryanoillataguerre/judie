@@ -9,6 +9,8 @@ import {
   getChatByIdQuery,
   getUserChatsQuery,
   GET_USER_CHATS,
+  GET_USER_FOLDERS,
+  getUserFoldersQuery,
 } from "@judie/data/queries";
 import { Chat, Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
@@ -145,18 +147,12 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setTempUserMessageChatId,
   ]);
 
-  useEffect(() => {
-    if (beingStreamedMessage) {
-      reset();
-    }
-  }, [auth?.userData?.id, reset, beingStreamedMessage]);
-
-  // If beingStreamedMessage hasn't been updated in 5 seconds, reset it
+  // If beingStreamedMessage hasn't been updated in 10 seconds, reset it
   useEffect(() => {
     if (beingStreamedMessage) {
       const timeout = setTimeout(() => {
         reset();
-      }, 5000);
+      }, 10000);
       return () => {
         clearTimeout(timeout);
       };
@@ -209,9 +205,8 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     return () => {
       reset();
-      setStreaming(false);
     };
-  }, [reset, setStreaming]);
+  }, [reset]);
 
   const completionOnError = (err: HTTPResponseError) => {
     setBeingStreamedChatId(() => undefined);
@@ -374,11 +369,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     [
       chatId,
-      beingStreamedMessage,
       completionMutation,
       toast,
       streaming,
-      setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
       setTempUserMessageChatId,
@@ -466,11 +459,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     },
     [
       chatId,
-      beingStreamedMessage,
       uploadMutation,
       toast,
       streaming,
-      setStreaming,
       setTempUserMessage,
       beingStreamedChatId,
       existingChatQuery.data?.subject,
@@ -479,6 +470,14 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   // User sets a subject from the chat window
+  const { refetch: refetchFolders } = useQuery(
+    [GET_USER_FOLDERS, auth?.userData?.id],
+    {
+      queryFn: getUserFoldersQuery,
+      staleTime: 60000,
+      enabled: false,
+    }
+  );
   const submitSubject = useCallback(
     async (subject: string) => {
       if (!chatId) {
@@ -494,8 +493,16 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       });
       existingChatQuery.refetch();
       userChatsQuery.refetch();
+      refetchFolders();
     },
-    [chatId, createChat, putChat, existingChatQuery, userChatsQuery]
+    [
+      chatId,
+      createChat,
+      putChat,
+      existingChatQuery,
+      userChatsQuery,
+      refetchFolders,
+    ]
   );
 
   const providerValue = useMemo(() => {

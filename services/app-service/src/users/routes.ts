@@ -8,6 +8,7 @@ import {
   getUser,
   getUserPermissions,
   getUserPermissionsRoomsSchools,
+  onboardUser,
   parentalConsentUser,
   updateUser,
   userAgeConsent,
@@ -15,7 +16,9 @@ import {
 } from "./service.js";
 import {
   Chat,
+  GradeYear,
   Message,
+  Purpose,
   Subscription,
   SubscriptionStatus,
   User,
@@ -106,6 +109,7 @@ router.get(
               }
             : true,
           subscription: true,
+          profile: true,
         }
       );
       // TODO: Create a job to turn subs with a canceledAt in the past into canceled subs
@@ -155,6 +159,38 @@ router.post(
     });
     res.status(200).send({
       data: transformUser(user),
+    });
+  })
+);
+
+router.post(
+  "/onboard",
+  [
+    body("purpose").isIn(Object.keys(Purpose)).exists(),
+    body("prepForTest").isString().optional(),
+    body("gradeYear").isIn(Object.keys(GradeYear)).optional(),
+    body("subjects").isArray().optional(),
+    body("country").isString().optional(),
+    body("state").isString().optional(),
+  ],
+  errorPassthrough(handleValidationErrors),
+  requireAuth,
+  errorPassthrough(async (req: Request, res: Response) => {
+    const session = req.session;
+    if (!session.userId) {
+      throw new UnauthorizedError("No user id found in session");
+    }
+    const profile = await onboardUser({
+      userId: session.userId,
+      purpose: req.body.purpose,
+      prepForTest: req.body.prepForTest,
+      gradeYear: req.body.gradeYear,
+      subjects: req.body.subjects,
+      country: req.body.country,
+      state: req.body.state,
+    });
+    res.status(200).send({
+      data: profile,
     });
   })
 );
