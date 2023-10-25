@@ -118,6 +118,7 @@ const FolderButton = ({
         router.push(`/folders/${id}`);
       }}
       marginY={"0.25rem"}
+      maxH={"4rem"}
       p={"0.5rem"}
     >
       <Center
