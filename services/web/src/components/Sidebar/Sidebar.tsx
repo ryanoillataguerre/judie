@@ -118,7 +118,7 @@ const FolderButton = ({
         router.push(`/folders/${id}`);
       }}
       marginY={"0.25rem"}
-      h={"4rem"}
+      maxH={"4rem"}
       p={"0.5rem"}
     >
       <Center
@@ -132,7 +132,12 @@ const FolderButton = ({
           title,
         })}
       </Center>
-      <VStack alignItems={"flex-start"} overflowX={"auto"}>
+      <VStack
+        alignItems={"flex-start"}
+        spacing={1}
+        overflowX={"auto"}
+        overflowY={"hidden"}
+      >
         <Text variant={"title"}>{title}</Text>
         <Text variant={"detail"}>
           {numChats} chat{(numChats || 0) === 1 ? "" : "s"}

@@ -58,7 +58,13 @@ export const checkout = async (
     allow_promotion_codes: true,
     subscription_data: {
       trial_period_days: 14,
+      trial_settings: {
+        end_behavior: {
+          missing_payment_method: "cancel",
+        },
+      },
     },
+    payment_method_collection: "if_required",
   };
   return await createCheckoutSession(params);
 };
