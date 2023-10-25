@@ -110,8 +110,15 @@ def test_history_single_str(env_setup):
             content="Wow that was sick content",
         )
     )
+    history.add_turn(
+        judie_data.ChatTurn(
+            role=judie_data.Role.USER,
+            content="Thanks dude",
+        )
+    )
 
-    assert "Student" in history.get_last_n_single_string(4)
+    assert "here" in history.get_last_n_single_string(4)
+    assert "here" not in history.get_last_n_single_string(2)
 
 
 def test_session_config(env_setup):

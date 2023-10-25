@@ -63,17 +63,15 @@ class History:
         return False
 
     def get_last_n_single_string(self, last_n: int = 5) -> str:
-        i = 0
+        i = 1
         history_block = ""
 
-        while i < last_n and i < len(self._chat_turns_list):
+        while i <= last_n and i <= len(self._chat_turns_list):
             chat = self._chat_turns_list[-1 * i]
             if chat.role == Role.USER:
-                history_block += "Student: "
+                history_block = "Student: " + chat.content + "\n" + history_block
             elif chat.role == Role.ASSISTANT:
-                history_block += "Tutor: "
-            history_block += chat.content + "\n"
-
+                history_block = "Tutor: " + chat.content + "\n" + history_block
             i += 1
 
         return history_block

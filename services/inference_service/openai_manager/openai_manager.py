@@ -1,5 +1,5 @@
 import openai
-from typing import List, Dict, Optional, Coroutine
+from typing import List, Dict, Optional, Awaitable
 import logging
 from dataclasses import dataclass
 from inference_service.server.judie_data import SessionConfig
@@ -58,7 +58,7 @@ def get_gpt_response_single(messages=None, openai_config: OpenAiConfig = None) -
 
 async def get_gpt_response_async(
     messages=None, openai_config: OpenAiConfig = None
-) -> str:
+) -> Awaitable[str]:
     """Response single callable asynchronously"""
 
     chat_response = await openai.ChatCompletion.acreate(
