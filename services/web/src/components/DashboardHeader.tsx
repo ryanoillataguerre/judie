@@ -10,7 +10,12 @@ import CreateFolderModal from "./CreateFolderModal";
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { createChatMutation } from "@judie/data/mutations";
-import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
+import {
+  GET_USER_CHATS,
+  GET_USER_FOLDERS,
+  getUserChatsQuery,
+  getUserFoldersQuery,
+} from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
 

@@ -172,6 +172,56 @@ router.put(
     }
     const { chatId } = req.params;
     const { subject, userTitle } = req.body;
+    const existingChat = await getChat({ id: chatId });
+    if (!existingChat) {
+      throw new NotFoundError("Chat not found");
+    }
+
+    // If subject is being set for the first time
+    if (!existingChat.subject && subject) {
+      // Put this chat in the user's folder for the subject
+      const existingFolder = await dbClient.chatFolder.findFirst({
+        where: {
+          userId: session.userId,
+          userTitle: subject,
+        },
+      });
+      if (existingFolder) {
+        await updateChat(chatId, {
+          subject,
+          userTitle,
+          folder: {
+            connect: {
+              id: existingFolder.id,
+            },
+          },
+        });
+      } else {
+        // Or create a new folder for the subject
+        const newFolder = await dbClient.chatFolder.create({
+          data: {
+            user: {
+              connect: {
+                id: session.userId,
+              },
+            },
+            userTitle: subject,
+          },
+        });
+        // And put the chat into it
+        await updateChat(chatId, {
+          subject,
+          userTitle,
+          folder: {
+            connect: {
+              id: newFolder.id,
+            },
+          },
+        });
+      }
+    }
+
+    // If subject is already set, or if update is something else
     const newChat = await updateChat(chatId, {
       subject,
       userTitle,
