@@ -130,7 +130,9 @@ def test_session_config(env_setup):
         )
     )
 
-    sesh_config = judie_data.SessionConfig(history=history, subject="Microeconomics")
+    sesh_config = judie_data.SessionConfig(
+        history=history, chat_id="1", subject="Microeconomics"
+    )
 
     assert sesh_config.subject == "Microeconomics"
     assert sesh_config.history.get_last_user_message() == "Sick content here"

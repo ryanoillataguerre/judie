@@ -80,6 +80,7 @@ class History:
 @dataclass
 class SessionConfig:
     history: History
+    chat_id: Optional[str]
     subject: Optional[str] = None
     special_context: Optional[List[str]] = None
     user_type: Optional[str] = None

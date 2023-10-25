@@ -64,7 +64,7 @@ def test_comprehension(env_setup):
         )
     )
     sesh = inference_service.server.judie_data.SessionConfig(
-        history=history, subject=""
+        history=history, chat_id="1", subject=""
     )
     comp_score = asyncio.run(openai_manager.comprehension_score(session_config=sesh))
 
@@ -80,7 +80,7 @@ def test_chat_sensitive_content_bio(env_setup):
         )
     )
     sesh = inference_service.server.judie_data.SessionConfig(
-        history=history, subject="AP Biology"
+        history=history, chat_id="1", subject="AP Biology"
     )
     sensitive = openai_manager.check_for_sensitive_content(session_config=sesh)
     assert sensitive is None
@@ -95,7 +95,7 @@ def test_chat_sensitive_content_date(env_setup):
         )
     )
     sesh = inference_service.server.judie_data.SessionConfig(
-        history=history, subject="AP Biology"
+        history=history, chat_id="1", subject="AP Biology"
     )
     sensitive = openai_manager.check_for_sensitive_content(session_config=sesh)
     assert sensitive is not None
@@ -110,7 +110,7 @@ def test_moderation(env_setup):
         )
     )
     sesh = inference_service.server.judie_data.SessionConfig(
-        history=history, subject="AP Biology"
+        history=history, chat_id="1", subject="AP Biology"
     )
     moderation = openai_manager.check_moderation_policy(session_config=sesh)
     assert moderation == []
@@ -125,7 +125,7 @@ def test_moderation_curse(env_setup):
         )
     )
     sesh = inference_service.server.judie_data.SessionConfig(
-        history=history, subject="AP Biology"
+        history=history, chat_id="1", subject="AP Biology"
     )
     moderation = openai_manager.check_moderation_policy(session_config=sesh)
     assert len(moderation) > 0

@@ -123,6 +123,11 @@ async def comprehension_score(session_config: SessionConfig) -> Optional[float]:
         if score.isnumeric():
             sum_comp += int(score)
             num_comps += 1
+        else:
+            logger.info(
+                f"Comprehension scorer for chat: {session_config.chat_id} returned "
+                f"non-numeric response: {score}"
+            )
 
     if num_comps:
         return sum_comp / num_comps
