@@ -24,7 +24,7 @@ export const getIconForSubject = ({
       style={
         padding
           ? {
-              margin: "0.5rem",
+              margin: "0.4rem",
             }
           : {}
       }
