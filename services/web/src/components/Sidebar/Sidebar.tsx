@@ -209,7 +209,7 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
       {
         icon: <FiSettings />,
         key: "settings",
-        label: "Preferences",
+        label: "Settings",
         onClick: () => {
           router.push("/settings");
         },
