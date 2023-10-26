@@ -33,3 +33,6 @@ The repo is structured as follows
   - `yarn migrate`
   - `yarn generate`
 - You need to migrate and generate the Prisma schema if you're developing on `app-service` locally, or it won't run successfully or give you TS errors in your editor.
+
+- If errors persist after following the above steps:
+  - Run `make rebuild` in `services/` as a last resort 
