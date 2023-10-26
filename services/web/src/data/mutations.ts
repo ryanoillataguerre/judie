@@ -113,9 +113,11 @@ export const signupMutation = async ({
 export const createChatMutation = async ({
   subject,
   folderId,
+  title,
 }: {
   subject?: string | undefined;
   folderId?: string | undefined;
+  title?: string | undefined;
 }): Promise<Chat> => {
   const response = await baseFetch({
     url: "/chat",
@@ -123,6 +125,7 @@ export const createChatMutation = async ({
     body: {
       subject: subject || undefined,
       folderId: folderId || undefined,
+      title: title || undefined,
     },
   });
   return response.data;

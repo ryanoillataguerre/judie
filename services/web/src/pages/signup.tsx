@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useMutation } from "react-query";
 import {
   CREATE_CHECKOUT_SESSION,
+  createChatMutation,
   createCheckoutSessionMutation,
   redeemInviteMutation,
   signupMutation,
@@ -66,25 +67,36 @@ export const SignupForm = ({
     reValidateMode: "onBlur",
   });
 
-  const redirectUrl = useMemo(() => {
-    return typeof window !== "undefined"
-      ? `${window.location.origin}/dashboard`
-      : "";
-  }, []);
-
-  const { mutateAsync: createCheckoutSession } = useMutation({
-    mutationKey: CREATE_CHECKOUT_SESSION,
-    mutationFn: () => createCheckoutSessionMutation(redirectUrl),
+  const createChat = useMutation({
+    mutationFn: createChatMutation,
+    onSuccess: ({ id }) => {
+      router.push({
+        pathname: "/chat",
+        query: {
+          id,
+        },
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast({
+        title: "Error creating chat",
+        description: "Sorry, there was an error creating your chat",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    },
   });
 
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signupMutation,
     onSuccess: async () => {
-      // Get checkout session URL
-      router.push("/dashboard");
-      // const url = await createCheckoutSession();
-      // // Redirect to checkout
-      // window?.location?.assign(url);
+      // Create chat
+      createChat.mutate({
+        title: "Welcome to Judie!",
+      });
+      // Send to chat page
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);

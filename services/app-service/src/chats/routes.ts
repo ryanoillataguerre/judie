@@ -123,7 +123,11 @@ router.get(
 
 router.post(
   "/",
-  [body("subject").optional(), body("folderId").optional()],
+  [
+    body("subject").optional(),
+    body("folderId").optional(),
+    body("userTitle").optional(),
+  ],
   requireAuth,
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -147,6 +151,7 @@ router.post(
           }
         : {}),
       subject: req.body?.subject || undefined,
+      userTitle: req.body?.userTitle || undefined,
     });
 
     res.status(200).json({
