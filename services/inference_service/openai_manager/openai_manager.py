@@ -1,3 +1,5 @@
+import asyncio
+
 import openai
 from typing import List, Dict, Optional, Awaitable
 import logging
@@ -106,16 +108,18 @@ async def comprehension_score(session_config: SessionConfig) -> Optional[float]:
     # arbitrarily use last five messages as conversation window
     history_str = session_config.history.get_last_n_single_string(5)
 
-    comp_responses = []
-    for prompt in prompts:
-        comp_score = await get_gpt_response_async(
-            messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": history_str},
-            ],
-            openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
-        )
-        comp_responses.append(comp_score)
+    comp_responses = await asyncio.gather(
+        *[
+            get_gpt_response_async(
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": history_str},
+                ],
+                openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
+            )
+            for prompt in prompts
+        ]
+    )
 
     sum_comp = 0
     num_comps = 0
