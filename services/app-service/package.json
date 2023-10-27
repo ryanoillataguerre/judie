@@ -10,7 +10,7 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "dev:test": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/test-server.ts",
-    "dev": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --trace-warnings --loader ts-node/esm' src/index.ts",
+    "dev": "nodemon --watch './**/*.ts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.ts",
     "test": "jest",
     "db:seed": "node --experimental-specifier-resolution=node --loader ts-node/esm ./prisma/seed/index.ts",
     "generate": "prisma generate --schema prisma/schema.prisma --generator client",

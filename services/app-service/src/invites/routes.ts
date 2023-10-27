@@ -8,7 +8,6 @@ import {
 import { BulkInviteBody, bulkInvite, invite, redeemInvite } from "./service.js";
 
 import dbClient from "../utils/prisma.js";
-import { signupValidation } from "../auth/routes.js";
 import { setUserSessionId } from "../auth/service.js";
 import { sendInviteEmail } from "../cio/service.js";
 

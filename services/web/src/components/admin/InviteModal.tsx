@@ -1,4 +1,7 @@
 import {
+  Alert,
+  AlertIcon,
+  Box,
   Flex,
   FormControl,
   FormLabel,
@@ -6,6 +9,7 @@ import {
   Link,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalOverlay,
   Select,
@@ -17,61 +21,204 @@ import {
   bulkInviteMutation,
   createInviteMutation,
 } from "@judie/data/mutations";
-import { GradeYear } from "@judie/data/types/api";
-import { useEffect, useState } from "react";
+import { GradeYear, PermissionType } from "@judie/data/types/api";
+import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Button from "../Button/Button";
-import PermissionsWidget from "./PermissionsWidget";
 import { HTTPResponseError } from "@judie/data/baseFetch";
-import { ReactSpreadsheetImport } from "react-spreadsheet-import";
-import useAdminActiveOrganization from "@judie/hooks/useAdminActiveOrganization";
-import { uploadThemeOverride } from "@judie/styles/chakra/chakra";
-import { useColorModeValue } from "@chakra-ui/react";
+import useAdminActiveEntities from "@judie/hooks/useAdminActiveEntities";
+
+export const getPermissionTypeLabel = (type: PermissionType | undefined) => {
+  switch (type) {
+    case PermissionType.ORG_ADMIN:
+      return "Organization Admin";
+    case PermissionType.SCHOOL_ADMIN:
+      return "Principal / School Admin";
+    case PermissionType.ROOM_ADMIN:
+      return "Teacher / Class Admin";
+    case PermissionType.STUDENT:
+      return "Student";
+    default:
+      return "--";
+  }
+};
+
+const getDefaultPermissionTypeForType = (type: InviteModalType) => {
+  switch (type) {
+    case InviteModalType.ORGANIZATION:
+      return PermissionType.ORG_ADMIN;
+    case InviteModalType.SCHOOL:
+      return PermissionType.SCHOOL_ADMIN;
+    case InviteModalType.ROOM:
+      return PermissionType.STUDENT;
+    default:
+      return undefined;
+  }
+};
 
 interface SubmitData {
   gradeYear?: GradeYear;
   email: string;
-  permissions: CreatePermissionType[];
+  permissionType?: PermissionType;
+  organizationId?: string;
+  schoolId?: string;
+  roomId?: string;
 }
 
-const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
+export enum InviteModalType {
+  ROOM = "room",
+  SCHOOL = "school",
+  ORGANIZATION = "organization",
+}
+const InviteModalBody = ({
+  onClose,
+  type,
+}: {
+  onClose: () => void;
+  type: InviteModalType;
+}) => {
   const toast = useToast();
   const createInvite = useMutation({
     mutationFn: createInviteMutation,
   });
-  const { handleSubmit, register } = useForm<SubmitData>({
-    defaultValues: {
-      gradeYear: undefined,
-      email: "",
-    },
-    reValidateMode: "onBlur",
-  });
-  const [permissions, setPermissions] = useState<CreatePermissionType[]>([]);
+  const { organizationId, schoolId, roomId, organization, school, room } =
+    useAdminActiveEntities();
 
-  useEffect(() => {
-    return () => {
-      setPermissions([]);
-    };
-  }, []);
+  const [permissionType, setPermissionType] = useState<
+    PermissionType | undefined
+  >(PermissionType.STUDENT);
+  const [schoolIdSuper, setSchoolIdSuper] = useState<string | undefined>(
+    undefined
+  );
+
+  // Set permission type options based on current location
+  const permissionOptions = useMemo(() => {
+    if (type === InviteModalType.ROOM) {
+      return [PermissionType.ROOM_ADMIN, PermissionType.STUDENT];
+    }
+    if (type === InviteModalType.SCHOOL) {
+      return [
+        PermissionType.SCHOOL_ADMIN,
+        PermissionType.ROOM_ADMIN,
+        PermissionType.STUDENT,
+      ];
+    }
+    if (type === InviteModalType.ORGANIZATION) {
+      return [
+        PermissionType.ORG_ADMIN,
+        PermissionType.SCHOOL_ADMIN,
+        PermissionType.ROOM_ADMIN,
+        PermissionType.STUDENT,
+      ];
+    }
+    return [];
+  }, [type]);
+
+  const getBodyText = () => {
+    if (type === InviteModalType.ROOM) {
+      return (
+        <>
+          <Text variant={"body"} mb={"1rem"}>
+            Invite a user to be a student or teacher in this Classroom.
+          </Text>
+          <Alert status={"info"} my={"0.5rem"}>
+            <AlertIcon />
+            <Text variant={"title"}>
+              You are inviting the user to be in the Classroom {room?.name}.
+              They will automatically be associated with the School{" "}
+              {school?.name}.
+            </Text>
+          </Alert>
+        </>
+      );
+    }
+    if (type === InviteModalType.SCHOOL) {
+      return (
+        <>
+          <Text variant={"body"} mb={"1rem"}>
+            Invite a user to be a student, teacher, or Principal in this School.
+            You can add them to specific classrooms once they accept their
+            invite.
+          </Text>
+          <Text variant={"detail"}>
+            Teachers can view and edit their Classrooms and the users in them.
+          </Text>
+          <Text variant={"detail"}>
+            Principals can view and edit the School, and Classrooms within the
+            school.
+          </Text>
+          <Alert status={"info"} my={"0.5rem"}>
+            <AlertIcon />
+            <Text variant={"title"}>
+              You are inviting the user to be in the School {school?.name}. If
+              you&apos;d like to invite them to a specific Classroom, please
+              exit and click into the Classroom before you invite them.
+            </Text>
+          </Alert>
+        </>
+      );
+    }
+    if (type === InviteModalType.ORGANIZATION) {
+      return (
+        <>
+          <Text variant={"detail"} mb={"1rem"}>
+            Principals can view and edit a school, teachers can view and edit
+            their Classrooms, and Organization Admins can view and edit the same
+            things that you can.
+          </Text>
+          <Alert status={"warning"} my={"0.5rem"}>
+            <AlertIcon />
+            <Text variant={"title"}>
+              You are inviting the user to the Organization {organization?.name}
+              . Be careful with permissions, as you can add Org Admins, School
+              Admins, Teachers, and Students.
+            </Text>
+          </Alert>
+        </>
+      );
+    }
+    return null;
+  };
+
+  const roomOptions = useMemo(() => {
+    if (schoolIdSuper) {
+      const school = organization?.schools?.find(
+        (school) => school.id === schoolIdSuper
+      );
+      return school?.rooms || [];
+    }
+    return school?.rooms || [];
+  }, [schoolIdSuper, school?.rooms, organization?.schools]);
+  const [roomIdSuper, setRoomIdSuper] = useState<string | undefined>(
+    roomOptions[0]?.id || undefined
+  );
 
   const onSubmit: SubmitHandler<SubmitData> = async ({
     gradeYear,
     email,
+    permissionType,
   }: SubmitData) => {
     try {
-      if (!permissions.length) {
+      if (!permissionType) {
         toast({
+          title: "Oops!",
+          description: "Please select a role",
           status: "error",
-          title: "Must attach permissions",
-          description: "We need to know what to do with this user",
         });
         return;
       }
       await createInvite.mutateAsync({
         gradeYear,
         email,
-        permissions,
+        permissions: [
+          {
+            type: permissionType,
+            organizationId,
+            schoolId: schoolIdSuper || schoolId,
+            roomId: roomIdSuper || roomId,
+          },
+        ],
       });
       // Toast
       toast({
@@ -79,7 +226,6 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
         description: "The user will receive an email with the invite link",
         status: "success",
       });
-      setPermissions([]);
       onClose();
     } catch (err) {
       toast({
@@ -89,292 +235,286 @@ const SingleInviteModalBody = ({ onClose }: { onClose: () => void }) => {
       });
     }
   };
+
+  const getExtraFieldsFromType = () => {
+    // For org admin, return none
+    // For school admin, and if type === org, return school
+    // For school admin, and if type === school, return none
+    // For room admin, and if type === school, return room
+    // For room admin, and if type === org, return school and room
+    // For room admin, and if type === room, return none
+    // For student, and if type === room, return none
+    // For student, and if type === school, return room
+    // For student, and if type === org, return school and room
+
+    const caseForRoomLevel = () => {
+      if (type === InviteModalType.ORGANIZATION) {
+        const schoolOptions = organization?.schools || [];
+
+        return (
+          <>
+            <FormControl
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+                width: "100%",
+              }}
+              isRequired
+            >
+              <FormLabel htmlFor="schoolId">School</FormLabel>
+              <Select
+                id="schoolId"
+                value={schoolIdSuper}
+                onChange={(e) => setSchoolIdSuper(e.target.value)}
+              >
+                <option value={undefined}>Select a School</option>
+                {schoolOptions.map((school) => (
+                  <option value={school.id} key={school.id}>
+                    {school.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            {schoolIdSuper && (
+              <FormControl
+                style={{
+                  marginTop: "0.5rem",
+                  marginBottom: "0.5rem",
+                  width: "100%",
+                }}
+                isRequired
+              >
+                <FormLabel htmlFor="roomId">Classroom</FormLabel>
+                <Select
+                  id="roomId"
+                  value={roomIdSuper}
+                  onChange={(e) => setRoomIdSuper(e.target.value)}
+                >
+                  <option value={undefined}>Select a Classroom</option>
+                  {roomOptions.map((room) => (
+                    <option value={room.id} key={room.id}>
+                      {room.name}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </>
+        );
+      }
+      if (type === InviteModalType.SCHOOL) {
+        const roomOptions = school?.rooms || [];
+        return (
+          <FormControl
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.5rem",
+              width: "100%",
+            }}
+            isRequired
+          >
+            <FormLabel htmlFor="roomId">Classroom</FormLabel>
+            <Select
+              id="roomId"
+              value={roomIdSuper}
+              onChange={(e) => setRoomIdSuper(e.target.value)}
+            >
+              {roomOptions.map((room) => (
+                <option value={room.id} key={room.id}>
+                  {room.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        );
+      }
+
+      if (type === InviteModalType.ROOM) {
+        return null;
+      }
+    };
+    switch (permissionType) {
+      case PermissionType.ORG_ADMIN:
+        // organizationId is defined, and that's all we need.
+        return null;
+      case PermissionType.SCHOOL_ADMIN:
+        if (type === InviteModalType.ORGANIZATION) {
+          // User is at organization level, adding a school admin.
+          const schoolOptions = organization?.schools || [];
+          return (
+            <FormControl
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: "0.5rem",
+                width: "100%",
+              }}
+              isRequired
+            >
+              <FormLabel htmlFor="schoolId">School</FormLabel>
+              <Select
+                id="schoolId"
+                value={schoolIdSuper}
+                onChange={(e) => setSchoolIdSuper(e.target.value)}
+              >
+                {schoolOptions.map((school) => (
+                  <option value={school.id} key={school.id}>
+                    {school.name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        }
+        if (type === InviteModalType.SCHOOL) {
+          return null;
+        }
+        break;
+      case PermissionType.ROOM_ADMIN:
+        return caseForRoomLevel();
+      case PermissionType.STUDENT:
+        return caseForRoomLevel();
+      default:
+        return null;
+    }
+  };
+
+  const { handleSubmit, register, watch } = useForm<SubmitData>({
+    defaultValues: {
+      gradeYear: undefined,
+      email: "",
+      permissionType: PermissionType.STUDENT,
+      organizationId: organizationId,
+      schoolId: schoolIdSuper || schoolId,
+      roomId: roomIdSuper || roomId || roomOptions[0]?.id,
+    },
+    reValidateMode: "onBlur",
+  });
+  const email = watch("email");
+
+  const isDisabled = useMemo(() => {
+    // Require email and permissionType
+    if (!permissionType) {
+      return true;
+    }
+    if (!email) {
+      return true;
+    }
+    if (permissionType === PermissionType.ROOM_ADMIN) {
+      switch (type) {
+        case InviteModalType.ROOM:
+          return !roomId;
+        case InviteModalType.SCHOOL:
+          return !(roomId || roomIdSuper) || !(schoolId || schoolIdSuper);
+        case InviteModalType.ORGANIZATION:
+          return (
+            !(roomId || roomIdSuper) ||
+            !(schoolId || schoolIdSuper) ||
+            !organizationId
+          );
+      }
+    }
+    if (permissionType === PermissionType.SCHOOL_ADMIN) {
+      switch (type) {
+        case InviteModalType.SCHOOL:
+          return !schoolId;
+        case InviteModalType.ORGANIZATION:
+          return !(schoolId || schoolIdSuper) || !organizationId;
+      }
+    }
+    if (permissionType === PermissionType.ORG_ADMIN) {
+      return !organizationId;
+    }
+
+    return false;
+  }, [
+    permissionType,
+    email,
+    roomId,
+    schoolId,
+    organizationId,
+    type,
+    roomIdSuper,
+    schoolIdSuper,
+  ]);
+
   return (
     <>
-      <Text
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 500,
-        }}
-      >
-        Add a user
-      </Text>
+      <Text variant={"subheader"}>Invite User</Text>
+      <Box width={"100%"} my={"1rem"}>
+        {getBodyText()}
+      </Box>
       <form
         onSubmit={handleSubmit(onSubmit)}
         style={{
           width: "100%",
         }}
       >
-        <Flex
+        <FormControl
           style={{
-            flexDirection: "column",
-            alignItems: "flex-start",
-            paddingBottom: "1rem",
+            marginTop: "0.5rem",
+            marginBottom: "0.5rem",
           }}
+          isRequired
         >
-          <Text
-            style={{
-              fontSize: "1rem",
-              margin: "1rem 0",
-            }}
+          <FormLabel htmlFor="email">Email</FormLabel>
+          <Input id="email" type="email" {...register("email", {})} />
+        </FormControl>
+        <FormControl
+          style={{
+            marginTop: "0.5rem",
+            marginBottom: "0.5rem",
+            width: "100%",
+          }}
+          isRequired
+        >
+          <FormLabel htmlFor="permissionType">Role</FormLabel>
+          <Select
+            id="permissionType"
+            {...register("permissionType", {})}
+            // value={permissionType}
+            onChange={(e) =>
+              setPermissionType(e.target.value as PermissionType)
+            }
           >
-            Enter the user&apos;s info below and attach them to an organization,
-            school, or room for them to start out.
-          </Text>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-            isRequired
-          >
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <Input id="email" type="email" {...register("email", {})} />
-          </FormControl>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-            }}
-          >
-            <FormLabel htmlFor="gradeYear">Grade Year</FormLabel>
-            <Select id="gradeYear" {...register("gradeYear", {})}>
-              <option value={undefined}>{"None"}</option>
-              {/* TODO Ryan: Make user-facing versions of these */}
-              {Object.keys(GradeYear).map((key) => (
-                <option value={key} key={key}>
-                  {key}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl
-            style={{
-              marginTop: "0.5rem",
-              marginBottom: "0.5rem",
-              width: "100%",
-            }}
-            isRequired
-          >
-            <FormLabel htmlFor="permissions">Permissions</FormLabel>
-            <PermissionsWidget
-              onChangePermissions={setPermissions}
-              permissions={permissions}
-            />
-          </FormControl>
-
-          <Button
-            style={{
-              width: "100%",
-              marginTop: "1rem",
-            }}
-            colorScheme="green"
-            variant={"solid"}
-            loading={createInvite.isLoading}
-            label="Invite User"
-            disabled={!permissions.length}
-            type="submit"
-          />
-        </Flex>
+            {permissionOptions.map((key) => (
+              <option value={key} key={key}>
+                {getPermissionTypeLabel(key)}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        {getExtraFieldsFromType()}
+        <Button
+          style={{
+            width: "100%",
+            marginTop: "1rem",
+          }}
+          colorScheme="green"
+          variant={"purp"}
+          loading={createInvite.isLoading}
+          label="Submit"
+          isDisabled={isDisabled}
+          type="submit"
+        />
       </form>
     </>
   );
 };
 
-export enum InviteSheetRole {
-  Student,
-  Teacher,
-  Principal,
-  Administrator,
-}
-export interface InviteRow {
-  Email: string;
-  Role: InviteSheetRole;
-  School?: string;
-  Classroom?: string;
-}
-interface OnSubmitData {
-  all: InviteRow[];
-  validData: InviteRow[];
-  invalidData: InviteRow[];
-}
-const fields = [
-  {
-    // Visible in table header and when matching columns.
-    label: "Email",
-    // This is the key used for this field when we call onSubmit.
-    key: "Email",
-    fieldType: {
-      // There are 3 types - "input" / "checkbox" / "select".
-      type: "input",
-    },
-    // Used in the first step to provide an example of what data is expected in this field. Optional.
-    example: "student@school.edu",
-    // Can have multiple validations that are visible in Validation Step table.
-    validations: [
-      {
-        // Can be "required" / "unique" / "regex"
-        rule: "required",
-        errorMessage: "Email is required",
-        // There can be "info" / "warning" / "error" levels. Optional. Default "error".
-        level: "error",
-      },
-    ],
-  },
-  {
-    label: "Role",
-    key: "Role",
-    fieldType: {
-      type: "select",
-      options: [
-        {
-          label: "Student",
-          value: "Student",
-        },
-        {
-          label: "Teacher",
-          value: "Teacher",
-        },
-        {
-          label: "Principal",
-          value: "Principal",
-        },
-        {
-          label: "Administrator",
-          value: "Administrator",
-        },
-      ],
-    },
-    example: "Student",
-    validations: [
-      {
-        rule: "required",
-        errorMessage: "Role is required",
-        level: "error",
-      },
-    ],
-  },
-  {
-    label: "School",
-    key: "School",
-    fieldType: {
-      type: "input",
-    },
-    example: "Hart High School",
-  },
-  {
-    label: "Classroom",
-    key: "Classroom",
-    fieldType: {
-      type: "input",
-    },
-    example: "Mr. Smith's 3rd Period Physics",
-  },
-] as const;
-
-// const rowHookValidator: RowHook<InviteRow> = (
-//   data: InviteRow,
-//   addError: (
-//     fieldKey: InviteRow,
-//     error: { message: string; level: string }
-//   ) => void
-// ) => {
-//   // If no email, throw err
-//   // If role === student and no school, throw err
-//   // If role === teacher and (no school or no room), throw err
-//   // If role === principal and no school, throw err
-//   // If role === administrator and school or room, throw err
-//   return data;
-// };
-
 const InviteModal = ({
   isOpen,
   onClose,
+  type = InviteModalType.ROOM,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  type?: InviteModalType;
 }) => {
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const onCloseUpload = () => {
-    setIsUploadOpen(false);
-  };
-  const organizationId = useAdminActiveOrganization();
-
-  const toast = useToast();
-
-  const bulkMutation = useMutation({
-    mutationFn: bulkInviteMutation,
-    onSuccess: () => {
-      // Toast
-      toast({
-        title: "Invites Sent!",
-        description:
-          "The users will receive an email with their corresponding invite link",
-        status: "success",
-      });
-      onClose();
-    },
-    onError: (err) => {
-      toast({
-        title: "Oops!",
-        description: (err as unknown as HTTPResponseError).message,
-        status: "error",
-      });
-    },
-  });
-
-  // TODO: Make these type strict
-  const onSubmit = async (defaultData: any) => {
-    const data = defaultData as OnSubmitData;
-    // Check for errors in rows
-    if (data.invalidData?.length) {
-      // If errors, show errors
-      toast({
-        title: "Oops!",
-        description:
-          "There are errors in your spreadsheet. Please match the format displayed in the example row.",
-        status: "error",
-        duration: 6000,
-      });
-      return;
-    }
-    console.error(
-      "invalid spreadsheet data for " + organizationId,
-      data.invalidData
-    );
-
-    // Else: Bulk upload route mutation
-    if (organizationId) {
-      await bulkMutation.mutateAsync({
-        organizationId,
-        invites: data.validData?.map((invite) => ({
-          email: invite.Email,
-          role: invite.Role,
-          school: invite.School,
-          classroom: invite.Classroom,
-        })),
-      });
-    } else {
-      toast({
-        title: "Oops!",
-        description: "You must be active in an organization to upload invites",
-        status: "error",
-      });
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      setIsUploadOpen(false);
-    };
-  }, []);
-
-  const theme = useColorModeValue({}, uploadThemeOverride);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
       <ModalContent py={8}>
+        <ModalCloseButton />
         <ModalBody
           style={{
             display: "flex",
@@ -382,34 +522,7 @@ const InviteModal = ({
             alignItems: "flex-start",
           }}
         >
-          <SingleInviteModalBody onClose={onClose} />
-          <ReactSpreadsheetImport
-            isOpen={isUploadOpen}
-            onClose={onCloseUpload}
-            onSubmit={onSubmit}
-            fields={fields}
-            // rowHook={rowHookValidator}
-            customTheme={theme}
-          />
-          <Flex
-            style={{
-              width: "100%",
-              padding: "1rem",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: "0.8rem",
-              }}
-            >
-              Want to invite many students at one time?{" "}
-              <Link color={"teal.500"} onClick={() => setIsUploadOpen(true)}>
-                Upload instead
-              </Link>
-            </Text>
-          </Flex>
+          <InviteModalBody type={type} onClose={onClose} />
         </ModalBody>
       </ModalContent>
     </Modal>

@@ -57,7 +57,7 @@ const Folder = ({ id }: { id: string }) => {
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
-      overflowY={"scroll"}
+      overflowY={"auto"}
     >
       <HStack
         alignItems={"center"}
@@ -103,6 +103,7 @@ const Folder = ({ id }: { id: string }) => {
       <ChatsTable
         isLoading={folderQuery.isLoading}
         chats={folderQuery.data?.chats}
+        refreshChats={folderQuery.refetch}
         folderName={folderQuery.data?.userTitle || undefined}
       />
     </VStack>

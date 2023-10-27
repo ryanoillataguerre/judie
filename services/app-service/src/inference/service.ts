@@ -23,7 +23,7 @@ export const getChatCompletion = async ({
   // Retry if return is not hit
   let triesCounter = 0;
   while (triesCounter < 3) {
-    console.log(`try #${triesCounter}`);
+    console.info(`try #${triesCounter}`);
     try {
       const result = inferenceServiceClient.getChatResponse(chatRequest);
       const fullResponse = [];

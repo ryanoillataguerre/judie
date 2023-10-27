@@ -348,7 +348,7 @@ export interface SubmitData
   extends Omit<UserProfile, "createdAt" | "updatedAt"> {}
 
 const OnboardingModal = () => {
-  const { userData, refresh, isLoading } = useAuth();
+  const { userData, refresh, isLoading, isB2B, isAdmin } = useAuth();
   const { handleSubmit, register, reset, watch } = useForm<SubmitData>({
     defaultValues: {
       purpose: userData?.profile?.purpose || undefined,
@@ -375,15 +375,24 @@ const OnboardingModal = () => {
       userData &&
       !userData?.profile?.purpose &&
       !onboardedRecently &&
-      !isLoading
+      !isLoading &&
+      !isB2B &&
+      !isAdmin
     ) {
       setIsOpen(true);
     }
-  }, [userData?.profile, onboardedRecently, userData]);
+  }, [
+    userData?.profile,
+    onboardedRecently,
+    userData,
+    isB2B,
+    isAdmin,
+    isLoading,
+  ]);
 
   const onboardingMutation = useMutation({
     mutationFn: onboardMutation,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Success!",
         description: "Your profile has been updated.",
@@ -481,7 +490,7 @@ const OnboardingModal = () => {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 paddingBottom: "1rem",
-                overflowY: "scroll",
+                overflowY: "auto",
                 maxHeight: "50vh",
               }}
               paddingX={"0.2rem"}

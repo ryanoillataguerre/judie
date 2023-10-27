@@ -106,11 +106,11 @@ const RecordButton = ({
     transcribeMutation.mutate({
       data: formData,
     });
-  }, [recordingBlob, transcribeMutation.mutate, transcribeMutation]);
+  }, [recordingBlob, transcribeMutation.mutate]);
 
-  useEffect(() => {
-    setIsRecording(isRecording);
-  }, [isRecording, setIsRecording]);
+  // useEffect(() => {
+  //   setIsRecording(isRecording);
+  // }, [isRecording, setIsRecording]);
 
   // If recording for 1 min, stop recording and send
   useEffect(() => {
@@ -259,44 +259,17 @@ const ChatFooter = () => {
     }
   );
   const toast = useToast();
-  const [shiftPressedRecently, setShiftPressedRecently] =
-    useState<boolean>(false);
   const onKeyUp = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && e.shiftKey) {
         e.preventDefault();
-        if (!shiftPressedRecently) {
-          toast({
-            title: (
-              <Flex direction={"row"} alignItems={"center"} gap={2}>
-                <Text>Press only </Text>
-                <AiOutlineEnter />
-                <Text> to submit</Text>
-              </Flex>
-            ),
-            status: "info",
-            duration: 4000,
-            isClosable: true,
-            position: toastPosition,
-          });
-          setShiftPressedRecently(true);
-        }
-        setTimeout(() => {
-          setShiftPressedRecently(false);
-        }, 15000);
       }
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         onSubmit(e);
       }
     },
-    [
-      onSubmit,
-      toast,
-      shiftPressedRecently,
-      setShiftPressedRecently,
-      toastPosition,
-    ]
+    [onSubmit, toast, toastPosition]
   );
 
   return (

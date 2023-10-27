@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useMutation } from "react-query";
 import {
   CREATE_CHECKOUT_SESSION,
+  createChatMutation,
   createCheckoutSessionMutation,
   redeemInviteMutation,
   signupMutation,
@@ -66,25 +67,36 @@ export const SignupForm = ({
     reValidateMode: "onBlur",
   });
 
-  const redirectUrl = useMemo(() => {
-    return typeof window !== "undefined"
-      ? `${window.location.origin}/dashboard`
-      : "";
-  }, []);
-
-  const { mutateAsync: createCheckoutSession } = useMutation({
-    mutationKey: CREATE_CHECKOUT_SESSION,
-    mutationFn: () => createCheckoutSessionMutation(redirectUrl),
+  const createChat = useMutation({
+    mutationFn: createChatMutation,
+    onSuccess: ({ id }) => {
+      router.push({
+        pathname: "/chat",
+        query: {
+          id,
+        },
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast({
+        title: "Error creating chat",
+        description: "Sorry, there was an error creating your chat",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    },
   });
 
   const { mutateAsync, isLoading } = useMutation({
     mutationFn: signupMutation,
     onSuccess: async () => {
-      // Get checkout session URL
-      router.push("/dashboard");
-      // const url = await createCheckoutSession();
-      // // Redirect to checkout
-      // window?.location?.assign(url);
+      // Create chat
+      createChat.mutate({
+        title: "Welcome to Judie!",
+      });
+      // Send to chat page
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);
@@ -98,25 +110,26 @@ export const SignupForm = ({
     },
   });
 
-  const { mutateAsync: mutateAsyncInvite } = useMutation({
-    mutationFn: redeemInviteMutation,
-    onSuccess: () => {
-      router.push({
-        pathname: "/dashboard",
-        query: router.query,
-      });
-    },
-    onError: (err: HTTPResponseError) => {
-      console.error("Error signing up", err);
-      toast({
-        title: "Error signing up",
-        description: err.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    },
-  });
+  const { mutateAsync: mutateAsyncInvite, isLoading: inviteIsLoading } =
+    useMutation({
+      mutationFn: redeemInviteMutation,
+      onSuccess: () => {
+        router.push({
+          pathname: "/dashboard",
+          query: router.query,
+        });
+      },
+      onError: (err: HTTPResponseError) => {
+        console.error("Error signing up", err);
+        toast({
+          title: "Error signing up",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
+    });
 
   const [receivePromotions, setReceivePromotions] = useState(true);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
@@ -387,7 +400,7 @@ export const SignupForm = ({
             width: "100%",
           }}
           variant={"purp"}
-          loading={isLoading}
+          loading={isLoading || inviteIsLoading}
           label="Sign Up"
           type="submit"
         />
@@ -398,7 +411,6 @@ export const SignupForm = ({
 
 const SignupPage = () => {
   useAuth({ allowUnauth: true });
-  // useUnauthRedirect();
   // const { logout } = useAuth();
   const logoPath = useColorModeValue("/logo.svg", "/logo_dark.svg");
 

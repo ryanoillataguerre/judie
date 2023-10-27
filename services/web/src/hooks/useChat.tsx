@@ -9,6 +9,8 @@ import {
   getChatByIdQuery,
   getUserChatsQuery,
   GET_USER_CHATS,
+  GET_USER_FOLDERS,
+  getUserFoldersQuery,
 } from "@judie/data/queries";
 import { Chat, Message, MessageType } from "@judie/data/types/api";
 import { useMutation, useQuery } from "react-query";
@@ -468,6 +470,14 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   // User sets a subject from the chat window
+  const { refetch: refetchFolders } = useQuery(
+    [GET_USER_FOLDERS, auth?.userData?.id],
+    {
+      queryFn: getUserFoldersQuery,
+      staleTime: 60000,
+      enabled: false,
+    }
+  );
   const submitSubject = useCallback(
     async (subject: string) => {
       if (!chatId) {
@@ -483,8 +493,16 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       });
       existingChatQuery.refetch();
       userChatsQuery.refetch();
+      refetchFolders();
     },
-    [chatId, createChat, putChat, existingChatQuery, userChatsQuery]
+    [
+      chatId,
+      createChat,
+      putChat,
+      existingChatQuery,
+      userChatsQuery,
+      refetchFolders,
+    ]
   );
 
   const providerValue = useMemo(() => {

@@ -1,14 +1,19 @@
-import { HStack, Text, VStack } from "@chakra-ui/react";
+import { HStack, Text, Toast, VStack, useToast } from "@chakra-ui/react";
 import DashboardHeader from "./DashboardHeader";
 import useAuth from "@judie/hooks/useAuth";
 import ChatsTable from "./ChatsTable";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
 import DashboardFoldersList from "./DashboardFoldersList";
 import OnboardingModal from "./OnboardingModal";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { createChatMutation } from "@judie/data/mutations";
 
 const Dashboard = () => {
-  const { userData } = useAuth();
+  const { userData, isLoading } = useAuth();
+  const router = useRouter();
+  const toast = useToast();
 
   const { data: chatsData, isLoading: isGetChatsLoading } = useQuery(
     [GET_USER_CHATS, userData?.id],
@@ -18,17 +23,50 @@ const Dashboard = () => {
       enabled: !!userData?.id,
     }
   );
+
+  const { refetch } = useQuery([GET_USER_CHATS, userData?.id], {
+    queryFn: getUserChatsQuery,
+    staleTime: 60000,
+    enabled: false,
+  });
+
+  const createChat = useMutation({
+    mutationFn: createChatMutation,
+    onSuccess: ({ id }) => {
+      refetch();
+      router.push({
+        pathname: "/chat",
+        query: {
+          id,
+        },
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast({
+        title: "Error creating chat",
+        description: "Sorry, there was an error creating your chat",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    },
+  });
+
   return (
     <VStack
       paddingX={"2rem"}
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
-      overflowY={"scroll"}
+      overflowY={"auto"}
     >
-      <OnboardingModal />
+      {!isLoading && <OnboardingModal />}
       {/* Dashboard Header */}
-      <DashboardHeader />
+      <DashboardHeader
+        onCreateChat={() => createChat.mutate({})}
+        isLoading={createChat.isLoading}
+      />
       {/* Title */}
       <VStack width={"100%"} alignItems={"flex-start"}>
         <Text variant={"header"}>👋 Hi {userData?.firstName || "there"}</Text>

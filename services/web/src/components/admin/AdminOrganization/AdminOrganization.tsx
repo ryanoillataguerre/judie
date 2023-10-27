@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   Tab,
@@ -8,6 +9,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   GET_INVITES_FOR_ORG,
@@ -27,8 +29,14 @@ import UsersTable from "../tables/UsersTable";
 import InvitesTable from "../tables/InvitesTable";
 import EditableTitle from "../EditableTitle";
 import { putOrgMutation } from "@judie/data/mutations";
+import { BsArrowLeft } from "react-icons/bs";
+import { useRouter } from "next/router";
+import InviteModal, { InviteModalType } from "../InviteModal";
+import BulkInviteModal from "../BulkInviteModal";
+import useAuth from "@judie/hooks/useAuth";
 
 const AdminOrganization = ({ id }: { id: string }) => {
+  const { refreshEntities } = useAuth();
   const { data: organizationData, refetch: refetchOrg } = useQuery({
     queryKey: [GET_ORG_BY_ID, id],
     queryFn: () => getOrgByIdQuery(id),
@@ -51,10 +59,15 @@ const AdminOrganization = ({ id }: { id: string }) => {
     mutationFn: putOrgMutation,
     onSuccess: () => {
       refetchOrg();
+      refreshEntities();
     },
   });
 
   const [createSchoolOpen, setCreateSchoolOpen] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [bulkInviteOpen, setBulkInviteOpen] = useState(false);
+  const buttonSize = useBreakpointValue({ base: "sm", md: "md" });
+  const router = useRouter();
 
   return (
     <VStack
@@ -72,39 +85,74 @@ const AdminOrganization = ({ id }: { id: string }) => {
         onClose={() => setCreateSchoolOpen(false)}
         organizationId={organizationData?.id as string}
       />
+      <InviteModal
+        type={InviteModalType.ORGANIZATION}
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+      />
+      <BulkInviteModal
+        isOpen={bulkInviteOpen}
+        onClose={() => setBulkInviteOpen(false)}
+      />
       <HStack
         alignItems={"center"}
         justifyContent={"space-between"}
         width={"100%"}
-        paddingLeft={"1rem"}
         paddingTop={"2rem"}
       >
-        <EditableTitle
-          title={organizationData?.name}
-          onChange={(value) => {
-            value = value.trim();
-            if (!value || value.length < 1) return;
-            if (value === organizationData?.name) return;
-            editOrgMutation.mutate({
-              organizationId: organizationData?.id as string,
-              name: value,
-            });
-          }}
-        />
+        <HStack paddingRight={"1rem"}>
+          <Box minW={"20px"}>
+            <BsArrowLeft
+              size={20}
+              style={{
+                margin: "0 1rem",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
 
-        <Button
-          size={"sm"}
-          variant={"solid"}
-          colorScheme="green"
-          onClick={() => setCreateSchoolOpen(true)}
-        >
-          <PlusSquareIcon marginRight={"0.3rem"} /> Create School
-        </Button>
+          <EditableTitle
+            title={organizationData?.name}
+            onChange={(value) => {
+              value = value.trim();
+              if (!value || value.length < 1) return;
+              if (value === organizationData?.name) return;
+              editOrgMutation.mutate({
+                organizationId: organizationData?.id as string,
+                name: value,
+              });
+            }}
+          />
+        </HStack>
+        <HStack spacing={2}>
+          <Button
+            variant={"purp"}
+            size={buttonSize}
+            onClick={() => setInviteModalOpen(true)}
+          >
+            + Invite
+          </Button>
+          <Button
+            variant={"purp"}
+            size={buttonSize}
+            onClick={() => setBulkInviteOpen(true)}
+          >
+            + Bulk Invite
+          </Button>
+          <Button
+            colorScheme="green"
+            size={buttonSize}
+            onClick={() => setCreateSchoolOpen(true)}
+          >
+            <PlusSquareIcon marginRight={"0.3rem"} /> Create School
+          </Button>
+        </HStack>
       </HStack>
       <Tabs size={"sm"} variant="line" width={"100%"} defaultIndex={0}>
         <TabList width={"100%"}>
           {organizationData?.schools?.length ? <Tab>Schools</Tab> : null}
-          {organizationData?.rooms?.length ? <Tab>Rooms</Tab> : null}
+          {organizationData?.rooms?.length ? <Tab>Classes</Tab> : null}
           {organizationUserData?.length ? <Tab>Users</Tab> : null}
           {organizationInvitesData?.length ? <Tab>Invites</Tab> : null}
         </TabList>
@@ -121,7 +169,7 @@ const AdminOrganization = ({ id }: { id: string }) => {
           ) : null}
           {organizationUserData?.length ? (
             <TabPanel>
-              <UsersTable users={organizationUserData} />
+              <UsersTable users={organizationUserData} organizationId={id} />
             </TabPanel>
           ) : null}
           {organizationInvitesData?.length ? (

@@ -232,6 +232,9 @@ const Paywall = ({
               Click below to start your free trial and get unlimited access to
               Judie.
             </Text>
+            <Text variant={"boldSubheader"} mt={"1rem"}>
+              No credit card required!
+            </Text>
           </ModalBody>
           <ModalFooter
             style={{
@@ -251,7 +254,7 @@ const Paywall = ({
               isLoading={loading}
               onClick={onClick}
             >
-              Start your free trial
+              Start free trial
             </Button>
           </ModalFooter>
         </Flex>

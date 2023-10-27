@@ -61,7 +61,7 @@ const CreateFolderModal = ({
       });
     } catch (err) {
       toast({
-        title: "Error creating organization",
+        title: "Error creating folder",
         description: (err as unknown as HTTPResponseError).message,
       });
     }

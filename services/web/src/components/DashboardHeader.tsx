@@ -10,11 +10,22 @@ import CreateFolderModal from "./CreateFolderModal";
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { createChatMutation } from "@judie/data/mutations";
-import { GET_USER_CHATS, getUserChatsQuery } from "@judie/data/queries";
+import {
+  GET_USER_CHATS,
+  GET_USER_FOLDERS,
+  getUserChatsQuery,
+  getUserFoldersQuery,
+} from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
 import { useRouter } from "next/router";
 
-const DashboardHeader = () => {
+const DashboardHeader = ({
+  onCreateChat,
+  isLoading,
+}: {
+  onCreateChat?: () => void;
+  isLoading?: boolean;
+}) => {
   const auth = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -28,28 +39,6 @@ const DashboardHeader = () => {
     queryFn: getUserChatsQuery,
     staleTime: 60000,
     enabled: false,
-  });
-  const createChat = useMutation({
-    mutationFn: createChatMutation,
-    onSuccess: ({ id }) => {
-      refetch();
-      router.push({
-        pathname: "/chat",
-        query: {
-          id,
-        },
-      });
-    },
-    onError: (error) => {
-      console.error(error);
-      toast({
-        title: "Error creating chat",
-        description: "Sorry, there was an error creating your chat",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    },
   });
 
   const isMobile = useBreakpointValue({
@@ -68,10 +57,10 @@ const DashboardHeader = () => {
       <HStack>
         <Button
           size={buttonSize}
-          variant={"secondary"}
+          variant={"purp"}
           type={"button"}
-          isLoading={createChat.isLoading}
-          onClick={() => createChat.mutate({})}
+          isLoading={isLoading}
+          onClick={onCreateChat}
         >
           <Text variant={"button"}>+ Create a new chat</Text>
         </Button>
@@ -79,7 +68,7 @@ const DashboardHeader = () => {
         {!isMobile && (
           <Button
             size={buttonSize}
-            variant={"purp"}
+            variant={"secondary"}
             type={"button"}
             onClick={() => {
               setIsCreateOpen(true);

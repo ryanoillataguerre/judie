@@ -192,6 +192,7 @@ export const getCompletion = async ({
   });
   // Save message to chat
   const latestChat = await updateChat(chat.id, {
+    updatedAt: createdAt,
     messages: {
       create: {
         content: completionText,
