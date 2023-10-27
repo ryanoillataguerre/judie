@@ -64,7 +64,8 @@ const SigninForm = () => {
       // Check if user has sub
       if (response.subscription?.status === SubscriptionStatus.ACTIVE) {
         // Redirect to chat
-        router.push("/chat", {
+        router.push({
+          pathname: "/chat",
           query: router.query,
         });
       } else {
