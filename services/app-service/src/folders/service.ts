@@ -44,7 +44,7 @@ export const getUserFoldersWithChatCounts = async (userId: string) => {
       },
     },
     orderBy: {
-      createdAt: "desc",
+      userTitle: "desc",
     },
   });
   return folders;
