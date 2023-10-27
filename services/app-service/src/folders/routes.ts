@@ -117,4 +117,36 @@ router.put(
   })
 );
 
+router.delete(
+  "/:folderId",
+  [param("folderId").exists()],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const folderId = req.params.folderId;
+    const folder = await getFolderById({
+      id: folderId,
+    });
+    if (folder?.schoolId) {
+      await validateSchoolAdmin({
+        userId: userId as string,
+        schoolId: folder.schoolId,
+      });
+    } else {
+      throw new UnauthorizedError(
+        "User is not authorized to delete this folder"
+      );
+    }
+    await deleteFolderById({
+      id: folderId,
+    });
+    res.status(200).send({
+      data: {
+        success: true,
+      },
+    });
+  })
+);
+
 export default router;

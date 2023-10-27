@@ -570,6 +570,18 @@ export const createFolderMutation = async ({ title }: { title: string }) => {
   return response.data;
 };
 
+export const deleteFolderMutation = async ({
+  folderId,
+}: {
+  folderId: string;
+}) => {
+  const response = await baseFetch({
+    url: `/folders/${folderId}`,
+    method: "DELETE",
+  });
+  return response.data;
+};
+
 export const ageAndConsentMutation = async ({
   dateOfBirth,
   parentEmail,
