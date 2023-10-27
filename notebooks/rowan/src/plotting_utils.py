@@ -16,6 +16,7 @@ def dict_to_bar_chart(
     save_path: str,
     palette: str = "husl",
     max_score: int = 10,
+    legend_title: str = "Competency Analysis",
 ) -> None:
     """Create a bar chart from a dictionary of [str: float].
 
@@ -70,7 +71,7 @@ def dict_to_bar_chart(
 
     # Add the color bars to the legend
     plt.legend(
-        title=title,
+        title=legend_title,
         handles=color_bars,
         labels=list(data_dc.keys()),
         fontsize=12,
@@ -85,16 +86,35 @@ def dict_to_bar_chart(
 
 if __name__ == "__main__":
     data_dc = {
-        "Solving Equations": 9.5, 
+        "Solving Equations": 8.8,
         "Solving Inequalities": 5.2,
-        "Linear Functions": 8.3,
+        "Linear Functions": 8.2,
         "Systems of Equations and Inequalities": 4.2,
-        "Exponents and Exponential Functions": 8.8,
+        "Exponents and Exponential Functions": 7.8,
         "Radical Expressions and Equations": 6.4,
         "Quadratic Functions": 3.2,
         "Data Analysis and Probability": 9.2
     }
-    title = "Competency Analysis"
+    '''
+    data_dc = {
+        "One-step Equations": 9.4,
+        "Two-step Equations": 9.0,
+        "Multi-step Equations": 8.4,
+        "Equations With Variables On Both Sides": 7.8,
+        "Literal Equations and Formulas": 9.1,
+    }
+    data_dc = {
+        "Rate of Change and Slope": 9.2,
+        "Direct Variation": 8.3,
+        "Slope-Intercept Form": 9.4,
+        "Point-Slope Form": 8.1,
+        "Standard Form": 7.0,
+        "Parallel and Perpendicular Lines": 6.4,
+        "Trend Lines": 8.9,
+        "Absolute Value": 6.2
+    }
+    '''
+    title = "Algebra 1"
     x_label = "Competency"
     y_label = "Score"
     save_path = "/Users/wingr-judieai/Desktop/competency_plot.png"
