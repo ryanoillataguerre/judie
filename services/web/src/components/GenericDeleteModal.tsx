@@ -7,21 +7,7 @@ import {
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
-import {
-  deleteRoomMutation,
-  deleteSchoolMutation,
-} from "@judie/data/mutations";
-import { useState } from "react";
-import { UseMutationResult, useMutation, useQuery } from "react-query";
-import {
-  GET_ORG_BY_ID,
-  GET_SCHOOL_BY_ID,
-  GET_USER_ENTITIES,
-  getSchoolByIdQuery,
-  getUserEntitiesQuery,
-} from "@judie/data/queries";
-import { useRouter } from "next/router";
-import useAuth from "@judie/hooks/useAuth";
+import { UseMutationResult } from "react-query";
 
 const GenericDeleteModal = ({
   isOpen,
@@ -40,32 +26,6 @@ const GenericDeleteModal = ({
   subMessageText?: string;
   deleteMutation: UseMutationResult<any, unknown, any, unknown> | null;
 }) => {
-  const { userData } = useAuth();
-  const [success, setSuccess] = useState(false);
-  // const organizationId = useRouter().query?.organizationId as string;
-
-  // const { refetch } = useQuery({
-  //   queryKey: [GET_ORG_BY_ID, organizationId],
-  //   queryFn: () => getSchoolByIdQuery(organizationId),
-  //   enabled: !!organizationId,
-  // });
-
-  // const { refetch: refreshEntities } = useQuery({
-  //   queryKey: [GET_USER_ENTITIES, userData?.id],
-  //   queryFn: getUserEntitiesQuery,
-  //   enabled: false,
-  // });
-
-  // const deleteSchool = useMutation({
-  //   mutationFn: deleteSchoolMutation,
-  //   onSuccess: () => {
-  //     setSuccess(true);
-  //     // refetch();
-  //     // refreshEntities();
-  //     onClose();
-  //   },
-  // });
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" px={"5%"} />
