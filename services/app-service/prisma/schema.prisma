@@ -132,7 +132,7 @@ model UserProfile {
   country     String?
   state       String?
   subjects    String[]   @default([])
-  userId      String     @unique @map("user_id")
+  userId      String     @id @unique @map("user_id")
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime?  @updatedAt @map("updated_at")
 
