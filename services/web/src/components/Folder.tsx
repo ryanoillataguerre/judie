@@ -102,7 +102,7 @@ const Folder = ({ id }: { id: string }) => {
   const purpleHexCode = useToken("colors", colorKey);
   return (
     <VStack
-      paddingX={"2rem"}
+      paddingX={{ base: "0.5rem", md: "2rem" }}
       paddingY={"1rem"}
       h={"100%"}
       w={"100%"}
@@ -124,18 +124,24 @@ const Folder = ({ id }: { id: string }) => {
         alignItems={"center"}
         justifyContent={"space-between"}
         paddingY={"1rem"}
+        pl={{ base: "1rem", md: "0rem" }}
         width={"100%"}
       >
         <HStack overflow={"hidden"} width={"100%"}>
-          <BsArrowLeft
-            size={20}
-            style={{
-              margin: "0 1rem",
-              minWidth: "20px",
-            }}
-            onClick={() => router.back()}
-            cursor={"pointer"}
-          />
+          <Box
+            ml={{ base: "2rem", md: "1rem" }}
+            mr={{ base: "0rem", md: "1rem" }}
+          >
+            <BsArrowLeft
+              size={20}
+              style={{
+                minWidth: "20px",
+              }}
+              onClick={() => router.back()}
+              cursor={"pointer"}
+            />
+          </Box>
+
           <Center borderRadius={"0.5rem"} padding={"0.5rem"} bgColor={"white"}>
             <HiMiniFolderOpen size={24} color={purpleHexCode} />
           </Center>
