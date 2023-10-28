@@ -74,6 +74,7 @@ export const SignupForm = ({
         pathname: "/chat",
         query: {
           id,
+          fresh: true,
         },
       });
     },

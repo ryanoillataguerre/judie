@@ -336,7 +336,13 @@ const ChatHeader = ({
               style={{
                 margin: "0 1rem",
               }}
-              onClick={() => router.back()}
+              onClick={() => {
+                if (router.query.fresh) {
+                  router.push("/dashboard");
+                } else {
+                  router.back();
+                }
+              }}
               cursor={"pointer"}
             />
           </Box>
