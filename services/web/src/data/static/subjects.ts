@@ -103,6 +103,7 @@ export const subjectSectionToSubjectsMap: { [key: string]: string[] } = {
     "GMAT Preparation",
     "DAT Prep",
   ],
+  Educators: ["Content Creation", "Lesson Plans", "Assignment Generation"],
   Admin: [
     "Default",
     "Content Creation",

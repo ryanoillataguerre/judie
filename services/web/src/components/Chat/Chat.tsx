@@ -527,7 +527,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       return [mainSection, ...subjectSectionsCopy];
     }
 
-    return Object.keys(subjectSectionToSubjectsMap);
+    return Object.keys(subjectsCopy);
   }, [userData]);
 
   const subjectsHeight = useBreakpointValue({
