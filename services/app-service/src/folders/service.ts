@@ -44,7 +44,7 @@ export const getUserFoldersWithChatCounts = async (userId: string) => {
       },
     },
     orderBy: {
-      createdAt: "desc",
+      userTitle: "asc",
     },
   });
   return folders;
@@ -63,4 +63,16 @@ export const getFolderById = (id: string) => {
       },
     },
   });
+};
+
+export const deleteFolderById = async (id: string) => {
+  const deletedFolder = await dbClient.chatFolder.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+  return deletedFolder;
 };

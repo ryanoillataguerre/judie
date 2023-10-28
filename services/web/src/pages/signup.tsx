@@ -74,6 +74,7 @@ export const SignupForm = ({
         pathname: "/chat",
         query: {
           id,
+          fresh: true,
         },
       });
     },
@@ -96,7 +97,6 @@ export const SignupForm = ({
       createChat.mutate({
         title: "Welcome to Judie!",
       });
-      // Send to chat page
     },
     onError: (err: HTTPResponseError) => {
       console.error("Error signing up", err);
@@ -114,9 +114,8 @@ export const SignupForm = ({
     useMutation({
       mutationFn: redeemInviteMutation,
       onSuccess: () => {
-        router.push({
-          pathname: "/dashboard",
-          query: router.query,
+        createChat.mutate({
+          title: "Welcome to Judie!",
         });
       },
       onError: (err: HTTPResponseError) => {

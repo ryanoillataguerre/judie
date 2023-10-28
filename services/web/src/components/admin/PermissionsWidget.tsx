@@ -462,6 +462,7 @@ const PermissionsWidget = ({
           permission={permission}
           onChange={(permission) => {
             // TODO: Update permission in permissions array and do mutation
+
             console.log("permission changed", permission);
           }}
         />

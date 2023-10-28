@@ -3,11 +3,10 @@ name: Branch App Service Integration
 on:
   push:
     branches-ignore:
-    - master
-    - sandbox
-    - production
+      - master
+      - production
     paths:
-    - "services/app-service/**"
+      - "services/app-service/**"
 
 jobs:
   build-app-service:
@@ -20,19 +19,19 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-        cache-dependency-path: services/app-service/yarn.lock
-    - name: Install Dependencies
-      run: yarn
-    - name: Generate Prisma Client
-      run: yarn generate || true
-    - name: Build App Service
-      run: yarn run build
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          cache-dependency-path: services/app-service/yarn.lock
+      - name: Install Dependencies
+        run: yarn
+      - name: Generate Prisma Client
+        run: yarn generate || true
+      - name: Build App Service
+        run: yarn run build
   test-app-service:
     name: Test App Service
     runs-on: ubuntu-latest
@@ -40,7 +39,7 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Run app-service Test Suite
-      working-directory: services
-      run: make test
+      - uses: actions/checkout@v3
+      - name: Run app-service Test Suite
+        working-directory: services
+        run: make test

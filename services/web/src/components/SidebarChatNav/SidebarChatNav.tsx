@@ -105,7 +105,7 @@ const SidebarChatNav = () => {
         })
       );
     }
-  }, [data]);
+  }, [data, setTodayChats, setYesterdayChats, setRecentChats]);
 
   // Delete single chat mutation
   const deleteChat = useMutation({
@@ -231,7 +231,7 @@ const SidebarChatNav = () => {
             }
           }}
         >
-          + Create a new chat
+          + New chat
         </Button>
         <Box position={"relative"} w={"100%"} h={"100%"}>
           <Flex

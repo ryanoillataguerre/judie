@@ -136,6 +136,7 @@ export enum Purpose {
   TEST_PREP = "TEST_PREP",
   CLASSES = "CLASSES",
   HOMESCHOOLING = "HOMESCHOOLING",
+  PROFESSIONAL = "PROFESSIONAL",
 }
 
 const purposeToNameMap = {
@@ -143,6 +144,7 @@ const purposeToNameMap = {
   [Purpose.TEST_PREP]: "Test Prep",
   [Purpose.CLASSES]: "Classes",
   [Purpose.HOMESCHOOLING]: "Homeschooling",
+  [Purpose.PROFESSIONAL]: "Professional",
 };
 
 export const getPurposeName = (purpose: Purpose) => {

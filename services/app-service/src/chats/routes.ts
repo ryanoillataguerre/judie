@@ -16,6 +16,7 @@ import {
   deleteChatsForUser,
   getPDFTextPrompt,
   validateMaxAssignmentLength,
+  updateChatSubject,
 } from "./service.js";
 import { Chat, ChatFolder, Message } from "@prisma/client";
 import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
@@ -154,6 +155,16 @@ router.post(
       userTitle: req.body?.userTitle || undefined,
     });
 
+    if (req.body.subject) {
+      await updateChatSubject({
+        userId: session.userId,
+        subject: req.body.subject,
+        userTitle: req.body.userTitle,
+        folderId: req.body.folderId || newChat.chatFolderId,
+        chatId: newChat.id,
+      });
+    }
+
     res.status(200).json({
       data: transformChat(newChat),
     });
@@ -176,65 +187,32 @@ router.put(
       throw new UnauthorizedError("No user id found in session");
     }
     const { chatId } = req.params;
-    const { subject, userTitle } = req.body;
+    const { subject, userTitle, folderId } = req.body;
     const existingChat = await getChat({ id: chatId });
     if (!existingChat) {
       throw new NotFoundError("Chat not found");
     }
 
     // If subject is being set for the first time
-    if (!existingChat.subject && subject) {
-      // Put this chat in the user's folder for the subject
-      const existingFolder = await dbClient.chatFolder.findFirst({
-        where: {
-          userId: session.userId,
-          userTitle: subject,
-        },
+    if (subject) {
+      await updateChatSubject({
+        userId: session.userId,
+        subject,
+        userTitle,
+        folderId: folderId || existingChat.chatFolderId,
+        chatId,
       });
-      if (existingFolder) {
-        await updateChat(chatId, {
-          subject,
-          userTitle,
-          folder: {
-            connect: {
-              id: existingFolder.id,
-            },
-          },
-        });
-      } else {
-        // Or create a new folder for the subject
-        const newFolder = await dbClient.chatFolder.create({
-          data: {
-            user: {
-              connect: {
-                id: session.userId,
-              },
-            },
-            userTitle: subject,
-          },
-        });
-        // And put the chat into it
-        await updateChat(chatId, {
-          subject,
-          userTitle,
-          folder: {
-            connect: {
-              id: newFolder.id,
-            },
-          },
-        });
-      }
     }
 
     // If subject is already set, or if update is something else
     const newChat = await updateChat(chatId, {
       subject,
       userTitle,
-      ...(req.body?.folderId
+      ...(folderId
         ? {
             folder: {
               connect: {
-                id: req.body.folderId,
+                id: folderId,
               },
             },
           }

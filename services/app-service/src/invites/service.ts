@@ -371,9 +371,10 @@ export const bulkInvite = async (
     validatePermissionsPromises.push(async () => {
       let schoolId = undefined;
       let roomId = undefined;
-      const school = await dbClient.school.findUnique({
+      const school = await dbClient.school.findFirst({
         where: {
           name: invite.school,
+          organizationId: params.organizationId,
         },
       });
       if (school) {
