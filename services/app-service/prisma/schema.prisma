@@ -258,7 +258,7 @@ model Organization {
 
 model School {
   id             String    @id @default(uuid())
-  name           String    @unique
+  name           String
   address        String?
   organizationId String    @map("organization_id")
   createdAt      DateTime  @default(now()) @map("created_at")

@@ -105,7 +105,7 @@ const SidebarChatNav = () => {
         })
       );
     }
-  }, [data]);
+  }, [data, setTodayChats, setYesterdayChats, setRecentChats]);
 
   // Delete single chat mutation
   const deleteChat = useMutation({
