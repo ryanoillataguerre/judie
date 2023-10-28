@@ -277,7 +277,6 @@ export const updateChatSubject = async ({
   folderId?: string;
   chatId: string;
 }) => {
-  console.log("firing");
   // Put this chat in the user's folder for the subject
   const existingFolder = await dbClient.chatFolder.findFirst({
     where: {
@@ -296,7 +295,6 @@ export const updateChatSubject = async ({
       },
     });
   } else {
-    console.log("here");
     // Or create a new folder for the subject
     await dbClient.chatFolder.create({
       data: {
