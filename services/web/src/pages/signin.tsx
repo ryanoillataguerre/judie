@@ -66,7 +66,10 @@ const SigninForm = () => {
         // Redirect to chat
         router.push({
           pathname: "/chat",
-          query: router.query,
+          query: {
+            ...router.query,
+            fresh: true,
+          },
         });
       } else {
         // Get checkout session URL
