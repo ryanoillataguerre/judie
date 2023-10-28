@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:13
+    container_name: dev_postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - dev
+    volumes:
+      - ../app-service/prisma/migrations/20230319033407_initial_schema:/docker-entrypoint-initdb.d
+      - judie-postgres-data:/var/lib/postgresql/data
+
+  inference-service:
+    privileged: true
+    depends_on:
+      - postgres
+    build:
+      context: ../
+      dockerfile: ./inference_service/Dockerfile
+    working_dir: /app
+    networks:
+      - dev
+    ports:
+      - 443:443
+    environment:
+      LOGGING_LEVEL: info
+      GRPC_PORT: 443
+      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/postgres}
+      WOLFRAM_APP_ID: ${WOLFRAM_APP_ID}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT}
+
+networks:
+  dev:
+    driver: bridge
+
+volumes:
+  judie-postgres-data: {}
+
