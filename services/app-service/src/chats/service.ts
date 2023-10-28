@@ -277,6 +277,18 @@ export const updateChatSubject = async ({
   folderId?: string;
   chatId: string;
 }) => {
+  if (folderId) {
+    // Connect this chat to the folder
+    return await updateChat(chatId, {
+      subject,
+      userTitle,
+      folder: {
+        connect: {
+          id: folderId,
+        },
+      },
+    });
+  }
   // Put this chat in the user's folder for the subject
   const existingFolder = await dbClient.chatFolder.findFirst({
     where: {
@@ -285,7 +297,7 @@ export const updateChatSubject = async ({
     },
   });
   if (existingFolder) {
-    await updateChat(chatId, {
+    return await updateChat(chatId, {
       subject,
       userTitle,
       folder: {
@@ -296,7 +308,7 @@ export const updateChatSubject = async ({
     });
   } else {
     // Or create a new folder for the subject
-    await dbClient.chatFolder.create({
+    return await dbClient.chatFolder.create({
       data: {
         user: {
           connect: {
@@ -311,7 +323,5 @@ export const updateChatSubject = async ({
         },
       },
     });
-    return;
   }
-  return;
 };

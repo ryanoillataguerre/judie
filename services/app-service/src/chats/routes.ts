@@ -202,7 +202,6 @@ router.put(
         folderId,
         chatId,
       });
-      return;
     }
 
     // If subject is already set, or if update is something else
