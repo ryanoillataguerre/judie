@@ -231,7 +231,7 @@ const SidebarChatNav = () => {
             }
           }}
         >
-          + Create a new chat
+          + New chat
         </Button>
         <Box position={"relative"} w={"100%"} h={"100%"}>
           <Flex
