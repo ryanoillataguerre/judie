@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Button,
   HStack,
@@ -20,7 +21,6 @@ const DashboardFoldersList = () => {
   const foldersQuery = useQuery({
     queryKey: [GET_USER_FOLDERS, auth?.userData?.id],
     queryFn: getUserFoldersQuery,
-    staleTime: 60000,
     enabled: !!auth?.userData?.id,
   });
 
@@ -34,6 +34,10 @@ const DashboardFoldersList = () => {
     md: 4,
   });
   const renderedFolders = foldersQuery.data?.slice(0, numFoldersShown);
+
+  useEffect(() => {
+    foldersQuery.refetch();
+  }, []);
 
   return renderedFolders?.length ? (
     <VStack w={"100%"}>
