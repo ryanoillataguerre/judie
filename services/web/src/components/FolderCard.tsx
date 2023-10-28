@@ -49,7 +49,8 @@ const FolderCard = ({
   const purpleHexCode = useToken("colors", colorKey);
   return (
     <VStack
-      h={"100%"}
+      overflow={"scroll"}
+      h={"15rem"}
       w={"100%"}
       maxW={"16rem"}
       borderColor={"gray.200"}

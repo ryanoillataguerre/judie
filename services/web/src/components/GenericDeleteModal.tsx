@@ -121,11 +121,7 @@ const GenericDeleteModal = ({
           >
             <Button onClick={onClose}>Cancel</Button>
             <Button
-              onClick={() =>
-                deleteMutation?.mutate({
-                  resourceId,
-                })
-              }
+              onClick={() => deleteMutation?.mutate(resourceId)}
               isLoading={deleteMutation?.isLoading || false}
               colorScheme="red"
               mr={4}

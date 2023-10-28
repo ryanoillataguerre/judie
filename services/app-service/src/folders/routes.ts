@@ -9,6 +9,7 @@ import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import {
   createFolder,
   getFolderById,
+  deleteFolderById,
   getUserFoldersWithChatCounts,
   updateFolder,
 } from "./service.js";
@@ -125,22 +126,11 @@ router.delete(
   errorPassthrough(async (req: Request, res: Response) => {
     const { userId } = req.session;
     const folderId = req.params.folderId;
-    const folder = await getFolderById({
-      id: folderId,
-    });
-    if (folder?.schoolId) {
-      await validateSchoolAdmin({
-        userId: userId as string,
-        schoolId: folder.schoolId,
-      });
-    } else {
-      throw new UnauthorizedError(
-        "User is not authorized to delete this folder"
-      );
+    const folder = await getFolderById(folderId);
+    if (!folder) {
+      throw new Error("Folder not found");
     }
-    await deleteFolderById({
-      id: folderId,
-    });
+    await deleteFolderById(folderId);
     res.status(200).send({
       data: {
         success: true,

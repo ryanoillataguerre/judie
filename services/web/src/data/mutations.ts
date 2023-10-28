@@ -570,11 +570,22 @@ export const createFolderMutation = async ({ title }: { title: string }) => {
   return response.data;
 };
 
-export const deleteFolderMutation = async ({
-  folderId,
+export const putFolderMutation = async ({
+  id,
+  title,
 }: {
-  folderId: string;
+  id: string;
+  title?: string;
 }) => {
+  const response = await baseFetch({
+    url: `/folders/${id}`,
+    method: "PUT",
+    body: { title },
+  });
+  return response.data;
+};
+
+export const deleteFolderMutation = async (folderId: string) => {
   const response = await baseFetch({
     url: `/folders/${folderId}`,
     method: "DELETE",

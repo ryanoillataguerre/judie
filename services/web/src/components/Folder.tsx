@@ -17,6 +17,7 @@ import {
 import {
   createChatMutation,
   deleteFolderMutation,
+  putFolderMutation,
 } from "@judie/data/mutations";
 import { GET_FOLDER_BY_ID, getFolderByIdQuery } from "@judie/data/queries";
 import { useRouter } from "next/router";
@@ -34,16 +35,34 @@ import GenericDeleteModal from "./GenericDeleteModal";
 const Folder = ({ id }: { id: string }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [folderTitle, setFolderTitle] = useState<string>("");
-  const [newfolderTitle, setNewFolderTitle] = useState<string>("");
+  const [originalFolderTitle, setOriginalFolderTitle] = useState<string>("");
   const [deleteFolderModalOpen, setDeleteFolderModalOpen] = useState(false);
 
   const router = useRouter();
   const toast = useToast();
+
   const folderQuery = useQuery({
     queryKey: [GET_FOLDER_BY_ID, id],
     queryFn: () => getFolderByIdQuery({ id }),
     onSuccess: (data) => {
       setFolderTitle(data.userTitle ?? "");
+      setOriginalFolderTitle(data.userTitle ?? "");
+    },
+  });
+
+  const editFolderMutation = useMutation({
+    mutationFn: putFolderMutation,
+    onSuccess: () => {
+      folderQuery.refetch();
+      setOriginalFolderTitle(folderTitle);
+      setIsEditingTitle(false);
+      toast({
+        title: "Folder name updated",
+        description: "Your folder name has been updated",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
     },
   });
 
@@ -72,10 +91,9 @@ const Folder = ({ id }: { id: string }) => {
   const deleteSchool = useMutation({
     mutationFn: deleteFolderMutation,
     onSuccess: () => {
-      // setSuccess(true);
-      // refetch();
-      // refreshEntities();
+      folderQuery.refetch();
       setDeleteFolderModalOpen(false);
+      router.push("/folders");
     },
   });
 
@@ -131,7 +149,9 @@ const Folder = ({ id }: { id: string }) => {
                 width={"100%"}
               />
               <IconButton
-                onClick={() => setIsEditingTitle(false)}
+                onClick={() =>
+                  editFolderMutation.mutate({ id, title: folderTitle })
+                }
                 colorScheme="green"
                 aria-label="Save folder name"
                 icon={<AiOutlineCheck />}
@@ -156,7 +176,7 @@ const Folder = ({ id }: { id: string }) => {
                 overflow={"hidden"}
                 flexGrow={1}
               >
-                {folderQuery?.data?.userTitle}
+                {originalFolderTitle}
               </Text>
               <IconButton
                 onClick={() => setIsEditingTitle(true)}

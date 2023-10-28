@@ -64,3 +64,15 @@ export const getFolderById = (id: string) => {
     },
   });
 };
+
+export const deleteFolderById = async (id: string) => {
+  const deletedFolder = await dbClient.chatFolder.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+  return deletedFolder;
+};
