@@ -62,10 +62,13 @@ class History:
             return True
         return False
 
+@dataclass
+class UserProfile:
+    user_type: Optional[str]
 
 @dataclass
 class SessionConfig:
     history: History
     subject: Optional[str] = None
     special_context: Optional[List[str]] = None
-    user_type: Optional[str] = None
+    user_profile: Optional[UserProfile]
