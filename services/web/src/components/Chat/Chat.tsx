@@ -336,7 +336,13 @@ const ChatHeader = ({
               style={{
                 margin: "0 1rem",
               }}
-              onClick={() => router.back()}
+              onClick={() => {
+                if (router.query.fresh) {
+                  router.push("/dashboard");
+                } else {
+                  router.back();
+                }
+              }}
               cursor={"pointer"}
             />
           </Box>
@@ -527,7 +533,7 @@ const Chat = ({ initialQuery }: { initialQuery?: string }) => {
       return [mainSection, ...subjectSectionsCopy];
     }
 
-    return Object.keys(subjectSectionToSubjectsMap);
+    return Object.keys(subjectsCopy);
   }, [userData]);
 
   const subjectsHeight = useBreakpointValue({

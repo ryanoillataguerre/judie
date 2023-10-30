@@ -63,9 +63,13 @@ const SigninForm = () => {
     onSuccess: async (response: User) => {
       // Check if user has sub
       if (response.subscription?.status === SubscriptionStatus.ACTIVE) {
-        // Redirect to dashboard
-        router.push("/dashboard", {
-          query: router.query,
+        // Redirect to chat
+        router.push({
+          pathname: "/chat",
+          query: {
+            ...router.query,
+            fresh: true,
+          },
         });
       } else {
         // Get checkout session URL

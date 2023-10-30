@@ -132,7 +132,7 @@ model UserProfile {
   country     String?
   state       String?
   subjects    String[]   @default([])
-  userId      String     @unique @map("user_id")
+  userId      String     @id @unique @map("user_id")
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime?  @updatedAt @map("updated_at")
 
@@ -258,7 +258,7 @@ model Organization {
 
 model School {
   id             String    @id @default(uuid())
-  name           String    @unique
+  name           String
   address        String?
   organizationId String    @map("organization_id")
   createdAt      DateTime  @default(now()) @map("created_at")

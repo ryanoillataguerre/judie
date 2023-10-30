@@ -163,7 +163,8 @@ export default function useAuth({
       !allowUnauth &&
       !DO_NOT_REDIRECT_PATHS.includes(router.asPath)
     ) {
-      router.push("/signin", {
+      router.push({
+        pathname: "/signin",
         query: router.query,
       });
     }

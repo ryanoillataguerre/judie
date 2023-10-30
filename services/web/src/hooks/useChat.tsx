@@ -480,20 +480,23 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   );
   const submitSubject = useCallback(
     async (subject: string) => {
+      let overrideChatId = undefined;
       if (!chatId) {
         // Create a chat
-        await createChat.mutateAsync({
+        const result = await createChat.mutateAsync({
           subject,
         });
+        overrideChatId = result.id;
         return;
       }
       await putChat.mutateAsync({
-        chatId,
+        chatId: overrideChatId || chatId,
         subject,
       });
       existingChatQuery.refetch();
       userChatsQuery.refetch();
       refetchFolders();
+      userChatsQuery.refetch();
     },
     [
       chatId,

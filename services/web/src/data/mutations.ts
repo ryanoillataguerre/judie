@@ -113,9 +113,11 @@ export const signupMutation = async ({
 export const createChatMutation = async ({
   subject,
   folderId,
+  title,
 }: {
   subject?: string | undefined;
   folderId?: string | undefined;
+  title?: string | undefined;
 }): Promise<Chat> => {
   const response = await baseFetch({
     url: "/chat",
@@ -123,6 +125,7 @@ export const createChatMutation = async ({
     body: {
       subject: subject || undefined,
       folderId: folderId || undefined,
+      title: title || undefined,
     },
   });
   return response.data;
@@ -566,6 +569,29 @@ export const createFolderMutation = async ({ title }: { title: string }) => {
     url: `/folders`,
     method: "POST",
     body: { title },
+  });
+  return response.data;
+};
+
+export const putFolderMutation = async ({
+  id,
+  title,
+}: {
+  id: string;
+  title?: string;
+}) => {
+  const response = await baseFetch({
+    url: `/folders/${id}`,
+    method: "PUT",
+    body: { title },
+  });
+  return response.data;
+};
+
+export const deleteFolderMutation = async (folderId: string) => {
+  const response = await baseFetch({
+    url: `/folders/${folderId}`,
+    method: "DELETE",
   });
   return response.data;
 };

@@ -263,3 +263,65 @@ export const validateMaxAssignmentLength = (message: string) => {
     throw new InternalError("Assignment content too long");
   }
 };
+
+export const updateChatSubject = async ({
+  userId,
+  subject,
+  userTitle,
+  folderId,
+  chatId,
+}: {
+  userId: string;
+  subject: string;
+  userTitle: string;
+  folderId?: string;
+  chatId: string;
+}) => {
+  if (folderId) {
+    // Connect this chat to the folder
+    return await updateChat(chatId, {
+      subject,
+      userTitle,
+      folder: {
+        connect: {
+          id: folderId,
+        },
+      },
+    });
+  }
+  // Put this chat in the user's folder for the subject
+  const existingFolder = await dbClient.chatFolder.findFirst({
+    where: {
+      userId: userId,
+      userTitle: subject,
+    },
+  });
+  if (existingFolder) {
+    return await updateChat(chatId, {
+      subject,
+      userTitle,
+      folder: {
+        connect: {
+          id: existingFolder.id,
+        },
+      },
+    });
+  } else {
+    // Or create a new folder for the subject
+    return await dbClient.chatFolder.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        userTitle: subject,
+        chats: {
+          connect: {
+            id: chatId,
+          },
+        },
+      },
+    });
+  }
+};

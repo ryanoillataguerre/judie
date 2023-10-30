@@ -217,7 +217,8 @@ const Sidebar = ({ isAdmin }: { isAdmin?: boolean }) => {
       {
         icon: <BiHelpCircle />,
         key: "help",
-        label: "Help",
+        label: "Tips and Tricks",
+        // TODO: "Learning with Judie" page
         onClick: () => {
           window.open("https://help.judie.io", "_blank");
         },

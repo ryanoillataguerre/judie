@@ -9,6 +9,7 @@ import UnauthorizedError from "../utils/errors/UnauthorizedError.js";
 import {
   createFolder,
   getFolderById,
+  deleteFolderById,
   getUserFoldersWithChatCounts,
   updateFolder,
 } from "./service.js";
@@ -113,6 +114,27 @@ router.put(
 
     res.status(200).json({
       data: folder,
+    });
+  })
+);
+
+router.delete(
+  "/:folderId",
+  [param("folderId").exists()],
+  requireAuth,
+  errorPassthrough(handleValidationErrors),
+  errorPassthrough(async (req: Request, res: Response) => {
+    const { userId } = req.session;
+    const folderId = req.params.folderId;
+    const folder = await getFolderById(folderId);
+    if (!folder) {
+      throw new Error("Folder not found");
+    }
+    await deleteFolderById(folderId);
+    res.status(200).send({
+      data: {
+        success: true,
+      },
     });
   })
 );
