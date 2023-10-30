@@ -62,13 +62,24 @@ class History:
             return True
         return False
 
+
+class UserType(Enum):
+    STUDENT = "USER"
+    PARENT = "PARENT"
+    TEACHER = "TEACHER"
+    ADMINISTRATOR = "ADMINISTRATOR"
+    JUDIE = "JUDIE"
+
+
 @dataclass
 class UserProfile:
-    user_type: Optional[str]
+    user_type: Optional[UserType]
+    grade_level: Optional[str]
+
 
 @dataclass
 class SessionConfig:
     history: History
+    user_profile: Optional[UserProfile]
     subject: Optional[str] = None
     special_context: Optional[List[str]] = None
-    user_profile: Optional[UserProfile]

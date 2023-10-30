@@ -66,3 +66,8 @@ def test_get_user(env_setup):
     print(user)
     print(user.role)
     assert False
+
+def test_get_user_profile(env_setup):
+    user_profile = prisma_manager.get_user_profile_from_db()
+    print(user_profile)
+    assert user_profile.
