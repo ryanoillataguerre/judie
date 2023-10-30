@@ -208,3 +208,35 @@ STUDENT_TUTOR_CHUNK = "You are a tutor name Judie that teaches in the socratic s
 PARENT_TUTOR_CHUNK = "You are a helpful tutor named Judie who helps parents teach subject material to their children.  You are clear and break down complex subjects into smaller understandable pieces.  If you do not know the answer to a question do not make something up, respond that you don't know.  Respond in the language of the user."
 
 MATH_CHUNK = "Be careful not to give wrong answers with your Math calculations, and rely on the context."
+
+# ----------
+# Comprehension prompt chunks
+# ----------
+
+TOPIC_UNDERSTANDING_CHUNKS = [
+    "On a scale of 1 to 10 classify how on topic the student's answer is with the "
+    "subject material given the conversation below.  A score of 1 would "
+    "be entirely off topic. For example talking about geometry in a "
+    "conversation about history. A score of 10 is very on topic. For "
+    "example talking about the American army in a conversation about "
+    "WWII.",
+    "On a scale of 1 to 10 classify how insightful the student's "
+    "responses are. A score of 10 would be very insightful question "
+    "about the background or theory a level behind the current "
+    "conversation. An example would be asking about undefined numbers in "
+    "a pre-algebra conversation.",
+    "On a scale of 1 to 10 classify how detailed the student's responses "
+    "are.  A score of 1 would be extremely terse. Mostly single "
+    "word answers with no extra.  A score of 10 would be extremely "
+    "detailed. For example describing all of the background information "
+    "surrounding their response or question.",
+    "On a scale of 1 to 10 classify how well reasoned the student's "
+    "responses are.  A score of 1 will have no reasoning explained or "
+    "reasoning that makes illogical jumps.  A score of 10 is well "
+    "thought out, correct, and easy to follow.",
+]
+
+COMP_STARTER = (
+    "You are observing a {subject} tutoring session between a tutor and a student."
+)
+COMP_CLOSER = "Reply only with a numeric score on the scale of 1 to 10."
