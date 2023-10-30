@@ -20,17 +20,19 @@ def test_judie_stream(env_setup):
 
 
 def test_create_chat_turn(env_setup):
-    turn = judie_data.ChatTurn(role=judie_data.Role.USER, content="Sick content here")
+    turn = judie_data.ChatTurn(
+        role=judie_data.MessageRole.USER, content="Sick content here"
+    )
 
     assert turn.content == "Sick content here"
-    assert turn.role == judie_data.Role.USER
+    assert turn.role == judie_data.MessageRole.USER
 
 
 def test_create_history(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -39,7 +41,7 @@ def test_create_history(env_setup):
 
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.ASSISTANT,
+            role=judie_data.MessageRole.ASSISTANT,
             content="Wow that was sick content",
         )
     )
@@ -48,7 +50,7 @@ def test_create_history(env_setup):
 
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="This is even sicker",
         )
     )
@@ -60,7 +62,7 @@ def test_history_openai_fmt(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -74,7 +76,7 @@ def test_history_openai_fmt_len_limit(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -86,7 +88,7 @@ def test_history_openai_fmt_len_limit(env_setup):
 
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.ASSISTANT,
+            role=judie_data.MessageRole.ASSISTANT,
             content="Wow that was sick content",
         )
     )
@@ -100,7 +102,7 @@ def test_session_config(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )

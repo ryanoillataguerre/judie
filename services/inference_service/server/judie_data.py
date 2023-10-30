@@ -4,7 +4,7 @@ from typing import List, Dict, Optional
 from collections import deque
 
 
-class Role(Enum):
+class MessageRole(Enum):
     USER = "user"
     ASSISTANT = "assistant"
     SYSTEM = "system"
@@ -12,7 +12,7 @@ class Role(Enum):
 
 @dataclass
 class ChatTurn:
-    role: Role
+    role: MessageRole
     content: str
 
 
@@ -34,7 +34,7 @@ class History:
     def get_last_user_message(self) -> Optional[str]:
         i = 1
         while i <= len(self._chat_turns_list):
-            if self._chat_turns_list[-1 * i].role == Role.USER:
+            if self._chat_turns_list[-1 * i].role == MessageRole.USER:
                 return self._chat_turns_list[-1 * i].content
             i += 1
         return None
@@ -58,7 +58,7 @@ class History:
     def last_msg_is_user(self) -> bool:
         if len(self._chat_turns_list) == 0:
             return False
-        if self._chat_turns_list[-1].role == Role.USER:
+        if self._chat_turns_list[-1].role == MessageRole.USER:
             return True
         return False
 

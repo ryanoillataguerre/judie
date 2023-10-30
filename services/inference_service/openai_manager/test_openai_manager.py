@@ -58,7 +58,7 @@ def test_comprehension(env_setup):
     history = inference_service.server.judie_data.History()
     history.add_turn(
         inference_service.server.judie_data.ChatTurn(
-            role=inference_service.server.judie_data.Role.USER,
+            role=inference_service.server.judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -74,7 +74,7 @@ def test_chat_sensitive_content_bio(env_setup):
     history = inference_service.server.judie_data.History()
     history.add_turn(
         inference_service.server.judie_data.ChatTurn(
-            role=inference_service.server.judie_data.Role.USER,
+            role=inference_service.server.judie_data.MessageRole.USER,
             content="Hi I want to learn about sexual reproduction",
         )
     )
@@ -89,7 +89,7 @@ def test_chat_sensitive_content_date(env_setup):
     history = inference_service.server.judie_data.History()
     history.add_turn(
         inference_service.server.judie_data.ChatTurn(
-            role=inference_service.server.judie_data.Role.USER,
+            role=inference_service.server.judie_data.MessageRole.USER,
             content="Hi I want to take you on a date Judie",
         )
     )
@@ -104,7 +104,7 @@ def test_moderation(env_setup):
     history = inference_service.server.judie_data.History()
     history.add_turn(
         inference_service.server.judie_data.ChatTurn(
-            role=inference_service.server.judie_data.Role.USER,
+            role=inference_service.server.judie_data.MessageRole.USER,
             content="Hi I want to learn about sexual reproduction",
         )
     )
@@ -119,7 +119,7 @@ def test_moderation_curse(env_setup):
     history = inference_service.server.judie_data.History()
     history.add_turn(
         inference_service.server.judie_data.ChatTurn(
-            role=inference_service.server.judie_data.Role.USER,
+            role=inference_service.server.judie_data.MessageRole.USER,
             content="Hey. Fuck You",
         )
     )

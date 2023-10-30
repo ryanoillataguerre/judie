@@ -2,7 +2,7 @@ from typing import Optional
 import prisma
 from typing import List, Dict
 from collections import deque
-from inference_service.server.judie_data import History, ChatTurn, Role
+from inference_service.server.judie_data import History, ChatTurn, MessageRole, UserType
 
 
 def get_messages(
@@ -33,9 +33,9 @@ def get_chat_history(
 
     for chat in messages:
         if chat.type == "USER":
-            turn = ChatTurn(role=Role.USER, content=chat.content)
+            turn = ChatTurn(role=MessageRole.USER, content=chat.content)
         elif chat.type == "BOT":
-            turn = ChatTurn(role=Role.ASSISTANT, content=chat.content)
+            turn = ChatTurn(role=MessageRole.ASSISTANT, content=chat.content)
         else:
             continue
 
@@ -156,10 +156,13 @@ def get_user_from_db(
     return None
 
 
-def get_user_type_from_user(user: prisma.models.User) -> str:
-    return user.role
+def get_user_type_from_user(user: prisma.models.User) -> UserType:
+    return UserType[user.role]
 
-def get_user_profile_from_db(user_id: str, app_db: Optional[prisma.Prisma] = None) -> Optional[prisma.models.UserProfile]:
+
+def get_user_profile_from_db(
+    user_id: str, app_db: Optional[prisma.Prisma] = None
+) -> Optional[prisma.models.UserProfile]:
     if not app_db:
         app_db = prisma.Prisma()
 
@@ -167,10 +170,18 @@ def get_user_profile_from_db(user_id: str, app_db: Optional[prisma.Prisma] = Non
 
     user_profile = app_db.userprofile.find_first(
         where={
-            "user_id": user_id,
+            "userId": user_id,
         },
     )
 
     if user_profile is not None:
         return user_profile
     return None
+
+
+def get_grade_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
+    return user_profile.gradeYear
+
+
+def get_purpose_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
+    return user_profile.purpose

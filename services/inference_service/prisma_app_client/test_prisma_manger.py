@@ -24,17 +24,17 @@ def test_get_chat(env_setup):
 def test_get_chat_openai(env_setup):
     chats = prisma_manager.get_chat_openai_fmt(chat_id=TEST_CHAT_ID_1)
     print(chats)
-    assert len(chats) == 2
+    assert len(chats) == 13
     assert chats[0]["role"] == "user"
-    assert "Gregory XIII" in chats[1]["content"]
+    assert "Raphael" in chats[1]["content"]
 
 
 def test_get_chat_length_limit(env_setup):
     chats = prisma_manager.get_chat_openai_fmt(
-        chat_id=TEST_CHAT_ID_1, length_limit=2735
+        chat_id=TEST_CHAT_ID_1, length_limit=2000
     )
     print(chats)
-    assert len(chats) == 1
+    assert len(chats) == 7
     assert chats[0]["role"] == "assistant"
 
 
@@ -65,9 +65,22 @@ def test_get_user(env_setup):
     user = prisma_manager.get_user_from_db(LOCAL_USER_ID)
     print(user)
     print(user.role)
-    assert False
+    assert user.role == "ADMINISTRATOR"
 
-def test_get_user_profile(env_setup):
-    user_profile = prisma_manager.get_user_profile_from_db()
+
+def test_get_user_profile_from_db(env_setup):
+    user_profile = prisma_manager.get_user_profile_from_db(LOCAL_USER_ID)
     print(user_profile)
-    assert user_profile.
+    assert user_profile.gradeYear == "EIGHTH"
+
+
+def test_grade_from_profile(env_setup):
+    user_profile = prisma_manager.get_user_profile_from_db(LOCAL_USER_ID)
+    grade = prisma_manager.get_grade_from_profile(user_profile)
+    assert grade == "EIGHTH"
+
+
+def test_purpose_from_profile(env_setup):
+    user_profile = prisma_manager.get_user_profile_from_db(LOCAL_USER_ID)
+    purpose = prisma_manager.get_purpose_from_profile(user_profile)
+    assert purpose == "CLASSES"
