@@ -1,7 +1,9 @@
 grpcio
-grpcio-tools
 grpcio-health-checking
+grpcio-tools
+lxml
 openai
 pinecone-client
 prisma
-lxml
+python-decouple==3.8
+python-dotenv==1.0.0

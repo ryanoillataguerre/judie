@@ -12,8 +12,8 @@ services:
     networks:
       - dev
     volumes:
-      - ../app-service/prisma/migrations/20230319033407_initial_schema:/docker-entrypoint-initdb.d
-      - judie-postgres-data:/var/lib/postgresql/data
+      - ./dev_init_sql_tmp:/docker-entrypoint-initdb.d
+      - judie-postgres-data-dev:/var/lib/postgresql/data
 
   inference-service:
     privileged: true
@@ -41,5 +41,5 @@ networks:
     driver: bridge
 
 volumes:
-  judie-postgres-data: {}
+  judie-postgres-data-dev: {}
 
