@@ -1,8 +1,11 @@
+import asyncio
+
 import openai
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Awaitable
 import logging
 from dataclasses import dataclass
 from inference_service.server.judie_data import SessionConfig
+from inference_service.prompts.comprehension_prompts import construct_comp_prompt_list
 
 logger = logging.getLogger("inference_logger")
 
@@ -55,6 +58,28 @@ def get_gpt_response_single(messages=None, openai_config: OpenAiConfig = None) -
         logger.error(f"Error parsing OpenAi response: {e}")
 
 
+async def get_gpt_response_async(
+    messages=None, openai_config: OpenAiConfig = None
+) -> Awaitable[str]:
+    """Response single callable asynchronously"""
+
+    chat_response = await openai.ChatCompletion.acreate(
+        model=openai_config.model,
+        messages=messages,
+        temperature=openai_config.temperature,
+        max_tokens=openai_config.max_tokens,
+        top_p=openai_config.top_p,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stream=False,
+    )
+
+    try:
+        return chat_response.choices[0].message.content
+    except AttributeError as e:
+        logger.error(f"Error parsing OpenAi response: {e}")
+
+
 def concat_sys_and_messages_openai(sys_prompt: str, messages: List[Dict]) -> List[Dict]:
     full_messages = [{"role": "system", "content": sys_prompt}]
     full_messages.extend(messages)
@@ -78,25 +103,39 @@ def identify_math_exp(message: str) -> str:
     return openai_response
 
 
-def comprehension_score(session_config: SessionConfig) -> Optional[int]:
-    prompt = [
-        {
-            "role": "system",
-            "content": "You are observing a conversation between a tutor and a student. On a scale of 1 to 10 classify how well the student understood the conversation and subject material given the context of the conversation and the last user response or question after the tutor.  Remember, well formed clarifying or curious questions can show comprehension.  Respond only with the numeric comprehension score on the scale of 1 to 10.",
-        },
-    ] + session_config.history.get_openai_format()[-5:]
+async def comprehension_score(session_config: SessionConfig) -> Optional[float]:
+    prompts = construct_comp_prompt_list(subject=session_config.subject)
     # arbitrarily use last five messages as conversation window
+    history_str = session_config.history.get_last_n_single_string(5)
 
-    comp_score = get_gpt_response_single(
-        messages=prompt,
-        openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
+    comp_responses = await asyncio.gather(
+        *[
+            get_gpt_response_async(
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": history_str},
+                ],
+                openai_config=OpenAiConfig(temperature=0.3, max_tokens=10),
+            )
+            for prompt in prompts
+        ]
     )
-    logger.info(f"Comprehension score: {comp_score}")
 
-    if comp_score.isnumeric():
-        return int(comp_score)
-    else:
-        return None
+    sum_comp = 0
+    num_comps = 0
+    for score in comp_responses:
+        if score.isnumeric():
+            sum_comp += int(score)
+            num_comps += 1
+        else:
+            logger.info(
+                f"Comprehension scorer for chat: {session_config.chat_id} returned "
+                f"non-numeric response: {score}"
+            )
+
+    if num_comps:
+        return sum_comp / num_comps
+    return None
 
 
 def check_for_sensitive_content(session_config: SessionConfig) -> Optional[str]:
