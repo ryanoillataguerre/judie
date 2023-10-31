@@ -62,6 +62,20 @@ class History:
             return True
         return False
 
+    def get_last_n_single_string(self, last_n: int = 5) -> str:
+        i = 1
+        history_block = ""
+
+        while i <= last_n and i <= len(self._chat_turns_list):
+            chat = self._chat_turns_list[-1 * i]
+            if chat.role == Role.USER:
+                history_block = "Student: " + chat.content + "\n" + history_block
+            elif chat.role == Role.ASSISTANT:
+                history_block = "Tutor: " + chat.content + "\n" + history_block
+            i += 1
+
+        return history_block
+
 
 class UserType(Enum):
     STUDENT = "USER"
@@ -81,5 +95,6 @@ class UserProfile:
 class SessionConfig:
     history: History
     user_profile: Optional[UserProfile]
+    chat_id: Optional[str]
     subject: Optional[str] = None
     special_context: Optional[List[str]] = None

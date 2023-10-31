@@ -5,6 +5,7 @@ from inference_service.prisma_app_client import prisma_manager
 from typing import Optional, Iterator, Dict, List
 import logging
 from inference_service.server.judie_data import SessionConfig, UserProfile
+import asyncio
 
 logger = logging.getLogger("inference_logger")
 
@@ -66,6 +67,7 @@ def grab_chat_config(chat_id: str) -> SessionConfig:
 
     return SessionConfig(
         history=prisma_manager.get_chat_history(chat_id=chat_id),
+        chat_id=chat_id,
         subject=prisma_manager.get_subject_from_chat(chat_obj),
         special_context=prisma_manager.get_special_context_from_chat(chat_obj),
         user_profile=grab_user_profile(chat_obj.userId),
@@ -80,7 +82,7 @@ def generate_chat_metadata(chat_config: SessionConfig) -> Dict[str, str]:
     """
     meta_data = {}
 
-    comprehension = openai_manager.comprehension_score(chat_config)
+    comprehension = asyncio.run(openai_manager.comprehension_score(chat_config))
     if comprehension is not None:
         meta_data["comprehension"] = str(comprehension)
 
