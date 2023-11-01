@@ -172,7 +172,7 @@ const SidebarChatItem = ({
           fontWeight: 500,
           width: "100%",
         }}
-        overflowX={"scroll"}
+        overflowX={"auto"}
         isPreviewFocusable={false}
         onChange={(value) => {
           setEditingValue(value);

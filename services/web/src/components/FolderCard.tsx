@@ -49,7 +49,7 @@ const FolderCard = ({
   const purpleHexCode = useToken("colors", colorKey);
   return (
     <VStack
-      overflow={"scroll"}
+      overflow={"auto"}
       h={"15rem"}
       w={"100%"}
       maxW={"16rem"}
