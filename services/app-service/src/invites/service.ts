@@ -282,7 +282,22 @@ export const invite = async (params: CreateInviteBody & { userId: string }) => {
     },
   });
   if (existingUser) {
-    throw new BadRequestError("User already exists");
+    // Add permissions to user
+    const updatePermissionsPromises = [];
+    for (const permission of params.permissions) {
+      updatePermissionsPromises.push(
+        dbClient.permission.create({
+          data: {
+            type: permission.type as PermissionType,
+            organizationId: permission.organizationId,
+            schoolId: permission.schoolId,
+            roomId: permission.roomId,
+            userId: existingUser.id,
+          },
+        })
+      );
+    }
+    await Promise.all(updatePermissionsPromises);
   }
 
   const now = new Date();
@@ -371,9 +386,10 @@ export const bulkInvite = async (
     validatePermissionsPromises.push(async () => {
       let schoolId = undefined;
       let roomId = undefined;
-      const school = await dbClient.school.findUnique({
+      const school = await dbClient.school.findFirst({
         where: {
           name: invite.school,
+          organizationId: params.organizationId,
         },
       });
       if (school) {

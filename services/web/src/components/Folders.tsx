@@ -10,19 +10,24 @@ import { GET_USER_FOLDERS, getUserFoldersQuery } from "@judie/data/queries";
 import useAuth from "@judie/hooks/useAuth";
 import { useQuery } from "react-query";
 import FolderCard from "./FolderCard";
+import { useEffect } from "react";
 
 const Folders = () => {
   const auth = useAuth();
   const foldersQuery = useQuery({
     queryKey: [GET_USER_FOLDERS, auth?.userData?.id],
     queryFn: getUserFoldersQuery,
-    staleTime: 60000,
     enabled: !!auth?.userData?.id,
   });
   const gridSpacing = useBreakpointValue({
     base: "0.5rem",
     md: "1rem",
   });
+
+  useEffect(() => {
+    foldersQuery.refetch();
+  }, []);
+
   return (
     <VStack
       paddingX={"2rem"}

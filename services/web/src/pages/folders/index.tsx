@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Head from "next/head";
 import useAuth from "@judie/hooks/useAuth";
 import SidebarPageContainer from "@judie/components/SidebarPageContainer/SidebarPageContainer";

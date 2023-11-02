@@ -62,7 +62,7 @@ const DashboardHeader = ({
           isLoading={isLoading}
           onClick={onCreateChat}
         >
-          <Text variant={"button"}>+ Create a new chat</Text>
+          <Text variant={"button"}>+ Learn something new</Text>
         </Button>
 
         {!isMobile && (
