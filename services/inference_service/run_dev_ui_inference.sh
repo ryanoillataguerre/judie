@@ -1,6 +1,16 @@
 #!/bin/bash
 
-echo "Starting (takes 10 seconds or so) ..."
+# Default values
+BUILD=""
+SLEEP_DURATION=10
+
+# Check for --build flag
+if [[ $1 == "--build" ]]; then
+    BUILD="--build"
+    SLEEP_DURATION=60
+fi
+
+echo "Starting (takes $SLEEP_DURATION seconds or so) ..."
 
 # Trap CTRL+C and other termination signals to ensure cleanup
 trap cleanup EXIT SIGINT SIGTERM
@@ -34,7 +44,7 @@ tmux split-window -t dev_session:0 -v
 tmux split-window -t dev_session:0 -hf
 
 # In the top-left pane, change to the correct directory and run docker-compose up
-tmux send-keys -t dev_session:0.0 "cd $current_dir; docker-compose up" C-m
+tmux send-keys -t dev_session:0.0 "cd $current_dir; docker-compose up $BUILD" C-m
 
 # Wait for services to start by performing a health check
 #while : ; do
@@ -43,7 +53,7 @@ tmux send-keys -t dev_session:0.0 "cd $current_dir; docker-compose up" C-m
 #    echo "Waiting for services to start..."
 #    sleep 2
 #done
-sleep 10
+sleep $SLEEP_DURATION
 
 # In the bottom-left pane, change to the correct directory and start the postgres interface
 tmux send-keys -t dev_session:0.1 "cd $current_dir; docker exec -it dev_postgres_container psql -U postgres -d postgres" C-m
