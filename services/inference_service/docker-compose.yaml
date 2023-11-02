@@ -30,7 +30,7 @@ services:
     environment:
       LOGGING_LEVEL: info
       GRPC_PORT: 443
-      DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@postgres:5432/postgres}
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       WOLFRAM_APP_ID: ${WOLFRAM_APP_ID}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       PINECONE_API_KEY: ${PINECONE_API_KEY}
