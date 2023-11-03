@@ -22,21 +22,6 @@ def test_get_chat(env_setup):
         print()
 
 
-def test_get_chat_openai(env_setup):
-    chats = prisma_manager.get_chat_openai_fmt(chat_id=LOCAL_ID_1)
-    print(chats)
-    assert len(chats) == 13
-    assert chats[0]["role"] == "user"
-    assert "Raphael" in chats[1]["content"]
-
-
-def test_get_chat_length_limit(env_setup):
-    chats = prisma_manager.get_chat_openai_fmt(chat_id=LOCAL_ID_1, length_limit=2000)
-    print(chats)
-    assert len(chats) == 7
-    assert chats[0]["role"] == "user"
-
-
 def test_get_subject_db(env_setup):
     subject = prisma_manager.get_subject_from_db(chat_id=LOCAL_ID_1)
     assert subject == "AP Art History"

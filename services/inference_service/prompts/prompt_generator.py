@@ -3,10 +3,15 @@ from inference_service.context import context_retriever
 from inference_service.wolfram_manager import math_api_handler
 from inference_service.openai_manager import openai_manager
 from typing import List, Optional
-from inference_service.server.judie_data import UserProfile, GradeYear
+from inference_service.server.judie_data import UserProfile, GradeYear, UserType
 
 
 def generate_level_chunk(user_profile: UserProfile) -> str:
+    """
+    Pull the level modifiers for younger students.  High School and up probably does not need it.
+    :param user_profile: profile object
+    :return: level modifier string
+    """
     if user_profile.grade_level in [GradeYear.FIRST, GradeYear.SECOND, GradeYear.THIRD]:
         return prompt_chunks.LOWER_ELEMENTARY_LEVEL
     elif user_profile.grade_level in [GradeYear.FOURTH, GradeYear.FIFTH]:
@@ -24,16 +29,21 @@ def assemble_prompt_chunks(subject: str, user_profile: Optional[UserProfile] = N
         chunks = prompt_chunks.PROMPT_MAP[subject]
     else:
         user_chunk = prompt_chunks.STUDENT_TUTOR_CHUNK
-        if user_profile.user_type:
-            if user_profile.user_type == "PARENT":
+        if user_profile is not None and user_profile.user_type is not None:
+            if user_profile.user_type == UserType.PARENT:
                 user_chunk = prompt_chunks.PARENT_TUTOR_CHUNK
-
         chunks = user_chunk
+
         if prompt_chunks in prompt_chunks.PROMPT_MAP:
             chunks = "  ".join([chunks, prompt_chunks.PROMPT_MAP[subject]])
 
         if subject in prompt_chunks.MATH_SUBJECTS:
             chunks = "  ".join([chunks, prompt_chunks.MATH_CHUNK])
+
+        if user_profile is not None and user_profile.grade_level is not None:
+            chunks = "  ".join([chunks, generate_level_chunk(user_profile)])
+
+        chunks = "  ".join([chunks, prompt_chunks.SAFETY_CHUNK])
 
     return chunks
 
@@ -48,7 +58,9 @@ def generate_question_answer_prompt(
 
     try:
         if subject:
-            subject_prompt = assemble_prompt_chunks(subject=subject)
+            subject_prompt = assemble_prompt_chunks(
+                subject=subject, user_profile=user_profile
+            )
 
             # special triggers
             if subject in prompt_chunks.MATH_SUBJECTS:

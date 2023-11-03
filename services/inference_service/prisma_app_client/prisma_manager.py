@@ -50,35 +50,6 @@ def get_chat_history(
     return hist
 
 
-def get_chat_openai_fmt(
-    chat_id: str,
-    app_db: Optional[prisma.Prisma] = None,
-    length_limit: Optional[int] = None,
-) -> List[Dict]:
-    chats = get_messages(chat_id=chat_id, app_db=app_db)
-
-    chats_fmtd = deque()
-
-    if length_limit is not None:
-        running_length = 0
-
-    for chat in reversed(chats):
-        if length_limit is not None:
-            running_length += len(chat.content)
-            if running_length > length_limit:
-                break
-
-        if chat.type == "USER":
-            role = "user"
-        elif chat.type == "BOT":
-            role = "assistant"
-        else:
-            continue
-
-        chats_fmtd.appendleft({"role": role, "content": chat.content})
-    return list(chats_fmtd)
-
-
 def get_chat_local():
     """
     Method to mock the DB storage functionality with local memory for local testing
@@ -186,25 +157,41 @@ def get_user_profile_from_db(
     return None
 
 
-def get_grade_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
-    return GradeYear[user_profile.gradeYear]
+def get_grade_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[GradeYear]:
+    if user_profile is not None and user_profile.gradeYear is not None:
+        return GradeYear[user_profile.gradeYear]
+    return None
 
 
 def get_purpose_from_profile(
     user_profile: prisma.models.UserProfile,
 ) -> Optional[AccountPurpose]:
-    return AccountPurpose[user_profile.purpose]
+    if user_profile is not None and user_profile.purpose is not None:
+        return AccountPurpose[user_profile.purpose]
+    return None
 
 
-def get_country_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
-    return user_profile.country
+def get_country_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[str]:
+    if user_profile is not None and user_profile.country is not None:
+        return user_profile.country
+    return None
 
 
-def get_state_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
-    return user_profile.state
+def get_state_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[str]:
+    if user_profile is not None and user_profile.state is not None:
+        return user_profile.state
+    return None
 
 
 def get_subjects_from_profile(
-    user_profile: prisma.models.UserProfile,
+    user_profile: Optional[prisma.models.UserProfile],
 ) -> Optional[List[str]]:
-    return [subject for subject in user_profile.subjects]
+    if user_profile is not None:
+        return [subject for subject in user_profile.subjects]
+    return None

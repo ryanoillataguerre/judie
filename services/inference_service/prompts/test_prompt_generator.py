@@ -4,6 +4,7 @@ from inference_service.context.context_retriever import (
     pull_context_block,
     CONTEXT_LIMIT,
 )
+from inference_service.server.judie_data import UserProfile, UserType, GradeYear
 from dotenv import load_dotenv
 import pinecone
 import os
@@ -65,10 +66,19 @@ def test_chunk_assembly(env_setup):
 
 
 def test_chunk_assembly_parent(env_setup):
+    user_profile = UserProfile(
+        user_type=UserType.PARENT,
+        purpose=None,
+        grade_level=GradeYear.SECOND,
+        country=None,
+        state=None,
+        focus_subjects=None,
+    )
     prompt = prompt_generator.assemble_prompt_chunks(
-        subject="AP Art History", user_type="PARENT"
+        subject="AP Art History", user_profile=user_profile
     )
     assert "parent" in prompt
+    assert "six year old" in prompt
 
 
 def test_chunk_assembly_math(env_setup):
