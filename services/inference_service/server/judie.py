@@ -28,6 +28,7 @@ def yield_judie_response(
             question=history.get_last_user_message(),
             subject=config.subject,
             extra_context=config.special_context,
+            user_profile=config.user_profile,
         )
         logger.info(f"Full prompt: {sys_prompt}")
 
@@ -58,7 +59,11 @@ def grab_user_profile(user_id: str) -> UserProfile:
 
     return UserProfile(
         user_type=prisma_manager.get_user_type_from_user(user_obj),
+        purpose=prisma_manager.get_purpose_from_profile(profile_obj),
         grade_level=prisma_manager.get_grade_from_profile(profile_obj),
+        country=prisma_manager.get_country_from_profile(profile_obj),
+        state=prisma_manager.get_state_from_profile(profile_obj),
+        focus_subjects=None,  # TODO: update once fix is in app
     )
 
 

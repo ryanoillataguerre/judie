@@ -210,6 +210,14 @@ PARENT_TUTOR_CHUNK = "You are a helpful tutor named Judie who helps parents teac
 MATH_CHUNK = "Be careful not to give wrong answers with your Math calculations, and rely on the context."
 
 # ----------
+# Grade level adjustment prompt chunks
+# ----------
+
+LOWER_ELEMENTARY_LEVEL = "Phrase this like you are explaining to a six year old.  Keep it extremely simple and uncomplicate topics where you can."
+UPPER_ELEMENTARY_LEVEL = "Phrase this like you are explaining to a ten year old.  Keep it simple and understandable."
+MIDDLE_SCHOOL_LEVEL = "Phrase this like you are explaining to a twelve year old in middle school. Keep topics straightforward and easy to follow."
+
+# ----------
 # Comprehension prompt chunks
 # ----------
 

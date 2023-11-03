@@ -68,9 +68,9 @@ class History:
 
         while i <= last_n and i <= len(self._chat_turns_list):
             chat = self._chat_turns_list[-1 * i]
-            if chat.role == Role.USER:
+            if chat.role == MessageRole.USER:
                 history_block = "Student: " + chat.content + "\n" + history_block
-            elif chat.role == Role.ASSISTANT:
+            elif chat.role == MessageRole.ASSISTANT:
                 history_block = "Tutor: " + chat.content + "\n" + history_block
             i += 1
 
@@ -85,10 +85,41 @@ class UserType(Enum):
     JUDIE = "JUDIE"
 
 
+class AccountPurpose(Enum):
+    PERSONAL = "PERSONAL"
+    TEST_PREP = "TEST_PREP"
+    CLASSES = "CLASSES"
+    HOMESCHOOLING = "HOMESCHOOLING"
+
+
+class GradeYear(Enum):
+    FIRST = "first"
+    SECOND = "second"
+    THIRD = "third"
+    FOURTH = "fourth"
+    FIFTH = "fifth"
+    SIXTH = "sixth"
+    SEVENTH = "sevent"
+    EIGHTH = "eighth"
+    FRESHMAN = "freshman"
+    SOPHOMORE = "sophomore"
+    JUNIOR = "junior"
+    SENIOR = "senior"
+    UNI_FRESHMAN = "university freshman"
+    UNI_SOPHOMORE = "university sophomore"
+    UNI_JUNIOR = "university junior"
+    UNI_SENIOR = "university senior"
+    GRADUATE = "graduate school"
+
+
 @dataclass
 class UserProfile:
     user_type: Optional[UserType]
-    grade_level: Optional[str]
+    purpose: Optional[AccountPurpose]
+    grade_level: Optional[GradeYear]
+    country: Optional[str]
+    state: Optional[str]
+    focus_subjects: Optional[List[str]]
 
 
 @dataclass

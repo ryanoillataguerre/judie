@@ -3,15 +3,29 @@ from inference_service.context import context_retriever
 from inference_service.wolfram_manager import math_api_handler
 from inference_service.openai_manager import openai_manager
 from typing import List, Optional
+from inference_service.server.judie_data import UserProfile, GradeYear
 
 
-def assemble_prompt_chunks(subject: str, user_type: Optional[str] = None):
+def generate_level_chunk(user_profile: UserProfile) -> str:
+    if user_profile.grade_level in [GradeYear.FIRST, GradeYear.SECOND, GradeYear.THIRD]:
+        return prompt_chunks.LOWER_ELEMENTARY_LEVEL
+    elif user_profile.grade_level in [GradeYear.FOURTH, GradeYear.FIFTH]:
+        return prompt_chunks.UPPER_ELEMENTARY_LEVEL
+    elif user_profile.grade_level in [
+        GradeYear.SIXTH,
+        GradeYear.SEVENTH,
+        GradeYear.EIGHTH,
+    ]:
+        return prompt_chunks.MIDDLE_SCHOOL_LEVEL
+
+
+def assemble_prompt_chunks(subject: str, user_profile: Optional[UserProfile] = None):
     if subject in prompt_chunks.NON_TUTOR_SUBJECTS:
         chunks = prompt_chunks.PROMPT_MAP[subject]
     else:
         user_chunk = prompt_chunks.STUDENT_TUTOR_CHUNK
-        if user_type:
-            if user_type == "PARENT":
+        if user_profile.user_type:
+            if user_profile.user_type == "PARENT":
                 user_chunk = prompt_chunks.PARENT_TUTOR_CHUNK
 
         chunks = user_chunk
@@ -25,7 +39,10 @@ def assemble_prompt_chunks(subject: str, user_type: Optional[str] = None):
 
 
 def generate_question_answer_prompt(
-    question: str, subject: str = None, extra_context: List[str] = []
+    question: str,
+    subject: str = None,
+    extra_context: List[str] = [],
+    user_profile: Optional[UserProfile] = None,
 ) -> str:
     special_context = extra_context
 

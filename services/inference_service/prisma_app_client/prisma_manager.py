@@ -2,7 +2,14 @@ from typing import Optional
 import prisma
 from typing import List, Dict
 from collections import deque
-from inference_service.server.judie_data import History, ChatTurn, MessageRole, UserType
+from inference_service.server.judie_data import (
+    History,
+    ChatTurn,
+    MessageRole,
+    UserType,
+    AccountPurpose,
+    GradeYear,
+)
 
 
 def get_messages(
@@ -57,7 +64,6 @@ def get_chat_openai_fmt(
 
     for chat in reversed(chats):
         if length_limit is not None:
-            print(chat.content)
             running_length += len(chat.content)
             if running_length > length_limit:
                 break
@@ -129,6 +135,7 @@ def get_assignment_from_db(
 def get_special_context_from_chat(chat: prisma.models.Chat) -> List[str]:
     context = []
     for tag in chat.tags:
+        print(f"TAG: {tag}")
         if tag == "assignment":
             special_content = get_assignment_from_db(chat_id=chat.id)
         else:
@@ -180,8 +187,24 @@ def get_user_profile_from_db(
 
 
 def get_grade_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
-    return user_profile.gradeYear
+    return GradeYear[user_profile.gradeYear]
 
 
-def get_purpose_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
-    return user_profile.purpose
+def get_purpose_from_profile(
+    user_profile: prisma.models.UserProfile,
+) -> Optional[AccountPurpose]:
+    return AccountPurpose[user_profile.purpose]
+
+
+def get_country_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
+    return user_profile.country
+
+
+def get_state_from_profile(user_profile: prisma.models.UserProfile) -> Optional[str]:
+    return user_profile.state
+
+
+def get_subjects_from_profile(
+    user_profile: prisma.models.UserProfile,
+) -> Optional[List[str]]:
+    return [subject for subject in user_profile.subjects]
