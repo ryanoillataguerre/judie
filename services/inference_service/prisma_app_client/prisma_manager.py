@@ -2,16 +2,14 @@ from typing import Optional
 import prisma
 from typing import List, Dict
 from collections import deque
-from enum import Enum
-from inference_service.server.judie_data import History, ChatTurn, Role
-
-
-class UserType(Enum):
-    STUDENT = "USER"
-    PARENT = "PARENT"
-    TEACHER = "TEACHER"
-    ADMINISTRATOR = "ADMINISTRATOR"
-    JUDIE = "JUDIE"
+from inference_service.server.judie_data import (
+    History,
+    ChatTurn,
+    MessageRole,
+    UserType,
+    AccountPurpose,
+    GradeYear,
+)
 
 
 def get_messages(
@@ -42,44 +40,14 @@ def get_chat_history(
 
     for chat in messages:
         if chat.type == "USER":
-            turn = ChatTurn(role=Role.USER, content=chat.content)
+            turn = ChatTurn(role=MessageRole.USER, content=chat.content)
         elif chat.type == "BOT":
-            turn = ChatTurn(role=Role.ASSISTANT, content=chat.content)
+            turn = ChatTurn(role=MessageRole.ASSISTANT, content=chat.content)
         else:
             continue
 
         hist.add_turn(turn)
     return hist
-
-
-def get_chat_openai_fmt(
-    chat_id: str,
-    app_db: Optional[prisma.Prisma] = None,
-    length_limit: Optional[int] = None,
-) -> List[Dict]:
-    chats = get_messages(chat_id=chat_id, app_db=app_db)
-
-    chats_fmtd = deque()
-
-    if length_limit is not None:
-        running_length = 0
-
-    for chat in reversed(chats):
-        if length_limit is not None:
-            print(chat.content)
-            running_length += len(chat.content)
-            if running_length > length_limit:
-                break
-
-        if chat.type == "USER":
-            role = "user"
-        elif chat.type == "BOT":
-            role = "assistant"
-        else:
-            continue
-
-        chats_fmtd.appendleft({"role": role, "content": chat.content})
-    return list(chats_fmtd)
 
 
 def get_chat_local():
@@ -138,6 +106,7 @@ def get_assignment_from_db(
 def get_special_context_from_chat(chat: prisma.models.Chat) -> List[str]:
     context = []
     for tag in chat.tags:
+        print(f"TAG: {tag}")
         if tag == "assignment":
             special_content = get_assignment_from_db(chat_id=chat.id)
         else:
@@ -165,5 +134,64 @@ def get_user_from_db(
     return None
 
 
-def get_user_type_from_user(user: prisma.models.User) -> str:
-    return user.role
+def get_user_type_from_user(user: prisma.models.User) -> UserType:
+    return UserType[user.role]
+
+
+def get_user_profile_from_db(
+    user_id: str, app_db: Optional[prisma.Prisma] = None
+) -> Optional[prisma.models.UserProfile]:
+    if not app_db:
+        app_db = prisma.Prisma()
+
+    app_db.connect()
+
+    user_profile = app_db.userprofile.find_first(
+        where={
+            "userId": user_id,
+        },
+    )
+
+    if user_profile is not None:
+        return user_profile
+    return None
+
+
+def get_grade_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[GradeYear]:
+    if user_profile is not None and user_profile.gradeYear is not None:
+        return GradeYear[user_profile.gradeYear]
+    return None
+
+
+def get_purpose_from_profile(
+    user_profile: prisma.models.UserProfile,
+) -> Optional[AccountPurpose]:
+    if user_profile is not None and user_profile.purpose is not None:
+        return AccountPurpose[user_profile.purpose]
+    return None
+
+
+def get_country_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[str]:
+    if user_profile is not None and user_profile.country is not None:
+        return user_profile.country
+    return None
+
+
+def get_state_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[str]:
+    if user_profile is not None and user_profile.state is not None:
+        return user_profile.state
+    return None
+
+
+def get_subjects_from_profile(
+    user_profile: Optional[prisma.models.UserProfile],
+) -> Optional[List[str]]:
+    if user_profile is not None:
+        return [subject for subject in user_profile.subjects]
+    return None

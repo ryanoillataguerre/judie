@@ -4,7 +4,7 @@ from typing import List, Dict, Optional
 from collections import deque
 
 
-class Role(Enum):
+class MessageRole(Enum):
     USER = "user"
     ASSISTANT = "assistant"
     SYSTEM = "system"
@@ -12,7 +12,7 @@ class Role(Enum):
 
 @dataclass
 class ChatTurn:
-    role: Role
+    role: MessageRole
     content: str
 
 
@@ -34,7 +34,7 @@ class History:
     def get_last_user_message(self) -> Optional[str]:
         i = 1
         while i <= len(self._chat_turns_list):
-            if self._chat_turns_list[-1 * i].role == Role.USER:
+            if self._chat_turns_list[-1 * i].role == MessageRole.USER:
                 return self._chat_turns_list[-1 * i].content
             i += 1
         return None
@@ -58,7 +58,7 @@ class History:
     def last_msg_is_user(self) -> bool:
         if len(self._chat_turns_list) == 0:
             return False
-        if self._chat_turns_list[-1].role == Role.USER:
+        if self._chat_turns_list[-1].role == MessageRole.USER:
             return True
         return False
 
@@ -68,19 +68,64 @@ class History:
 
         while i <= last_n and i <= len(self._chat_turns_list):
             chat = self._chat_turns_list[-1 * i]
-            if chat.role == Role.USER:
+            if chat.role == MessageRole.USER:
                 history_block = "Student: " + chat.content + "\n" + history_block
-            elif chat.role == Role.ASSISTANT:
+            elif chat.role == MessageRole.ASSISTANT:
                 history_block = "Tutor: " + chat.content + "\n" + history_block
             i += 1
 
         return history_block
 
 
+class UserType(Enum):
+    STUDENT = "USER"
+    PARENT = "PARENT"
+    TEACHER = "TEACHER"
+    ADMINISTRATOR = "ADMINISTRATOR"
+    JUDIE = "JUDIE"
+
+
+class AccountPurpose(Enum):
+    PERSONAL = "PERSONAL"
+    TEST_PREP = "TEST_PREP"
+    CLASSES = "CLASSES"
+    HOMESCHOOLING = "HOMESCHOOLING"
+
+
+class GradeYear(Enum):
+    FIRST = "first"
+    SECOND = "second"
+    THIRD = "third"
+    FOURTH = "fourth"
+    FIFTH = "fifth"
+    SIXTH = "sixth"
+    SEVENTH = "sevent"
+    EIGHTH = "eighth"
+    FRESHMAN = "freshman"
+    SOPHOMORE = "sophomore"
+    JUNIOR = "junior"
+    SENIOR = "senior"
+    UNI_FRESHMAN = "university freshman"
+    UNI_SOPHOMORE = "university sophomore"
+    UNI_JUNIOR = "university junior"
+    UNI_SENIOR = "university senior"
+    GRADUATE = "graduate school"
+
+
+@dataclass
+class UserProfile:
+    user_type: Optional[UserType]
+    purpose: Optional[AccountPurpose]
+    grade_level: Optional[GradeYear]
+    country: Optional[str]
+    state: Optional[str]
+    focus_subjects: Optional[List[str]]
+
+
 @dataclass
 class SessionConfig:
     history: History
+    user_profile: Optional[UserProfile]
     chat_id: Optional[str]
     subject: Optional[str] = None
     special_context: Optional[List[str]] = None
-    user_type: Optional[str] = None

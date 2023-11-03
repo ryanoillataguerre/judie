@@ -1,7 +1,10 @@
 from inference_service.server import judie_data
 from inference_service.server import judie
 from inference_service.server.judie import generate_chat_metadata
-from inference_service.test_client.test_chats_config import TEST_CHAT_ID_2
+from inference_service.test_client.test_chats_config import (
+    TEST_CHAT_ID_2,
+    TEST_CHAT_ID_1,
+)
 from inference_service.test_client.testing_utils import env_setup
 
 
@@ -9,6 +12,11 @@ def test_get_config(env_setup):
     sesh = judie.grab_chat_config(TEST_CHAT_ID_2)
     assert sesh.subject == "AP Microeconomics"
     assert "core" in sesh.history.get_last_user_message()
+
+
+def test_get_config_w_profile(env_setup):
+    sesh = judie.grab_chat_config(TEST_CHAT_ID_1)
+    assert sesh.user_profile.user_type == judie_data.UserType.STUDENT
 
 
 def test_judie_stream(env_setup):
@@ -20,17 +28,19 @@ def test_judie_stream(env_setup):
 
 
 def test_create_chat_turn(env_setup):
-    turn = judie_data.ChatTurn(role=judie_data.Role.USER, content="Sick content here")
+    turn = judie_data.ChatTurn(
+        role=judie_data.MessageRole.USER, content="Sick content here"
+    )
 
     assert turn.content == "Sick content here"
-    assert turn.role == judie_data.Role.USER
+    assert turn.role == judie_data.MessageRole.USER
 
 
 def test_create_history(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -39,7 +49,7 @@ def test_create_history(env_setup):
 
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.ASSISTANT,
+            role=judie_data.MessageRole.ASSISTANT,
             content="Wow that was sick content",
         )
     )
@@ -48,7 +58,7 @@ def test_create_history(env_setup):
 
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="This is even sicker",
         )
     )
@@ -60,7 +70,7 @@ def test_history_openai_fmt(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -74,7 +84,7 @@ def test_history_openai_fmt_len_limit(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
@@ -86,7 +96,7 @@ def test_history_openai_fmt_len_limit(env_setup):
 
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.ASSISTANT,
+            role=judie_data.MessageRole.ASSISTANT,
             content="Wow that was sick content",
         )
     )
@@ -100,19 +110,19 @@ def test_history_single_str(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.ASSISTANT,
+            role=judie_data.MessageRole.ASSISTANT,
             content="Wow that was sick content",
         )
     )
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Thanks dude",
         )
     )
@@ -125,13 +135,13 @@ def test_session_config(env_setup):
     history = judie_data.History()
     history.add_turn(
         judie_data.ChatTurn(
-            role=judie_data.Role.USER,
+            role=judie_data.MessageRole.USER,
             content="Sick content here",
         )
     )
 
     sesh_config = judie_data.SessionConfig(
-        history=history, chat_id="1", subject="Microeconomics"
+        history=history, user_profile=None, chat_id="1", subject="Microeconomics"
     )
 
     assert sesh_config.subject == "Microeconomics"

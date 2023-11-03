@@ -1,9 +1,9 @@
-TEST_CHAT_ID_1 = "52de7f7c-d4fe-4e33-91d6-a806ea1a3e42"
+TEST_CHAT_ID_1 = "8cdae3a9-b93c-4e92-b655-d7d088259ec9"
 TEST_CHAT_ID_2 = "02a4a4a0-34fd-45aa-b8a2-c58e7316f7a3"
 
 SANDBOX_ID_1 = "f579698f-4608-41a2-ac2b-5ab272093510"
 
-LOCAL_ID_1 = "2320b4b0-1b0b-45bc-987c-cfc381a623ca"
-LOCAL_ID_2 = "e3aac7df-93f1-41a0-8b77-db1c74ca8940"
+LOCAL_ID_1 = "a2586a3f-ebb6-425d-9022-47dd53c91ce8"
+LOCAL_ID_3 = "a167d4c3-c58c-4ec0-adc4-e47febbb4e7a"
 
-LOCAL_USER_ID = "9a6efffb-9ba0-4d4b-b54f-d4fb9dc22ab4"
+LOCAL_USER_ID = "a9a2402f-f344-4d0d-b115-4fcd705c4a42"
