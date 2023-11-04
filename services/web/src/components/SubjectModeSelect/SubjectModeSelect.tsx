@@ -110,6 +110,7 @@ const SubjectModeSelect = ({ subject }: SubjectModeSelectProps) => {
           <Box display={"Flex"} flexDir={"column"} alignItems={"center"}>
             {chatModes.map((key, idx) => (
               <Tag
+                key={`${key}-${idx}`}
                 as={"div"}
                 size={"lg"}
                 w={"90%"}
