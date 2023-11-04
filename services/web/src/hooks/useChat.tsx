@@ -54,6 +54,7 @@ interface UseChatData {
   tempUserMessageChatId?: string;
   reset: () => void;
   uploadAssignment: (data: FormData) => void;
+  existingChatQuery: ReturnType<typeof useQuery>;
 }
 
 export const ChatContext = createContext<UseChatData>({
@@ -73,6 +74,7 @@ export const ChatContext = createContext<UseChatData>({
   tempUserMessageChatId: undefined,
   reset: () => {},
   uploadAssignment: () => {},
+  existingChatQuery: {} as ReturnType<typeof useQuery>,
 });
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
@@ -525,6 +527,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       tempUserMessageChatId,
       reset,
       uploadAssignment,
+      existingChatQuery,
     };
   }, [
     existingChatQuery.data,
@@ -543,6 +546,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     tempUserMessageChatId,
     reset,
     uploadAssignment,
+    existingChatQuery,
   ]);
   return (
     <ChatContext.Provider value={providerValue}>

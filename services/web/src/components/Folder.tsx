@@ -165,7 +165,10 @@ const Folder = ({ id }: { id: string }) => {
                 borderRadius={"0.5rem"}
               />
               <IconButton
-                onClick={() => setIsEditingTitle(false)}
+                onClick={() => {
+                  setFolderTitle(originalFolderTitle);
+                  setIsEditingTitle(false);
+                }}
                 colorScheme="red"
                 aria-label="cancel folder name edit"
                 icon={<RxCross2 />}

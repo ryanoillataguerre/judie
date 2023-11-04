@@ -205,6 +205,12 @@ export enum MessageType {
   USER = "USER",
   SYSTEM = "SYSTEM",
 }
+
+export enum ChatMode {
+  TUTOR = "TUTOR",
+  LESSON = "LESSON",
+  PRACTICE = "PRACTICE",
+}
 export interface Message {
   id: string;
   content: string;
@@ -234,6 +240,7 @@ export interface Chat {
   userId: string;
   userTitle?: string;
   subject?: string;
+  mode?: ChatMode;
   createdAt: Date;
   updatedAt: Date | null;
   messages: Message[];

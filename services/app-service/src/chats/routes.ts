@@ -40,6 +40,7 @@ const transformChat = (
     id: chat.id,
     userTitle: chat.userTitle,
     subject: chat.subject,
+    mode: chat.mode,
     createdAt: chat.createdAt,
     updatedAt: chat.updatedAt,
     userId: chat.userId,
@@ -179,6 +180,7 @@ router.put(
     param("chatId").exists(),
     body("userTitle").optional(),
     body("folderId").optional(),
+    body("mode").optional(),
   ],
   errorPassthrough(handleValidationErrors),
   errorPassthrough(async (req: Request, res: Response) => {
@@ -187,7 +189,7 @@ router.put(
       throw new UnauthorizedError("No user id found in session");
     }
     const { chatId } = req.params;
-    const { subject, userTitle, folderId } = req.body;
+    const { subject, userTitle, folderId, mode } = req.body;
     const existingChat = await getChat({ id: chatId });
     if (!existingChat) {
       throw new NotFoundError("Chat not found");
@@ -199,6 +201,7 @@ router.put(
         userId: session.userId,
         subject,
         userTitle,
+        mode,
         folderId: folderId || existingChat.chatFolderId,
         chatId,
       });
@@ -208,6 +211,7 @@ router.put(
     const newChat = await updateChat(chatId, {
       subject,
       userTitle,
+      mode,
       ...(folderId
         ? {
             folder: {
