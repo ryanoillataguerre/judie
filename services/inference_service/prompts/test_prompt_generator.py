@@ -1,5 +1,5 @@
 import pytest
-from inference_service.prompts import prompt_generator
+from inference_service.prompts import prompt_generator, comprehension_prompts
 from inference_service.context.context_retriever import (
     pull_context_block,
     CONTEXT_LIMIT,
@@ -79,3 +79,9 @@ def test_chunk_assembly_math(env_setup):
 def test_chunk_assembly_non_tutor(env_setup):
     prompt = prompt_generator.assemble_prompt_chunks(subject="Testing")
     assert "tutor" not in prompt
+
+
+def test_comprehension_prompts(env_setup):
+    prompts = comprehension_prompts.construct_comp_prompt_list(subject="Test Subject")
+    for prompt in prompts:
+        assert "Test" in prompt

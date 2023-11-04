@@ -8,6 +8,7 @@ brew install node
 brew install yarn
 brew install terraform
 
+/Applications/Python\ 3.10/Install\ Certificates.command
 
 if [[ ! -d ../python/ve ]]; then
   echo "No Python virtual environment installed. Installing ...."

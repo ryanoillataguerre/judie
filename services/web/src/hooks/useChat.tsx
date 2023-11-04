@@ -477,9 +477,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     {
       queryFn: getUserFoldersQuery,
       staleTime: 60000,
-      enabled: false,
     }
   );
+
   const submitSubject = useCallback(
     async (subject: string) => {
       let overrideChatId = undefined;
@@ -489,7 +489,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           subject,
         });
         overrideChatId = result.id;
-        return;
       }
       await putChat.mutateAsync({
         chatId: overrideChatId || chatId,

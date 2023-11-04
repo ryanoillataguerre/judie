@@ -161,7 +161,7 @@ router.post(
         userId: session.userId,
         subject: req.body.subject,
         userTitle: req.body.userTitle,
-        folderId: req.body.folderId,
+        folderId: req.body.folderId || newChat.chatFolderId,
         chatId: newChat.id,
       });
     }
@@ -201,8 +201,8 @@ router.put(
         userId: session.userId,
         subject,
         userTitle,
-        folderId,
         mode,
+        folderId: folderId || existingChat.chatFolderId,
         chatId,
       });
     }

@@ -57,6 +57,9 @@ export const getFolderById = (id: string) => {
     },
     include: {
       chats: {
+        orderBy: {
+          createdAt: "desc",
+        },
         where: {
           deletedAt: null,
         },
