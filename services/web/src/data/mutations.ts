@@ -2,6 +2,7 @@ import { InviteSheetRole } from "@judie/components/admin/BulkInviteModal";
 import { HTTPResponseError, baseFetch } from "./baseFetch";
 import {
   Chat,
+  ChatMode,
   GradeYear,
   PermissionType,
   UserProfile,
@@ -136,11 +137,13 @@ export const putChatMutation = async ({
   subject,
   userTitle,
   folderId,
+  mode,
 }: {
   chatId: string;
   subject?: string;
   userTitle?: string;
   folderId?: string;
+  mode?: ChatMode;
 }): Promise<Chat> => {
   const response = await baseFetch({
     url: `/chat/${chatId}`,
@@ -149,6 +152,7 @@ export const putChatMutation = async ({
       subject,
       userTitle,
       folderId,
+      mode,
     },
   });
   return response.data;

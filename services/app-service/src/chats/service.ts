@@ -1,7 +1,7 @@
 import { InternalError, NotFoundError } from "../utils/errors/index.js";
 import { ChatCompletionRequestMessage } from "openai";
 import dbClient from "../utils/prisma.js";
-import { Chat, Message, MessageType, Prisma } from "@prisma/client";
+import { Chat, Message, MessageType, Prisma, Mode } from "@prisma/client";
 import { Response } from "express";
 import { getChatCompletion } from "../inference/service.js";
 
@@ -269,12 +269,14 @@ export const updateChatSubject = async ({
   subject,
   userTitle,
   folderId,
+  mode,
   chatId,
 }: {
   userId: string;
   subject: string;
   userTitle: string;
   folderId?: string;
+  mode?: Mode;
   chatId: string;
 }) => {
   if (folderId) {
@@ -299,6 +301,7 @@ export const updateChatSubject = async ({
   if (existingFolder) {
     return await updateChat(chatId, {
       subject,
+      mode,
       userTitle,
       folder: {
         connect: {

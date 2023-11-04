@@ -125,6 +125,12 @@ enum Purpose {
   HOMESCHOOLING
 }
 
+enum Mode {
+  TUTOR
+  LESSON
+  PRACTICE
+}
+
 model UserProfile {
   purpose     Purpose?
   prepForTest String?    @map("prep_for_test")
@@ -146,6 +152,7 @@ model Chat {
   id           String    @id @default(uuid())
   userId       String    @map("user_id")
   subject      String?
+  mode         Mode?     @default(TUTOR)
   userTitle    String?   @map("user_title")
   chatFolderId String?   @map("chat_folder_id")
   tags         String[]

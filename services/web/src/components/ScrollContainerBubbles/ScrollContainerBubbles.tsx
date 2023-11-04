@@ -1,15 +1,8 @@
-import {
-  Box,
-  Flex,
-  Tag,
-  TagLabel,
-  useColorModeValue,
-  Divider,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Flex } from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
 import { ChatContext } from "@judie/hooks/useChat";
 import { useContext } from "react";
-import { getTopicEmoji } from "@judie/utils/topicEmoji";
+import SubjectModeSelect from "../SubjectModeSelect/SubjectModeSelect";
 
 const ScrollContainerBubbles = ({
   children,
@@ -25,12 +18,6 @@ const ScrollContainerBubbles = ({
 
   const chatContext = useContext(ChatContext);
   const subject = chatContext.chat?.subject;
-  const bgColor = useColorModeValue("gray.200", "gray.700");
-  const fontColor = useColorModeValue("#000", "#FFF");
-  const subjectBorderColor = useColorModeValue(
-    "rgba(60, 20, 120, 0.80)",
-    "whiteAlpha.300"
-  );
 
   useEffect(() => {
     if (defaultTop) {
@@ -66,28 +53,7 @@ const ScrollContainerBubbles = ({
         m={"auto"}
       >
         <div ref={topRef} />
-        {subject && (
-          <Tag
-            as={"div"}
-            size={"xl"}
-            variant={"solid"}
-            bg={bgColor}
-            borderRadius="full"
-            width={"fit-content"}
-            mx={"auto"}
-            px={"20px"}
-            py={"10px"}
-            border={"1px solid"}
-            borderColor={subjectBorderColor}
-            my={"30px"}
-            position={"sticky"}
-            top={0}
-            zIndex={1}
-            color={fontColor}
-          >
-            <TagLabel>{`${getTopicEmoji(subject)} ${subject}`}</TagLabel>
-          </Tag>
-        )}
+        {subject && <SubjectModeSelect subject={subject} />}
         {children}
         <div ref={bottomRef} />
       </Flex>
