@@ -38,6 +38,7 @@ const SubjectModeSelect = ({ subject }: SubjectModeSelectProps) => {
 
   const chatMode = chatContext.chat?.mode;
   const bgColor = useColorModeValue("gray.200", "gray.700");
+  const buttonHoverBGColor = useColorModeValue("gray.300", "gray.600");
   const fontColor = useColorModeValue("#000", "#FFF");
   const subjectBorderColor = useColorModeValue(
     "rgba(60, 20, 120, 0.80)",
@@ -127,7 +128,7 @@ const SubjectModeSelect = ({ subject }: SubjectModeSelectProps) => {
                 onClick={() => handleSelectModeClick(chatModes[idx])}
                 _hover={{
                   cursor: "pointer",
-                  bg: useColorModeValue("gray.300", "gray.600"),
+                  bg: buttonHoverBGColor,
                 }}
               >
                 <TagLabel w={"100%"}>{getChatModeText(key)}</TagLabel>
