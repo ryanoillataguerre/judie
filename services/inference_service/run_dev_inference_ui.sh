@@ -23,7 +23,7 @@ trap cleanup EXIT SIGINT SIGTERM
 BUILD=""
 BUILD_MSG=""
 STARTUP_DURATION=5
-HEALTH_CHECK_TIMEOUT=20
+HEALTH_CHECK_TIMEOUT=10
 WINDOWS=false
 
 # Check for flags
@@ -62,6 +62,10 @@ wait_for_server_readiness() {
     # Get the start time
     start_time=$(date +%s)
 
+    # Set PYTHONPATH
+    export PYTHONPATH=$current_dir:../:$PYTHONPATH
+    echo $PYTHONPATH
+
     while : ; do
         # Get the current time
         current_time=$(date +%s)
@@ -76,9 +80,7 @@ wait_for_server_readiness() {
         fi
 
         # Attempt to run the health check
-        cd $current_dir
-        export PYTHONPATH=$PYTHONPATH:../
-        python -m test_client/dev_inference_ui --health-check
+        python -m test_client.dev_inference_ui --health-check
         if [[ $? -eq 0 ]]; then
             echo "Services are ready."
             break
@@ -113,7 +115,7 @@ if [ "${WINDOWS}" = true ]; then
     tmux send-keys -t dev_session:2 "cd $current_dir; docker exec -it dev_postgres_container psql -U postgres -d postgres" C-m
 
     tmux new-window -t dev_session:3 -n 'chat'
-    tmux send-keys -t dev_session:3 "cd $current_dir; export PYTHONPATH=\"$PYTHONPATH:../\"; python -m test_client/dev_inference_ui" C-m
+    tmux send-keys -t dev_session:3 "cd $current_dir; export PYTHONPATH=\"$PYTHONPATH:../\"; python -m test_client.dev_inference_ui" C-m
 
 else
     # Create one window will separate panes
@@ -131,7 +133,7 @@ else
 
     # Split the bottom pane and send command for python ui
     tmux split-window -t dev_session:0.1 -h
-    tmux send-keys -t dev_session:0.2 "cd $current_dir; export PYTHONPATH=\"$PYTHONPATH:../\"; python -m test_client/dev_inference_ui" C-m
+    tmux send-keys -t dev_session:0.2 "cd $current_dir; export PYTHONPATH=\"$PYTHONPATH:../\"; python -m test_client.dev_inference_ui" C-m
 fi
 
 # Attach to the tmux session
