@@ -22,3 +22,5 @@ altair_saver
 vl-convert-python
 lxml
 pytest-asyncio
+langchain
+PyPDF2

@@ -3,8 +3,8 @@ import sys
 import os
 
 
-def setup_logger():
-    logger = logging.getLogger("inference_logger")
+def setup_logger(name="inference_logger"):
+    logger = logging.getLogger(name)
 
     log_level_env = os.getenv("LOGGING_LEVEL")
 

@@ -2,7 +2,7 @@ from inference_service.server import judie_data
 from inference_service.server import judie
 from inference_service.server.judie import generate_chat_metadata
 from inference_service.test_client.test_chats_config import TEST_CHAT_ID_2
-from inference_service.test_client.testing_utils import env_setup
+from inference_service.test_client.testing_utils import env_setup_fixture
 
 
 def test_get_config(env_setup):
