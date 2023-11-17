@@ -1,4 +1,4 @@
-from inference_service.test_client.testing_utils import env_setup
+from inference_service.test_client.testing_utils import env_setup_fixture
 from inference_service.wolfram_manager import math_api_handler
 
 
