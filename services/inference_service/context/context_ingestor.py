@@ -13,15 +13,13 @@ logger = logging.getLogger("cmd_logger")
 def read_text_from_pdf(file_path, pages: Optional[List[int]] = None) -> str:
     logger.info(file_path)
     reader = PyPDF2.PdfReader(file_path)
-    print(reader.pages[20].extract_text())
-    print(len(reader.pages[20].extract_text()))
 
     if pages is None:
         pages = range(len(reader.pages))
 
     total_text = ""
 
-    print("Parsing pages of PDF...")
+    logger.info("Parsing pages of PDF...")
     for i in tqdm(pages):
         total_text += reader.pages[i].extract_text()
 
@@ -56,7 +54,7 @@ def upload_chunks(
     vectors = []
     id_index = 1
 
-    print(
+    logger.info(
         f"Uploading chunked text to Pinecone index: {index_name}, on namespace: {namespace}"
     )
     for chunk in tqdm(chunks):

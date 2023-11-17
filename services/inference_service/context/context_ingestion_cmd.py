@@ -13,6 +13,9 @@ def parse_pages(page_ranges: List[str]):
     :param page_ranges: list of strs in format '33-35'
     :return: List of int page indices
     """
+    if page_ranges is None:
+        return None
+
     page_nums = []
     for pages in page_ranges:
         start_page = int(pages.split("-")[0])
